@@ -405,7 +405,7 @@ const Portrait = ({ galaxy, theme }) => {
         </>
       )}
       <div style={{ position:'absolute', inset:'6% 6% 0', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:1 }}>
-        <img src={isLight ? 'Images/omar-light.png' : 'Images/omar.png'} alt="Omar Tavarez" draggable={false} style={{
+        <img src={isLight ? '/Images/omar-light.png' : '/Images/omar.png'} alt="Omar Tavarez" draggable={false} style={{
           width:'100%', height:'100%', objectFit:'contain', objectPosition:'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10,114,239,0.16)) drop-shadow(0 26px 48px rgba(255,91,79,0.12)) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
@@ -758,15 +758,15 @@ const ABOUT_LONG = [
 ];
 
 const COMPANY_LOGOS = [
-  { name: 'Plastiq',      src: 'Images/Carousel/plastiq.svg',                    maxW: 90,  maxH: 24, basis: 110 },
-  { name: 'Disney',        src: 'Images/Carousel/disney.svg',                     maxW: 65,  maxH: 24, basis: 70 },
-  { name: 'Raven Health',  src: 'Images/Carousel/raven-health-logo.svg',          maxW: 100, maxH: 26, basis: 130 },
-  { name: 'GoNation',      src: 'Images/Carousel/gonation-dark.svg',              maxW: 110, maxH: 20, basis: 140 },
-  { name: 'Time Inc.',     src: 'Images/Carousel/Time_Inc._logo.svg',             maxW: 75,  maxH: 20, basis: 85 },
-  { name: 'Pyle',          src: 'Images/Carousel/Pyle_wordmark.svg',              maxW: 70,  maxH: 28, basis: 100 },
-  { name: 'Wisdom',        src: 'Images/Carousel/Wisdom_Logo_Full-White.svg',     maxW: 130, maxH: 34, basis: 115 },
-  { name: 'Meredith',      src: 'Images/Carousel/meredith-vector-logo.svg',       maxW: 120, maxH: 26, basis: 150 },
-  { name: 'Simplero',      src: 'Images/Carousel/simplero.svg',                   maxW: 90,  maxH: 24, basis: 110 },
+  { name: 'Plastiq',      src: '/Images/Carousel/plastiq.svg',                    maxW: 90,  maxH: 24, basis: 110 },
+  { name: 'Disney',        src: '/Images/Carousel/disney.svg',                     maxW: 65,  maxH: 24, basis: 70 },
+  { name: 'Raven Health',  src: '/Images/Carousel/raven-health-logo.svg',          maxW: 100, maxH: 26, basis: 130 },
+  { name: 'GoNation',      src: '/Images/Carousel/gonation-dark.svg',              maxW: 110, maxH: 20, basis: 140 },
+  { name: 'Time Inc.',     src: '/Images/Carousel/Time_Inc._logo.svg',             maxW: 75,  maxH: 20, basis: 85 },
+  { name: 'Pyle',          src: '/Images/Carousel/Pyle_wordmark.svg',              maxW: 70,  maxH: 28, basis: 100 },
+  { name: 'Wisdom',        src: '/Images/Carousel/Wisdom_Logo_Full-White.svg',     maxW: 130, maxH: 34, basis: 115 },
+  { name: 'Meredith',      src: '/Images/Carousel/meredith-vector-logo.svg',       maxW: 120, maxH: 26, basis: 150 },
+  { name: 'Simplero',      src: '/Images/Carousel/simplero.svg',                   maxW: 90,  maxH: 24, basis: 110 },
 ];
 
 const LogoCarousel = () => (
@@ -1397,7 +1397,7 @@ const Contact = () => (
         </h2>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
           <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" />
-          <ContactCard label="Resume / CV" value="Open PDF" href="Omar%20Tavarez%20Resume%20%28v2.0%29%20.pdf" eventName="resume_download" />
+          <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
           <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
           <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" />
           <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" />
@@ -1567,7 +1567,7 @@ const App = () => {
       ? Promise.resolve()
       : new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
-    const heroSrc = theme === 'light' ? 'Images/omar-light.png' : 'Images/omar.png';
+    const heroSrc = theme === 'light' ? '/Images/omar-light.png' : '/Images/omar.png';
     const heroImageReady = new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve();
