@@ -875,6 +875,7 @@ const CASE_STUDIES = [
     id: 'mgmt-portal', num: '01', year: '2025', client: 'Wisdom',
     title: 'Management Portal',
     subtitle: 'Ops command center replacing 200+ spreadsheets with real-time operational intelligence.',
+    coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.png',
     role: 'Lead Product Designer — Strategy & UX Architecture',
     tags: ['B2B SaaS', 'Systems Design', '0→1', 'AI'],
     metrics: [
@@ -1197,6 +1198,39 @@ const CaseStudyPage = ({ c, onBack }) => {
         borderRadius:16, overflow:'hidden',
         boxShadow:'var(--shadow-card-subtle)', marginBottom:48,
       }}>
+        {c.coverImage && (
+          <div style={{
+            position:'absolute', inset:'56px 28px 24px',
+            borderRadius:12, overflow:'hidden',
+            background:'var(--bg-page)',
+            boxShadow:'0 18px 48px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.08)',
+          }}>
+            <div style={{
+              display:'flex', alignItems:'center', gap:6,
+              height:34, padding:'0 12px',
+              background:'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
+              borderBottom:'1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
+            }}>
+              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(255,95,86,0.95)', display:'inline-block' }}/>
+              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(255,189,46,0.95)', display:'inline-block' }}/>
+              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(39,201,63,0.95)', display:'inline-block' }}/>
+              <div style={{
+                marginLeft:10, flex:1, height:12, borderRadius:9999,
+                background:'color-mix(in oklab, var(--color-gray-100) 92%, transparent)',
+                opacity:0.78,
+              }}/>
+            </div>
+            <div style={{
+              width:'100%', height:'calc(100% - 34px)',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              background:'var(--bg-page)',
+            }}>
+              <img src={c.coverImage} alt={`${c.title} dashboard preview`} style={{
+                width:'100%', height:'100%', objectFit:'contain', objectPosition:'center top', display:'block',
+              }}/>
+            </div>
+          </div>
+        )}
         <div style={{
           position:'absolute', top:20, left:22,
           fontFamily:'var(--font-mono)', fontSize:11, fontWeight:500,
