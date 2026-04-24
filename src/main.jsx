@@ -1335,9 +1335,9 @@ const KeyFacts = () => {
 
       if (gradRef.current) {
         gradRef.current.style.background = `
-          radial-gradient(ellipse 70% 60% at ${ax}% ${ay}%, var(--color-ship-red)     0%, transparent 68%),
-          radial-gradient(ellipse 65% 70% at ${bx}% ${by}%, var(--color-preview-pink) 0%, transparent 68%),
-          radial-gradient(ellipse 75% 55% at ${cx}% ${cy}%, var(--color-develop-blue) 0%, transparent 68%)
+          radial-gradient(ellipse 120% 110% at ${ax}% ${ay}%, var(--color-ship-red)     0%, color-mix(in srgb, var(--color-ship-red) 0%, transparent) 100%),
+          radial-gradient(ellipse 130% 120% at ${bx}% ${by}%, var(--color-preview-pink) 0%, color-mix(in srgb, var(--color-preview-pink) 0%, transparent) 100%),
+          radial-gradient(ellipse 140% 130% at ${cx}% ${cy}%, var(--color-develop-blue) 0%, color-mix(in srgb, var(--color-develop-blue) 0%, transparent) 100%)
         `;
       }
       animRef.current = requestAnimationFrame(loop);
@@ -1363,13 +1363,13 @@ const KeyFacts = () => {
         position: 'relative',
         padding: '140px 24px',
         overflow: 'hidden',
-        background: 'var(--bg-page)',
+        background: 'var(--color-develop-blue)',
       }}
     >
       {/* Swirling mesh gradient — rAF driven, no CSS transition needed */}
       <div ref={gradRef} style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        opacity: 0.9,
+        opacity: 1,
       }} />
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <Reveal variant="section" className="facts-grid" style={{
