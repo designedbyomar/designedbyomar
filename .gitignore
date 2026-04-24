@@ -137,3 +137,9 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Developer tooling / internal docs
+CLAUDE.md
+.DS_Store
+Website/DEPLOYMENT_ROADMAP.md
+Website/DEPLOYMENT_RUNBOOK.md
