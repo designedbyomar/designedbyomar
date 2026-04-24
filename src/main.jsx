@@ -1561,7 +1561,7 @@ const PrivacyPolicyPage = ({ theme, onBack }) => (
       <p>Google Analytics utilizes cookies to distinguish unique users and sessions. By continuing to use this site, you consent to the use of these tracking mechanisms unless you have disabled cookies in your browser or are using privacy-enhancing browser extensions.</p>
 
       <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>3. Third-party Links</h2>
-      <p>This site contains links to other websites, including LinkedIn and Read.cv. Please be aware that I am not responsible for the privacy practices of such other sites. I encourage users to be aware when they leave my site and to read the privacy statements of any other site that collects personally identifiable information.</p>
+      <p>This site contains links to other websites, including LinkedIn, GitHub, and Substack. Please be aware that I am not responsible for the privacy practices of such other sites. I encourage users to be aware when they leave my site and to read the privacy statements of any other site that collects personally identifiable information.</p>
       
       <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>4. Contact</h2>
       <p>For any questions regarding this policy, please reach out to <a href="mailto:omar@designedbyomar.com" style={{ color:'var(--color-develop-blue)', textDecoration:'none' }}>omar@designedbyomar.com</a>.</p>
