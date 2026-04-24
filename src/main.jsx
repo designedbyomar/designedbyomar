@@ -1300,16 +1300,38 @@ const ContactCard = ({ label, value, href, eventName }) => (
 // ============================================================
 // Key Facts (AEO Section)
 // ============================================================
+const FIREBALL_COLORS = [
+  { raw: 'var(--color-ship-red)',     dark: '#ff6b60', light: '#ff5b4f' },
+  { raw: 'var(--color-preview-pink)', dark: '#ff3da0', light: '#de1d8d' },
+  { raw: 'var(--color-develop-blue)', dark: '#3291ff', light: '#0a72ef' },
+];
+
 const KeyFacts = () => {
   const sectionRef = React.useRef(null);
-  const [mousePos, setMousePos] = React.useState({ x: 50, y: 50 });
+  const [pos, setPos]           = React.useState({ x: 50, y: 50 });
+  const [colorIdx, setColorIdx] = React.useState(0);
+  const lastClientPos           = React.useRef({ x: 0, y: 0 });
+  const distAccum               = React.useRef(0);
 
   const handleMouseMove = React.useCallback((e) => {
     const rect = sectionRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y });
+
+    // Update position as % within section
+    setPos({
+      x: ((e.clientX - rect.left) / rect.width)  * 100,
+      y: ((e.clientY - rect.top)  / rect.height) * 100,
+    });
+
+    // Accumulate real pixel distance; cycle color every 80px
+    const dx = e.clientX - lastClientPos.current.x;
+    const dy = e.clientY - lastClientPos.current.y;
+    distAccum.current += Math.sqrt(dx * dx + dy * dy);
+    if (distAccum.current > 80) {
+      setColorIdx(prev => (prev + 1) % 3);
+      distAccum.current = 0;
+    }
+    lastClientPos.current = { x: e.clientX, y: e.clientY };
   }, []);
 
   const facts = [
@@ -1319,6 +1341,8 @@ const KeyFacts = () => {
     { label: 'Writing', value: null, custom: true },
   ];
 
+  const c = FIREBALL_COLORS[colorIdx];
+
   return (
     <section
       ref={sectionRef}
@@ -1327,23 +1351,31 @@ const KeyFacts = () => {
       onMouseMove={handleMouseMove}
       style={{
         position: 'relative',
-        padding: '72px 24px',
+        padding: '140px 24px',
         overflow: 'hidden',
         background: 'var(--bg-page)',
       }}
     >
-      {/* Animated gradient background */}
-      <div className="facts-gradient" style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        background: `
-          radial-gradient(ellipse 600px 400px at ${mousePos.x}% ${mousePos.y}%, var(--color-ship-red) 0%, transparent 70%),
-          radial-gradient(ellipse 500px 350px at ${Math.max(0, mousePos.x - 30)}% ${Math.min(100, mousePos.y + 20)}%, var(--color-preview-pink) 0%, transparent 70%),
-          radial-gradient(ellipse 550px 380px at ${Math.min(100, mousePos.x + 25)}% ${Math.max(0, mousePos.y - 15)}%, var(--color-develop-blue) 0%, transparent 70%)
-        `,
-        opacity: 0.12,
-        transition: 'background 150ms ease-out',
+      {/* Fireball glow — outer bloom */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: `radial-gradient(circle 480px at ${pos.x}% ${pos.y}%, ${c.raw} 0%, transparent 75%)`,
+        opacity: 0.28,
+        transition: 'background 120ms ease-out',
+      }} />
+      {/* Fireball glow — mid */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: `radial-gradient(circle 220px at ${pos.x}% ${pos.y}%, ${c.raw} 0%, transparent 80%)`,
+        opacity: 0.55,
+        transition: 'background 80ms ease-out',
+      }} />
+      {/* Fireball glow — hot core */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: `radial-gradient(circle 80px at ${pos.x}% ${pos.y}%, #ffffff 0%, ${c.raw} 40%, transparent 100%)`,
+        opacity: 0.45,
+        transition: 'background 40ms ease-out',
       }} />
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <Reveal variant="section" className="facts-grid" style={{
