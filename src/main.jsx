@@ -1300,38 +1300,50 @@ const ContactCard = ({ label, value, href, eventName }) => (
 // ============================================================
 // Key Facts (AEO Section)
 // ============================================================
-const FIREBALL_COLORS = [
-  { raw: 'var(--color-ship-red)',     dark: '#ff6b60', light: '#ff5b4f' },
-  { raw: 'var(--color-preview-pink)', dark: '#ff3da0', light: '#de1d8d' },
-  { raw: 'var(--color-develop-blue)', dark: '#3291ff', light: '#0a72ef' },
-];
-
 const KeyFacts = () => {
   const sectionRef = React.useRef(null);
-  const [pos, setPos]           = React.useState({ x: 50, y: 50 });
-  const [colorIdx, setColorIdx] = React.useState(0);
-  const lastClientPos           = React.useRef({ x: 0, y: 0 });
-  const distAccum               = React.useRef(0);
+  const gradRef    = React.useRef(null);
+  const mouseRef   = React.useRef({ x: 0.5, y: 0.5 });
+  const animRef    = React.useRef(null);
 
   const handleMouseMove = React.useCallback((e) => {
     const rect = sectionRef.current?.getBoundingClientRect();
     if (!rect) return;
+    mouseRef.current = {
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top)  / rect.height,
+    };
+  }, []);
 
-    // Update position as % within section
-    setPos({
-      x: ((e.clientX - rect.left) / rect.width)  * 100,
-      y: ((e.clientY - rect.top)  / rect.height) * 100,
-    });
+  React.useEffect(() => {
+    const loop = (ts) => {
+      const t  = ts / 1000;
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
 
-    // Accumulate real pixel distance; cycle color every 80px
-    const dx = e.clientX - lastClientPos.current.x;
-    const dy = e.clientY - lastClientPos.current.y;
-    distAccum.current += Math.sqrt(dx * dx + dy * dy);
-    if (distAccum.current > 80) {
-      setColorIdx(prev => (prev + 1) % 3);
-      distAccum.current = 0;
-    }
-    lastClientPos.current = { x: e.clientX, y: e.clientY };
+      // Blob A — ship-red: drifts top-left area, mouse pushes right/down
+      const ax = 25 + Math.sin(t * 0.35) * 22 + mx * 45;
+      const ay = 45 + Math.cos(t * 0.28) * 28 + my * 35;
+
+      // Blob B — preview-pink: drifts top-right area, mouse pushes left/down
+      const bx = 72 + Math.cos(t * 0.42) * 20 - mx * 35;
+      const by = 28 + Math.sin(t * 0.38) * 22 + my * 45;
+
+      // Blob C — develop-blue: drifts bottom-center, mouse pushes slightly
+      const cx = 50 + Math.sin(t * 0.31 + 2) * 28 + mx * 20;
+      const cy = 72 + Math.cos(t * 0.33) * 24 - my * 30;
+
+      if (gradRef.current) {
+        gradRef.current.style.background = `
+          radial-gradient(ellipse 70% 60% at ${ax}% ${ay}%, var(--color-ship-red)     0%, transparent 68%),
+          radial-gradient(ellipse 65% 70% at ${bx}% ${by}%, var(--color-preview-pink) 0%, transparent 68%),
+          radial-gradient(ellipse 75% 55% at ${cx}% ${cy}%, var(--color-develop-blue) 0%, transparent 68%)
+        `;
+      }
+      animRef.current = requestAnimationFrame(loop);
+    };
+    animRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animRef.current);
   }, []);
 
   const facts = [
@@ -1340,8 +1352,6 @@ const KeyFacts = () => {
     { label: 'Experience', value: 'Impactful work at Disney, Plastiq, Simplero, and Wisdom (2019–Present)' },
     { label: 'Writing', value: null, custom: true },
   ];
-
-  const c = FIREBALL_COLORS[colorIdx];
 
   return (
     <section
@@ -1356,26 +1366,10 @@ const KeyFacts = () => {
         background: 'var(--bg-page)',
       }}
     >
-      {/* Fireball glow — outer bloom */}
-      <div style={{
+      {/* Swirling mesh gradient — rAF driven, no CSS transition needed */}
+      <div ref={gradRef} style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: `radial-gradient(circle 480px at ${pos.x}% ${pos.y}%, ${c.raw} 0%, transparent 75%)`,
-        opacity: 0.28,
-        transition: 'background 120ms ease-out',
-      }} />
-      {/* Fireball glow — mid */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: `radial-gradient(circle 220px at ${pos.x}% ${pos.y}%, ${c.raw} 0%, transparent 80%)`,
-        opacity: 0.55,
-        transition: 'background 80ms ease-out',
-      }} />
-      {/* Fireball glow — hot core */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: `radial-gradient(circle 80px at ${pos.x}% ${pos.y}%, #ffffff 0%, ${c.raw} 40%, transparent 100%)`,
-        opacity: 0.45,
-        transition: 'background 40ms ease-out',
+        opacity: 0.9,
       }} />
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <Reveal variant="section" className="facts-grid" style={{
