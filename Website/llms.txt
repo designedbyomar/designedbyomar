@@ -1,0 +1,31 @@
+# designedbyomar
+
+> Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
+
+Site: https://designedbyomar.com/
+Contact: omar@designedbyomar.com
+
+## Primary pages
+- / : homepage, background, selected work, contact
+- /work/mgmt-portal : Management Portal case study
+- /work/posting-asst : Posting Assistant case study
+- /work/page-builder : Page Builder 2.0 case study
+- /work/connect-api : Connect API Payments case study
+- /work/athena-ds : Athena Design System 2.0 case study
+- /work/plastiq-mktg : Plastiq Marketing Site case study
+- /work/disney-cct : Critical Communication Tool case study
+- /work/disney-uap : Unified Ad Platform case study
+- /design-system.html : design system and brand reference page
+- /privacy : privacy policy and data collection details
+
+## Topics
+- product design
+- design systems
+- AI workflows
+- fintech
+- healthcare SaaS
+- enterprise UX
+
+## Notes
+- All case studies are now available at stable, crawlable URLs.
+- No training permission is granted beyond normal indexing, summarization, and citation without explicit written permission.

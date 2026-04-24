@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design System — designedbyomar</title>
+<meta name="description" content="Design system and brandkit reference for designedbyomar.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://designedbyomar.com/design-system.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN SYSTEM TOKENS
+   ============================================================ */
+:root {
+  --color-omar-black: #171717;
+  --color-white: #ffffff;
+  --color-ship-red: #ff5b4f;
+  --color-preview-pink: #de1d8d;
+  --color-develop-blue: #0a72ef;
+  --color-link: #0072f5;
+  --color-focus: hsla(212, 100%, 48%, 1);
+  --color-gray-900: #171717;
+  --color-gray-600: #4d4d4d;
+  --color-gray-500: #666666;
+  --color-gray-400: #808080;
+  --color-gray-100: #ebebeb;
+  --color-gray-50:  #fafafa;
+  --fg-primary:   var(--color-omar-black);
+  --fg-secondary: var(--color-gray-600);
+  --fg-tertiary:  var(--color-gray-500);
+  --fg-disabled:  var(--color-gray-400);
+  --fg-on-dark:   var(--color-white);
+  --bg-page:      var(--color-white);
+  --bg-subtle:    var(--color-gray-50);
+  --shadow-card-subtle: rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px;
+  --shadow-card-full:   rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, rgba(0,0,0,0.04) 0px 8px 8px -8px, #fafafa 0px 0px 0px 1px;
+  --shadow-ring: rgb(235, 235, 235) 0px 0px 0px 1px;
+  --font-sans: 'Geist', Arial, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+[data-theme="dark"] {
+  --color-gray-900: #ededed;
+  --color-gray-600: #a1a1a1;
+  --color-gray-500: #8f8f8f;
+  --color-gray-400: #7e7e7e;
+  --color-gray-100: #2e2e2e;
+  --color-gray-50:  #1a1a1a;
+  --bg-page:   #0a0a0a;
+  --bg-subtle: #1a1a1a;
+  --fg-primary:   #ededed;
+  --fg-secondary: #a1a1a1;
+  --fg-tertiary:  #8f8f8f;
+  --fg-disabled:  #5a5a5a;
+  --fg-on-dark:   #0a0a0a;
+  --color-ship-red:     #ff6b60;
+  --color-preview-pink: #ff3da0;
+  --color-develop-blue: #3291ff;
+  --shadow-card-subtle: rgba(255,255,255,0.12) 0px 0px 0px 1px, rgba(0,0,0,0.40) 0px 2px 2px;
+  --shadow-card-full:   rgba(255,255,255,0.12) 0px 0px 0px 1px, rgba(0,0,0,0.40) 0px 2px 2px, rgba(0,0,0,0.60) 0px 8px 8px -8px, rgba(255,255,255,0.04) 0px 0px 0px 1px inset;
+  --shadow-ring: rgba(255, 255, 255, 0.12) 0px 0px 0px 1px;
+  color-scheme: dark;
+}
+
+/* RESET */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
+  scroll-behavior: smooth;
+  min-height: 100vh;
+}
+body { transition: background 320ms ease, color 320ms ease; }
+a { color: inherit; }
+::selection { background: var(--fg-primary); color: var(--bg-page); }
+
+/* Typography Globals */
+.tnum { font-feature-settings: "tnum" 1, "liga" 1; }
+
+.section-head {
+  border-bottom: 1px solid var(--fg-primary);
+  padding-bottom: 16px;
+  margin-bottom: 64px;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+
+.copy-button {
+  opacity: 0;
+  transition: opacity 150ms;
+}
+.swatch:hover .copy-button {
+  opacity: 1;
+}
+
+/* Contact card animated border */
+@property --contact-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes contact-border-spin {
+  to { --contact-angle: 360deg; }
+}
+.contact-card {
+  position: relative;
+}
+.contact-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 9.5px;
+  background: conic-gradient(
+    from var(--contact-angle),
+    var(--color-ship-red),
+    var(--color-preview-pink),
+    var(--color-develop-blue),
+    var(--color-ship-red)
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+  animation: contact-border-spin 3s linear infinite;
+  z-index: 0;
+}
+.contact-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: var(--bg-page);
+  z-index: 1;
+}
+.contact-card > span {
+  position: relative;
+  z-index: 2;
+}
+.contact-card:hover::before { opacity: 1; }
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="module" src="/src/design-system.jsx"></script>
+</body>
+</html>

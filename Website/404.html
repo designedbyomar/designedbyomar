@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Page Not Found — designedbyomar</title>
+<meta name="description" content="The page you requested could not be found.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://designedbyomar.com/404.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-page: #0a0a0a;
+  --bg-subtle: #1a1a1a;
+  --fg-primary: #ededed;
+  --fg-secondary: #a1a1a1;
+  --fg-tertiary: #8f8f8f;
+  --color-gray-100: #2e2e2e;
+  --color-develop-blue: #3291ff;
+  --font-sans: 'Geist', Arial, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  min-height: 100%;
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+.shell {
+  width: 100%;
+  max-width: 860px;
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--bg-subtle) 58%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
+  padding: 40px 32px;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin-bottom: 18px;
+}
+h1 {
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+}
+p {
+  max-width: 620px;
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.6;
+  color: var(--fg-secondary);
+  margin-bottom: 28px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.button,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+.button {
+  background: var(--fg-primary);
+  color: var(--bg-page);
+}
+.button-secondary {
+  color: var(--fg-primary);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
+}
+.button:hover,
+.button-secondary:hover {
+  opacity: 0.88;
+}
+</style>
+</head>
+<body>
+  <main class="shell">
+    <div class="eyebrow"><span style="color: var(--color-develop-blue)">404</span> · Page not found</div>
+    <h1>This page wandered off.</h1>
+    <p>The link may be outdated, the URL may be wrong, or the page has not been published yet. Head back home or jump straight into the work.</p>
+    <div class="actions">
+      <a class="button" href="index.html">Back home</a>
+      <a class="button-secondary" href="index.html#work">View work</a>
+      <a class="button-secondary" href="mailto:omar@designedbyomar.com">Contact Omar</a>
+    </div>
+  </main>
+</body>
+</html>
