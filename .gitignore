@@ -138,8 +138,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Build output and dependencies
+node_modules/
+dist/
+
 # Developer tooling / internal docs
 CLAUDE.md
 .DS_Store
-Website/DEPLOYMENT_ROADMAP.md
-Website/DEPLOYMENT_RUNBOOK.md
+DEPLOYMENT_ROADMAP.md
+DEPLOYMENT_RUNBOOK.md
