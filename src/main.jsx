@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
@@ -595,6 +595,26 @@ const Reveal = ({ as: Tag = 'div', children, delay = 0, variant = 'soft', once =
   );
 };
 
+const MOBILE_BREAKPOINT = 600;
+const COMPACT_LAYOUT_BREAKPOINT = 1054;
+const WIDE_LAYOUT_BREAKPOINT = 1200;
+const TABLET_BREAKPOINT = 900;
+
+const useViewportWidth = () => {
+  const [viewportWidth, setViewportWidth] = React.useState(() => (
+    typeof window === 'undefined' ? 1280 : window.innerWidth
+  ));
+
+  React.useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth);
+    onResize();
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return viewportWidth;
+};
+
 // ============================================================
 // Nav
 // ============================================================
@@ -644,13 +664,29 @@ const NavLogo = ({ onClick }) => {
 
 const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
   const [scrolled, setScrolled] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const viewportWidth = useViewportWidth();
+  const isMobile = viewportWidth <= TABLET_BREAKPOINT;
   React.useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12);
     on(); window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
+  React.useEffect(() => {
+    if (!isMobile && isMobileMenuOpen) setIsMobileMenuOpen(false);
+  }, [isMobile, isMobileMenuOpen]);
+  React.useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+    const onKey = (event) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isMobileMenuOpen]);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const goSection = (id) => (e) => {
     e.preventDefault();
+    closeMobileMenu();
     if (window.location.hash && window.location.hash !== '#') {
       window.location.hash = '';
       setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' }), 40);
@@ -673,35 +709,75 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
       boxShadow: scrolled ? 'rgba(127,127,127,0.18) 0px -1px 0px 0px inset' : 'none',
       transition:'background 200ms, box-shadow 200ms',
     }}>
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', minHeight:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative' }}>
         <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
-        <nav style={{ display:'flex', gap:2 }}>
-          <a href="#work" onClick={goSection('work')} style={navLink}
-            onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-            onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
-          >Work</a>
-          <button onClick={onOpenAbout} style={navLink}
-            onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-            onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
-          >About</button>
-          <a href="#contact" onClick={goSection('contact')} style={navLink}
-            onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-            onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
-          >Contact</a>
-        </nav>
+        {!isMobile && (
+          <nav style={{ display:'flex', gap:2 }}>
+            <a href="#work" onClick={goSection('work')} style={navLink}
+              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
+              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+            >Work</a>
+            <button onClick={onOpenAbout} style={navLink}
+              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
+              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+            >About</button>
+            <a href="#contact" onClick={goSection('contact')} style={navLink}
+              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
+              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+            >Contact</a>
+          </nav>
+        )}
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <ThemeToggle theme={theme} setTheme={(t) => {
             setTheme(t);
             if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('theme_toggle', { new_theme: t });
           }} />
-          <a href="#contact" onClick={goSection('contact')} style={{
-            fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'8px 14px',
-            borderRadius:6, background:'var(--fg-primary)', textDecoration:'none', transition:'opacity 150ms',
-          }}
-            onMouseEnter={e=>e.currentTarget.style.opacity='0.86'}
-            onMouseLeave={e=>e.currentTarget.style.opacity='1'}
-          >Get in touch</a>
+          {isMobile ? (
+            <button
+              type="button"
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(open => !open)}
+              style={{
+                display:'inline-flex', alignItems:'center', justifyContent:'center',
+                width:36, height:36, borderRadius:9999, background:'transparent',
+                color:'var(--fg-primary)', border:'none', boxShadow:'inset 0 0 0 1px var(--color-gray-100)',
+                cursor:'pointer', transition:'background 150ms',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background='var(--bg-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background='transparent'}
+            >
+              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} strokeWidth={2.1} />
+            </button>
+          ) : (
+            <a href="#contact" onClick={goSection('contact')} style={{
+              fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'8px 14px',
+              borderRadius:6, background:'var(--fg-primary)', textDecoration:'none', transition:'opacity 150ms',
+            }}
+              onMouseEnter={e=>e.currentTarget.style.opacity='0.86'}
+              onMouseLeave={e=>e.currentTarget.style.opacity='1'}
+            >Get in touch</a>
+          )}
         </div>
+        {isMobile && isMobileMenuOpen && (
+          <div style={{
+            position:'absolute', top:'calc(100% + 8px)', left:24, right:24, zIndex:60,
+            padding:12, borderRadius:14, background:'color-mix(in oklab, var(--bg-page) 94%, transparent)',
+            boxShadow:'var(--shadow-card-full)', border:'1px solid var(--color-gray-100)',
+            backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)',
+          }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>Work</a>
+              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>About</button>
+              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>Contact</a>
+              <a href="#contact" onClick={goSection('contact')} style={{
+                display:'inline-flex', alignItems:'center', justifyContent:'center',
+                fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'12px 16px', marginTop:6,
+                borderRadius:8, background:'var(--fg-primary)', textDecoration:'none', transition:'opacity 150ms',
+              }} onMouseEnter={e=>e.currentTarget.style.opacity='0.86'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>Get in touch</a>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
@@ -1026,15 +1102,20 @@ const CASE_STUDIES = [
 // ============================================================
 // CaseCard — gradient cover tile used on homepage + drawer
 // ============================================================
-const CaseCard = ({ c, featured = false }) => (
+const CaseCard = ({ c, featured = false }) => {
+  const viewportWidth = useViewportWidth();
+  const useSharedMobileAspectRatio = viewportWidth <= TABLET_BREAKPOINT;
+  const mediaAspectRatio = useSharedMobileAspectRatio ? '4/3' : featured ? '16/8' : '4/3';
+
+  return (
   <a href={`/work/${c.id}`} className="case-card" style={{
-    display:'flex', flexDirection:'column', gap:16,
+    display:'flex', flexDirection:'column', gap:16, height:'100%',
     textDecoration:'none', color:'inherit',
     borderRadius:12, transition:'transform 220ms ease',
   }}>
     <div className="case-card-media" style={{
       position:'relative', width:'100%',
-      aspectRatio: featured ? '16/8' : '4/3',
+      aspectRatio: mediaAspectRatio,
       background:`linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
       borderRadius:12, overflow:'hidden',
       boxShadow:'var(--shadow-card-subtle)',
@@ -1079,7 +1160,7 @@ const CaseCard = ({ c, featured = false }) => (
       }}>{c.num} · {c.year} · {c.client}</div>
     </div>
 
-    <div style={{ padding:'4px 4px 0' }}>
+    <div style={{ padding:'4px 4px 0', display:'flex', flexDirection:'column', flex:1 }}>
       <div style={{ display:'flex', alignItems:'baseline', gap:10, flexWrap:'wrap', marginBottom:10 }}>
         <h3 style={{
           fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
@@ -1088,22 +1169,28 @@ const CaseCard = ({ c, featured = false }) => (
         }}>{c.title}</h3>
       </div>
       <p style={{ fontSize: featured ? 16 : 14, lineHeight:1.55, color:'var(--fg-secondary)', margin:'0 0 14px', maxWidth:560 }}>{c.subtitle}</p>
-      <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+      <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginTop:'auto' }}>
         {c.tags.slice(0, 3).map(t => (
           <span key={t} style={{ fontSize:11, fontWeight:500, padding:'3px 10px', borderRadius:9999, color:'var(--fg-secondary)', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
         ))}
       </div>
     </div>
   </a>
-);
+  );
+};
 
 // ============================================================
 // Work — homepage section
 // ============================================================
-const Work = ({ onOpenDrawer }) => (
+const Work = ({ onOpenDrawer }) => {
+  const viewportWidth = useViewportWidth();
+  const workHeadColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr';
+  const secondaryColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
+
+  return (
   <section id="work" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'96px 24px' }}>
     <div style={{ maxWidth:1200, margin:'0 auto' }}>
-      <Reveal className="work-head" variant="section" style={{ display:'grid', gridTemplateColumns:'220px 1fr', gap:64, alignItems:'start', marginBottom:56 }}>
+      <Reveal className="work-head" variant="section" style={{ display:'grid', gridTemplateColumns:workHeadColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems:'start', marginBottom:56 }}>
         <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
           <span style={{ color:'var(--color-preview-pink)' }}>02 — </span>Selected work
         </div>
@@ -1115,7 +1202,7 @@ const Work = ({ onOpenDrawer }) => (
       <Reveal delay={70} style={{ display:'grid', gridTemplateColumns:'1fr', gap:32, marginBottom:32 }}>
         <CaseCard c={CASE_STUDIES[0]} featured />
       </Reveal>
-      <Reveal delay={130} style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:32, marginBottom:48 }}>
+      <Reveal delay={130} style={{ display:'grid', gridTemplateColumns:secondaryColumns, gap:32, marginBottom:48, alignItems:'stretch' }}>
         <CaseCard c={CASE_STUDIES[1]} />
         <CaseCard c={CASE_STUDIES[2]} />
       </Reveal>
@@ -1136,7 +1223,8 @@ const Work = ({ onOpenDrawer }) => (
       </Reveal>
     </div>
   </section>
-);
+  );
+};
 
 // ============================================================
 // WorkDrawer — all case studies
@@ -1348,10 +1436,12 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
     }
   };
 
+  const hasCopyButton = Boolean(copyValue);
+
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
       position: 'relative',
-      display: 'flex', flexDirection: 'column', gap: 8, padding: '18px 20px', borderRadius: 8,
+      display: 'flex', flexDirection: 'column', gap: 8, padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 8,
       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
       transition: 'transform 180ms ease',
     }}
@@ -1360,16 +1450,8 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
           window.trackAnalyticsEvent(eventName, { link_url: href });
         }
       }}
-      onMouseEnter={e=>{
-        e.currentTarget.style.transform='translateY(-2px)';
-        const copyButton = e.currentTarget.querySelector('[data-copy-button="true"]');
-        if (copyButton && !copied) copyButton.style.opacity = '1';
-      }}
-      onMouseLeave={e=>{
-        e.currentTarget.style.transform='translateY(0)';
-        const copyButton = e.currentTarget.querySelector('[data-copy-button="true"]');
-        if (copyButton && !copied) copyButton.style.opacity = '0';
-      }}
+      onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-2px)'; }}
+      onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; }}
     >
       {copyValue && (
         <button
@@ -1386,8 +1468,9 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
             background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
             color: copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
             boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            opacity: copied ? 1 : 0,
-            pointerEvents: copied ? 'auto' : 'none',
+            opacity: 1,
+            pointerEvents: 'auto',
+            zIndex: 2,
             transition: 'opacity 150ms ease, color 150ms ease, background 150ms ease',
           }}
           onMouseEnter={e => {
@@ -1396,7 +1479,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
             e.currentTarget.style.background = 'var(--bg-subtle)';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.opacity = copied ? '1' : '0';
+            e.currentTarget.style.opacity = '1';
             e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)';
             e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
           }}
@@ -1418,6 +1501,8 @@ const KeyFacts = () => {
   const gradRef    = React.useRef(null);
   const mouseRef   = React.useRef({ x: 0.5, y: 0.5 });
   const animRef    = React.useRef(null);
+  const viewportWidth = useViewportWidth();
+  const factsColumns = viewportWidth <= COMPACT_LAYOUT_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)';
 
   const handleMouseMove = React.useCallback((e) => {
     const rect = sectionRef.current?.getBoundingClientRect();
@@ -1485,9 +1570,29 @@ const KeyFacts = () => {
         opacity: 1,
       }} />
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <Reveal className="work-head" variant="section" style={{
+          display:'grid',
+          gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr',
+          gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64,
+          alignItems:'start',
+          marginBottom: 56,
+        }}>
+          <div style={{
+            fontFamily:'var(--font-mono)',
+            fontSize:12,
+            color:'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)',
+            textTransform:'uppercase',
+            letterSpacing:'0.08em'
+          }}>
+            <span style={{ color:'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>04 — </span>At a Glance
+          </div>
+          <h2 style={{ fontSize:'clamp(32px, 4.2vw, 56px)', fontWeight:600, lineHeight:1.02, letterSpacing:'-0.04em', color:'var(--fg-on-dark)', margin:0, maxWidth:760 }}>
+            The short version: <span style={{ color:'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
+          </h2>
+        </Reveal>
         <Reveal variant="section" className="facts-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: factsColumns,
           gap: 20,
         }}>
           {facts.map((f, i) => (
@@ -1524,9 +1629,14 @@ const KeyFacts = () => {
   );
 };
 
-const Contact = () => (
+const Contact = () => {
+  const viewportWidth = useViewportWidth();
+  const contactGridColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr';
+  const contactCardColumns = viewportWidth <= MOBILE_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))';
+
+  return (
   <section id="contact" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'112px 24px 96px' }}>
-    <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'220px 1fr', gap:64, alignItems:'start' }}>
+    <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:contactGridColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems:'start' }}>
       <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
         <span style={{ color:'var(--color-ship-red)' }}>03 — </span>Contact
       </div>
@@ -1534,7 +1644,7 @@ const Contact = () => (
         <h2 style={{ fontSize:'clamp(36px, 6vw, 80px)', fontWeight:600, lineHeight:0.98, letterSpacing:'-0.04em', color:'var(--fg-secondary)', margin:0 }}>
           Turn complexity <br/><span style={{ color:'var(--fg-secondary)' }}>into clarity. </span><br/><span style={{ color:'var(--fg-primary)' }}>Let's talk.</span>
         </h2>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:contactCardColumns, gap:16 }}>
           <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
           <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
           <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
@@ -1544,81 +1654,454 @@ const Contact = () => (
       </div>
     </Reveal>
   </section>
+  );
+};
+
+// ============================================================
+// Alien pixel icon + retro arrival animation
+// ============================================================
+const ALIEN_PIXELS = [
+  [3,0,1,1],[7,0,1,1],
+  [4,1,1,1],[6,1,1,1],
+  [2,2,7,1],
+  [1,3,2,1],[4,3,3,1],[8,3,2,1],
+  [0,4,11,1],
+  [0,5,1,1],[2,5,7,1],[10,5,1,1],
+  [0,6,1,1],[2,6,1,1],[8,6,1,1],[10,6,1,1],
+  [3,7,2,1],[6,7,2,1],
+];
+
+const AlienPixel = ({ size = '1.4em', title = 'Alien', style, ...rest }) => (
+  <svg
+    viewBox="0 0 11 8"
+    width={size}
+    height="auto"
+    role="img"
+    shapeRendering="crispEdges"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{
+      display: 'inline-block',
+      verticalAlign: '-0.15em',
+      color: 'var(--color-develop-blue)',
+      ...style,
+    }}
+    {...rest}
+  >
+    <title>{title}</title>
+    {ALIEN_PIXELS.map(([x, y, w, h], i) => (
+      <rect key={i} x={x} y={y} width={w} height={h} fill="currentColor" />
+    ))}
+  </svg>
 );
 
-const SiteFooter = () => (
-  <footer style={{ borderTop:'1px solid var(--fg-primary)', padding:'24px 24px' }}>
-    <style dangerouslySetInnerHTML={{__html: `
-      .footer-easter-egg {
-        position: absolute; left: 50%; top: 50%; transform: translate(-50%, 12px);
-        opacity: 0; filter: blur(8px); pointer-events: none;
-        transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
-        text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
-        color: var(--color-develop-blue); font-weight: 600;
-      }
-      .footer-easter-egg:hover { color: var(--color-preview-pink); }
-      .footer-inner:hover .footer-easter-egg {
-        opacity: 1; filter: blur(0px); pointer-events: auto; transform: translate(-50%, -50%);
-      }
-      .footer-text { transition: opacity 300ms ease, filter 300ms ease; }
-      .footer-inner:hover .footer-text { opacity: 0.15; filter: blur(2px); }
-      @media (prefers-reduced-motion: reduce) {
-        .footer-easter-egg { transform: translate(-50%, -50%); transition: opacity 200ms ease; filter: none; }
-        .footer-inner:hover .footer-easter-egg { transform: translate(-50%, -50%); }
-        .footer-inner:hover .footer-text { filter: none; }
-      }
-    `}} />
-    <div className="footer-inner" style={{
-      maxWidth:1200, margin:'0 auto', display:'flex', justifyContent:'space-between', alignItems:'center',
-      flexWrap:'wrap', gap:12, fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)',
-      textTransform:'uppercase', letterSpacing:'0.06em', position:'relative'
-    }}>
-      <div className="footer-text" style={{ display:'flex', gap: 16 }}>
-        <span>© 2026 Omar Tavarez</span>
-        <a href="/privacy" style={{ textDecoration:'none', color:'inherit', transition:'color 150ms' }} onMouseEnter={e=>e.currentTarget.style.color='var(--fg-secondary)'} onMouseLeave={e=>e.currentTarget.style.color='inherit'}>Privacy Policy</a>
-        <a href="https://github.com/designedbyomar" target="_blank" rel="noopener noreferrer" style={{ textDecoration:'none', color:'inherit' }}>GitHub</a>
-        <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ textDecoration:'none', color:'inherit' }}>Substack</a>
-      </div>
-      
-      <a href="design-system.html" className="footer-easter-egg" aria-label="See Design System">
-        <AppIcon icon={Box} size={14} strokeWidth={2.5} />
-        See design system
-      </a>
+const UFO = ({ size = '1.8em' }) => (
+  <svg
+    viewBox="0 0 11 5"
+    width={size}
+    height="auto"
+    aria-hidden="true"
+    shapeRendering="crispEdges"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block' }}
+  >
+    <g fill="var(--color-ship-red)">
+      <rect x="3" y="0" width="5" height="1" />
+      <rect x="2" y="1" width="7" height="1" />
+      <rect x="0" y="2" width="11" height="1" />
+      <rect x="1" y="3" width="9" height="1" />
+    </g>
+    <g fill="var(--color-preview-pink)">
+      <rect x="2" y="4" width="1" height="1" />
+      <rect x="4" y="4" width="1" height="1" />
+      <rect x="6" y="4" width="1" height="1" />
+      <rect x="8" y="4" width="1" height="1" />
+    </g>
+  </svg>
+);
 
-      <span className="footer-text" style={{ display:'inline-flex', alignItems:'center', gap:8 }}>
-        Designed by Omar. Built with AI-native coding tools
-        <span aria-hidden="true" style={{ display:'inline-flex', color:'var(--color-develop-blue)', flex:'0 0 auto' }}>
-          <svg width="18" height="14" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" shapeRendering="crispEdges">
-            <rect x="5" y="0" width="2" height="1" fill="currentColor"/>
-            <rect x="9" y="0" width="2" height="1" fill="currentColor"/>
-            <rect x="4" y="1" width="8" height="1" fill="currentColor"/>
-            <rect x="3" y="2" width="10" height="1" fill="currentColor"/>
-            <rect x="2" y="3" width="12" height="1" fill="currentColor"/>
-            <rect x="2" y="4" width="3" height="1" fill="currentColor"/>
-            <rect x="7" y="4" width="2" height="1" fill="currentColor"/>
-            <rect x="11" y="4" width="3" height="1" fill="currentColor"/>
-            <rect x="2" y="5" width="12" height="1" fill="currentColor"/>
-            <rect x="1" y="6" width="3" height="1" fill="currentColor"/>
-            <rect x="5" y="6" width="6" height="1" fill="currentColor"/>
-            <rect x="12" y="6" width="3" height="1" fill="currentColor"/>
-            <rect x="0" y="7" width="2" height="1" fill="currentColor"/>
-            <rect x="4" y="7" width="3" height="1" fill="currentColor"/>
-            <rect x="9" y="7" width="3" height="1" fill="currentColor"/>
-            <rect x="14" y="7" width="2" height="1" fill="currentColor"/>
-            <rect x="0" y="8" width="2" height="1" fill="currentColor"/>
-            <rect x="4" y="8" width="3" height="1" fill="currentColor"/>
-            <rect x="9" y="8" width="3" height="1" fill="currentColor"/>
-            <rect x="14" y="8" width="2" height="1" fill="currentColor"/>
-            <rect x="4" y="9" width="2" height="1" fill="currentColor"/>
-            <rect x="10" y="9" width="2" height="1" fill="currentColor"/>
-            <rect x="3" y="10" width="3" height="1" fill="currentColor"/>
-            <rect x="10" y="10" width="3" height="1" fill="currentColor"/>
-          </svg>
-        </span>
+const FooterAlien = () => {
+  const ref = React.useRef(null);
+  const [played, setPlayed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (played) return;
+    if (typeof window === 'undefined') return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof IntersectionObserver === 'undefined') {
+      setPlayed(true);
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setPlayed(true);
+        obs.disconnect();
+      }
+    }, { threshold: 0.6 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [played]);
+
+  return (
+    <span
+      ref={ref}
+      className="footer-alien-arrival"
+      data-playing={played ? 'true' : 'false'}
+      aria-label="Alien arrival animation"
+      style={{
+        position: 'relative',
+        display: 'inline-block',
+        width: '1.4em',
+        height: '1em',
+        verticalAlign: '-0.15em',
+        overflow: 'visible',
+        flex: '0 0 auto',
+        lineHeight: 0,
+      }}
+    >
+      <span className="faa-ufo" aria-hidden="true">
+        <UFO />
       </span>
-    </div>
-  </footer>
-);
+      <span className="faa-beam" aria-hidden="true" />
+      <span className="faa-alien">
+        <AlienPixel style={{ verticalAlign: 'top' }} />
+      </span>
+    </span>
+  );
+};
+
+const SiteFooter = ({ onOpenAbout, onHome }) => {
+  const footerLabelStyle = {
+    fontFamily:'var(--font-mono)',
+    fontSize:12,
+    color:'var(--fg-tertiary)',
+    textTransform:'uppercase',
+    letterSpacing:'0.08em',
+  };
+  const footerLinkStyle = {
+    display:'inline-flex',
+    alignItems:'center',
+    gap:8,
+    width:'fit-content',
+    fontSize:15,
+    fontWeight:500,
+    lineHeight:1.4,
+    color:'var(--fg-secondary)',
+    textDecoration:'none',
+    transition:'color 160ms ease, transform 160ms ease',
+  };
+  const footerButtonStyle = {
+    ...footerLinkStyle,
+    padding:0,
+    background:'transparent',
+    border:'none',
+    fontFamily:'inherit',
+    cursor:'pointer',
+  };
+  const emphasizeLinkStyle = {
+    ...footerLinkStyle,
+    color:'var(--color-develop-blue)',
+  };
+  const socialLinkStyle = {
+    display:'inline-flex',
+    flexDirection:'column',
+    alignItems:'flex-start',
+    gap:10,
+    width:'fit-content',
+    fontSize:14,
+    fontWeight:500,
+    lineHeight:1.3,
+    color:'var(--fg-secondary)',
+    textDecoration:'none',
+    transition:'color 160ms ease, transform 160ms ease',
+  };
+
+  const enhanceLink = (event, color = 'var(--fg-primary)') => {
+    event.currentTarget.style.color = color;
+    event.currentTarget.style.transform = 'translateX(4px)';
+  };
+
+  const resetLink = (event, color = 'var(--fg-secondary)') => {
+    event.currentTarget.style.color = color;
+    event.currentTarget.style.transform = 'translateX(0)';
+  };
+
+  const goSection = (id) => (event) => {
+    event.preventDefault();
+    if (window.location.pathname !== '/') {
+      history.pushState(null, '', '/');
+      window.dispatchEvent(new Event('popstate'));
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+        });
+      });
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+  };
+
+  return (
+    <footer style={{ borderTop:'1px solid var(--color-gray-100)', padding:'56px 24px 72px' }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        .site-footer-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
+          gap: 40px 72px;
+        }
+        .site-footer-block {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          min-width: 0;
+        }
+        .site-footer-link:focus-visible {
+          outline: 2px solid var(--color-develop-blue);
+          outline-offset: 6px;
+          border-radius: 6px;
+        }
+        .footer-signoff {
+          position: relative;
+        }
+        .footer-alien-arrival {
+          --faa-ufo-w: 1.8em;
+        }
+        .footer-alien-arrival .faa-ufo {
+          position: absolute;
+          left: 50%;
+          top: -1.25em;
+          width: var(--faa-ufo-w);
+          transform: translate(-50%, 0) translateX(-260%);
+          opacity: 0;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        .footer-alien-arrival .faa-beam {
+          position: absolute;
+          left: 50%;
+          top: -0.35em;
+          width: 1.1em;
+          height: 1.25em;
+          transform: translateX(-50%) scaleY(0);
+          transform-origin: top center;
+          opacity: 0;
+          background: linear-gradient(
+            180deg,
+            color-mix(in oklab, var(--color-preview-pink) 70%, transparent),
+            color-mix(in oklab, var(--color-preview-pink) 8%, transparent)
+          );
+          clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+          mix-blend-mode: screen;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        .footer-alien-arrival .faa-alien {
+          position: absolute;
+          left: 50%;
+          bottom: -0.05em;
+          transform: translate(-50%, 0);
+          line-height: 0;
+          opacity: 0;
+          will-change: transform, opacity;
+        }
+        .footer-alien-arrival[data-playing="true"] .faa-alien {
+          opacity: 1;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .footer-alien-arrival[data-playing="true"] .faa-ufo {
+            animation:
+              faa-ufo-arrive 1.0s cubic-bezier(.2,.7,.2,1) forwards,
+              faa-ufo-leave  0.9s cubic-bezier(.6,.0,.7,.3) 2.0s forwards;
+          }
+          .footer-alien-arrival[data-playing="true"] .faa-beam {
+            animation: faa-beam-pulse 1.1s ease-in-out 0.9s forwards;
+          }
+          .footer-alien-arrival[data-playing="true"] .faa-alien {
+            animation: faa-alien-land 0.5s cubic-bezier(.2,.9,.3,1.4) 1.4s both;
+          }
+        }
+        @keyframes faa-ufo-arrive {
+          from { transform: translate(-50%, 0) translateX(-260%); opacity: 0; }
+          to   { transform: translate(-50%, 0) translateX(0);     opacity: 1; }
+        }
+        @keyframes faa-ufo-leave {
+          from { transform: translate(-50%, 0) translateX(0);    opacity: 1; }
+          to   { transform: translate(-50%, 0) translateX(280%); opacity: 0; }
+        }
+        @keyframes faa-beam-pulse {
+          0%   { transform: translateX(-50%) scaleY(0); opacity: 0; }
+          25%  { transform: translateX(-50%) scaleY(1); opacity: 0.85; }
+          75%  { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
+          100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+        }
+        @keyframes faa-alien-land {
+          0%   { opacity: 0; transform: translate(-50%, -0.6em) scale(0.55); }
+          60%  { opacity: 1; transform: translate(-50%, 0.05em) scale(1.05); }
+          100% { opacity: 1; transform: translate(-50%, 0)      scale(1);    }
+        }
+        @media (max-width: 900px) {
+          .site-footer-grid {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 36px 32px;
+          }
+          .site-footer-brand {
+            grid-column: 1 / -1;
+          }
+        }
+        @media (max-width: 600px) {
+          .site-footer-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 32px;
+          }
+        }
+      `}} />
+      <div style={{ maxWidth:1200, margin:'0 auto' }}>
+        <div className="site-footer-grid">
+          <div className="site-footer-block site-footer-brand" style={{ gap:22 }}>
+            <div style={{ display:'inline-flex', width:'fit-content' }}>
+              <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
+            </div>
+            <p style={{ maxWidth:360, margin:0, fontSize:16, lineHeight:1.65, color:'var(--fg-tertiary)' }}>
+              Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.
+            </p>
+            <span className="footer-signoff" style={{
+              display:'inline-flex',
+              alignItems:'center',
+              gap:10,
+              flexWrap:'wrap',
+              width:'fit-content',
+              fontFamily:'var(--font-mono)',
+              fontSize:12,
+              lineHeight:1.7,
+              color:'var(--fg-tertiary)',
+              letterSpacing:'0.02em',
+            }}>
+              <span>Designed by Omar. Built with AI-native coding tools.</span>
+              <FooterAlien />
+            </span>
+          </div>
+
+          <div className="site-footer-block">
+            <span style={footerLabelStyle}>Site Links</span>
+            <button
+              type="button"
+              className="site-footer-link"
+              onClick={goSection('work')}
+              style={footerButtonStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              Work
+            </button>
+            <button
+              type="button"
+              className="site-footer-link"
+              onClick={onOpenAbout}
+              style={footerButtonStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              About
+            </button>
+            <a
+              href="#contact"
+              className="site-footer-link"
+              onClick={goSection('contact')}
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              Contact
+            </a>
+            <a
+              href="/privacy"
+              className="site-footer-link"
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="design-system.html"
+              className="site-footer-link"
+              aria-label="See Design System"
+              style={emphasizeLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event, 'var(--color-preview-pink)')}
+              onMouseLeave={(event) => resetLink(event, 'var(--color-develop-blue)')}
+            >
+              <AppIcon icon={Box} size={15} strokeWidth={2.4} />
+              Design System
+            </a>
+          </div>
+
+          <div className="site-footer-block">
+            <span style={footerLabelStyle}>Social</span>
+            <div style={{ display:'flex', gap:22, flexWrap:'wrap', alignItems:'flex-start' }}>
+              <a
+                href="https://www.linkedin.com/in/omartavarez/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-footer-link"
+                style={socialLinkStyle}
+                onMouseEnter={(event) => enhanceLink(event)}
+                onMouseLeave={(event) => resetLink(event)}
+              >
+                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2.25" y="6.75" width="2.5" height="8.5" stroke="currentColor" strokeWidth="1.8"/>
+                    <circle cx="3.5" cy="3.75" r="1.15" fill="currentColor"/>
+                    <path d="M7.25 6.75V15.25" stroke="currentColor" strokeWidth="1.8"/>
+                    <path d="M7.25 10.1C7.25 8.25 8.35 6.75 10.55 6.75C12.7 6.75 13.75 8.15 13.75 10.75V15.25" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
+                  </svg>
+                </span>
+                <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://github.com/designedbyomar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-footer-link"
+                style={socialLinkStyle}
+                onMouseEnter={(event) => enhanceLink(event)}
+                onMouseLeave={(event) => resetLink(event)}
+              >
+                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 2.4C5.36 2.4 2.4 5.38 2.4 9.05C2.4 11.98 4.28 14.46 6.89 15.34C7.22 15.4 7.34 15.2 7.34 15.03V13.87C5.53 14.27 5.15 13.08 5.15 13.08C4.86 12.32 4.43 12.12 4.43 12.12C3.84 11.72 4.48 11.73 4.48 11.73C5.13 11.78 5.47 12.41 5.47 12.41C6.05 13.41 6.99 13.12 7.36 12.95C7.42 12.53 7.58 12.24 7.76 12.07C6.31 11.9 4.79 11.33 4.79 8.75C4.79 8.01 5.05 7.41 5.48 6.94C5.41 6.77 5.19 6.06 5.55 5.09C5.55 5.09 6.1 4.91 7.33 5.74C7.85 5.59 8.41 5.51 8.97 5.51C9.53 5.51 10.09 5.59 10.61 5.74C11.84 4.91 12.39 5.09 12.39 5.09C12.75 6.06 12.53 6.77 12.46 6.94C12.89 7.41 13.15 8.01 13.15 8.75C13.15 11.34 11.63 11.9 10.18 12.07C10.41 12.29 10.62 12.72 10.62 13.37V15.03C10.62 15.2 10.74 15.41 11.08 15.34C13.69 14.46 15.57 11.98 15.57 9.05C15.57 5.38 12.61 2.4 9 2.4Z" stroke="currentColor" strokeWidth="1.15" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://substack.com/@designedbyomar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-footer-link"
+                style={socialLinkStyle}
+                onMouseEnter={(event) => enhanceLink(event)}
+                onMouseLeave={(event) => resetLink(event)}
+              >
+                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 3.25H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
+                    <path d="M2 7.25H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
+                    <path d="M4 10.5H14V15H4V10.5Z" stroke="currentColor" strokeWidth="1.8"/>
+                  </svg>
+                </span>
+                <span>Substack</span>
+              </a>
+            </div>
+            <span style={{ paddingTop:8, fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', letterSpacing:'0.06em', textTransform:'uppercase' }}>
+              © 2026 Omar Tavarez
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
 // ============================================================
 // Privacy Policy Page
@@ -1877,7 +2360,7 @@ const App = () => {
             </>
           )}
         </main>
-        <SiteFooter />
+        <SiteFooter onOpenAbout={() => setAboutOpen(true)} onHome={goHome} />
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />
