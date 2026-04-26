@@ -12,6 +12,9 @@
 <meta property="og:description" content="Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.">
 <meta property="og:url" content="https://designedbyomar.com/">
 <meta property="og:image" content="https://designedbyomar.com/Images/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="designedbyomar — Omar Tavarez">
 <meta name="twitter:description" content="Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.">
@@ -24,9 +27,10 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
   gtag('js', new Date());
-  gtag('config', 'G-T7W0PFD3HD');
-  gtag('config', 'GT-T56BGFG');
+  gtag('config', 'G-T7W0PFD3HD', { send_page_view: false });
+  gtag('config', 'GT-T56BGFG', { send_page_view: false });
   
   // Custom wrapper for event pushing 
   window.trackAnalyticsEvent = function(eventName, params) {

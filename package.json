@@ -6,18 +6,22 @@
     "dev": "vite",
     "build": "vite build && node postbuild.js",
     "preview": "vite preview",
-    "test": "npm run build"
+    "test": "npm run build",
+    "optimize:image": "node scripts/optimize-image.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sentry/react": "^10.50.0",
+    "lucide-react": "^1.11.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
+    "sharp": "^0.34.5",
     "vite": "^8.0.10"
   }
 }

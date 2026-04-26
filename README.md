@@ -63,3 +63,9 @@ npm test
 
 - Build command: `npm run build`
 - Output directory: `dist`
+
+## Error Monitoring
+
+- Minimal browser error monitoring is available via Sentry.
+- Set `VITE_SENTRY_DSN` in your production hosting environment to enable it.
+- If `VITE_SENTRY_DSN` is not set, Sentry stays disabled and the site still builds normally.

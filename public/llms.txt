@@ -27,5 +27,6 @@ Contact: omar@designedbyomar.com
 - enterprise UX
 
 ## Notes
-- All case studies are now available at stable, crawlable URLs.
-- No training permission is granted beyond normal indexing, summarization, and citation without explicit written permission.
+- All case studies are available at stable, crawlable URLs.
+- Indexing, summarization, and citation are allowed.
+- Training, bulk reuse, or republication beyond normal citation requires explicit written permission.

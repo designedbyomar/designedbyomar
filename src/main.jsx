@@ -1,5 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import * as Sentry from '@sentry/react';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X } from './ui-icons.jsx';
+
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
+
+if (SENTRY_ENABLED) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    environment: 'production',
+  });
+}
+
 // ============================================================
 // Galaxy — canvas pixel orbit
 // ============================================================
@@ -405,7 +418,7 @@ const Portrait = ({ galaxy, theme }) => {
         </>
       )}
       <div style={{ position:'absolute', inset:'6% 6% 0', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:1 }}>
-        <img src={isLight ? '/Images/omar-light.png' : '/Images/omar.png'} alt="Omar Tavarez" draggable={false} style={{
+        <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" draggable={false} style={{
           width:'100%', height:'100%', objectFit:'contain', objectPosition:'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10,114,239,0.16)) drop-shadow(0 26px 48px rgba(255,91,79,0.12)) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
@@ -598,8 +611,8 @@ const ThemeToggle = ({ theme, setTheme }) => {
       onMouseLeave={e => e.currentTarget.style.background='transparent'}
     >
       {isDark
-        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        ? <AppIcon icon={Moon} size={16} strokeWidth={1.8} />
+        : <AppIcon icon={Sun} size={16} strokeWidth={1.8} />
       }
     </button>
   );
@@ -728,7 +741,7 @@ const Hero = ({ galaxy, theme }) => (
           onMouseLeave={e=>e.currentTarget.style.opacity='1'}
         >
           View case studies
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+          <AppIcon icon={ArrowUpRight} size={12} strokeWidth={2.5} />
         </a>
         <a href="#contact" onClick={(e)=>{e.preventDefault();document.getElementById('contact')?.scrollIntoView({behavior:'smooth'});}} style={{
           display:'inline-flex', alignItems:'center', gap:8, fontSize:14, fontWeight:500,
@@ -817,7 +830,7 @@ const About = ({ onOpenDrawer }) => (
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}
         >
           Read more about me
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <AppIcon icon={ArrowRight} size={12} strokeWidth={2.5} />
         </button>
       </div>
     </div>
@@ -845,7 +858,7 @@ const AboutDrawer = ({ open, onClose }) => {
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', borderBottom:'1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>About / long-form</div>
           <button onClick={onClose} aria-label="Close" style={{ width:32, height:32, borderRadius:9999, display:'grid', placeItems:'center', background:'transparent', color:'var(--fg-primary)', border:'none', cursor:'pointer', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <AppIcon icon={X} size={14} strokeWidth={2} />
           </button>
         </div>
         <div style={{ padding:'36px 36px 72px', overflowY:'auto', flex:1 }}>
@@ -875,7 +888,7 @@ const CASE_STUDIES = [
     id: 'mgmt-portal', num: '01', year: '2025', client: 'Wisdom',
     title: 'Management Portal',
     subtitle: 'Ops command center replacing 200+ spreadsheets with real-time operational intelligence.',
-    coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.png',
+    coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp',
     role: 'Lead Product Designer — Strategy & UX Architecture',
     tags: ['B2B SaaS', 'Systems Design', '0→1', 'AI'],
     metrics: [
@@ -1118,7 +1131,7 @@ const Work = ({ onOpenDrawer }) => (
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}
         >
           See all {CASE_STUDIES.length} case studies
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <AppIcon icon={ArrowRight} size={12} strokeWidth={2.5} />
         </button>
       </Reveal>
     </div>
@@ -1147,7 +1160,7 @@ const WorkDrawer = ({ open, onClose }) => {
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', borderBottom:'1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
           <button onClick={onClose} aria-label="Close" style={{ width:32, height:32, borderRadius:9999, display:'grid', placeItems:'center', background:'transparent', color:'var(--fg-primary)', border:'none', cursor:'pointer', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <AppIcon icon={X} size={14} strokeWidth={2} />
           </button>
         </div>
         <div style={{ padding:'28px', overflowY:'auto', flex:1 }}>
@@ -1187,7 +1200,7 @@ const CaseStudyPage = ({ c, onBack }) => {
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        <AppIcon icon={ArrowLeft} size={12} strokeWidth={2.5} />
         Back to work
       </a>
 
@@ -1312,24 +1325,90 @@ const CaseStudyPage = ({ c, onBack }) => {
 // ============================================================
 // Contact + Footer
 // ============================================================
-const ContactCard = ({ label, value, href, eventName }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
-    display: 'flex', flexDirection: 'column', gap: 8, padding: '18px 20px', borderRadius: 8,
-    background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
-    transition: 'transform 180ms ease',
-  }}
-    onClick={() => {
-      if (window.trackAnalyticsEvent && eventName) {
-        window.trackAnalyticsEvent(eventName, { link_url: href });
-      }
+const ContactCard = ({ label, value, href, eventName, copyValue }) => {
+  const [copied, setCopied] = React.useState(false);
+  const resetTimerRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+  }, []);
+
+  const handleCopy = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!copyValue) return;
+
+    try {
+      await navigator.clipboard.writeText(copyValue);
+      setCopied(true);
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = window.setTimeout(() => setCopied(false), 1200);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
+      position: 'relative',
+      display: 'flex', flexDirection: 'column', gap: 8, padding: '18px 20px', borderRadius: 8,
+      background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
+      transition: 'transform 180ms ease',
     }}
-    onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';}}
-    onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';}}
-  >
-    <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
-    <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value} ↗</span>
-  </a>
-);
+      onClick={() => {
+        if (window.trackAnalyticsEvent && eventName) {
+          window.trackAnalyticsEvent(eventName, { link_url: href });
+        }
+      }}
+      onMouseEnter={e=>{
+        e.currentTarget.style.transform='translateY(-2px)';
+        const copyButton = e.currentTarget.querySelector('[data-copy-button="true"]');
+        if (copyButton && !copied) copyButton.style.opacity = '1';
+      }}
+      onMouseLeave={e=>{
+        e.currentTarget.style.transform='translateY(0)';
+        const copyButton = e.currentTarget.querySelector('[data-copy-button="true"]');
+        if (copyButton && !copied) copyButton.style.opacity = '0';
+      }}
+    >
+      {copyValue && (
+        <button
+          type="button"
+          data-copy-button="true"
+          aria-label={copied ? `Copied ${label}` : `Copy ${label}`}
+          title={copied ? 'Copied' : 'Copy'}
+          onClick={handleCopy}
+          style={{
+            position: 'absolute', top: 12, right: 12,
+            width: 28, height: 28, borderRadius: 9999,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            border: 'none', cursor: 'pointer',
+            background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
+            color: copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
+            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            opacity: copied ? 1 : 0,
+            pointerEvents: copied ? 'auto' : 'none',
+            transition: 'opacity 150ms ease, color 150ms ease, background 150ms ease',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-primary)';
+            e.currentTarget.style.background = 'var(--bg-subtle)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.opacity = copied ? '1' : '0';
+            e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)';
+            e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
+          }}
+        >
+          <AppIcon icon={copied ? Check : Copy} size={13} strokeWidth={2.2} />
+        </button>
+      )}
+      <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
+      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
+    </a>
+  );
+};
 
 // ============================================================
 // Key Facts (AEO Section)
@@ -1456,7 +1535,7 @@ const Contact = () => (
           Turn complexity <br/><span style={{ color:'var(--fg-secondary)' }}>into clarity. </span><br/><span style={{ color:'var(--fg-primary)' }}>Let's talk.</span>
         </h2>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
-          <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" />
+          <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
           <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
           <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
           <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" />
@@ -1502,7 +1581,7 @@ const SiteFooter = () => (
       </div>
       
       <a href="design-system.html" className="footer-easter-egg" aria-label="See Design System">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        <AppIcon icon={Box} size={14} strokeWidth={2.5} />
         See design system
       </a>
 
@@ -1570,6 +1649,103 @@ const PrivacyPolicyPage = ({ theme, onBack }) => (
 );
 
 // ============================================================
+// Route metadata + analytics
+// ============================================================
+const SITE_ORIGIN = 'https://designedbyomar.com';
+const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
+const LOADER_SESSION_KEY = 'omar.loader-seen';
+
+const setHeadValue = (selector, attribute, value) => {
+  const element = document.head.querySelector(selector);
+  if (element && value) element.setAttribute(attribute, value);
+};
+
+const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'privacy') {
+    return {
+      title: 'Privacy Policy — Omar Tavarez',
+      description: 'Privacy policy and data collection details for designedbyomar.com.',
+      url: `${SITE_ORIGIN}/privacy`,
+      robots: 'index,follow,max-image-preview:large',
+    };
+  }
+
+  if (currentCase) {
+    return {
+      title: `${currentCase.title} — Omar Tavarez`,
+      description: currentCase.subtitle,
+      url: `${SITE_ORIGIN}/work/${currentCase.id}/`,
+      robots: 'index,follow,max-image-preview:large',
+    };
+  }
+
+  return {
+    title: 'designedbyomar — Omar Tavarez',
+    description: 'Omar Tavarez is a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.',
+    url: `${SITE_ORIGIN}/`,
+    robots: 'index,follow,max-image-preview:large',
+  };
+};
+
+const syncRouteHead = (meta) => {
+  document.title = meta.title;
+  setHeadValue('meta[name="description"]', 'content', meta.description);
+  setHeadValue('meta[name="robots"]', 'content', meta.robots);
+  setHeadValue('link[rel="canonical"]', 'href', meta.url);
+  setHeadValue('meta[property="og:title"]', 'content', meta.title);
+  setHeadValue('meta[property="og:description"]', 'content', meta.description);
+  setHeadValue('meta[property="og:url"]', 'content', meta.url);
+  setHeadValue('meta[property="og:image"]', 'content', DEFAULT_OG_IMAGE);
+  setHeadValue('meta[name="twitter:title"]', 'content', meta.title);
+  setHeadValue('meta[name="twitter:description"]', 'content', meta.description);
+  setHeadValue('meta[name="twitter:image"]', 'content', DEFAULT_OG_IMAGE);
+};
+
+const trackPageView = (meta, route, currentCase) => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'page_view', {
+    page_title: meta.title,
+    page_location: meta.url,
+    page_path: window.location.pathname,
+    page_type: route.type,
+    case_study_id: currentCase?.id,
+  });
+};
+
+const syncSentryContext = (route, currentCase, theme) => {
+  if (!SENTRY_ENABLED) return;
+
+  Sentry.setTag('route_type', route.type);
+  Sentry.setTag('theme', theme);
+  Sentry.setContext('page', {
+    pathname: window.location.pathname,
+    routeType: route.type,
+    caseStudyId: currentCase?.id ?? null,
+    theme,
+  });
+};
+
+const AppShellErrorFallback = () => (
+  <div style={{ minHeight:'100vh', display:'grid', placeItems:'center', padding:'32px 24px', background:'var(--bg-page)', color:'var(--fg-primary)' }}>
+    <div style={{ width:'100%', maxWidth:720, borderRadius:16, padding:'32px 28px', background:'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
+      <div style={{ fontFamily:'var(--font-mono)', fontSize:12, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--fg-tertiary)', marginBottom:14 }}>
+        Unexpected error
+      </div>
+      <h1 style={{ fontSize:'clamp(32px, 5vw, 56px)', lineHeight:1, letterSpacing:'-0.04em', margin:'0 0 16px' }}>
+        This view failed to load.
+      </h1>
+      <p style={{ fontSize:17, lineHeight:1.6, color:'var(--fg-secondary)', margin:'0 0 24px' }}>
+        Refresh the page or head back home. The issue has been logged for review.
+      </p>
+      <a href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'10px 16px', borderRadius:6, background:'var(--fg-primary)', textDecoration:'none' }}>
+        Back home
+      </a>
+    </div>
+  </div>
+);
+
+// ============================================================
 // Routing
 // ============================================================
 // ============================================================
@@ -1618,16 +1794,22 @@ const App = () => {
   const [theme, setTheme] = React.useState(() => localStorage.getItem('omar.theme') || 'dark');
   React.useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem('omar.theme', theme); }, [theme]);
 
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(() => {
+    try {
+      return sessionStorage.getItem(LOADER_SESSION_KEY) !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
   React.useEffect(() => {
     if (!loading) return;
     let cancelled = false;
-    const minDelay = new Promise((resolve) => setTimeout(resolve, 3000));
     const pageReady = document.readyState === 'complete'
       ? Promise.resolve()
       : new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
-    const heroSrc = theme === 'light' ? '/Images/omar-light.png' : '/Images/omar.png';
+    const heroSrc = theme === 'light' ? '/Images/omar-light.webp' : '/Images/omar.webp';
     const heroImageReady = new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve();
@@ -1636,8 +1818,13 @@ const App = () => {
       if (img.complete) resolve();
     });
 
-    Promise.all([minDelay, pageReady, fontsReady, heroImageReady]).then(() => {
-      if (!cancelled) setLoading(false);
+    Promise.all([pageReady, fontsReady, heroImageReady]).then(() => {
+      if (!cancelled) {
+        try {
+          sessionStorage.setItem(LOADER_SESSION_KEY, 'true');
+        } catch {}
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -1651,6 +1838,16 @@ const App = () => {
 
   const route = useRoute();
   const currentCase = route.type === 'case' ? CASE_STUDIES.find(c => c.id === route.id) : null;
+
+  React.useEffect(() => {
+    const meta = getRouteMeta(route, currentCase);
+    syncRouteHead(meta);
+    trackPageView(meta, route, currentCase);
+  }, [route, currentCase]);
+
+  React.useEffect(() => {
+    syncSentryContext(route, currentCase, theme);
+  }, [route, currentCase, theme]);
 
   const goHome = () => {
     if (window.location.pathname !== '/') {
@@ -1688,4 +1885,8 @@ const App = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Sentry.ErrorBoundary fallback={<AppShellErrorFallback />}>
+    <App />
+  </Sentry.ErrorBoundary>
+);
