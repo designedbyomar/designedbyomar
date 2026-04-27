@@ -174,15 +174,15 @@ const HERO_STATS = [
   {
     value: '200+ sheets replaced',
     label: 'Centralized fragmented ops',
-    desktop: { bottom: '12%', right: '4%', maxWidth: 172 },
-    mobile: { bottom: '14%', right: '4%', maxWidth: 144 },
+    desktop: { bottom: '8%', right: '4%', maxWidth: 172 },
+    mobile: { bottom: '10%', right: '4%', maxWidth: 144 },
     motion: { phase: 4.6, radiusX: 6, radiusY: 4, boostX: 7, boostY: 5, parallaxX: 0.28, parallaxY: 0.16, rotate: 1.0, rotateBoost: 0.75, rotateDir: 1 },
   },
   {
     value: '260 → 900+ offices',
     label: 'Scaled ops tooling',
-    desktop: { top: '48%', right: '-8%', maxWidth: 170 },
-    mobile: { top: '42%', right: '0%', maxWidth: 140 },
+    desktop: { top: '38%', right: '-12%', maxWidth: 170 },
+    mobile: { top: '34%', right: '-2%', maxWidth: 140 },
     motion: { phase: 2.4, radiusX: 6, radiusY: 5, boostX: 7, boostY: 6, parallaxX: 0.32, parallaxY: -0.12, rotate: 1.1, rotateBoost: 0.8, rotateDir: 1 },
   },
 ];
