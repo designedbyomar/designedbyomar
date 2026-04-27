@@ -1800,22 +1800,9 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
     fontFamily:'inherit',
     cursor:'pointer',
   };
-  const emphasizeLinkStyle = {
+  const specialFooterLinkStyle = {
     ...footerLinkStyle,
-    color:'var(--color-develop-blue)',
-  };
-  const socialLinkStyle = {
-    display:'inline-flex',
-    flexDirection:'column',
-    alignItems:'flex-start',
-    gap:10,
-    width:'fit-content',
-    fontSize:14,
-    fontWeight:500,
-    lineHeight:1.3,
     color:'var(--fg-secondary)',
-    textDecoration:'none',
-    transition:'color 160ms ease, transform 160ms ease',
   };
 
   const enhanceLink = (event, color = 'var(--fg-primary)') => {
@@ -1848,7 +1835,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
       <style dangerouslySetInnerHTML={{__html: `
         .site-footer-grid {
           display: grid;
-          grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
+          grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
           gap: 40px 72px;
         }
         .site-footer-block {
@@ -1943,7 +1930,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
         }
         @media (max-width: 900px) {
           .site-footer-grid {
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 36px 32px;
           }
           .site-footer-brand {
@@ -1974,9 +1961,10 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
               width:'fit-content',
               fontFamily:'var(--font-mono)',
               fontSize:12,
-              lineHeight:1.7,
+              lineHeight:1.55,
               color:'var(--fg-tertiary)',
-              letterSpacing:'0.02em',
+              letterSpacing:'0.08em',
+              textTransform:'uppercase',
             }}>
               <span>Designed by Omar. Built with AI-native coding tools.</span>
               <FooterAlien />
@@ -2024,80 +2012,61 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
             >
               Privacy Policy
             </a>
-            <a
-              href="design-system.html"
-              className="site-footer-link"
-              aria-label="See Design System"
-              style={emphasizeLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event, 'var(--color-preview-pink)')}
-              onMouseLeave={(event) => resetLink(event, 'var(--color-develop-blue)')}
-            >
-              <AppIcon icon={Box} size={15} strokeWidth={2.4} />
-              Design System
-            </a>
+            <div style={{ display:'flex', flexDirection:'column', gap:18, paddingTop:10 }}>
+              <span style={footerLabelStyle}>Brand System</span>
+              <a
+                href="design-system.html"
+                className="site-footer-link"
+                aria-label="See Design System"
+                style={specialFooterLinkStyle}
+                onMouseEnter={(event) => enhanceLink(event, 'var(--color-develop-blue)')}
+                onMouseLeave={(event) => resetLink(event, 'var(--fg-secondary)')}
+              >
+                Design System
+              </a>
+            </div>
           </div>
 
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Social</span>
-            <div style={{ display:'flex', gap:22, flexWrap:'wrap', alignItems:'flex-start' }}>
-              <a
-                href="https://www.linkedin.com/in/omartavarez/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="site-footer-link"
-                style={socialLinkStyle}
-                onMouseEnter={(event) => enhanceLink(event)}
-                onMouseLeave={(event) => resetLink(event)}
-              >
-                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="2.25" y="6.75" width="2.5" height="8.5" stroke="currentColor" strokeWidth="1.8"/>
-                    <circle cx="3.5" cy="3.75" r="1.15" fill="currentColor"/>
-                    <path d="M7.25 6.75V15.25" stroke="currentColor" strokeWidth="1.8"/>
-                    <path d="M7.25 10.1C7.25 8.25 8.35 6.75 10.55 6.75C12.7 6.75 13.75 8.15 13.75 10.75V15.25" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
-                  </svg>
-                </span>
-                <span>LinkedIn</span>
-              </a>
-              <a
-                href="https://github.com/designedbyomar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="site-footer-link"
-                style={socialLinkStyle}
-                onMouseEnter={(event) => enhanceLink(event)}
-                onMouseLeave={(event) => resetLink(event)}
-              >
-                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 2.4C5.36 2.4 2.4 5.38 2.4 9.05C2.4 11.98 4.28 14.46 6.89 15.34C7.22 15.4 7.34 15.2 7.34 15.03V13.87C5.53 14.27 5.15 13.08 5.15 13.08C4.86 12.32 4.43 12.12 4.43 12.12C3.84 11.72 4.48 11.73 4.48 11.73C5.13 11.78 5.47 12.41 5.47 12.41C6.05 13.41 6.99 13.12 7.36 12.95C7.42 12.53 7.58 12.24 7.76 12.07C6.31 11.9 4.79 11.33 4.79 8.75C4.79 8.01 5.05 7.41 5.48 6.94C5.41 6.77 5.19 6.06 5.55 5.09C5.55 5.09 6.1 4.91 7.33 5.74C7.85 5.59 8.41 5.51 8.97 5.51C9.53 5.51 10.09 5.59 10.61 5.74C11.84 4.91 12.39 5.09 12.39 5.09C12.75 6.06 12.53 6.77 12.46 6.94C12.89 7.41 13.15 8.01 13.15 8.75C13.15 11.34 11.63 11.9 10.18 12.07C10.41 12.29 10.62 12.72 10.62 13.37V15.03C10.62 15.2 10.74 15.41 11.08 15.34C13.69 14.46 15.57 11.98 15.57 9.05C15.57 5.38 12.61 2.4 9 2.4Z" stroke="currentColor" strokeWidth="1.15" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-                <span>GitHub</span>
-              </a>
-              <a
-                href="https://substack.com/@designedbyomar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="site-footer-link"
-                style={socialLinkStyle}
-                onMouseEnter={(event) => enhanceLink(event)}
-                onMouseLeave={(event) => resetLink(event)}
-              >
-                <span aria-hidden="true" style={{ display:'inline-flex', color:'currentColor' }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 3.25H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
-                    <path d="M2 7.25H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square"/>
-                    <path d="M4 10.5H14V15H4V10.5Z" stroke="currentColor" strokeWidth="1.8"/>
-                  </svg>
-                </span>
-                <span>Substack</span>
-              </a>
-            </div>
+            <a
+              href="https://www.linkedin.com/in/omartavarez/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-footer-link"
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://github.com/designedbyomar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-footer-link"
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              GitHub
+            </a>
+            <a
+              href="https://substack.com/@designedbyomar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-footer-link"
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              Substack
+            </a>
             <span style={{ paddingTop:8, fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', letterSpacing:'0.06em', textTransform:'uppercase' }}>
               © 2026 Omar Tavarez
             </span>
           </div>
+
         </div>
       </div>
     </footer>
