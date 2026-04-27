@@ -664,7 +664,7 @@ const NavLogo = ({ onClick }) => {
   );
 };
 
-const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
+const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
   const [scrolled, setScrolled] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const viewportWidth = useViewportWidth();
@@ -689,12 +689,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
   const goSection = (id) => (e) => {
     e.preventDefault();
     closeMobileMenu();
-    if (window.location.hash && window.location.hash !== '#') {
-      window.location.hash = '';
-      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
-    } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    scrollToSection(id);
   };
   const navLink = {
     fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)',
@@ -810,7 +805,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         I partner with product and engineering leaders to translate complex workflows into scalable systems — using prototypes to align teams and measurable outcomes to guide decisions.
       </p>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <a href="#work" onClick={(e) => { e.preventDefault(); document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' }); }} style={{
+        <a href="#work" onClick={(e) => { e.preventDefault(); scrollToSection('work'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
           color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)',
           textDecoration: 'none', transition: 'opacity 150ms',
@@ -1689,7 +1684,7 @@ const FooterAlien = () => {
   return <div ref={ref} style={{ display: 'inline-block' }}><FooterArrival played={played} /></div>;
 };
 
-const SiteFooter = ({ onOpenAbout, onHome }) => {
+const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
   const footerLabelStyle = {
     fontFamily: 'var(--font-mono)',
     fontSize: 12,
@@ -1730,17 +1725,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
 
   const goSection = (id) => (event) => {
     event.preventDefault();
-    if (window.location.pathname !== '/') {
-      history.pushState(null, '', '/');
-      window.dispatchEvent(new Event('popstate'));
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      });
-      return;
-    }
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToSection(id);
   };
 
   return (
@@ -2138,14 +2123,13 @@ const App = () => {
   };
 
   const scrollToSection = (id) => {
-    if (window.location.pathname !== '/') {
+    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname === '';
+    if (!isHome) {
       history.pushState(null, '', '/');
       window.dispatchEvent(new Event('popstate'));
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      });
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 40);
       return;
     }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2155,7 +2139,7 @@ const App = () => {
     <>
       <LogoLoader visible={loading} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity 400ms ease 120ms' }}>
-        <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} />
+        <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
@@ -2171,7 +2155,7 @@ const App = () => {
             </>
           )}
         </main>
-        <SiteFooter onOpenAbout={() => setAboutOpen(true)} onHome={goHome} />
+        <SiteFooter onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />
