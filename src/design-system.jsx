@@ -94,12 +94,31 @@ const RadiusBox = ({ label, radius }) => (
   </div>
 );
 
-const SpaceRow = ({ size }) => (
+const SpaceRow = ({ token, px }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 16, height: 24 }}>
-    <div style={{ width: size, height: '100%', background: 'var(--color-develop-blue)', opacity: 0.2, borderRadius: 1 }} />
-    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)' }}>{size}px</span>
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', minWidth: 92 }}>--{token}</span>
+    <div style={{ width: `var(--${token})`, height: '100%', background: 'var(--color-develop-blue)', opacity: 0.2, borderRadius: 1 }} />
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)' }}>{px}px</span>
   </div>
 );
+
+const SPACE_TOKENS_UI = [
+  { token: 'space-1', px: 4 },
+  { token: 'space-2', px: 8 },
+  { token: 'space-3', px: 12 },
+  { token: 'space-4', px: 16 },
+  { token: 'space-5', px: 20 },
+  { token: 'space-6', px: 24 },
+  { token: 'space-7', px: 32 },
+  { token: 'space-8', px: 40 },
+];
+
+const SPACE_TOKENS_LAYOUT = [
+  { token: 'layout-1', px: 48 },
+  { token: 'layout-2', px: 64 },
+  { token: 'layout-3', px: 96 },
+  { token: 'layout-4', px: 120 },
+];
 
 const NavMarkIcon = ({ color = 'currentColor', width = 86, height = 18 }) => (
   <svg width={width} height={height} viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -473,8 +492,19 @@ const DesignSystem = () => {
             {/* Spacing System */}
             <div>
               <div className="mono-label">Spacing Scale</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: 'var(--bg-page)', padding: 24, borderRadius: 8, boxShadow: 'var(--shadow-ring)' }}>
-                {[1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 32, 36, 40].map(s => <SpaceRow key={s} size={s} />)}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg-page)', padding: 24, borderRadius: 8, boxShadow: 'var(--shadow-ring)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>UI band — component spacing</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {SPACE_TOKENS_UI.map(t => <SpaceRow key={t.token} token={t.token} px={t.px} />)}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Layout band — section rhythm</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {SPACE_TOKENS_LAYOUT.map(t => <SpaceRow key={t.token} token={t.token} px={t.px} />)}
+                  </div>
+                </div>
               </div>
             </div>
 
