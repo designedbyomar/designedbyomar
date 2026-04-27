@@ -1915,6 +1915,74 @@ const PrivacyPolicyPage = ({ theme, onBack }) => (
 );
 
 // ============================================================
+// Cookie Banner
+// ============================================================
+const CookieBanner = ({ onAccept, onPrivacy }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 24,
+      left: 24,
+      right: 24,
+      zIndex: 10000,
+      display: 'flex',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+    }}>
+      <div style={{
+        maxWidth: 580,
+        width: '100%',
+        background: 'color-mix(in oklab, var(--bg-page) 82%, transparent)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: 'var(--shadow-card-full)',
+        borderRadius: 16,
+        padding: '18px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 24,
+        pointerEvents: 'auto',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(24px) scale(0.98)',
+        transition: 'all 600ms cubic-bezier(0.16, 1, 0.3, 1)',
+        border: '1px solid var(--color-gray-100)',
+      }}>
+        <p style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5, margin: 0 }}>
+          I use cookies to understand how you interact with my work. Learn more in the <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>.
+        </p>
+        <button 
+          onClick={onAccept}
+          style={{
+            background: 'var(--fg-primary)',
+            color: 'var(--bg-page)',
+            padding: '9px 18px',
+            borderRadius: 8,
+            fontSize: 13,
+            fontWeight: 600,
+            border: 'none',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            transition: 'transform 150ms ease, opacity 150ms ease'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'scale(1.02)'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          Accept
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
 // Route metadata + analytics
 // ============================================================
 const SITE_ORIGIN = 'https://designedbyomar.com';
@@ -2076,6 +2144,31 @@ const App = () => {
     }
   });
 
+  const [cookieConsent, setCookieConsent] = React.useState(() => {
+    try {
+      return localStorage.getItem('omar.consent') === 'true';
+    } catch {
+      return true; // Default to true if storage fails to avoid annoying users
+    }
+  });
+
+  const handleAcceptCookies = () => {
+    try {
+      localStorage.setItem('omar.consent', 'true');
+      setCookieConsent(true);
+    } catch (e) {
+      setCookieConsent(true);
+    }
+  };
+
+  const showPrivacy = () => {
+    setAboutOpen(false);
+    setWorkOpen(false);
+    history.pushState(null, '', '/privacy');
+    window.dispatchEvent(new Event('popstate'));
+    window.scrollTo(0, 0);
+  };
+
   React.useEffect(() => {
     if (!loading) return;
     let cancelled = false;
@@ -2193,6 +2286,7 @@ const App = () => {
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />
+      {!cookieConsent && <CookieBanner onAccept={handleAcceptCookies} onPrivacy={showPrivacy} />}
     </>
   );
 };

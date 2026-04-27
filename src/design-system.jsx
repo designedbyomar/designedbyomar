@@ -288,6 +288,37 @@ const MiniFooterPreview = () => (
   </div>
 );
 
+const MiniCookieBannerPreview = () => (
+  <div style={{
+    width: '100%',
+    background: 'color-mix(in oklab, var(--bg-page) 82%, transparent)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: 'var(--shadow-card-full)',
+    borderRadius: 12,
+    padding: '14px 18px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+    border: '1px solid var(--color-gray-100)',
+  }}>
+    <p style={{ fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.4, margin: 0 }}>
+      I use cookies to understand how you interact with my work.
+    </p>
+    <div style={{
+      background: 'var(--fg-primary)',
+      color: 'var(--bg-page)',
+      padding: '6px 12px',
+      borderRadius: 6,
+      fontSize: 11,
+      fontWeight: 600,
+    }}>
+      Accept
+    </div>
+  </div>
+);
+
 const MotionRow = ({ name, timing, note }) => (
   <div style={{ padding: '18px 0', borderBottom: '1px solid var(--color-gray-100)', display: 'grid', gridTemplateColumns: 'minmax(180px, 1fr) 1fr', gap: 24, alignItems: 'start' }}>
     <div>
@@ -645,6 +676,33 @@ const DesignSystem = () => {
                 Collapse: 3 → 2 → 1 columns<br />
                 Links: 160ms color + translateX hover treatment<br />
                 Brand system link: lives in footer, not as a top-level nav item
+              </div>
+            </SystemCard>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Overlays & Notifications</h2>
+          </div>
+
+          <div className="mono-label">Floating patterns, consent banners, and glass shells</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+            <SystemCard
+              label="Cookie Consent Banner"
+              note="A non-intrusive floating banner for privacy compliance. Uses the standard glassmorphism stack (blur + opacity + shadow) to maintain depth without breaking the layout."
+            >
+              <MiniCookieBannerPreview />
+            </SystemCard>
+            <SystemCard
+              label="Interaction & Motion"
+              note="The banner animates from the bottom with a 600ms spring-like transition. It persists via localStorage and respects the global theme toggle automatically."
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                Entrance: `translateY(24px)` → `0` @ 1200ms delay<br />
+                Stacking: `z-index: 10000`<br />
+                Backdrop: `blur(16px)` + `var(--bg-page) @ 82%`<br />
+                Persistence: `omar.consent` in localStorage
               </div>
             </SystemCard>
           </div>
