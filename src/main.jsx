@@ -420,7 +420,7 @@ const Portrait = ({ galaxy, theme }) => {
           }} />
         </>
       )}
-      <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1 }}>
+      <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 3 }}>
         <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
@@ -440,7 +440,7 @@ const Portrait = ({ galaxy, theme }) => {
         }} />
       )}
       {!isLight && (
-        <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 2, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
+        <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 1, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
       )}
       <div className="hero-stats-layer" aria-hidden={!statsVisible}>
         {HERO_STATS.map((stat, index) => {
