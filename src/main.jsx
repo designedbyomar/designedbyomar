@@ -807,11 +807,14 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
       </div>
       <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-        Omar <span style={{ color: 'var(--fg-primary)' }}>Tavarez</span>
+        Designing the systems <span style={{ color: 'var(--fg-tertiary)' }}>behind high-performing products.</span>
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 400, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
-        I partner with product and engineering leaders to translate complex workflows into scalable systems — using prototypes to align teams and measurable outcomes to guide decisions.
+        I lead design across AI and SaaS platforms—aligning product strategy, UX, and systems to turn complex operations into scalable products.
       </p>
+      <div style={{ fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
+        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% efficiency gains • 900+ locations supported • $20M+ MRR workflows</span>
+      </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
