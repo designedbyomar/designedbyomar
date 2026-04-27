@@ -417,13 +417,13 @@ const Portrait = ({ galaxy, theme }) => {
           <div style={{
             position: 'absolute', inset: '11% 8% 18%', zIndex: 0, pointerEvents: 'none',
             borderRadius: '48% 52% 46% 54% / 42% 46% 54% 58%',
-            background: 'radial-gradient(circle at 50% 38%, color-mix(in srgb, #fff2d8 82%, var(--color-preview-pink) 18%) 0%, color-mix(in srgb, #fff4e6 76%, var(--color-ship-red) 24%) 34%, color-mix(in srgb, #f6f7ff 80%, var(--color-develop-blue) 20%) 72%, rgba(255,255,255,0) 100%)',
+            background: 'var(--gradient-hero-radial-blur)',
             filter: 'blur(26px)', opacity: 0.95,
           }} />
           <div style={{
             position: 'absolute', inset: '4% 10% auto auto', width: '34%', height: '30%', zIndex: 0, pointerEvents: 'none',
             borderRadius: '9999px',
-            background: 'radial-gradient(circle, color-mix(in srgb, var(--color-preview-pink) 22%, white) 0%, rgba(255,255,255,0) 72%)',
+            background: 'var(--gradient-hero-overlay-pink)',
             filter: 'blur(18px)', opacity: 0.7,
           }} />
         </>
@@ -435,15 +435,15 @@ const Portrait = ({ galaxy, theme }) => {
             ? 'drop-shadow(0 18px 44px rgba(10,114,239,0.16)) drop-shadow(0 26px 48px rgba(255,91,79,0.12)) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
             : 'drop-shadow(0 20px 60px rgba(0,0,0,0.55))',
           userSelect: 'none', pointerEvents: 'none',
-          WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
-          maskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'var(--gradient-mask-fade-vertical)',
+          maskImage: 'var(--gradient-mask-fade-vertical)',
         }} />
       </div>
       {isLight && (
         <div style={{
           position: 'absolute', inset: '8% 12% 4%', zIndex: 2, pointerEvents: 'none',
           borderRadius: '40% 60% 52% 48% / 44% 42% 58% 56%',
-          background: 'linear-gradient(155deg, color-mix(in srgb, var(--color-preview-pink) 10%, transparent) 0%, transparent 34%, color-mix(in srgb, var(--color-develop-blue) 11%, transparent) 67%, color-mix(in srgb, var(--color-ship-red) 10%, transparent) 100%)',
+          background: 'var(--gradient-overlay-diagonal)',
           opacity: 0.65,
         }} />
       )}
