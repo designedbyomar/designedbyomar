@@ -688,6 +688,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const goSection = (id) => (e) => {
     e.preventDefault();
+    e.stopPropagation();
     closeMobileMenu();
     scrollToSection(id);
   };
@@ -805,7 +806,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         I partner with product and engineering leaders to translate complex workflows into scalable systems — using prototypes to align teams and measurable outcomes to guide decisions.
       </p>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <a href="#work" onClick={(e) => { e.preventDefault(); scrollToSection('work'); }} style={{
+        <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
           color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)',
           textDecoration: 'none', transition: 'opacity 150ms',
@@ -816,7 +817,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           View case studies
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
-        <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} style={{
+        <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
           color: 'var(--fg-primary)', padding: '10px 16px', borderRadius: 6, background: 'transparent',
           boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background 150ms',
@@ -2023,7 +2024,15 @@ const useRoute = () => {
   const [route, setRoute] = React.useState(() => parse(window.location.pathname));
 
   React.useEffect(() => {
-    const on = () => { setRoute(parse(window.location.pathname)); window.scrollTo(0, 0); };
+    const on = () => {
+      const next = parse(window.location.pathname);
+      setRoute(prev => {
+        if (prev.type !== next.type || (prev.type === 'case' && prev.id !== next.id)) {
+          window.scrollTo(0, 0);
+        }
+        return next;
+      });
+    };
     window.addEventListener('popstate', on);
     return () => window.removeEventListener('popstate', on);
   }, []);
@@ -2034,8 +2043,8 @@ const useRoute = () => {
       if (a && a.href) {
         const url = new URL(a.href);
         if (url.origin === window.location.origin) {
+          if (url.pathname === window.location.pathname && url.hash) return;
           if (url.pathname.startsWith('/work/') || url.pathname === '/privacy' || url.pathname === '/') {
-            // Internal React route
             e.preventDefault();
             history.pushState(null, '', url.pathname + url.search + url.hash);
             window.dispatchEvent(new Event('popstate'));
