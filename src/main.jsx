@@ -1585,7 +1585,7 @@ const KeyFacts = () => {
             textTransform:'uppercase',
             letterSpacing:'0.08em'
           }}>
-            <span style={{ color:'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>04 — </span>At a Glance
+            <span style={{ color:'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
           <h2 style={{ fontSize:'clamp(32px, 4.2vw, 56px)', fontWeight:600, lineHeight:1.02, letterSpacing:'-0.04em', color:'var(--fg-on-dark)', margin:0, maxWidth:760 }}>
             The short version: <span style={{ color:'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
@@ -1639,7 +1639,7 @@ const Contact = () => {
   <section id="contact" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'112px 24px 96px' }}>
     <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:contactGridColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems:'start' }}>
       <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
-        <span style={{ color:'var(--color-ship-red)' }}>03 — </span>Contact
+        <span style={{ color:'var(--color-ship-red)' }}>04 — </span>Contact
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:40, maxWidth:820 }}>
         <h2 style={{ fontSize:'clamp(36px, 6vw, 80px)', fontWeight:600, lineHeight:0.98, letterSpacing:'-0.04em', color:'var(--fg-secondary)', margin:0 }}>
