@@ -1560,7 +1560,7 @@ const KeyFacts = () => {
       onMouseMove={handleMouseMove}
       style={{
         position: 'relative',
-        padding: '140px 24px',
+        padding: 'var(--layout-4) var(--space-6)',
         overflow: 'hidden',
         background: 'var(--color-develop-blue)',
       }}
@@ -1574,9 +1574,9 @@ const KeyFacts = () => {
         <Reveal className="work-head" variant="section" style={{
           display:'grid',
           gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr',
-          gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64,
+          gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)',
           alignItems:'start',
-          marginBottom: 56,
+          marginBottom: 'var(--layout-1)',
         }}>
           <div style={{
             fontFamily:'var(--font-mono)',
@@ -1594,11 +1594,11 @@ const KeyFacts = () => {
         <Reveal variant="section" className="facts-grid" style={{
           display: 'grid',
           gridTemplateColumns: factsColumns,
-          gap: 20,
+          gap: 'var(--space-5)',
         }}>
           {facts.map((f, i) => (
             <div key={i} style={{
-              padding: '24px 20px',
+              padding: 'var(--space-6) var(--space-5)',
               borderRadius: 12,
               background: 'var(--bg-subtle)',
               boxShadow: 'var(--shadow-card-subtle)',
@@ -1607,7 +1607,7 @@ const KeyFacts = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:12 }}>
+              <div style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'var(--space-3)' }}>
                 {f.label}
               </div>
               {f.custom ? (
@@ -1636,16 +1636,16 @@ const Contact = () => {
   const contactCardColumns = viewportWidth <= MOBILE_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))';
 
   return (
-  <section id="contact" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'112px 24px 96px' }}>
-    <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:contactGridColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems:'start' }}>
+  <section id="contact" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'var(--layout-4) var(--space-6) var(--layout-3)' }}>
+    <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:contactGridColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems:'start' }}>
       <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
         <span style={{ color:'var(--color-ship-red)' }}>04 — </span>Contact
       </div>
-      <div style={{ display:'flex', flexDirection:'column', gap:40, maxWidth:820 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:'var(--space-8)', maxWidth:820 }}>
         <h2 style={{ fontSize:'clamp(36px, 6vw, 80px)', fontWeight:600, lineHeight:0.98, letterSpacing:'-0.04em', color:'var(--fg-secondary)', margin:0 }}>
           Turn complexity <br/><span style={{ color:'var(--fg-secondary)' }}>into clarity. </span><br/><span style={{ color:'var(--fg-primary)' }}>Let's talk.</span>
         </h2>
-        <div style={{ display:'grid', gridTemplateColumns:contactCardColumns, gap:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:contactCardColumns, gap:'var(--space-4)' }}>
           <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
           <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
           <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
