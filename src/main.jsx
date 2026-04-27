@@ -181,8 +181,8 @@ const HERO_STATS = [
   {
     value: '260 → 900+ offices',
     label: 'Scaled ops tooling',
-    desktop: { top: '38%', right: '-12%', maxWidth: 170 },
-    mobile: { top: '34%', right: '-2%', maxWidth: 140 },
+    desktop: { top: '44%', right: '-10%', maxWidth: 170 },
+    mobile: { top: '38%', right: '0%', maxWidth: 140 },
     motion: { phase: 2.4, radiusX: 6, radiusY: 5, boostX: 7, boostY: 6, parallaxX: 0.32, parallaxY: -0.12, rotate: 1.1, rotateBoost: 0.8, rotateDir: 1 },
   },
 ];
