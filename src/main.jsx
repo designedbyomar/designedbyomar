@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -2369,7 +2370,10 @@ const App = () => {
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <Sentry.ErrorBoundary fallback={<AppShellErrorFallback />}>
-    <App />
-  </Sentry.ErrorBoundary>
+  <>
+    <Sentry.ErrorBoundary fallback={<AppShellErrorFallback />}>
+      <App />
+    </Sentry.ErrorBoundary>
+    <SpeedInsights />
+  </>
 );
