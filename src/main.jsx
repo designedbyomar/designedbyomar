@@ -1831,7 +1831,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
   };
 
   return (
-    <footer style={{ borderTop:'1px solid var(--color-gray-100)', padding:'56px 24px 72px' }}>
+    <footer style={{ borderTop:'1px solid var(--color-gray-100)', padding:'var(--layout-1) var(--space-6) var(--layout-2)' }}>
       <style dangerouslySetInnerHTML={{__html: `
         .site-footer-grid {
           display: grid;
@@ -1946,7 +1946,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
       `}} />
       <div style={{ maxWidth:1200, margin:'0 auto' }}>
         <div className="site-footer-grid">
-          <div className="site-footer-block site-footer-brand" style={{ gap:22 }}>
+          <div className="site-footer-block site-footer-brand" style={{ gap:'var(--space-6)' }}>
             <div style={{ display:'inline-flex', width:'fit-content' }}>
               <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
             </div>
@@ -1956,7 +1956,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
             <span className="footer-signoff" style={{
               display:'inline-flex',
               alignItems:'center',
-              gap:10,
+              gap:'var(--space-2)',
               flexWrap:'wrap',
               width:'fit-content',
               fontFamily:'var(--font-mono)',
@@ -2012,7 +2012,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
             >
               Privacy Policy
             </a>
-            <div style={{ display:'flex', flexDirection:'column', gap:18, paddingTop:10 }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)', paddingTop:'var(--space-2)' }}>
               <span style={footerLabelStyle}>Brand System</span>
               <a
                 href="design-system.html"
