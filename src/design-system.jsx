@@ -1,29 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+
 const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
   return (
     <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
-      display:'inline-flex', alignItems:'center', justifyContent:'center',
-      width:36, height:36, borderRadius:9999, background:'transparent',
-      color:'var(--fg-primary)', border:'none',
-      boxShadow:'inset 0 0 0 1px var(--color-gray-100)', cursor:'pointer', transition:'background 150ms',
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+      color: 'var(--fg-primary)', border: 'none',
+      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms',
     }}
-      onMouseEnter={e => e.currentTarget.style.background='var(--bg-subtle)'}
-      onMouseLeave={e => e.currentTarget.style.background='transparent'}
+      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
     >
-      {isDark
-        ? <AppIcon icon={Moon} size={16} strokeWidth={1.8} />
-        : <AppIcon icon={Sun} size={16} strokeWidth={1.8} />
-      }
+      {isDark ? <AppIcon icon={Moon} size={16} /> : <AppIcon icon={Sun} size={16} />}
     </button>
   );
 };
 
 const Header = ({ theme, setTheme }) => (
   <header style={{ padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: 1200, margin: '0 auto' }}>
-    <a href="index.html" style={{fontFamily:'var(--font-mono)', fontSize: 13, fontWeight: 500, textDecoration: 'none', color: 'var(--fg-primary)'}}>
+    <a href="index.html" style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500, textDecoration: 'none', color: 'var(--fg-primary)' }}>
       ← Back to Site
     </a>
     <ThemeToggle theme={theme} setTheme={setTheme} />
@@ -34,24 +33,24 @@ const ColorSwatch = ({ name, variable, hexLight, hexDark, theme }) => {
   const isDark = theme === 'dark';
   const color = `var(${variable})`;
   const displayHex = isDark && hexDark ? hexDark : hexLight;
-  
+
   return (
     <div className="swatch" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{
-        width: '100%', height: 120, borderRadius: 8, background: color, 
+        width: '100%', height: 120, borderRadius: 8, background: color,
         boxShadow: 'var(--shadow-card-subtle)',
-        display:'flex', alignItems:'flex-end', justifyContent:'flex-end', padding: 12
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 12
       }}>
-        <button className="copy-button" onClick={() => navigator.clipboard.writeText(displayHex)} 
-          style={{ 
-            background: 'rgba(255,255,255,0.2)', border:'none', backdropFilter:'blur(4px)', 
-            padding:'6px 10px', borderRadius:6, fontFamily:'var(--font-mono)', fontSize:11,
+        <button className="copy-button" onClick={() => navigator.clipboard.writeText(displayHex)}
+          style={{
+            background: 'rgba(255,255,255,0.2)', border: 'none', backdropFilter: 'blur(4px)',
+            padding: '6px 10px', borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: 11,
             cursor: 'pointer', color: 'white', textShadow: '0 1px 2px rgba(0,0,0,0.5)'
           }}>Copy Hex</button>
       </div>
       <div>
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 4 }}>{name}</div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform:'uppercase' }}>{displayHex}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase' }}>{displayHex}</div>
       </div>
     </div>
   );
@@ -62,18 +61,18 @@ const TypoRow = ({ role, font, size, weight, letterSpacing, lineHeight, sample }
     <div>
       <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 8 }}>{role}</div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', lineHeight: 1.6 }}>
-        {font} <br/>
-        Size: {size}<br/>
-        Weight: {weight}<br/>
-        Tracking: {letterSpacing}<br/>
+        {font} <br />
+        Size: {size}<br />
+        Weight: {weight}<br />
+        Tracking: {letterSpacing}<br />
         Leading: {lineHeight}
       </div>
     </div>
-    <div style={{ 
+    <div style={{
       fontFamily: font.includes('Mono') ? 'var(--font-mono)' : 'var(--font-sans)',
-      fontSize: size, 
-      fontWeight: weight, 
-      letterSpacing: letterSpacing, 
+      fontSize: size,
+      fontWeight: weight,
+      letterSpacing: letterSpacing,
       lineHeight: lineHeight,
       color: 'var(--fg-primary)'
     }}>
@@ -122,97 +121,10 @@ const SPACE_TOKENS_LAYOUT = [
 
 const NavMarkIcon = ({ color = 'currentColor', width = 86, height = 18 }) => (
   <svg width={width} height={height} viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" fill={color}/>
-    <path d="M39.9286 0H21.5V18H39.9286V0Z" fill={color}/>
-    <path d="M53.75 0L64.5 18H43L53.75 0Z" fill={color}/>
-    <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" fill={color}/>
-  </svg>
-);
-
-const PixelAlienIcon = ({ color = 'currentColor', size = 64 }) => (
-  <svg width={size} height={size * 0.75} viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" shapeRendering="crispEdges">
-    <rect x="5" y="0" width="2" height="1" fill={color}/>
-    <rect x="9" y="0" width="2" height="1" fill={color}/>
-    <rect x="4" y="1" width="8" height="1" fill={color}/>
-    <rect x="3" y="2" width="10" height="1" fill={color}/>
-    <rect x="2" y="3" width="12" height="1" fill={color}/>
-    <rect x="2" y="4" width="3" height="1" fill={color}/>
-    <rect x="7" y="4" width="2" height="1" fill={color}/>
-    <rect x="11" y="4" width="3" height="1" fill={color}/>
-    <rect x="2" y="5" width="12" height="1" fill={color}/>
-    <rect x="1" y="6" width="3" height="1" fill={color}/>
-    <rect x="5" y="6" width="6" height="1" fill={color}/>
-    <rect x="12" y="6" width="3" height="1" fill={color}/>
-    <rect x="0" y="7" width="2" height="1" fill={color}/>
-    <rect x="4" y="7" width="3" height="1" fill={color}/>
-    <rect x="9" y="7" width="3" height="1" fill={color}/>
-    <rect x="14" y="7" width="2" height="1" fill={color}/>
-    <rect x="0" y="8" width="2" height="1" fill={color}/>
-    <rect x="4" y="8" width="3" height="1" fill={color}/>
-    <rect x="9" y="8" width="3" height="1" fill={color}/>
-    <rect x="14" y="8" width="2" height="1" fill={color}/>
-    <rect x="4" y="9" width="2" height="1" fill={color}/>
-    <rect x="10" y="9" width="2" height="1" fill={color}/>
-    <rect x="3" y="10" width="3" height="1" fill={color}/>
-    <rect x="10" y="10" width="3" height="1" fill={color}/>
-  </svg>
-);
-
-const FOOTER_ALIEN_PIXELS = [
-  [3,0,1,1],[7,0,1,1],
-  [4,1,1,1],[6,1,1,1],
-  [2,2,7,1],
-  [1,3,2,1],[4,3,3,1],[8,3,2,1],
-  [0,4,11,1],
-  [0,5,1,1],[2,5,7,1],[10,5,1,1],
-  [0,6,1,1],[2,6,1,1],[8,6,1,1],[10,6,1,1],
-  [3,7,2,1],[6,7,2,1],
-];
-
-const FooterAlienPixel = ({ size = '4.6em', style, ...rest }) => (
-  <svg
-    viewBox="0 0 11 8"
-    width={size}
-    height="auto"
-    role="img"
-    shapeRendering="crispEdges"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{
-      display: 'inline-block',
-      verticalAlign: 'top',
-      color: 'var(--color-develop-blue)',
-      ...style,
-    }}
-    {...rest}
-  >
-    {FOOTER_ALIEN_PIXELS.map(([x, y, w, h], i) => (
-      <rect key={i} x={x} y={y} width={w} height={h} fill="currentColor" />
-    ))}
-  </svg>
-);
-
-const FooterAlienUFO = ({ size = '5.6em' }) => (
-  <svg
-    viewBox="0 0 11 5"
-    width={size}
-    height="auto"
-    aria-hidden="true"
-    shapeRendering="crispEdges"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ display: 'block' }}
-  >
-    <g fill="var(--color-ship-red)">
-      <rect x="3" y="0" width="5" height="1" />
-      <rect x="2" y="1" width="7" height="1" />
-      <rect x="0" y="2" width="11" height="1" />
-      <rect x="1" y="3" width="9" height="1" />
-    </g>
-    <g fill="var(--color-preview-pink)">
-      <rect x="2" y="4" width="1" height="1" />
-      <rect x="4" y="4" width="1" height="1" />
-      <rect x="6" y="4" width="1" height="1" />
-      <rect x="8" y="4" width="1" height="1" />
-    </g>
+    <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" fill={color} />
+    <path d="M39.9286 0H21.5V18H39.9286V0Z" fill={color} />
+    <path d="M53.75 0L64.5 18H43L53.75 0Z" fill={color} />
+    <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" fill={color} />
   </svg>
 );
 
@@ -230,117 +142,35 @@ const FooterAlienArrivalDemo = () => {
   }, []);
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:16, width:'100%' }}>
-      <style>{`
-        .ds-footer-alien-arrival {
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
+      <style>{footerAlienStyles + `
+        .ds-faa-wrapper { 
           --faa-ufo-w: 5.6em;
-          position: relative;
-          display: inline-block;
-          width: 4.6em;
-          height: 3.6em;
-          overflow: visible;
-          line-height: 0;
+          width: 4.6em; 
+          height: 3.6em; 
         }
-        .ds-footer-alien-arrival .faa-ufo {
-          position: absolute;
-          left: 50%;
-          top: -0.9em;
-          width: var(--faa-ufo-w);
-          transform: translate(-50%, 0) translateX(-260%);
-          opacity: 0;
-          pointer-events: none;
-          will-change: transform, opacity;
-        }
-        .ds-footer-alien-arrival .faa-beam {
-          position: absolute;
-          left: 50%;
-          top: 0.15em;
-          width: 3.2em;
-          height: 2.4em;
-          transform: translateX(-50%) scaleY(0);
-          transform-origin: top center;
-          opacity: 0;
-          background: linear-gradient(
-            180deg,
-            color-mix(in oklab, var(--color-preview-pink) 70%, transparent),
-            color-mix(in oklab, var(--color-preview-pink) 8%, transparent)
-          );
-          clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
-          mix-blend-mode: screen;
-          pointer-events: none;
-          will-change: transform, opacity;
-        }
-        .ds-footer-alien-arrival .faa-alien {
-          position: absolute;
-          left: 50%;
-          bottom: 0;
-          transform: translate(-50%, 0);
-          line-height: 0;
-          opacity: 0;
-          will-change: transform, opacity;
-        }
-        .ds-footer-alien-arrival[data-playing="true"] .faa-alien {
-          opacity: 1;
-        }
-        @media (prefers-reduced-motion: no-preference) {
-          .ds-footer-alien-arrival[data-playing="true"] .faa-ufo {
-            animation:
-              faa-ufo-arrive 1.0s cubic-bezier(.2,.7,.2,1) forwards,
-              faa-ufo-leave 0.9s cubic-bezier(.6,.0,.7,.3) 2.0s forwards;
-          }
-          .ds-footer-alien-arrival[data-playing="true"] .faa-beam {
-            animation: faa-beam-pulse 1.1s ease-in-out 0.9s forwards;
-          }
-          .ds-footer-alien-arrival[data-playing="true"] .faa-alien {
-            animation: faa-alien-land 0.5s cubic-bezier(.2,.9,.3,1.4) 1.4s both;
-          }
-        }
-        @keyframes faa-ufo-arrive {
-          from { transform: translate(-50%, 0) translateX(-260%); opacity: 0; }
-          to { transform: translate(-50%, 0) translateX(0); opacity: 1; }
-        }
-        @keyframes faa-ufo-leave {
-          from { transform: translate(-50%, 0) translateX(0); opacity: 1; }
-          to { transform: translate(-50%, 0) translateX(280%); opacity: 0; }
-        }
-        @keyframes faa-beam-pulse {
-          0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
-          25% { transform: translateX(-50%) scaleY(1); opacity: 0.85; }
-          75% { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
-          100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
-        }
-        @keyframes faa-alien-land {
-          0% { opacity: 0; transform: translate(-50%, -0.6em) scale(0.55); }
-          60% { opacity: 1; transform: translate(-50%, 0.05em) scale(1.05); }
-          100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-        }
+        .ds-faa-wrapper .faa-ufo { top: -0.9em; width: var(--faa-ufo-w); }
+        .ds-faa-wrapper .faa-beam { top: 0.15em; width: 3.2em; height: 2.4em; }
       `}</style>
       <div style={{
         minHeight: 170,
         borderRadius: 12,
         boxShadow: 'var(--shadow-ring)',
-        display:'grid',
-        placeItems:'center',
-        background:'linear-gradient(180deg, color-mix(in oklab, var(--bg-subtle) 78%, transparent), var(--bg-page))',
+        display: 'grid',
+        placeItems: 'center',
+        background: 'linear-gradient(180deg, color-mix(in oklab, var(--bg-subtle) 78%, transparent), var(--bg-page))',
       }}>
         <span
           key={runId}
-          className="ds-footer-alien-arrival"
-          data-playing="true"
+          className="ds-faa-wrapper"
           aria-label="Pixel alien footer arrival animation"
         >
-          <span className="faa-ufo" aria-hidden="true">
-            <FooterAlienUFO />
-          </span>
-          <span className="faa-beam" aria-hidden="true" />
-          <span className="faa-alien">
-            <FooterAlienPixel />
-          </span>
+          <FooterArrival played={true} ufoSize="5.6em" alienSize="4.6em" />
         </span>
       </div>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', lineHeight:1.7 }}>
-          Sequence: UFO arrive 1.0s, beam pulse 1.1s at 0.9s delay, alien land 0.5s at 1.4s delay, UFO exit 0.9s at 2.0s delay.<br/>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.7 }}>
+          Sequence: UFO arrive 1.0s, beam pulse 1.1s at 0.9s delay, alien land 0.5s at 1.4s delay, UFO exit 0.9s at 2.0s delay.<br />
           Colors: ship-red UFO body, preview-pink beam, develop-blue alien. Reduced motion shows the final landed state without motion.
         </div>
         <button
@@ -348,11 +178,11 @@ const FooterAlienArrivalDemo = () => {
           onClick={() => !prefersReducedMotion && setRunId(id => id + 1)}
           disabled={prefersReducedMotion}
           style={{
-            display:'inline-flex', alignItems:'center', justifyContent:'center',
-            padding:'10px 14px', borderRadius:8, border:'none', cursor:prefersReducedMotion ? 'not-allowed' : 'pointer',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '10px 14px', borderRadius: 8, border: 'none', cursor: prefersReducedMotion ? 'not-allowed' : 'pointer',
             background: prefersReducedMotion ? 'var(--bg-subtle)' : 'var(--fg-primary)',
             color: prefersReducedMotion ? 'var(--fg-disabled)' : 'var(--bg-page)',
-            fontSize:13, fontWeight:600, boxShadow:'var(--shadow-card-subtle)'
+            fontSize: 13, fontWeight: 600, boxShadow: 'var(--shadow-card-subtle)'
           }}
         >
           {prefersReducedMotion ? 'Reduced motion enabled' : 'Replay animation'}
@@ -364,37 +194,128 @@ const FooterAlienArrivalDemo = () => {
 
 const PixelOrbitPreview = () => (
   <div style={{
-    position:'relative', width:160, height:120, borderRadius:16,
-    background:'radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--bg-subtle) 90%, transparent) 0%, transparent 72%)'
+    position: 'relative', width: 160, height: 120, borderRadius: 16,
+    background: 'radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--bg-subtle) 90%, transparent) 0%, transparent 72%)'
   }}>
     {[
-      { left:'18%', top:'56%', color:'var(--color-develop-blue)' },
-      { left:'28%', top:'26%', color:'var(--color-preview-pink)' },
-      { left:'42%', top:'18%', color:'var(--fg-primary)' },
-      { left:'62%', top:'22%', color:'var(--fg-secondary)' },
-      { left:'76%', top:'44%', color:'var(--color-ship-red)' },
-      { left:'68%', top:'66%', color:'var(--color-develop-blue)' },
-      { left:'46%', top:'74%', color:'var(--fg-primary)' },
-      { left:'24%', top:'70%', color:'var(--color-preview-pink)' },
-      { left:'10%', top:'44%', color:'var(--fg-secondary)' },
+      { left: '18%', top: '56%', color: 'var(--color-develop-blue)' },
+      { left: '28%', top: '26%', color: 'var(--color-preview-pink)' },
+      { left: '42%', top: '18%', color: 'var(--fg-primary)' },
+      { left: '62%', top: '22%', color: 'var(--fg-secondary)' },
+      { left: '76%', top: '44%', color: 'var(--color-ship-red)' },
+      { left: '68%', top: '66%', color: 'var(--color-develop-blue)' },
+      { left: '46%', top: '74%', color: 'var(--fg-primary)' },
+      { left: '24%', top: '70%', color: 'var(--color-preview-pink)' },
+      { left: '10%', top: '44%', color: 'var(--fg-secondary)' },
     ].map((dot, index) => (
       <span key={index} style={{
-        position:'absolute', left:dot.left, top:dot.top, width:index % 3 === 0 ? 4 : 3, height:index % 3 === 0 ? 4 : 3,
-        background:dot.color, display:'block', boxShadow:'0 0 0 1px rgba(0,0,0,0.02)'
-      }}/>
+        position: 'absolute', left: dot.left, top: dot.top, width: index % 3 === 0 ? 4 : 3, height: index % 3 === 0 ? 4 : 3,
+        background: dot.color, display: 'block', boxShadow: '0 0 0 1px rgba(0,0,0,0.02)'
+      }} />
     ))}
   </div>
 );
 
 const CustomElementCard = ({ label, note, children }) => (
-  <div style={{ padding: 28, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display:'flex', flexDirection:'column', gap:18 }}>
-    <div style={{ minHeight: 132, display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg-page)', borderRadius: 8, boxShadow:'var(--shadow-ring)' }}>
+  <div style={{ padding: 28, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ minHeight: 132, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-page)', borderRadius: 8, boxShadow: 'var(--shadow-ring)' }}>
       {children}
     </div>
     <div>
-      <div style={{ fontSize: 16, fontWeight: 600, color:'var(--fg-primary)', marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 14, color:'var(--fg-secondary)', lineHeight: 1.5 }}>{note}</div>
+      <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--fg-primary)', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>{note}</div>
     </div>
+  </div>
+);
+
+const SystemCard = ({ label, note, children }) => (
+  <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ minHeight: 132, borderRadius: 10, boxShadow: 'var(--shadow-ring)', background: 'var(--bg-page)', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {children}
+    </div>
+    <div>
+      <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--fg-primary)', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.6 }}>{note}</div>
+    </div>
+  </div>
+);
+
+const MiniHeaderPreview = () => (
+  <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+    <div style={{ background: 'color-mix(in oklab, var(--bg-page) 82%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--color-gray-100)', width: '100%', padding: '12px 16px', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <NavMarkIcon color="var(--fg-primary)" width={72} height={15} />
+      <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--fg-secondary)', fontWeight: 500 }}>
+        <span>Work</span>
+        <span>About</span>
+        <span style={{ color: 'var(--fg-primary)' }}>Contact</span>
+      </div>
+    </div>
+  </div>
+);
+
+const MiniCaseCoverPreview = ({ gradient = 'linear-gradient(135deg, var(--color-develop-blue) 0%, color-mix(in srgb, var(--color-omar-black) 86%, var(--color-develop-blue) 14%) 100%)' }) => (
+  <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: 14, overflow: 'hidden', background: gradient, boxShadow: 'var(--shadow-card-subtle)' }}>
+    <div style={{ position: 'absolute', top: 14, left: 14, fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em', background: 'rgba(0,0,0,0.32)', padding: '5px 9px', borderRadius: 4, backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}>02 · 2025 · Wisdom</div>
+    <div style={{ position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%', background: 'var(--bg-page)', borderRadius: '10px 10px 0 0', boxShadow: '0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,0.35)' }}>
+      <div style={{ position: 'absolute', top: 10, left: 10, right: 10, height: 18, display: 'flex', alignItems: 'center', gap: 5, borderBottom: '1px solid color-mix(in srgb, var(--color-gray-100) 72%, transparent)' }}>
+        <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'var(--color-develop-blue)', opacity: 0.7 }} />
+        <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'var(--color-preview-pink)', opacity: 0.7 }} />
+        <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'var(--color-ship-red)', opacity: 0.7 }} />
+      </div>
+      <div style={{ position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 3, background: 'color-mix(in srgb, var(--color-develop-blue) 18%, transparent)' }} />
+      <div style={{ position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 3, background: 'color-mix(in srgb, var(--color-preview-pink) 30%, transparent)' }} />
+      <div style={{ position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 3, background: 'color-mix(in srgb, var(--color-gray-100) 40%, transparent)' }} />
+    </div>
+  </div>
+);
+
+const MiniFooterPreview = () => (
+  <div style={{ width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(120px, 0.8fr) minmax(120px, 0.8fr)', gap: 18, alignItems: 'start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <NavMarkIcon color="var(--fg-primary)" width={72} height={15} />
+      <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--fg-tertiary)' }}>Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Site Links</div>
+      <span style={{ fontSize: 13, color: 'var(--fg-secondary)' }}>Work</span>
+      <span style={{ fontSize: 13, color: 'var(--fg-secondary)' }}>About</span>
+      <span style={{ fontSize: 13, color: 'var(--fg-secondary)' }}>Design System</span>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Social</div>
+      <span style={{ fontSize: 13, color: 'var(--fg-secondary)' }}>LinkedIn</span>
+    </div>
+  </div>
+);
+
+const MotionRow = ({ name, timing, note }) => (
+  <div style={{ padding: '18px 0', borderBottom: '1px solid var(--color-gray-100)', display: 'grid', gridTemplateColumns: 'minmax(180px, 1fr) 1fr', gap: 24, alignItems: 'start' }}>
+    <div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--fg-primary)', marginBottom: 6 }}>{name}</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{timing}</div>
+    </div>
+    <div style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.6 }}>{note}</div>
+  </div>
+);
+
+const ResponsiveTable = () => (
+  <div style={{ border: '1px solid var(--color-gray-100)', borderRadius: 12, overflow: 'hidden', marginTop: 32 }}>
+    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 14 }}>
+      <thead style={{ background: 'var(--bg-subtle)', color: 'var(--fg-tertiary)', fontFamily: 'var(--font-mono)', fontSize: 11, textTransform: 'uppercase' }}>
+        <tr>
+          <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Breakpoint</th>
+          <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Change</th>
+          <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Reason</th>
+        </tr>
+      </thead>
+      <tbody style={{ color: 'var(--fg-secondary)' }}>
+        <tr><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>≤ 1200px</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Contact cards 3 → 2 cols</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Prevent card text pinch</td></tr>
+        <tr><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>≤ 1054px</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>At a Glance 2 → 1 cols</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Maintain line length</td></tr>
+        <tr><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>≤ 900px</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Hamburger Nav swap</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Navigation density</td></tr>
+        <tr><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>≤ 600px</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Grid stack cleanup</td><td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Mobile readability</td></tr>
+        <tr><td style={{ padding: '16px 20px', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>Reduced Motion</td><td style={{ padding: '16px 20px' }}>Skip translate / transitions</td><td style={{ padding: '16px 20px' }}>Accessibility / Performance</td></tr>
+      </tbody>
+    </table>
   </div>
 );
 
@@ -402,10 +323,10 @@ const ICON_SET = [
   { label: 'Arrow Up Right', icon: ArrowUpRight },
   { label: 'Arrow Right', icon: ArrowRight },
   { label: 'Arrow Left', icon: ArrowLeft },
+  { label: 'Menu', icon: Menu },
   { label: 'Copy', icon: Copy },
   { label: 'Check', icon: Check },
   { label: 'Close', icon: X },
-  { label: 'Box', icon: Box },
   { label: 'Sun', icon: Sun },
   { label: 'Moon', icon: Moon },
 ];
@@ -413,7 +334,7 @@ const ICON_SET = [
 const IconCard = ({ label, icon }) => (
   <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', gap: 16 }}>
     <div style={{ minHeight: 84, borderRadius: 8, boxShadow: 'var(--shadow-ring)', display: 'grid', placeItems: 'center', background: 'var(--bg-page)' }}>
-      <AppIcon icon={icon} size={22} strokeWidth={2.2} />
+      <AppIcon icon={icon} size={22} />
     </div>
     <div>
       <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--fg-primary)', marginBottom: 6 }}>{label}</div>
@@ -479,10 +400,10 @@ const DesignSystemContactCard = ({ label, value, copyValue }) => {
           e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
         }}
       >
-        <AppIcon icon={copied ? Check : Copy} size={13} strokeWidth={2.2} />
+        <AppIcon icon={copied ? Check : Copy} size={13} />
       </button>
-      <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
-      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
     </a>
   );
 };
@@ -494,9 +415,9 @@ const DesignSystem = () => {
   return (
     <div style={{ paddingBottom: 160 }}>
       <Header theme={theme} setTheme={setTheme} />
-      
+
       <main style={{ maxWidth: 1040, margin: '80px auto', padding: '0 24px' }}>
-        
+
         {/* Intro */}
         <div style={{ marginBottom: 120 }}>
           <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 24px' }}>
@@ -512,7 +433,7 @@ const DesignSystem = () => {
           <div className="section-head">
             <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Color System</h2>
           </div>
-          
+
           <div className="mono-label">Primary & Neutrals</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 32, marginBottom: 80 }}>
             <ColorSwatch name="Page Background" variable="--bg-page" theme={theme} hexLight="#ffffff" hexDark="#0a0a0a" />
@@ -521,6 +442,8 @@ const DesignSystem = () => {
             <ColorSwatch name="Secondary Text" variable="--fg-secondary" theme={theme} hexLight="#4d4d4d" hexDark="#a1a1a1" />
             <ColorSwatch name="Tertiary Text" variable="--fg-tertiary" theme={theme} hexLight="#666666" hexDark="#8f8f8f" />
             <ColorSwatch name="Border/Divider" variable="--color-gray-100" theme={theme} hexLight="#ebebeb" hexDark="#2e2e2e" />
+            <ColorSwatch name="On-Dark Foreground" variable="--fg-on-dark" theme={theme} hexLight="#ffffff" hexDark="#0a0a0a" />
+            <ColorSwatch name="Focus Ring" variable="--color-focus" theme={theme} hexLight="#0072f5" hexDark="#3291ff" />
           </div>
 
           <div className="mono-label">Workflow Accents</div>
@@ -536,7 +459,7 @@ const DesignSystem = () => {
           <div className="section-head">
             <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Typography Map</h2>
           </div>
-          
+
           <div style={{ borderTop: '1px solid var(--color-gray-100)' }}>
             <TypoRow role="Display Hero" font="Geist Sans" size="clamp(44px, 7vw, 88px)" weight="600" letterSpacing="-0.04em" lineHeight="0.96" sample="Compression as identity." />
             <TypoRow role="Section Heading" font="Geist Sans" size="40px" weight="600" letterSpacing="-2.4px" lineHeight="1.20" sample="Feature sections & titles" />
@@ -548,7 +471,7 @@ const DesignSystem = () => {
             <TypoRow role="Body Semibold" font="Geist Sans" size="16px" weight="600" letterSpacing="-0.32px" lineHeight="1.50" sample="Strong functional labels" />
             <TypoRow role="Button / Link" font="Geist Sans" size="14px" weight="500" letterSpacing="normal" lineHeight="1.43" sample="Actionable elements" />
             <TypoRow role="Mono Body" font="Geist Mono" size="16px" weight="400" letterSpacing="normal" lineHeight="1.50" sample="console.log('System initialized');" />
-            <TypoRow role="Mono Label" font="Geist Mono" size="12px" weight="500" letterSpacing="0.08em" lineHeight="1.0" sample={<span style={{textTransform:'uppercase'}}>Technical Label</span>} />
+            <TypoRow role="Mono Label" font="Geist Mono" size="12px" weight="500" letterSpacing="0.08em" lineHeight="1.0" sample={<span style={{ textTransform: 'uppercase' }}>Technical Label</span>} />
           </div>
         </section>
 
@@ -558,41 +481,41 @@ const DesignSystem = () => {
             <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Elevation & shadow-as-border</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 40 }}>
-            
+
             {/* Level 1 */}
             <div>
-              <div style={{ 
+              <div style={{
                 height: 180, background: 'var(--bg-page)', borderRadius: 8,
                 boxShadow: 'var(--shadow-ring)',
-                display:'flex', alignItems:'center', justifyContent:'center', marginBottom: 16
+                display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16
               }}>
-                <span className="mono-label" style={{margin:0}}>Level 1 (Ring)</span>
+                <span className="mono-label" style={{ margin: 0 }}>Ring (--shadow-ring)</span>
               </div>
-              <p style={{fontSize: 14, color:'var(--fg-secondary)', lineHeight: 1.5}}>Shadow-as-border replacing traditional CSS borders everywhere.</p>
+              <p style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>Shadow-as-border replacing traditional CSS borders everywhere.</p>
             </div>
 
             {/* Level 2 */}
             <div>
-              <div style={{ 
+              <div style={{
                 height: 180, background: 'var(--bg-page)', borderRadius: 8,
                 boxShadow: 'var(--shadow-card-subtle)',
-                display:'flex', alignItems:'center', justifyContent:'center', marginBottom: 16
+                display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16
               }}>
-                <span className="mono-label" style={{margin:0}}>Level 2 (Subtle)</span>
+                <span className="mono-label" style={{ margin: 0 }}>Level 2 (Subtle)</span>
               </div>
-              <p style={{fontSize: 14, color:'var(--fg-secondary)', lineHeight: 1.5}}>Standard cards. Ring + `0px 2px 2px` drop shadow.</p>
+              <p style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>Standard cards. Ring + `0px 2px 2px` drop shadow.</p>
             </div>
 
             {/* Level 3 */}
             <div>
-              <div style={{ 
+              <div style={{
                 height: 180, background: 'var(--bg-page)', borderRadius: 8,
                 boxShadow: 'var(--shadow-card-full)',
-                display:'flex', alignItems:'center', justifyContent:'center', marginBottom: 16
+                display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16
               }}>
-                <span className="mono-label" style={{margin:0}}>Level 3 (Full Stack)</span>
+                <span className="mono-label" style={{ margin: 0 }}>Level 3 (Full Stack)</span>
               </div>
-              <p style={{fontSize: 14, color:'var(--fg-secondary)', lineHeight: 1.5}}>Featured panels. Combines border, lift, distance blur, and inner highlight glow.</p>
+              <p style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>Featured panels. Combines border, lift, distance blur, and inner highlight glow.</p>
             </div>
 
           </div>
@@ -611,13 +534,6 @@ const DesignSystem = () => {
               note="Primary site signature used in navigation and the loader. Four primitives: circle, square, triangle, and D-form."
             >
               <NavMarkIcon color="var(--fg-primary)" width={150} height={32} />
-            </CustomElementCard>
-
-            <CustomElementCard
-              label="Pixel Alien / Static Mark"
-              note="The current pixel alien mark used as the footer signoff character. Rendered in develop blue with crisp-edge pixel geometry as the base asset for the animated footer sequence."
-            >
-              <PixelAlienIcon color="var(--color-develop-blue)" size={86} />
             </CustomElementCard>
 
             <CustomElementCard
@@ -653,6 +569,114 @@ const DesignSystem = () => {
           </div>
         </section>
 
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Header & Navigation</h2>
+          </div>
+
+          <div className="mono-label">Sticky nav, mobile swap, logo motion</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+            <SystemCard
+              label="Desktop / Mobile Header"
+              note="Production header stays transparent at rest, shifts into a blurred shell on scroll, and swaps desktop links for theme toggle + hamburger at the tablet breakpoint."
+            >
+              <MiniHeaderPreview />
+            </SystemCard>
+            <SystemCard
+              label="Interaction Rules"
+              note="Desktop keeps inline Work, About, Contact, and CTA. Mobile keeps only the logo, theme toggle, and menu trigger; the rest moves into the dropdown panel. The geometric mark also runs a bounce sequence on hover."
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                Scroll state: transparent → blur shell<br />
+                Mobile switch: at `900px` and below<br />
+                Menu contents: Work, About, Contact, Get in touch<br />
+                Logo motion: 580ms staggered bounce on hover
+              </div>
+            </SystemCard>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Case Study Cover System</h2>
+          </div>
+
+          <div className="mono-label">Homepage work cards and browser-window shells</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+            <SystemCard
+              label="Homepage Cover Tile"
+              note="Live case cards use a gradient shell, browser-window silhouette, glass metadata chip, and hover sheen. The first card keeps a featured treatment on wider screens and normalizes to a shared aspect ratio on smaller viewports."
+            >
+              <MiniCaseCoverPreview />
+            </SystemCard>
+            <SystemCard
+              label="Interaction Pattern"
+              note="The card body is a flex column so copy and tags align cleanly. Non-featured cards stretch to equal height, and the tag row anchors to the bottom to keep the reading rhythm consistent."
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                Featured ratio: `16 / 8` on desktop<br />
+                Shared mobile ratio: `4 / 3` at `900px` and below<br />
+                Hover: lift, sheen, screen shift, tag nudge<br />
+                Metadata chip: glass tag anchored top-left
+              </div>
+            </SystemCard>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Footer System</h2>
+          </div>
+
+          <div className="mono-label">Brand block, link columns, signoff motion</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+            <SystemCard
+              label="Footer Grid"
+              note="The production footer is a real layout system, not a loose link list. It uses a brand block plus two utility columns, then collapses from three columns to two and finally to one as the viewport narrows."
+            >
+              <MiniFooterPreview />
+            </SystemCard>
+            <SystemCard
+              label="Footer Signoff"
+              note="The signoff uses mono uppercase copy, the footer-arrival alien, and subtle horizontal hover motion on links. This is the canonical home of the Pixel Alien in the live site."
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                Layout: `1.35fr / 0.85fr / 0.85fr` on wide screens<br />
+                Collapse: 3 → 2 → 1 columns<br />
+                Links: 160ms color + translateX hover treatment<br />
+                Brand system link: lives in footer, not as a top-level nav item
+              </div>
+            </SystemCard>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Motion System</h2>
+          </div>
+
+          <div className="mono-label">Live site behaviors, not placeholder animation</div>
+          <div style={{ borderTop: '1px solid var(--color-gray-100)' }}>
+            <MotionRow name="Loader Mark Bounce" timing="4s looping sequence" note="The four-part nav mark runs a staggered bounce as the loader centerpiece before the site settles into the hero." />
+            <MotionRow name="Reveal on Scroll" timing="560ms opacity / 720ms translate" note="Sections use staggered reveal classes with a soft upward settle. Reduced motion skips the translation and shows final state immediately." />
+            <MotionRow name="Case Card Hover" timing="220–360ms layered transitions" note="Case-study cards combine overall lift, screen shift, sheen motion, tag nudge, and line travel to make the covers feel alive without becoming noisy." />
+            <MotionRow name="Logo Marquee" timing="44s linear" note="Company logos scroll as a masked, continuously moving strip. Reduced motion stops the marquee and leaves the marks in a stable state." />
+            <MotionRow name="Facts Mesh Gradient" timing="rAF driven" note="The At a Glance section background is not a static fill. It is a live radial-mesh composition driven by time and pointer position." />
+            <MotionRow name="Footer Alien Arrival" timing="1.0s / 1.1s / 0.5s / 0.9s" note="The footer animation is the canonical narrative motion moment: UFO in, beam pulse, alien lands, UFO out. Reduced motion shows the landed state instead." />
+          </div>
+        </section>
+
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Responsive Rules</h2>
+          </div>
+
+          <div className="mono-label">Production breakpoints and layout swaps</div>
+          <div style={{ borderTop: '1px solid var(--color-gray-100)' }}>
+            <ResponsiveTable />
+          </div>
+        </section>
+
         {/* Components */}
         <section>
           <div className="section-head">
@@ -660,7 +684,7 @@ const DesignSystem = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
-            
+
             {/* Buttons */}
             <div>
               <div className="mono-label">Buttons & Badges</div>
@@ -669,15 +693,15 @@ const DesignSystem = () => {
                   background: 'var(--fg-primary)', color: 'var(--bg-page)',
                   padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
                   border: 'none', cursor: 'pointer', transition: 'opacity 150ms', fontFamily: 'inherit'
-                }} onMouseEnter={e=>e.currentTarget.style.opacity='0.86'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+                }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
                   Primary Action
                 </button>
-                
+
                 <button style={{
                   background: 'transparent', color: 'var(--fg-primary)',
                   padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
                   border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms', fontFamily: 'inherit'
-                }} onMouseEnter={e=>e.currentTarget.style.background='var(--bg-subtle)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   Secondary Action
                 </button>
 
@@ -688,32 +712,6 @@ const DesignSystem = () => {
                 }}>
                   Status Pill
                 </div>
-              </div>
-            </div>
-
-            {/* Feature Workflows */}
-            <div>
-              <div className="mono-label">Workflow Paradigm</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
-                
-                <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-develop-blue)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Develop</div>
-                  <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.96px', margin: '0 0 12px' }}>Write Code</h3>
-                  <p style={{ fontSize: 16, color: 'var(--fg-secondary)', lineHeight: 1.5, margin: 0 }}>Build features seamlessly attached to your repository context.</p>
-                </div>
-
-                <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-preview-pink)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Preview</div>
-                  <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.96px', margin: '0 0 12px' }}>Review Instantly</h3>
-                  <p style={{ fontSize: 16, color: 'var(--fg-secondary)', lineHeight: 1.5, margin: 0 }}>Every change generates a collaborative URL securely isolated.</p>
-                </div>
-
-                <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-ship-red)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Ship</div>
-                  <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.96px', margin: '0 0 12px' }}>Deploy to Edge</h3>
-                  <p style={{ fontSize: 16, color: 'var(--fg-secondary)', lineHeight: 1.5, margin: 0 }}>Push reliably across a global network with immutable artifacts.</p>
-                </div>
-
               </div>
             </div>
 
@@ -736,59 +734,14 @@ const DesignSystem = () => {
                       onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                       onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                     >
-                      <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
-                      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+                      <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
                     </a>
                   ))}
                 </div>
-                <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', lineHeight:1.8 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
                   Card click opens the destination, top-right icon copies when present. Border treatment remains the same: conic-gradient cycles ship-red → preview-pink → develop-blue · 3s linear · border-only via ::before (inset −1.5px) + ::after cover (inset 0) + foreground content at z-index 2.
                 </div>
-              </div>
-            </div>
-
-            {/* Inputs & Metrics */}
-            <div>
-              <div className="mono-label">Interactive Forms & Metrics</div>
-              <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                
-                {/* Input Demo */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1, minWidth: 280 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)' }}>Email Address</label>
-                    <input type="email" placeholder="you@example.com" style={{
-                      width: '100%', padding: '10px 12px', fontSize: 14, fontFamily: 'inherit',
-                      background: 'var(--bg-page)', color: 'var(--fg-primary)',
-                      border: 'none', borderRadius: 6, boxShadow: 'var(--shadow-card-subtle)',
-                      outline: 'none', transition: 'box-shadow 150ms'
-                    }} onFocus={e => e.target.style.boxShadow = '0 0 0 2px var(--color-focus)'} 
-                       onBlur={e => e.target.style.boxShadow = 'var(--shadow-card-subtle)'} />
-                  </div>
-                  
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{
-                      width: 16, height: 16, borderRadius: '50%', border: 'none', boxShadow: 'var(--shadow-ring)',
-                      background: 'var(--bg-subtle)'
-                    }} />
-                    <span style={{ fontSize: 14, color: 'var(--fg-secondary)' }}>Option one</span>
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{
-                      width: 16, height: 16, borderRadius: '50%', border: 'none', boxShadow: '0 0 0 2px var(--color-focus)',
-                      background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-focus)' }} />
-                    </div>
-                    <span style={{ fontSize: 14, color: 'var(--fg-primary)' }}>Option two (Selected)</span>
-                  </label>
-                </div>
-
-                {/* Metric Card */}
-                <div style={{ flex: 1, minWidth: 280, padding: '32px 40px', borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 'clamp(40px, 5vw, 48px)', fontWeight: 600, letterSpacing: '-2.4px', color: 'var(--fg-primary)', lineHeight: 1, marginBottom: 16 }}>10x faster</div>
-                  <div style={{ fontSize: 16, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>Performance optimized for the modern edge.</div>
-                </div>
-
               </div>
             </div>
 

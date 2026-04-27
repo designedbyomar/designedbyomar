@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
@@ -53,7 +54,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
     let inView = true;
     let pageVisible = document.visibilityState === 'visible';
     let last = performance.now();
-    let tick = () => {};
+    let tick = () => { };
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       w = rect.width; h = rect.height;
@@ -106,9 +107,9 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
     const observer = typeof IntersectionObserver === 'undefined'
       ? null
       : new IntersectionObserver((entries) => {
-          inView = entries[0]?.isIntersecting ?? true;
-          updateRunning();
-        }, { threshold: 0.05 });
+        inView = entries[0]?.isIntersecting ?? true;
+        updateRunning();
+      }, { threshold: 0.05 });
     observer?.observe(canvas);
     const onVisibilityChange = () => {
       pageVisible = document.visibilityState === 'visible';
@@ -118,8 +119,8 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
     tick = (now) => {
       if (!activeRef.current) return;
       const dt = Math.min(40, now - last); last = now;
-      if (style === 'ethereal') { ctx.fillStyle = toAlpha(bgPage, theme === 'dark' ? 0.18 : 0.22); ctx.fillRect(0,0,w,h); }
-      else ctx.clearRect(0,0,w,h);
+      if (style === 'ethereal') { ctx.fillStyle = toAlpha(bgPage, theme === 'dark' ? 0.18 : 0.22); ctx.fillRect(0, 0, w, h); }
+      else ctx.clearRect(0, 0, w, h);
       for (const p of particles) {
         p.a += p.av * dt * speed; p.twinkle += p.tv;
         const x = cx + Math.cos(p.a) * p.r, y = cy + Math.sin(p.a) * p.r * p.tilt;
@@ -127,7 +128,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
         ctx.globalAlpha = Math.max(0, Math.min(1, (back ? 0.22 : 1) * (0.55 + Math.sin(p.twinkle) * 0.45) * (p.outer ? 0.45 : 1)));
         ctx.fillStyle = p.color;
         const s = p.size * (back ? 0.85 : 1);
-        ctx.fillRect(Math.round(x - s/2), Math.round(y - s/2), s, s);
+        ctx.fillRect(Math.round(x - s / 2), Math.round(y - s / 2), s, s);
       }
       ctx.globalAlpha = 1;
       rafRef.current = requestAnimationFrame(tick);
@@ -140,7 +141,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
       window.removeEventListener('resize', resize);
     };
   }, [density, speed, style, accent, theme]);
-  return <canvas ref={canvasRef} style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }} />;
+  return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />;
 };
 
 // ============================================================
@@ -325,15 +326,15 @@ const Portrait = ({ galaxy, theme }) => {
 
   const cardBaseStyle = isLight
     ? {
-        background: 'rgba(255,255,255,0.68)',
-        border: '1px solid rgba(23,23,23,0.10)',
-        boxShadow: '0 18px 36px rgba(10,114,239,0.10), 0 10px 24px rgba(255,91,79,0.08)',
-      }
+      background: 'rgba(255,255,255,0.68)',
+      border: '1px solid rgba(23,23,23,0.10)',
+      boxShadow: '0 18px 36px rgba(10,114,239,0.10), 0 10px 24px rgba(255,91,79,0.08)',
+    }
     : {
-        background: 'rgba(10,10,10,0.42)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.26)',
-      };
+      background: 'rgba(10,10,10,0.42)',
+      border: '1px solid rgba(255,255,255,0.12)',
+      boxShadow: '0 18px 44px rgba(0,0,0,0.26)',
+    };
 
   const updatePointerMotion = (clientX, clientY, timestamp = performance.now()) => {
     if (isTouchLayout || prefersReducedMotion) return;
@@ -370,7 +371,7 @@ const Portrait = ({ galaxy, theme }) => {
   return (
     <div
       ref={portraitRef}
-      style={{ position:'relative', width:'100%', maxWidth:590, aspectRatio:'1/1', margin:'0 auto', cursor:isTouchLayout ? 'pointer' : 'default' }}
+      style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1/1', margin: '0 auto', cursor: isTouchLayout ? 'pointer' : 'default' }}
       role="button"
       tabIndex={0}
       aria-label="Show hero highlights"
@@ -405,40 +406,40 @@ const Portrait = ({ galaxy, theme }) => {
       {isLight && (
         <>
           <div style={{
-            position:'absolute', inset:'11% 8% 18%', zIndex:0, pointerEvents:'none',
-            borderRadius:'48% 52% 46% 54% / 42% 46% 54% 58%',
-            background:'radial-gradient(circle at 50% 38%, color-mix(in srgb, #fff2d8 82%, var(--color-preview-pink) 18%) 0%, color-mix(in srgb, #fff4e6 76%, var(--color-ship-red) 24%) 34%, color-mix(in srgb, #f6f7ff 80%, var(--color-develop-blue) 20%) 72%, rgba(255,255,255,0) 100%)',
-            filter:'blur(26px)', opacity:0.95,
-          }}/>
+            position: 'absolute', inset: '11% 8% 18%', zIndex: 0, pointerEvents: 'none',
+            borderRadius: '48% 52% 46% 54% / 42% 46% 54% 58%',
+            background: 'radial-gradient(circle at 50% 38%, color-mix(in srgb, #fff2d8 82%, var(--color-preview-pink) 18%) 0%, color-mix(in srgb, #fff4e6 76%, var(--color-ship-red) 24%) 34%, color-mix(in srgb, #f6f7ff 80%, var(--color-develop-blue) 20%) 72%, rgba(255,255,255,0) 100%)',
+            filter: 'blur(26px)', opacity: 0.95,
+          }} />
           <div style={{
-            position:'absolute', inset:'4% 10% auto auto', width:'34%', height:'30%', zIndex:0, pointerEvents:'none',
-            borderRadius:'9999px',
-            background:'radial-gradient(circle, color-mix(in srgb, var(--color-preview-pink) 22%, white) 0%, rgba(255,255,255,0) 72%)',
-            filter:'blur(18px)', opacity:0.7,
-          }}/>
+            position: 'absolute', inset: '4% 10% auto auto', width: '34%', height: '30%', zIndex: 0, pointerEvents: 'none',
+            borderRadius: '9999px',
+            background: 'radial-gradient(circle, color-mix(in srgb, var(--color-preview-pink) 22%, white) 0%, rgba(255,255,255,0) 72%)',
+            filter: 'blur(18px)', opacity: 0.7,
+          }} />
         </>
       )}
-      <div style={{ position:'absolute', inset:'6% 6% 0', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:1 }}>
+      <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1 }}>
         <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" draggable={false} style={{
-          width:'100%', height:'100%', objectFit:'contain', objectPosition:'center bottom',
+          width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10,114,239,0.16)) drop-shadow(0 26px 48px rgba(255,91,79,0.12)) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
             : 'drop-shadow(0 20px 60px rgba(0,0,0,0.55))',
-          userSelect:'none', pointerEvents:'none',
-          WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
-          maskImage:'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
-        }}/>
+          userSelect: 'none', pointerEvents: 'none',
+          WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
+          maskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%)',
+        }} />
       </div>
       {isLight && (
         <div style={{
-          position:'absolute', inset:'8% 12% 4%', zIndex:1, pointerEvents:'none',
-          borderRadius:'40% 60% 52% 48% / 44% 42% 58% 56%',
-          background:'linear-gradient(155deg, color-mix(in srgb, var(--color-preview-pink) 10%, transparent) 0%, transparent 34%, color-mix(in srgb, var(--color-develop-blue) 11%, transparent) 67%, color-mix(in srgb, var(--color-ship-red) 10%, transparent) 100%)',
-          opacity:0.65,
-        }}/>
+          position: 'absolute', inset: '8% 12% 4%', zIndex: 1, pointerEvents: 'none',
+          borderRadius: '40% 60% 52% 48% / 44% 42% 58% 56%',
+          background: 'linear-gradient(155deg, color-mix(in srgb, var(--color-preview-pink) 10%, transparent) 0%, transparent 34%, color-mix(in srgb, var(--color-develop-blue) 11%, transparent) 67%, color-mix(in srgb, var(--color-ship-red) 10%, transparent) 100%)',
+          opacity: 0.65,
+        }} />
       )}
       {!isLight && (
-        <div style={{ position:'absolute', top:'2%', right:'-12%', bottom:'-8%', left:'-12%', zIndex:2, pointerEvents:'none' }}><Galaxy {...galaxy} /></div>
+        <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 2, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
       )}
       <div className="hero-stats-layer" aria-hidden={!statsVisible}>
         {HERO_STATS.map((stat, index) => {
@@ -506,20 +507,20 @@ const LogoLoader = ({ visible }) => {
 
   return (
     <div style={{
-      position:'fixed', inset:0, background:'var(--bg-page)',
-      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-      zIndex:9999, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none',
-      transition:'opacity 500ms ease',
+      position: 'fixed', inset: 0, background: 'var(--bg-page)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      zIndex: 9999, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none',
+      transition: 'opacity 500ms ease',
     }}>
       <div className="logo-loader">
         <svg width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg" overflow="visible">
-          <path id="shape-circle"   d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z"/>
-          <path id="shape-rect"     d="M39.9286 0H21.5V18H39.9286V0Z"/>
-          <path id="shape-triangle" d="M53.75 0L64.5 18H43L53.75 0Z"/>
-          <path id="shape-d"        d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z"/>
+          <path id="shape-circle" d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" />
+          <path id="shape-rect" d="M39.9286 0H21.5V18H39.9286V0Z" />
+          <path id="shape-triangle" d="M53.75 0L64.5 18H43L53.75 0Z" />
+          <path id="shape-d" d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" />
         </svg>
       </div>
-      
+
       <div aria-live="polite" aria-atomic="true" style={{
         fontFamily: 'var(--font-mono)',
         fontSize: 13,
@@ -539,7 +540,7 @@ const LogoLoader = ({ visible }) => {
               aria-hidden="true"
               style={{
                 display: 'inline-block',
-                animation: isExiting 
+                animation: isExiting
                   ? `letterExit 250ms cubic-bezier(0.4, 0, 0.2, 1) ${i * 5}ms forwards`
                   : `letterEnter 300ms cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
                 opacity: 0,
@@ -623,17 +624,17 @@ const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
   return (
     <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
-      display:'inline-flex', alignItems:'center', justifyContent:'center',
-      width:36, height:36, borderRadius:9999, background:'transparent',
-      color:'var(--fg-primary)', border:'none',
-      boxShadow:'inset 0 0 0 1px var(--color-gray-100)', cursor:'pointer', transition:'background 150ms',
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+      color: 'var(--fg-primary)', border: 'none',
+      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms',
     }}
-      onMouseEnter={e => e.currentTarget.style.background='var(--bg-subtle)'}
-      onMouseLeave={e => e.currentTarget.style.background='transparent'}
+      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
     >
       {isDark
-        ? <AppIcon icon={Moon} size={16} strokeWidth={1.8} />
-        : <AppIcon icon={Sun} size={16} strokeWidth={1.8} />
+        ? <AppIcon icon={Moon} size={16} />
+        : <AppIcon icon={Sun} size={16} />
       }
     </button>
   );
@@ -650,14 +651,14 @@ const NavLogo = ({ onClick }) => {
   return (
     <a href="#" onClick={onClick}
       onMouseEnter={() => setKey(k => k + 1)}
-      style={{ display:'flex', alignItems:'center', textDecoration:'none', cursor:'pointer' }}
+      style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', cursor: 'pointer' }}
       aria-label="designedbyomar"
     >
       <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" style={shapeStyle(0)}/>
-        <path d="M39.9286 0H21.5V18H39.9286V0Z" style={shapeStyle(55)}/>
-        <path d="M53.75 0L64.5 18H43L53.75 0Z" style={shapeStyle(110)}/>
-        <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" style={shapeStyle(165)}/>
+        <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" style={shapeStyle(0)} />
+        <path d="M39.9286 0H21.5V18H39.9286V0Z" style={shapeStyle(55)} />
+        <path d="M53.75 0L64.5 18H43L53.75 0Z" style={shapeStyle(110)} />
+        <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" style={shapeStyle(165)} />
       </svg>
     </a>
   );
@@ -690,45 +691,45 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
     closeMobileMenu();
     if (window.location.hash && window.location.hash !== '#') {
       window.location.hash = '';
-      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' }), 40);
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
     } else {
-      document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
   const navLink = {
-    fontSize:14, fontWeight:500, color:'var(--fg-secondary)',
-    textDecoration:'none', padding:'6px 10px', borderRadius:6,
-    transition:'color 150ms, background 150ms', cursor:'pointer',
-    background:'transparent', border:'none', fontFamily:'inherit',
+    fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)',
+    textDecoration: 'none', padding: '6px 10px', borderRadius: 6,
+    transition: 'color 150ms, background 150ms', cursor: 'pointer',
+    background: 'transparent', border: 'none', fontFamily: 'inherit',
   };
   return (
     <header style={{
-      position:'sticky', top:0, zIndex:50,
+      position: 'sticky', top: 0, zIndex: 50,
       background: scrolled ? 'color-mix(in oklab, var(--bg-page) 82%, transparent)' : 'transparent',
       backdropFilter: scrolled ? 'blur(12px)' : 'none',
       WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
       boxShadow: scrolled ? 'rgba(127,127,127,0.18) 0px -1px 0px 0px inset' : 'none',
-      transition:'background 200ms, box-shadow 200ms',
+      transition: 'background 200ms, box-shadow 200ms',
     }}>
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', minHeight:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
         {!isMobile && (
-          <nav style={{ display:'flex', gap:2 }}>
+          <nav style={{ display: 'flex', gap: 2 }}>
             <a href="#work" onClick={goSection('work')} style={navLink}
-              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Work</a>
             <button onClick={onOpenAbout} style={navLink}
-              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >About</button>
             <a href="#contact" onClick={goSection('contact')} style={navLink}
-              onMouseEnter={e=>{e.currentTarget.style.color='var(--fg-primary)';e.currentTarget.style.background='var(--bg-subtle)';}}
-              onMouseLeave={e=>{e.currentTarget.style.color='var(--fg-secondary)';e.currentTarget.style.background='transparent';}}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Contact</a>
           </nav>
         )}
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ThemeToggle theme={theme} setTheme={(t) => {
             setTheme(t);
             if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('theme_toggle', { new_theme: t });
@@ -740,42 +741,42 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
               aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(open => !open)}
               style={{
-                display:'inline-flex', alignItems:'center', justifyContent:'center',
-                width:36, height:36, borderRadius:9999, background:'transparent',
-                color:'var(--fg-primary)', border:'none', boxShadow:'inset 0 0 0 1px var(--color-gray-100)',
-                cursor:'pointer', transition:'background 150ms',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+                color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                cursor: 'pointer', transition: 'background 150ms',
               }}
-              onMouseEnter={e => e.currentTarget.style.background='var(--bg-subtle)'}
-              onMouseLeave={e => e.currentTarget.style.background='transparent'}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
-              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} strokeWidth={2.1} />
+              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
             </button>
           ) : (
             <a href="#contact" onClick={goSection('contact')} style={{
-              fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'8px 14px',
-              borderRadius:6, background:'var(--fg-primary)', textDecoration:'none', transition:'opacity 150ms',
+              fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '8px 14px',
+              borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
             }}
-              onMouseEnter={e=>e.currentTarget.style.opacity='0.86'}
-              onMouseLeave={e=>e.currentTarget.style.opacity='1'}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >Get in touch</a>
           )}
         </div>
         {isMobile && isMobileMenuOpen && (
           <div style={{
-            position:'absolute', top:'calc(100% + 8px)', left:24, right:24, zIndex:60,
-            padding:12, borderRadius:14, background:'color-mix(in oklab, var(--bg-page) 94%, transparent)',
-            boxShadow:'var(--shadow-card-full)', border:'1px solid var(--color-gray-100)',
-            backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)',
+            position: 'absolute', top: 'calc(100% + 8px)', left: 24, right: 24, zIndex: 60,
+            padding: 12, borderRadius: 14, background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
+            boxShadow: 'var(--shadow-card-full)', border: '1px solid var(--color-gray-100)',
+            backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
           }}>
-            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>Work</a>
-              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>About</button>
-              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width:'100%', textAlign:'left', padding:'12px 14px', color:'var(--fg-primary)' }}>Contact</a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>Work</a>
+              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>About</button>
+              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
-                display:'inline-flex', alignItems:'center', justifyContent:'center',
-                fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'12px 16px', marginTop:6,
-                borderRadius:8, background:'var(--fg-primary)', textDecoration:'none', transition:'opacity 150ms',
-              }} onMouseEnter={e=>e.currentTarget.style.opacity='0.86'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>Get in touch</a>
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '12px 16px', marginTop: 6,
+                borderRadius: 8, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
+              }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
             </div>
           </div>
         )}
@@ -788,45 +789,45 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome }) => {
 // Hero
 // ============================================================
 const Dot = () => (
-  <span style={{ display:'inline-flex', alignItems:'center' }}>
-    <span style={{ width:6, height:6, borderRadius:9999, background:'#22c55e', boxShadow:'0 0 0 3px rgba(34,197,94,0.22)', display:'inline-block' }}/>
+  <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+    <span style={{ width: 6, height: 6, borderRadius: 9999, background: '#22c55e', boxShadow: '0 0 0 3px rgba(34,197,94,0.22)', display: 'inline-block' }} />
   </span>
 );
 
 const Hero = ({ galaxy, theme }) => (
   <section id="top" className="hero-editorial" style={{
-    maxWidth:1200, margin:'0 auto', padding:'32px 24px 72px',
-    display:'grid', gridTemplateColumns:'1.1fr 1fr', alignItems:'center', gap:48,
+    maxWidth: 1200, margin: '0 auto', padding: '32px 24px 72px',
+    display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 48,
   }}>
-    <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
-      <div style={{ display:'flex', gap:18, flexWrap:'wrap', fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.06em' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
       </div>
-      <h1 style={{ fontSize:'clamp(44px, 7vw, 88px)', fontWeight:600, lineHeight:0.96, letterSpacing:'-0.04em', color:'var(--fg-primary)', margin:0 }}>
-        Omar <span style={{ color:'var(--fg-primary)' }}>Tavarez</span>
+      <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+        Omar <span style={{ color: 'var(--fg-primary)' }}>Tavarez</span>
       </h1>
-      <p style={{ fontSize:'clamp(17px, 1.5vw, 21px)', fontWeight:400, lineHeight:1.55, color:'var(--fg-secondary)', margin:0, maxWidth:520 }}>
+      <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 400, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
         I partner with product and engineering leaders to translate complex workflows into scalable systems — using prototypes to align teams and measurable outcomes to guide decisions.
       </p>
-      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-        <a href="#work" onClick={(e)=>{e.preventDefault();document.getElementById('work')?.scrollIntoView({behavior:'smooth'});}} style={{
-          display:'inline-flex', alignItems:'center', gap:8, fontSize:14, fontWeight:500,
-          color:'var(--bg-page)', padding:'10px 16px', borderRadius:6, background:'var(--fg-primary)',
-          textDecoration:'none', transition:'opacity 150ms',
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <a href="#work" onClick={(e) => { e.preventDefault(); document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' }); }} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
+          color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)',
+          textDecoration: 'none', transition: 'opacity 150ms',
         }}
-          onMouseEnter={e=>e.currentTarget.style.opacity='0.86'}
-          onMouseLeave={e=>e.currentTarget.style.opacity='1'}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
           View case studies
-          <AppIcon icon={ArrowUpRight} size={12} strokeWidth={2.5} />
+          <AppIcon icon={ArrowUpRight} size={12} />
         </a>
-        <a href="#contact" onClick={(e)=>{e.preventDefault();document.getElementById('contact')?.scrollIntoView({behavior:'smooth'});}} style={{
-          display:'inline-flex', alignItems:'center', gap:8, fontSize:14, fontWeight:500,
-          color:'var(--fg-primary)', padding:'10px 16px', borderRadius:6, background:'transparent',
-          boxShadow:'inset 0 0 0 1px var(--color-gray-100)', textDecoration:'none', transition:'background 150ms',
+        <a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
+          color: 'var(--fg-primary)', padding: '10px 16px', borderRadius: 6, background: 'transparent',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background 150ms',
         }}
-          onMouseEnter={e=>e.currentTarget.style.background='var(--bg-subtle)'}
-          onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >Say hello</a>
       </div>
     </div>
@@ -848,19 +849,19 @@ const ABOUT_LONG = [
 ];
 
 const COMPANY_LOGOS = [
-  { name: 'Plastiq',      src: '/Images/Carousel/plastiq.svg',                    maxW: 90,  maxH: 24, basis: 110 },
-  { name: 'Disney',        src: '/Images/Carousel/disney.svg',                     maxW: 65,  maxH: 24, basis: 70 },
-  { name: 'Raven Health',  src: '/Images/Carousel/raven-health-logo.svg',          maxW: 100, maxH: 26, basis: 130 },
-  { name: 'GoNation',      src: '/Images/Carousel/gonation-dark.svg',              maxW: 110, maxH: 20, basis: 140 },
-  { name: 'Time Inc.',     src: '/Images/Carousel/Time_Inc._logo.svg',             maxW: 75,  maxH: 20, basis: 85 },
-  { name: 'Pyle',          src: '/Images/Carousel/Pyle_wordmark.svg',              maxW: 70,  maxH: 28, basis: 100 },
-  { name: 'Wisdom',        src: '/Images/Carousel/Wisdom_Logo_Full-White.svg',     maxW: 130, maxH: 34, basis: 115 },
-  { name: 'Meredith',      src: '/Images/Carousel/meredith-vector-logo.svg',       maxW: 120, maxH: 26, basis: 150 },
-  { name: 'Simplero',      src: '/Images/Carousel/simplero.svg',                   maxW: 90,  maxH: 24, basis: 110 },
+  { name: 'Plastiq', src: '/Images/Carousel/plastiq.svg', maxW: 90, maxH: 24, basis: 110 },
+  { name: 'Disney', src: '/Images/Carousel/disney.svg', maxW: 65, maxH: 24, basis: 70 },
+  { name: 'Raven Health', src: '/Images/Carousel/raven-health-logo.svg', maxW: 100, maxH: 26, basis: 130 },
+  { name: 'GoNation', src: '/Images/Carousel/gonation-dark.svg', maxW: 110, maxH: 20, basis: 140 },
+  { name: 'Time Inc.', src: '/Images/Carousel/Time_Inc._logo.svg', maxW: 75, maxH: 20, basis: 85 },
+  { name: 'Pyle', src: '/Images/Carousel/Pyle_wordmark.svg', maxW: 70, maxH: 28, basis: 100 },
+  { name: 'Wisdom', src: '/Images/Carousel/Wisdom_Logo_Full-White.svg', maxW: 130, maxH: 34, basis: 115 },
+  { name: 'Meredith', src: '/Images/Carousel/meredith-vector-logo.svg', maxW: 120, maxH: 26, basis: 150 },
+  { name: 'Simplero', src: '/Images/Carousel/simplero.svg', maxW: 90, maxH: 24, basis: 110 },
 ];
 
 const LogoCarousel = () => (
-  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding:'18px 0 40px' }}>
+  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '18px 0 40px' }}>
     <div className="logo-carousel">
       <div className="logo-track">
         {[...COMPANY_LOGOS, ...COMPANY_LOGOS].map((logo, index) => {
@@ -888,31 +889,31 @@ const LogoCarousel = () => (
 
 const About = ({ onOpenDrawer }) => (
   <>
-  <Reveal as="section" id="about" variant="section" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'96px 24px 48px' }}>
-    <div className="about-grid" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'220px 1fr', gap:64, alignItems:'start' }}>
-      <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
-        <span style={{ color:'var(--color-develop-blue)' }}>01 — </span>About
+    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 48px' }}>
+      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '220px 1fr', gap: 64, alignItems: 'start' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 760 }}>
+          <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 500, lineHeight: 1.4, letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
+            {ABOUT_SHORT}
+          </p>
+          <button onClick={onOpenDrawer} style={{
+            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
+            fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', padding: '10px 16px',
+            borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 150ms',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            Read more about me
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </button>
+        </div>
       </div>
-      <div style={{ display:'flex', flexDirection:'column', gap:32, maxWidth:760 }}>
-        <p style={{ fontSize:'clamp(20px, 2vw, 28px)', fontWeight:500, lineHeight:1.4, letterSpacing:'-0.02em', color:'var(--fg-primary)', margin:0 }}>
-          {ABOUT_SHORT}
-        </p>
-        <button onClick={onOpenDrawer} style={{
-          alignSelf:'flex-start', display:'inline-flex', alignItems:'center', gap:8,
-          fontSize:14, fontWeight:500, color:'var(--fg-primary)', padding:'10px 16px',
-          borderRadius:6, background:'transparent', boxShadow:'inset 0 0 0 1px var(--color-gray-100)',
-          border:'none', cursor:'pointer', fontFamily:'inherit', transition:'background 150ms',
-        }}
-          onMouseEnter={e=>e.currentTarget.style.background='var(--bg-subtle)'}
-          onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-        >
-          Read more about me
-          <AppIcon icon={ArrowRight} size={12} strokeWidth={2.5} />
-        </button>
-      </div>
-    </div>
-  </Reveal>
-  <LogoCarousel />
+    </Reveal>
+    <LogoCarousel />
   </>
 );
 
@@ -925,29 +926,29 @@ const AboutDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:80, background:open?'rgba(0,0,0,0.45)':'transparent', backdropFilter:open?'blur(4px)':'none', WebkitBackdropFilter:open?'blur(4px)':'none', opacity:open?1:0, pointerEvents:open?'auto':'none', transition:'opacity 250ms ease' }}/>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity 250ms ease' }} />
       <aside role="dialog" aria-label="About Omar" style={{
-        position:'fixed', top:0, right:0, bottom:0, zIndex:81, width:'min(640px, 92vw)',
-        background:'var(--bg-page)', boxShadow:open?'-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)':'none',
-        transform:open?'translateX(0)':'translateX(100%)', transition:'transform 340ms cubic-bezier(0.22,1,0.36,1)',
-        display:'flex', flexDirection:'column',
+        position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
+        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 340ms cubic-bezier(0.22,1,0.36,1)',
+        display: 'flex', flexDirection: 'column',
       }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', borderBottom:'1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>About / long-form</div>
-          <button onClick={onClose} aria-label="Close" style={{ width:32, height:32, borderRadius:9999, display:'grid', placeItems:'center', background:'transparent', color:'var(--fg-primary)', border:'none', cursor:'pointer', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <AppIcon icon={X} size={14} strokeWidth={2} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
+          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+            <AppIcon icon={X} size={14} />
           </button>
         </div>
-        <div style={{ padding:'36px 36px 72px', overflowY:'auto', flex:1 }}>
-          <h2 style={{ fontSize:'clamp(28px, 3.2vw, 40px)', fontWeight:600, lineHeight:1.05, letterSpacing:'-0.04em', color:'var(--fg-primary)', margin:'0 0 20px' }}>
-            A longer version,<br/><span style={{ color:'var(--fg-tertiary)' }}>for the curious.</span>
+        <div style={{ padding: '36px 36px 72px', overflowY: 'auto', flex: 1 }}>
+          <h2 style={{ fontSize: 'clamp(28px, 3.2vw, 40px)', fontWeight: 600, lineHeight: 1.05, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 20px' }}>
+            A longer version,<br /><span style={{ color: 'var(--fg-tertiary)' }}>for the curious.</span>
           </h2>
-          <p style={{ fontSize:17, lineHeight:1.65, color:'var(--fg-secondary)', margin:'0 0 36px', maxWidth:560 }}>{ABOUT_SHORT}</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:28, maxWidth:560 }}>
+          <p style={{ fontSize: 17, lineHeight: 1.65, color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 560 }}>
             {ABOUT_LONG.map(s => (
               <div key={s.heading}>
-                <div style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>{s.heading}</div>
-                <p style={{ fontSize:15, lineHeight:1.65, color:'var(--fg-secondary)', margin:0 }}>{s.body}</p>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
+                <p style={{ fontSize: 15, lineHeight: 1.65, color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
               </div>
             ))}
           </div>
@@ -1109,74 +1110,74 @@ const CaseCard = ({ c, featured = false }) => {
   const mediaAspectRatio = useSharedMobileAspectRatio ? '4/3' : featured ? '16/8' : '4/3';
 
   return (
-  <a href={`/work/${c.id}`} className="case-card" style={{
-    display:'flex', flexDirection:'column', gap:16, height:'100%',
-    textDecoration:'none', color:'inherit',
-    borderRadius:12, transition:'transform 220ms ease',
-  }}>
-    <div className="case-card-media" style={{
-      position:'relative', width:'100%',
-      aspectRatio: mediaAspectRatio,
-      background:`linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
-      borderRadius:12, overflow:'hidden',
-      boxShadow:'var(--shadow-card-subtle)',
+    <a href={`/work/${c.id}`} className="case-card" style={{
+      display: 'flex', flexDirection: 'column', gap: 16, height: '100%',
+      textDecoration: 'none', color: 'inherit',
+      borderRadius: 12, transition: 'transform 220ms ease',
     }}>
-      <div className="case-card-sheen"/>
-      {/* stacked "screen" silhouettes */}
-      <div className="case-card-screen" style={{
-        position:'absolute', left:'16%', right:'16%', bottom:'-6%', top:'22%',
-        background:c.swatch[2],
-        borderRadius:'10px 10px 0 0',
-        boxShadow:`0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,0.35)`,
+      <div className="case-card-media" style={{
+        position: 'relative', width: '100%',
+        aspectRatio: mediaAspectRatio,
+        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
+        borderRadius: 12, overflow: 'hidden',
+        boxShadow: 'var(--shadow-card-subtle)',
       }}>
-        <div style={{
-          position:'absolute', top:10, left:10, right:10, height:18,
-          display:'flex', alignItems:'center', gap:5,
-          borderBottom:`1px solid ${c.swatch[3]}22`,
+        <div className="case-card-sheen" />
+        {/* stacked "screen" silhouettes */}
+        <div className="case-card-screen" style={{
+          position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
+          background: c.swatch[2],
+          borderRadius: '10px 10px 0 0',
+          boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,0.35)`,
         }}>
-          <span style={{ width:6, height:6, borderRadius:9999, background:c.swatch[3], opacity:0.7 }}/>
-          <span style={{ width:6, height:6, borderRadius:9999, background:c.swatch[0], opacity:0.7 }}/>
-          <span style={{ width:6, height:6, borderRadius:9999, background:c.swatch[1], opacity:0.7 }}/>
+          <div style={{
+            position: 'absolute', top: 10, left: 10, right: 10, height: 18,
+            display: 'flex', alignItems: 'center', gap: 5,
+            borderBottom: `1px solid ${c.swatch[3]}22`,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[3], opacity: 0.7 }} />
+            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[0], opacity: 0.7 }} />
+            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[1], opacity: 0.7 }} />
+          </div>
+          <div className="case-card-line case-card-line--full" style={{
+            position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 3,
+            background: `${c.swatch[3]}22`,
+          }} />
+          <div className="case-card-line case-card-line--left" style={{
+            position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 3,
+            background: `${c.swatch[0]}44`,
+          }} />
+          <div className="case-card-line case-card-line--right" style={{
+            position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 3,
+            background: `${c.swatch[3]}22`,
+          }} />
         </div>
-        <div className="case-card-line case-card-line--full" style={{
-          position:'absolute', top:40, left:16, right:16, height:10, borderRadius:3,
-          background:`${c.swatch[3]}22`,
-        }}/>
-        <div className="case-card-line case-card-line--left" style={{
-          position:'absolute', top:58, left:16, width:'40%', height:10, borderRadius:3,
-          background:`${c.swatch[0]}44`,
-        }}/>
-        <div className="case-card-line case-card-line--right" style={{
-          position:'absolute', top:58, left:'46%', width:'38%', height:10, borderRadius:3,
-          background:`${c.swatch[3]}22`,
-        }}/>
+        {/* accent tag */}
+        <div className="case-card-tag" style={{
+          position: 'absolute', top: 16, left: 16,
+          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
+          color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: 'rgba(0,0,0,0.32)', padding: '5px 9px', borderRadius: 4,
+          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+        }}>{c.num} · {c.year} · {c.client}</div>
       </div>
-      {/* accent tag */}
-      <div className="case-card-tag" style={{
-        position:'absolute', top:16, left:16,
-        fontFamily:'var(--font-mono)', fontSize:10, fontWeight:500,
-        color:'#fff', textTransform:'uppercase', letterSpacing:'0.08em',
-        background:'rgba(0,0,0,0.32)', padding:'5px 9px', borderRadius:4,
-        backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)',
-      }}>{c.num} · {c.year} · {c.client}</div>
-    </div>
 
-    <div style={{ padding:'4px 4px 0', display:'flex', flexDirection:'column', flex:1 }}>
-      <div style={{ display:'flex', alignItems:'baseline', gap:10, flexWrap:'wrap', marginBottom:10 }}>
-        <h3 style={{
-          fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
-          fontWeight:600, letterSpacing:'-0.025em',
-          color:'var(--fg-primary)', margin:0, lineHeight:1.15,
-        }}>{c.title}</h3>
+      <div style={{ padding: '4px 4px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+          <h3 style={{
+            fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
+            fontWeight: 600, letterSpacing: '-0.025em',
+            color: 'var(--fg-primary)', margin: 0, lineHeight: 1.15,
+          }}>{c.title}</h3>
+        </div>
+        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: '0 0 14px', maxWidth: 560 }}>{c.subtitle}</p>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
+          {c.tags.slice(0, 3).map(t => (
+            <span key={t} style={{ fontSize: 11, fontWeight: 500, padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+          ))}
+        </div>
       </div>
-      <p style={{ fontSize: featured ? 16 : 14, lineHeight:1.55, color:'var(--fg-secondary)', margin:'0 0 14px', maxWidth:560 }}>{c.subtitle}</p>
-      <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginTop:'auto' }}>
-        {c.tags.slice(0, 3).map(t => (
-          <span key={t} style={{ fontSize:11, fontWeight:500, padding:'3px 10px', borderRadius:9999, color:'var(--fg-secondary)', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
-        ))}
-      </div>
-    </div>
-  </a>
+    </a>
   );
 };
 
@@ -1189,41 +1190,41 @@ const Work = ({ onOpenDrawer }) => {
   const secondaryColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
 
   return (
-  <section id="work" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'96px 24px' }}>
-    <div style={{ maxWidth:1200, margin:'0 auto' }}>
-      <Reveal className="work-head" variant="section" style={{ display:'grid', gridTemplateColumns:workHeadColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems:'start', marginBottom:56 }}>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
-          <span style={{ color:'var(--color-preview-pink)' }}>02 — </span>Selected work
-        </div>
-        <h2 style={{ fontSize:'clamp(32px, 4.2vw, 56px)', fontWeight:600, lineHeight:1.02, letterSpacing:'-0.04em', color:'var(--fg-primary)', margin:0, maxWidth:760 }}>
-          A decade of systems work — <span style={{ color:'var(--fg-tertiary)' }}>across fintech, healthcare, and enterprise.</span>
-        </h2>
-      </Reveal>
+    <section id="work" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: workHeadColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
+          </div>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0, maxWidth: 760 }}>
+            A decade of systems work — <span style={{ color: 'var(--fg-tertiary)' }}>across fintech, healthcare, and enterprise.</span>
+          </h2>
+        </Reveal>
 
-      <Reveal delay={70} style={{ display:'grid', gridTemplateColumns:'1fr', gap:32, marginBottom:32 }}>
-        <CaseCard c={CASE_STUDIES[0]} featured />
-      </Reveal>
-      <Reveal delay={130} style={{ display:'grid', gridTemplateColumns:secondaryColumns, gap:32, marginBottom:48, alignItems:'stretch' }}>
-        <CaseCard c={CASE_STUDIES[1]} />
-        <CaseCard c={CASE_STUDIES[2]} />
-      </Reveal>
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32, marginBottom: 32 }}>
+          <CaseCard c={CASE_STUDIES[0]} featured />
+        </Reveal>
+        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 32, marginBottom: 48, alignItems: 'stretch' }}>
+          <CaseCard c={CASE_STUDIES[1]} />
+          <CaseCard c={CASE_STUDIES[2]} />
+        </Reveal>
 
-      <Reveal as="div" delay={180} style={{ display:'inline-flex' }}>
-        <button onClick={onOpenDrawer} style={{
-          display:'inline-flex', alignItems:'center', gap:8,
-          fontSize:14, fontWeight:500, color:'var(--fg-primary)', padding:'10px 16px',
-          borderRadius:6, background:'transparent', boxShadow:'inset 0 0 0 1px var(--color-gray-100)',
-          border:'none', cursor:'pointer', fontFamily:'inherit', transition:'background 150ms',
-        }}
-          onMouseEnter={e=>e.currentTarget.style.background='var(--bg-subtle)'}
-          onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-        >
-          See all {CASE_STUDIES.length} case studies
-          <AppIcon icon={ArrowRight} size={12} strokeWidth={2.5} />
-        </button>
-      </Reveal>
-    </div>
-  </section>
+        <Reveal as="div" delay={180} style={{ display: 'inline-flex' }}>
+          <button onClick={onOpenDrawer} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', padding: '10px 16px',
+            borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 150ms',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            See all {CASE_STUDIES.length} case studies
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </button>
+        </Reveal>
+      </div>
+    </section>
   );
 };
 
@@ -1239,21 +1240,21 @@ const WorkDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:80, background:open?'rgba(0,0,0,0.45)':'transparent', backdropFilter:open?'blur(4px)':'none', WebkitBackdropFilter:open?'blur(4px)':'none', opacity:open?1:0, pointerEvents:open?'auto':'none', transition:'opacity 250ms ease' }}/>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity 250ms ease' }} />
       <aside role="dialog" aria-label="All case studies" style={{
-        position:'fixed', top:0, right:0, bottom:0, zIndex:81, width:'min(980px, 96vw)',
-        background:'var(--bg-page)', boxShadow:open?'-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)':'none',
-        transform:open?'translateX(0)':'translateX(100%)', transition:'transform 340ms cubic-bezier(0.22,1,0.36,1)',
-        display:'flex', flexDirection:'column',
+        position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
+        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 340ms cubic-bezier(0.22,1,0.36,1)',
+        display: 'flex', flexDirection: 'column',
       }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', borderBottom:'1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
-          <button onClick={onClose} aria-label="Close" style={{ width:32, height:32, borderRadius:9999, display:'grid', placeItems:'center', background:'transparent', color:'var(--fg-primary)', border:'none', cursor:'pointer', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <AppIcon icon={X} size={14} strokeWidth={2} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
+          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+            <AppIcon icon={X} size={14} />
           </button>
         </div>
-        <div style={{ padding:'28px', overflowY:'auto', flex:1 }}>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:24 }}>
+        <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {CASE_STUDIES.map(c => (
               <div key={c.id} onClick={onClose}>
                 <CaseCard c={c} />
@@ -1279,132 +1280,132 @@ const CaseStudyPage = ({ c, onBack }) => {
   const next = CASE_STUDIES[(idx + 1) % CASE_STUDIES.length];
 
   return (
-    <article style={{ maxWidth:1040, margin:'0 auto', padding:'40px 24px 96px' }}>
+    <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-        display:'inline-flex', alignItems:'center', gap:8,
-        fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)',
-        textDecoration:'none', textTransform:'uppercase', letterSpacing:'0.08em',
-        marginBottom:40, transition:'color 150ms',
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
+        marginBottom: 40, transition: 'color 150ms',
       }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
       >
-        <AppIcon icon={ArrowLeft} size={12} strokeWidth={2.5} />
+        <AppIcon icon={ArrowLeft} size={12} />
         Back to work
       </a>
 
       {/* Cover */}
       <div style={{
-        position:'relative', width:'100%', aspectRatio:'21/9',
-        background:`linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
-        borderRadius:16, overflow:'hidden',
-        boxShadow:'var(--shadow-card-subtle)', marginBottom:48,
+        position: 'relative', width: '100%', aspectRatio: '21/9',
+        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
+        borderRadius: 16, overflow: 'hidden',
+        boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
       }}>
         {c.coverImage && (
           <div style={{
-            position:'absolute', inset:'56px 28px 24px',
-            borderRadius:12, overflow:'hidden',
-            background:'var(--bg-page)',
-            boxShadow:'0 18px 48px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.08)',
+            position: 'absolute', inset: '56px 28px 24px',
+            borderRadius: 12, overflow: 'hidden',
+            background: 'var(--bg-page)',
+            boxShadow: '0 18px 48px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.08)',
           }}>
             <div style={{
-              display:'flex', alignItems:'center', gap:6,
-              height:34, padding:'0 12px',
-              background:'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
-              borderBottom:'1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
+              display: 'flex', alignItems: 'center', gap: 6,
+              height: 34, padding: '0 12px',
+              background: 'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
+              borderBottom: '1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
             }}>
-              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(255,95,86,0.95)', display:'inline-block' }}/>
-              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(255,189,46,0.95)', display:'inline-block' }}/>
-              <span style={{ width:8, height:8, borderRadius:9999, background:'rgba(39,201,63,0.95)', display:'inline-block' }}/>
+              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(255,95,86,0.95)', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(255,189,46,0.95)', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(39,201,63,0.95)', display: 'inline-block' }} />
               <div style={{
-                marginLeft:10, flex:1, height:12, borderRadius:9999,
-                background:'color-mix(in oklab, var(--color-gray-100) 92%, transparent)',
-                opacity:0.78,
-              }}/>
+                marginLeft: 10, flex: 1, height: 12, borderRadius: 9999,
+                background: 'color-mix(in oklab, var(--color-gray-100) 92%, transparent)',
+                opacity: 0.78,
+              }} />
             </div>
             <div style={{
-              width:'100%', height:'calc(100% - 34px)',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              background:'var(--bg-page)',
+              width: '100%', height: 'calc(100% - 34px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--bg-page)',
             }}>
               <img src={c.coverImage} alt={`${c.title} dashboard preview`} style={{
-                width:'100%', height:'100%', objectFit:'contain', objectPosition:'center top', display:'block',
-              }}/>
+                width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center top', display: 'block',
+              }} />
             </div>
           </div>
         )}
         <div style={{
-          position:'absolute', top:20, left:22,
-          fontFamily:'var(--font-mono)', fontSize:11, fontWeight:500,
-          color:'#fff', textTransform:'uppercase', letterSpacing:'0.08em',
-          background:'rgba(0,0,0,0.32)', padding:'5px 10px', borderRadius:4,
-          backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)',
+          position: 'absolute', top: 20, left: 22,
+          fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500,
+          color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: 'rgba(0,0,0,0.32)', padding: '5px 10px', borderRadius: 4,
+          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
         }}>{c.num} · {c.year} · {c.client}</div>
       </div>
 
       {/* Title + meta */}
-      <div style={{ marginBottom:48 }}>
+      <div style={{ marginBottom: 48 }}>
         <h1 style={{
-          fontSize:'clamp(40px, 6vw, 80px)', fontWeight:600,
-          lineHeight:1.0, letterSpacing:'-0.04em',
-          color:'var(--fg-primary)', margin:'0 0 20px',
+          fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 600,
+          lineHeight: 1.0, letterSpacing: '-0.04em',
+          color: 'var(--fg-primary)', margin: '0 0 20px',
         }}>{c.title}</h1>
-        <p style={{ fontSize:'clamp(17px, 1.4vw, 21px)', lineHeight:1.5, color:'var(--fg-secondary)', margin:'0 0 24px', maxWidth:760 }}>{c.subtitle}</p>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:16 }}>{c.role}</div>
-        <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 1.5, color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 760 }}>{c.subtitle}</p>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {c.tags.map(t => (
-            <span key={t} style={{ fontSize:11, fontWeight:500, padding:'3px 10px', borderRadius:9999, color:'var(--fg-secondary)', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <span key={t} style={{ fontSize: 11, fontWeight: 500, padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
           ))}
         </div>
       </div>
 
       {/* Metrics strip */}
       <div className="cs-metrics-grid" style={{
-        display:'grid', gridTemplateColumns:`repeat(${c.metrics.length}, 1fr)`,
-        borderRadius:12, overflow:'hidden',
-        boxShadow:'var(--shadow-card-subtle)',
-        background:'var(--bg-page)', marginBottom:64,
+        display: 'grid', gridTemplateColumns: `repeat(${c.metrics.length}, 1fr)`,
+        borderRadius: 12, overflow: 'hidden',
+        boxShadow: 'var(--shadow-card-subtle)',
+        background: 'var(--bg-page)', marginBottom: 64,
       }}>
         {c.metrics.map((m, i) => (
           <div key={i} style={{
-            padding:'32px 24px', textAlign:'center',
+            padding: '32px 24px', textAlign: 'center',
             borderRight: i < c.metrics.length - 1 ? '1px solid var(--color-gray-100)' : 'none',
           }}>
-            <div style={{ fontSize:'clamp(28px, 3.2vw, 44px)', fontWeight:700, letterSpacing:'-0.04em', color:c.accent, lineHeight:1 }}>{m.value}</div>
-            <div style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', marginTop:10, textTransform:'uppercase', letterSpacing:'0.06em' }}>{m.label}</div>
+            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 700, letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
           </div>
         ))}
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display:'flex', flexDirection:'column', gap:56, maxWidth:760 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 56, maxWidth: 760 }}>
         {[
-          { label:'Challenge', body:c.challenge },
-          { label:'Approach',  body:c.approach  },
-          { label:'Outcome',   body:c.outcome   },
+          { label: 'Challenge', body: c.challenge },
+          { label: 'Approach', body: c.approach },
+          { label: 'Outcome', body: c.outcome },
         ].map(({ label, body }) => (
           <div key={label}>
-            <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:c.accent, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:16 }}>{label}</div>
-            <p style={{ fontSize:'clamp(16px, 1.25vw, 19px)', lineHeight:1.65, color:'var(--fg-primary)', margin:0 }}>{body}</p>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
+            <p style={{ fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 1.65, color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
           </div>
         ))}
       </div>
 
       {/* Prev / Next */}
       <div className="cs-prevnext" style={{
-        marginTop:96, paddingTop:32,
-        borderTop:'1px solid var(--color-gray-100)',
-        display:'grid', gridTemplateColumns:'1fr 1fr', gap:24,
+        marginTop: 96, paddingTop: 32,
+        borderTop: '1px solid var(--color-gray-100)',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24,
       }}>
-        <a href={`/work/${prev.id}`} style={{ textDecoration:'none', color:'inherit' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:10, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:10 }}>← Previous</div>
-          <div style={{ fontSize:20, fontWeight:600, letterSpacing:'-0.025em', color:'var(--fg-primary)' }}>{prev.title}</div>
-          <div style={{ fontSize:13, color:'var(--fg-tertiary)', marginTop:4 }}>{prev.client}</div>
+        <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
+          <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
+          <div style={{ fontSize: 13, color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}`} style={{ textDecoration:'none', color:'inherit', textAlign:'right' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:10, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:10 }}>Next →</div>
-          <div style={{ fontSize:20, fontWeight:600, letterSpacing:'-0.025em', color:'var(--fg-primary)' }}>{next.title}</div>
-          <div style={{ fontSize:13, color:'var(--fg-tertiary)', marginTop:4 }}>{next.client}</div>
+        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit', textAlign: 'right' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
+          <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
+          <div style={{ fontSize: 13, color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
         </a>
       </div>
     </article>
@@ -1451,8 +1452,8 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
           window.trackAnalyticsEvent(eventName, { link_url: href });
         }
       }}
-      onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-2px)'; }}
-      onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
     >
       {copyValue && (
         <button
@@ -1485,11 +1486,11 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
             e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
           }}
         >
-          <AppIcon icon={copied ? Check : Copy} size={13} strokeWidth={2.2} />
+          <AppIcon icon={copied ? Check : Copy} size={13} />
         </button>
       )}
-      <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
-      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
     </a>
   );
 };
@@ -1499,9 +1500,9 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
 // ============================================================
 const KeyFacts = () => {
   const sectionRef = React.useRef(null);
-  const gradRef    = React.useRef(null);
-  const mouseRef   = React.useRef({ x: 0.5, y: 0.5 });
-  const animRef    = React.useRef(null);
+  const gradRef = React.useRef(null);
+  const mouseRef = React.useRef({ x: 0.5, y: 0.5 });
+  const animRef = React.useRef(null);
   const viewportWidth = useViewportWidth();
   const factsColumns = viewportWidth <= COMPACT_LAYOUT_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)';
 
@@ -1510,13 +1511,13 @@ const KeyFacts = () => {
     if (!rect) return;
     mouseRef.current = {
       x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top)  / rect.height,
+      y: (e.clientY - rect.top) / rect.height,
     };
   }, []);
 
   React.useEffect(() => {
     const loop = (ts) => {
-      const t  = ts / 1000;
+      const t = ts / 1000;
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
 
@@ -1572,23 +1573,23 @@ const KeyFacts = () => {
       }} />
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <Reveal className="work-head" variant="section" style={{
-          display:'grid',
+          display: 'grid',
           gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr',
           gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)',
-          alignItems:'start',
+          alignItems: 'start',
           marginBottom: 'var(--layout-1)',
         }}>
           <div style={{
-            fontFamily:'var(--font-mono)',
-            fontSize:12,
-            color:'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)',
-            textTransform:'uppercase',
-            letterSpacing:'0.08em'
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12,
+            color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em'
           }}>
-            <span style={{ color:'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
+            <span style={{ color: 'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
-          <h2 style={{ fontSize:'clamp(32px, 4.2vw, 56px)', fontWeight:600, lineHeight:1.02, letterSpacing:'-0.04em', color:'var(--fg-on-dark)', margin:0, maxWidth:760 }}>
-            The short version: <span style={{ color:'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
+            The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
           </h2>
         </Reveal>
         <Reveal variant="section" className="facts-grid" style={{
@@ -1607,18 +1608,18 @@ const KeyFacts = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'var(--space-3)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
                 {f.label}
               </div>
               {f.custom ? (
-                <div style={{ fontSize:15, fontWeight:500, color:'var(--fg-primary)', lineHeight:1.5 }}>
+                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--fg-primary)', lineHeight: 1.5 }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color:'var(--color-develop-blue)', textDecoration:'none', borderBottom:'1px solid currentColor' }}>LinkedIn</a>
+                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>LinkedIn</a>
                   {' '}and{' '}
-                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color:'var(--color-preview-pink)', textDecoration:'none', borderBottom:'1px solid currentColor' }}>Substack</a>
+                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>Substack</a>
                 </div>
               ) : (
-                <div style={{ fontSize:15, fontWeight:500, color:'var(--fg-primary)', lineHeight:1.5 }}>
+                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--fg-primary)', lineHeight: 1.5 }}>
                   {f.value}
                 </div>
               )}
@@ -1636,90 +1637,31 @@ const Contact = () => {
   const contactCardColumns = viewportWidth <= MOBILE_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))';
 
   return (
-  <section id="contact" style={{ borderTop:'1px solid var(--color-gray-100)', padding:'var(--layout-4) var(--space-6) var(--layout-3)' }}>
-    <Reveal className="contact-grid" variant="section" style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:contactGridColumns, gap:viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems:'start' }}>
-      <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>
-        <span style={{ color:'var(--color-ship-red)' }}>04 — </span>Contact
-      </div>
-      <div style={{ display:'flex', flexDirection:'column', gap:'var(--space-8)', maxWidth:820 }}>
-        <h2 style={{ fontSize:'clamp(36px, 6vw, 80px)', fontWeight:600, lineHeight:0.98, letterSpacing:'-0.04em', color:'var(--fg-secondary)', margin:0 }}>
-          Turn complexity <br/><span style={{ color:'var(--fg-secondary)' }}>into clarity. </span><br/><span style={{ color:'var(--fg-primary)' }}>Let's talk.</span>
-        </h2>
-        <div style={{ display:'grid', gridTemplateColumns:contactCardColumns, gap:'var(--space-4)' }}>
-          <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
-          <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
-          <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
-          <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" />
-          <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" />
+    <section id="contact" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6) var(--layout-3)' }}>
+      <Reveal className="contact-grid" variant="section" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ color: 'var(--color-ship-red)' }}>04 — </span>Contact
         </div>
-      </div>
-    </Reveal>
-  </section>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 820 }}>
+          <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 600, lineHeight: 0.98, letterSpacing: '-0.04em', color: 'var(--fg-secondary)', margin: 0 }}>
+            Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
+            <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
+            <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
+            <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
+            <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" />
+            <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" />
+          </div>
+        </div>
+      </Reveal>
+    </section>
   );
 };
 
 // ============================================================
 // Alien pixel icon + retro arrival animation
 // ============================================================
-const ALIEN_PIXELS = [
-  [3,0,1,1],[7,0,1,1],
-  [4,1,1,1],[6,1,1,1],
-  [2,2,7,1],
-  [1,3,2,1],[4,3,3,1],[8,3,2,1],
-  [0,4,11,1],
-  [0,5,1,1],[2,5,7,1],[10,5,1,1],
-  [0,6,1,1],[2,6,1,1],[8,6,1,1],[10,6,1,1],
-  [3,7,2,1],[6,7,2,1],
-];
-
-const AlienPixel = ({ size = '1.4em', title = 'Alien', style, ...rest }) => (
-  <svg
-    viewBox="0 0 11 8"
-    width={size}
-    height="auto"
-    role="img"
-    shapeRendering="crispEdges"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{
-      display: 'inline-block',
-      verticalAlign: '-0.15em',
-      color: 'var(--color-develop-blue)',
-      ...style,
-    }}
-    {...rest}
-  >
-    <title>{title}</title>
-    {ALIEN_PIXELS.map(([x, y, w, h], i) => (
-      <rect key={i} x={x} y={y} width={w} height={h} fill="currentColor" />
-    ))}
-  </svg>
-);
-
-const UFO = ({ size = '1.8em' }) => (
-  <svg
-    viewBox="0 0 11 5"
-    width={size}
-    height="auto"
-    aria-hidden="true"
-    shapeRendering="crispEdges"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ display: 'block' }}
-  >
-    <g fill="var(--color-ship-red)">
-      <rect x="3" y="0" width="5" height="1" />
-      <rect x="2" y="1" width="7" height="1" />
-      <rect x="0" y="2" width="11" height="1" />
-      <rect x="1" y="3" width="9" height="1" />
-    </g>
-    <g fill="var(--color-preview-pink)">
-      <rect x="2" y="4" width="1" height="1" />
-      <rect x="4" y="4" width="1" height="1" />
-      <rect x="6" y="4" width="1" height="1" />
-      <rect x="8" y="4" width="1" height="1" />
-    </g>
-  </svg>
-);
-
 const FooterAlien = () => {
   const ref = React.useRef(null);
   const [played, setPlayed] = React.useState(false);
@@ -1744,65 +1686,36 @@ const FooterAlien = () => {
     return () => obs.disconnect();
   }, [played]);
 
-  return (
-    <span
-      ref={ref}
-      className="footer-alien-arrival"
-      data-playing={played ? 'true' : 'false'}
-      aria-label="Alien arrival animation"
-      style={{
-        position: 'relative',
-        display: 'inline-block',
-        width: '1.4em',
-        height: '1em',
-        verticalAlign: '-0.15em',
-        overflow: 'visible',
-        flex: '0 0 auto',
-        lineHeight: 0,
-      }}
-    >
-      <span className="faa-ufo" aria-hidden="true">
-        <UFO />
-      </span>
-      <span className="faa-beam" aria-hidden="true" />
-      <span className="faa-alien">
-        <AlienPixel style={{ verticalAlign: 'top' }} />
-      </span>
-    </span>
-  );
+  return <div ref={ref} style={{ display: 'inline-block' }}><FooterArrival played={played} /></div>;
 };
 
 const SiteFooter = ({ onOpenAbout, onHome }) => {
   const footerLabelStyle = {
-    fontFamily:'var(--font-mono)',
-    fontSize:12,
-    color:'var(--fg-tertiary)',
-    textTransform:'uppercase',
-    letterSpacing:'0.08em',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 12,
+    color: 'var(--fg-tertiary)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
   };
   const footerLinkStyle = {
-    display:'inline-flex',
-    alignItems:'center',
-    gap:8,
-    width:'fit-content',
-    fontSize:15,
-    fontWeight:500,
-    lineHeight:1.4,
-    color:'var(--fg-secondary)',
-    textDecoration:'none',
-    transition:'color 160ms ease, transform 160ms ease',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    width: 'fit-content',
+    fontSize: 15,
+    fontWeight: 500,
+    lineHeight: 1.4,
+    color: 'var(--fg-secondary)',
+    textDecoration: 'none',
+    transition: 'color 160ms ease, transform 160ms ease',
   };
   const footerButtonStyle = {
     ...footerLinkStyle,
-    padding:0,
-    background:'transparent',
-    border:'none',
-    fontFamily:'inherit',
-    cursor:'pointer',
-  };
-  const specialFooterLinkStyle = {
-    ...footerLinkStyle,
-    color:'var(--fg-secondary)',
+    padding: 0,
+    background: 'transparent',
+    border: 'none',
+    fontFamily: 'inherit',
+    cursor: 'pointer',
   };
 
   const enhanceLink = (event, color = 'var(--fg-primary)') => {
@@ -1822,17 +1735,18 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
       window.dispatchEvent(new Event('popstate'));
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
-          document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
       });
       return;
     }
-    document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <footer style={{ borderTop:'1px solid var(--color-gray-100)', padding:'var(--layout-1) var(--space-6) var(--layout-2)' }}>
-      <style dangerouslySetInnerHTML={{__html: `
+    <footer style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-1) var(--space-6) var(--layout-2)' }}>
+      <style dangerouslySetInnerHTML={{
+        __html: footerAlienStyles + `
         .site-footer-grid {
           display: grid;
           grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
@@ -1843,90 +1757,6 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
           flex-direction: column;
           gap: 18px;
           min-width: 0;
-        }
-        .site-footer-link:focus-visible {
-          outline: 2px solid var(--color-develop-blue);
-          outline-offset: 6px;
-          border-radius: 6px;
-        }
-        .footer-signoff {
-          position: relative;
-        }
-        .footer-alien-arrival {
-          --faa-ufo-w: 1.8em;
-        }
-        .footer-alien-arrival .faa-ufo {
-          position: absolute;
-          left: 50%;
-          top: -1.25em;
-          width: var(--faa-ufo-w);
-          transform: translate(-50%, 0) translateX(-260%);
-          opacity: 0;
-          pointer-events: none;
-          will-change: transform, opacity;
-        }
-        .footer-alien-arrival .faa-beam {
-          position: absolute;
-          left: 50%;
-          top: -0.35em;
-          width: 1.1em;
-          height: 1.25em;
-          transform: translateX(-50%) scaleY(0);
-          transform-origin: top center;
-          opacity: 0;
-          background: linear-gradient(
-            180deg,
-            color-mix(in oklab, var(--color-preview-pink) 70%, transparent),
-            color-mix(in oklab, var(--color-preview-pink) 8%, transparent)
-          );
-          clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
-          mix-blend-mode: screen;
-          pointer-events: none;
-          will-change: transform, opacity;
-        }
-        .footer-alien-arrival .faa-alien {
-          position: absolute;
-          left: 50%;
-          bottom: -0.05em;
-          transform: translate(-50%, 0);
-          line-height: 0;
-          opacity: 0;
-          will-change: transform, opacity;
-        }
-        .footer-alien-arrival[data-playing="true"] .faa-alien {
-          opacity: 1;
-        }
-        @media (prefers-reduced-motion: no-preference) {
-          .footer-alien-arrival[data-playing="true"] .faa-ufo {
-            animation:
-              faa-ufo-arrive 1.0s cubic-bezier(.2,.7,.2,1) forwards,
-              faa-ufo-leave  0.9s cubic-bezier(.6,.0,.7,.3) 2.0s forwards;
-          }
-          .footer-alien-arrival[data-playing="true"] .faa-beam {
-            animation: faa-beam-pulse 1.1s ease-in-out 0.9s forwards;
-          }
-          .footer-alien-arrival[data-playing="true"] .faa-alien {
-            animation: faa-alien-land 0.5s cubic-bezier(.2,.9,.3,1.4) 1.4s both;
-          }
-        }
-        @keyframes faa-ufo-arrive {
-          from { transform: translate(-50%, 0) translateX(-260%); opacity: 0; }
-          to   { transform: translate(-50%, 0) translateX(0);     opacity: 1; }
-        }
-        @keyframes faa-ufo-leave {
-          from { transform: translate(-50%, 0) translateX(0);    opacity: 1; }
-          to   { transform: translate(-50%, 0) translateX(280%); opacity: 0; }
-        }
-        @keyframes faa-beam-pulse {
-          0%   { transform: translateX(-50%) scaleY(0); opacity: 0; }
-          25%  { transform: translateX(-50%) scaleY(1); opacity: 0.85; }
-          75%  { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
-          100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
-        }
-        @keyframes faa-alien-land {
-          0%   { opacity: 0; transform: translate(-50%, -0.6em) scale(0.55); }
-          60%  { opacity: 1; transform: translate(-50%, 0.05em) scale(1.05); }
-          100% { opacity: 1; transform: translate(-50%, 0)      scale(1);    }
         }
         @media (max-width: 900px) {
           .site-footer-grid {
@@ -1944,27 +1774,27 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
           }
         }
       `}} />
-      <div style={{ maxWidth:1200, margin:'0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div className="site-footer-grid">
-          <div className="site-footer-block site-footer-brand" style={{ gap:'var(--space-6)' }}>
-            <div style={{ display:'inline-flex', width:'fit-content' }}>
+          <div className="site-footer-block site-footer-brand" style={{ gap: 'var(--space-6)' }}>
+            <div style={{ display: 'inline-flex', width: 'fit-content' }}>
               <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
             </div>
-            <p style={{ maxWidth:360, margin:0, fontSize:16, lineHeight:1.65, color:'var(--fg-tertiary)' }}>
+            <p style={{ maxWidth: 360, margin: 0, fontSize: 16, lineHeight: 1.65, color: 'var(--fg-tertiary)' }}>
               Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.
             </p>
             <span className="footer-signoff" style={{
-              display:'inline-flex',
-              alignItems:'center',
-              gap:'var(--space-2)',
-              flexWrap:'wrap',
-              width:'fit-content',
-              fontFamily:'var(--font-mono)',
-              fontSize:12,
-              lineHeight:1.55,
-              color:'var(--fg-tertiary)',
-              letterSpacing:'0.08em',
-              textTransform:'uppercase',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              flexWrap: 'wrap',
+              width: 'fit-content',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 12,
+              lineHeight: 1.55,
+              color: 'var(--fg-tertiary)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
             }}>
               <span>Designed by Omar. Built with AI-native coding tools.</span>
               <FooterAlien />
@@ -2012,19 +1842,16 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
             >
               Privacy Policy
             </a>
-            <div style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)', paddingTop:'var(--space-2)' }}>
-              <span style={footerLabelStyle}>Brand System</span>
-              <a
-                href="design-system.html"
-                className="site-footer-link"
-                aria-label="See Design System"
-                style={specialFooterLinkStyle}
-                onMouseEnter={(event) => enhanceLink(event, 'var(--color-develop-blue)')}
-                onMouseLeave={(event) => resetLink(event, 'var(--fg-secondary)')}
-              >
-                Design System
-              </a>
-            </div>
+            <a
+              href="design-system.html"
+              className="site-footer-link"
+              aria-label="See Design System"
+              style={footerLinkStyle}
+              onMouseEnter={(event) => enhanceLink(event)}
+              onMouseLeave={(event) => resetLink(event)}
+            >
+              Design System
+            </a>
           </div>
 
           <div className="site-footer-block">
@@ -2062,7 +1889,7 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
             >
               Substack
             </a>
-            <span style={{ paddingTop:8, fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', letterSpacing:'0.06em', textTransform:'uppercase' }}>
+            <span style={{ paddingTop: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               © 2026 Omar Tavarez
             </span>
           </div>
@@ -2079,24 +1906,24 @@ const SiteFooter = ({ onOpenAbout, onHome }) => {
 const PrivacyPolicyPage = ({ theme, onBack }) => (
   <div style={{ maxWidth: 800, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
     <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-      display:'inline-flex', alignItems:'center', fontSize:14, fontWeight:500, color:'var(--fg-secondary)', textDecoration:'none', marginBottom:48
+      display: 'inline-flex', alignItems: 'center', fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)', textDecoration: 'none', marginBottom: 48
     }}>← Back to home</a>
-    <h1 style={{ fontSize:32, fontWeight:600, letterSpacing:'-0.03em', color:'var(--fg-primary)', marginBottom:32 }}>Privacy Policy</h1>
-    
-    <div style={{ display:'flex', flexDirection:'column', gap:24, color:'var(--fg-secondary)', lineHeight:1.6, fontSize:15 }}>
+    <h1 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, color: 'var(--fg-secondary)', lineHeight: 1.6, fontSize: 15 }}>
       <p>Last updated: April 2026</p>
-      
-      <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>1. Data Collection</h2>
+
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
       <p>This website ("designedbyomar.com") uses Google Analytics 4 to collect basic, anonymized telemetry data such as page views, scroll depth, and interaction events (like theme toggling or external link clicks). This helps me understand which case studies are resonating and improve the overall portfolio experience.</p>
-      
-      <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>2. Cookies</h2>
+
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>2. Cookies</h2>
       <p>Google Analytics utilizes cookies to distinguish unique users and sessions. By continuing to use this site, you consent to the use of these tracking mechanisms unless you have disabled cookies in your browser or are using privacy-enhancing browser extensions.</p>
 
-      <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>3. Third-party Links</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>3. Third-party Links</h2>
       <p>This site contains links to other websites, including LinkedIn, GitHub, and Substack. Please be aware that I am not responsible for the privacy practices of such other sites. I encourage users to be aware when they leave my site and to read the privacy statements of any other site that collects personally identifiable information.</p>
-      
-      <h2 style={{ fontSize:20, fontWeight:600, color:'var(--fg-primary)', marginTop:16 }}>4. Contact</h2>
-      <p>For any questions regarding this policy, please reach out to <a href="mailto:omar@designedbyomar.com" style={{ color:'var(--color-develop-blue)', textDecoration:'none' }}>omar@designedbyomar.com</a>.</p>
+
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>4. Contact</h2>
+      <p>For any questions regarding this policy, please reach out to <a href="mailto:omar@designedbyomar.com" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none' }}>omar@designedbyomar.com</a>.</p>
     </div>
   </div>
 );
@@ -2180,18 +2007,18 @@ const syncSentryContext = (route, currentCase, theme) => {
 };
 
 const AppShellErrorFallback = () => (
-  <div style={{ minHeight:'100vh', display:'grid', placeItems:'center', padding:'32px 24px', background:'var(--bg-page)', color:'var(--fg-primary)' }}>
-    <div style={{ width:'100%', maxWidth:720, borderRadius:16, padding:'32px 28px', background:'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow:'inset 0 0 0 1px var(--color-gray-100)' }}>
-      <div style={{ fontFamily:'var(--font-mono)', fontSize:12, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--fg-tertiary)', marginBottom:14 }}>
+  <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '32px 24px', background: 'var(--bg-page)', color: 'var(--fg-primary)' }}>
+    <div style={{ width: '100%', maxWidth: 720, borderRadius: 16, padding: '32px 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 14 }}>
         Unexpected error
       </div>
-      <h1 style={{ fontSize:'clamp(32px, 5vw, 56px)', lineHeight:1, letterSpacing:'-0.04em', margin:'0 0 16px' }}>
+      <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1, letterSpacing: '-0.04em', margin: '0 0 16px' }}>
         This view failed to load.
       </h1>
-      <p style={{ fontSize:17, lineHeight:1.6, color:'var(--fg-secondary)', margin:'0 0 24px' }}>
+      <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
         Refresh the page or head back home. The issue has been logged for review.
       </p>
-      <a href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:14, fontWeight:500, color:'var(--bg-page)', padding:'10px 16px', borderRadius:6, background:'var(--fg-primary)', textDecoration:'none' }}>
+      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none' }}>
         Back home
       </a>
     </div>
@@ -2206,10 +2033,10 @@ const useRoute = () => {
   const parse = (path) => {
     if (path.match(/^\/privacy\/?$/)) return { type: 'privacy' };
     const m = path.match(/^\/work\/(.+?)(\/)?$/);
-    return m ? { type:'case', id: m[1] } : { type:'home' };
+    return m ? { type: 'case', id: m[1] } : { type: 'home' };
   };
   const [route, setRoute] = React.useState(() => parse(window.location.pathname));
-  
+
   React.useEffect(() => {
     const on = () => { setRoute(parse(window.location.pathname)); window.scrollTo(0, 0); };
     window.addEventListener('popstate', on);
@@ -2275,7 +2102,7 @@ const App = () => {
       if (!cancelled) {
         try {
           sessionStorage.setItem(LOADER_SESSION_KEY, 'true');
-        } catch {}
+        } catch { }
         setLoading(false);
       }
     });
@@ -2287,7 +2114,7 @@ const App = () => {
 
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [workOpen, setWorkOpen] = React.useState(false);
-  const galaxy = { density:1.9, speed:0.75, style:'pixel', accent:'workflow', theme };
+  const galaxy = { density: 1.9, speed: 0.75, style: 'pixel', accent: 'workflow', theme };
 
   const route = useRoute();
   const currentCase = route.type === 'case' ? CASE_STUDIES.find(c => c.id === route.id) : null;
