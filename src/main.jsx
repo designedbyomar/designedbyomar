@@ -701,7 +701,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
   };
   const navLink = {
     fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)',
-    textDecoration: 'none', padding: '6px 10px', borderRadius: 6,
+    textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 6,
     transition: 'color 150ms, background 150ms', cursor: 'pointer',
     background: 'transparent', border: 'none', fontFamily: 'inherit',
   };
@@ -714,7 +714,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       boxShadow: scrolled ? 'rgba(127,127,127,0.18) 0px -1px 0px 0px inset' : 'none',
       transition: 'background 200ms, box-shadow 200ms',
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
@@ -732,7 +732,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             >Contact</a>
           </nav>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <ThemeToggle theme={theme} setTheme={(t) => {
             setTheme(t);
             if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('theme_toggle', { new_theme: t });
@@ -756,7 +756,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             </button>
           ) : (
             <a href="#contact" onClick={goSection('contact')} style={{
-              fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '8px 14px',
+              fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
               borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
@@ -767,17 +767,17 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
         {isMobile && isMobileMenuOpen && (
           <div style={{
             position: 'absolute', top: 'calc(100% + 8px)', left: 24, right: 24, zIndex: 60,
-            padding: 12, borderRadius: 14, background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
+            padding: 'var(--space-3)', borderRadius: 14, background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
             boxShadow: 'var(--shadow-card-full)', border: '1px solid var(--color-gray-100)',
             backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>Work</a>
-              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>About</button>
-              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: '12px 14px', color: 'var(--fg-primary)' }}>Contact</a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
+              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
+              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '12px 16px', marginTop: 6,
+                fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
                 borderRadius: 8, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
               }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
             </div>
@@ -799,11 +799,11 @@ const Dot = () => (
 
 const Hero = ({ galaxy, theme, scrollToSection }) => (
   <section id="top" className="hero-editorial" style={{
-    maxWidth: 1200, margin: '0 auto', padding: '32px 24px 72px',
-    display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 48,
+    maxWidth: 1200, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--layout-2)',
+    display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
   }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
       </div>
       <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
@@ -815,10 +815,10 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
       <div style={{ fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 300% customer scaling • $20M+ workflows</span>
       </div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
-          color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)',
+          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 14, fontWeight: 500,
+          color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'var(--fg-primary)',
           textDecoration: 'none', transition: 'opacity 150ms',
         }}
           onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
@@ -828,8 +828,8 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
         <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact'); }} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
-          color: 'var(--fg-primary)', padding: '10px 16px', borderRadius: 6, background: 'transparent',
+          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 14, fontWeight: 500,
+          color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'transparent',
           boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background 150ms',
         }}
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
