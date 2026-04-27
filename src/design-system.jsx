@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppIcon, Moon, Sun } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X } from './ui-icons.jsx';
 const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
   return (
@@ -158,6 +158,210 @@ const PixelAlienIcon = ({ color = 'currentColor', size = 64 }) => (
   </svg>
 );
 
+const FOOTER_ALIEN_PIXELS = [
+  [3,0,1,1],[7,0,1,1],
+  [4,1,1,1],[6,1,1,1],
+  [2,2,7,1],
+  [1,3,2,1],[4,3,3,1],[8,3,2,1],
+  [0,4,11,1],
+  [0,5,1,1],[2,5,7,1],[10,5,1,1],
+  [0,6,1,1],[2,6,1,1],[8,6,1,1],[10,6,1,1],
+  [3,7,2,1],[6,7,2,1],
+];
+
+const FooterAlienPixel = ({ size = '4.6em', style, ...rest }) => (
+  <svg
+    viewBox="0 0 11 8"
+    width={size}
+    height="auto"
+    role="img"
+    shapeRendering="crispEdges"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{
+      display: 'inline-block',
+      verticalAlign: 'top',
+      color: 'var(--color-develop-blue)',
+      ...style,
+    }}
+    {...rest}
+  >
+    {FOOTER_ALIEN_PIXELS.map(([x, y, w, h], i) => (
+      <rect key={i} x={x} y={y} width={w} height={h} fill="currentColor" />
+    ))}
+  </svg>
+);
+
+const FooterAlienUFO = ({ size = '5.6em' }) => (
+  <svg
+    viewBox="0 0 11 5"
+    width={size}
+    height="auto"
+    aria-hidden="true"
+    shapeRendering="crispEdges"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block' }}
+  >
+    <g fill="var(--color-ship-red)">
+      <rect x="3" y="0" width="5" height="1" />
+      <rect x="2" y="1" width="7" height="1" />
+      <rect x="0" y="2" width="11" height="1" />
+      <rect x="1" y="3" width="9" height="1" />
+    </g>
+    <g fill="var(--color-preview-pink)">
+      <rect x="2" y="4" width="1" height="1" />
+      <rect x="4" y="4" width="1" height="1" />
+      <rect x="6" y="4" width="1" height="1" />
+      <rect x="8" y="4" width="1" height="1" />
+    </g>
+  </svg>
+);
+
+const FooterAlienArrivalDemo = () => {
+  const [runId, setRunId] = React.useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncPreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    syncPreference();
+    mediaQuery.addEventListener('change', syncPreference);
+    return () => mediaQuery.removeEventListener('change', syncPreference);
+  }, []);
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:16, width:'100%' }}>
+      <style>{`
+        .ds-footer-alien-arrival {
+          --faa-ufo-w: 5.6em;
+          position: relative;
+          display: inline-block;
+          width: 4.6em;
+          height: 3.6em;
+          overflow: visible;
+          line-height: 0;
+        }
+        .ds-footer-alien-arrival .faa-ufo {
+          position: absolute;
+          left: 50%;
+          top: -0.9em;
+          width: var(--faa-ufo-w);
+          transform: translate(-50%, 0) translateX(-260%);
+          opacity: 0;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        .ds-footer-alien-arrival .faa-beam {
+          position: absolute;
+          left: 50%;
+          top: 0.15em;
+          width: 3.2em;
+          height: 2.4em;
+          transform: translateX(-50%) scaleY(0);
+          transform-origin: top center;
+          opacity: 0;
+          background: linear-gradient(
+            180deg,
+            color-mix(in oklab, var(--color-preview-pink) 70%, transparent),
+            color-mix(in oklab, var(--color-preview-pink) 8%, transparent)
+          );
+          clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+          mix-blend-mode: screen;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        .ds-footer-alien-arrival .faa-alien {
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          transform: translate(-50%, 0);
+          line-height: 0;
+          opacity: 0;
+          will-change: transform, opacity;
+        }
+        .ds-footer-alien-arrival[data-playing="true"] .faa-alien {
+          opacity: 1;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .ds-footer-alien-arrival[data-playing="true"] .faa-ufo {
+            animation:
+              faa-ufo-arrive 1.0s cubic-bezier(.2,.7,.2,1) forwards,
+              faa-ufo-leave 0.9s cubic-bezier(.6,.0,.7,.3) 2.0s forwards;
+          }
+          .ds-footer-alien-arrival[data-playing="true"] .faa-beam {
+            animation: faa-beam-pulse 1.1s ease-in-out 0.9s forwards;
+          }
+          .ds-footer-alien-arrival[data-playing="true"] .faa-alien {
+            animation: faa-alien-land 0.5s cubic-bezier(.2,.9,.3,1.4) 1.4s both;
+          }
+        }
+        @keyframes faa-ufo-arrive {
+          from { transform: translate(-50%, 0) translateX(-260%); opacity: 0; }
+          to { transform: translate(-50%, 0) translateX(0); opacity: 1; }
+        }
+        @keyframes faa-ufo-leave {
+          from { transform: translate(-50%, 0) translateX(0); opacity: 1; }
+          to { transform: translate(-50%, 0) translateX(280%); opacity: 0; }
+        }
+        @keyframes faa-beam-pulse {
+          0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+          25% { transform: translateX(-50%) scaleY(1); opacity: 0.85; }
+          75% { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
+          100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+        }
+        @keyframes faa-alien-land {
+          0% { opacity: 0; transform: translate(-50%, -0.6em) scale(0.55); }
+          60% { opacity: 1; transform: translate(-50%, 0.05em) scale(1.05); }
+          100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+      `}</style>
+      <div style={{
+        minHeight: 170,
+        borderRadius: 12,
+        boxShadow: 'var(--shadow-ring)',
+        display:'grid',
+        placeItems:'center',
+        background:'linear-gradient(180deg, color-mix(in oklab, var(--bg-subtle) 78%, transparent), var(--bg-page))',
+      }}>
+        <span
+          key={runId}
+          className="ds-footer-alien-arrival"
+          data-playing="true"
+          aria-label="Pixel alien footer arrival animation"
+        >
+          <span className="faa-ufo" aria-hidden="true">
+            <FooterAlienUFO />
+          </span>
+          <span className="faa-beam" aria-hidden="true" />
+          <span className="faa-alien">
+            <FooterAlienPixel />
+          </span>
+        </span>
+      </div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+        <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', lineHeight:1.7 }}>
+          Sequence: UFO arrive 1.0s, beam pulse 1.1s at 0.9s delay, alien land 0.5s at 1.4s delay, UFO exit 0.9s at 2.0s delay.<br/>
+          Colors: ship-red UFO body, preview-pink beam, develop-blue alien. Reduced motion shows the final landed state without motion.
+        </div>
+        <button
+          type="button"
+          onClick={() => !prefersReducedMotion && setRunId(id => id + 1)}
+          disabled={prefersReducedMotion}
+          style={{
+            display:'inline-flex', alignItems:'center', justifyContent:'center',
+            padding:'10px 14px', borderRadius:8, border:'none', cursor:prefersReducedMotion ? 'not-allowed' : 'pointer',
+            background: prefersReducedMotion ? 'var(--bg-subtle)' : 'var(--fg-primary)',
+            color: prefersReducedMotion ? 'var(--fg-disabled)' : 'var(--bg-page)',
+            fontSize:13, fontWeight:600, boxShadow:'var(--shadow-card-subtle)'
+          }}
+        >
+          {prefersReducedMotion ? 'Reduced motion enabled' : 'Replay animation'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const PixelOrbitPreview = () => (
   <div style={{
     position:'relative', width:160, height:120, borderRadius:16,
@@ -194,6 +398,95 @@ const CustomElementCard = ({ label, note, children }) => (
   </div>
 );
 
+const ICON_SET = [
+  { label: 'Arrow Up Right', icon: ArrowUpRight },
+  { label: 'Arrow Right', icon: ArrowRight },
+  { label: 'Arrow Left', icon: ArrowLeft },
+  { label: 'Copy', icon: Copy },
+  { label: 'Check', icon: Check },
+  { label: 'Close', icon: X },
+  { label: 'Box', icon: Box },
+  { label: 'Sun', icon: Sun },
+  { label: 'Moon', icon: Moon },
+];
+
+const IconCard = ({ label, icon }) => (
+  <div style={{ padding: 24, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ minHeight: 84, borderRadius: 8, boxShadow: 'var(--shadow-ring)', display: 'grid', placeItems: 'center', background: 'var(--bg-page)' }}>
+      <AppIcon icon={icon} size={22} strokeWidth={2.2} />
+    </div>
+    <div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--fg-primary)', marginBottom: 6 }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Lucide Icon</div>
+    </div>
+  </div>
+);
+
+const DesignSystemContactCard = ({ label, value, copyValue }) => {
+  const [copied, setCopied] = React.useState(false);
+  const resetTimerRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+  }, []);
+
+  const handleCopy = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      await navigator.clipboard.writeText(copyValue);
+      setCopied(true);
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = window.setTimeout(() => setCopied(false), 1200);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <a className="contact-card" href="mailto:omar@designedbyomar.com" style={{
+      position: 'relative',
+      display: 'flex', flexDirection: 'column', gap: 8, padding: '18px 56px 18px 20px', borderRadius: 8,
+      background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
+      transition: 'transform 180ms ease',
+    }}
+      onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+      onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+    >
+      <button
+        type="button"
+        aria-label={copied ? `Copied ${label}` : `Copy ${label}`}
+        title={copied ? 'Copied' : 'Copy'}
+        onClick={handleCopy}
+        style={{
+          position: 'absolute', top: 12, right: 12,
+          width: 28, height: 28, borderRadius: 9999,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          border: 'none', cursor: 'pointer',
+          background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
+          color: copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+          zIndex: 2,
+          transition: 'color 150ms ease, background 150ms ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-primary)';
+          e.currentTarget.style.background = 'var(--bg-subtle)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)';
+          e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
+        }}
+      >
+        <AppIcon icon={copied ? Check : Copy} size={13} strokeWidth={2.2} />
+      </button>
+      <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
+      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
+    </a>
+  );
+};
+
 const DesignSystem = () => {
   const [theme, setTheme] = React.useState(() => localStorage.getItem('omar.theme') || 'dark');
   React.useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem('omar.theme', theme); }, [theme]);
@@ -207,10 +500,10 @@ const DesignSystem = () => {
         {/* Intro */}
         <div style={{ marginBottom: 120 }}>
           <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 24px' }}>
-            Brandkit <span style={{ color: 'var(--fg-tertiary)' }}>&amp; Core Systems</span>
+            designedbyomar <span style={{ color: 'var(--fg-tertiary)' }}>Design System</span>
           </h1>
           <p style={{ fontSize: 20, lineHeight: 1.8, color: 'var(--fg-secondary)', maxWidth: 640 }}>
-            Developer infrastructure made invisible. An architecture built on pure functionality, gallery-like emptiness, and precise typographic compression.
+            The core reference for designedbyomar visual language, interaction behavior, and shared UI primitives, including the Lucide icon set used across the site.
           </p>
         </div>
 
@@ -321,10 +614,17 @@ const DesignSystem = () => {
             </CustomElementCard>
 
             <CustomElementCard
-              label="Pixel Alien"
-              note="Footer easter-egg and AI-native accent. Always rendered in develop blue for contrast against monochrome footer copy."
+              label="Pixel Alien / Static Mark"
+              note="The current pixel alien mark used as the footer signoff character. Rendered in develop blue with crisp-edge pixel geometry as the base asset for the animated footer sequence."
             >
               <PixelAlienIcon color="var(--color-develop-blue)" size={86} />
+            </CustomElementCard>
+
+            <CustomElementCard
+              label="Pixel Alien / Footer Arrival"
+              note="Production footer animation. A ship-red UFO enters, casts a preview-pink beam, drops the develop-blue alien, then exits. Plays once on entry in the live footer and respects reduced-motion settings."
+            >
+              <FooterAlienArrivalDemo />
             </CustomElementCard>
 
             <CustomElementCard
@@ -333,6 +633,23 @@ const DesignSystem = () => {
             >
               <PixelOrbitPreview />
             </CustomElementCard>
+          </div>
+        </section>
+
+        {/* Iconography */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Iconography</h2>
+          </div>
+
+          <div className="mono-label">Lucide Icons</div>
+          <div style={{ maxWidth: 760, marginBottom: 32 }}>
+            <p style={{ fontSize: 16, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0 }}>
+              This platform uses Lucide Icons through the shared `AppIcon` wrapper in `src/ui-icons.jsx`. The wrapper keeps stroke weight, sizing, and rendering behavior consistent across navigation, contact cards, drawers, and utility actions.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20 }}>
+            {ICON_SET.map(({ label, icon }) => <IconCard key={label} label={label} icon={icon} />)}
           </div>
         </section>
 
@@ -405,12 +722,13 @@ const DesignSystem = () => {
               <div className="mono-label">Contact Card — Animated Border</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                  <DesignSystemContactCard label="Email" value="omar@designedbyomar.com" copyValue="omar@designedbyomar.com" />
                   {[
-                    { label: 'Email',    value: 'omar@designedbyomar.com' },
                     { label: 'LinkedIn', value: 'in/omartavarez' },
-                    { label: 'GitHub',   value: 'designedbyomar' },
+                    { label: 'GitHub', value: 'designedbyomar' },
                   ].map(({ label, value }) => (
                     <a key={label} className="contact-card" href="#" style={{
+                      position: 'relative',
                       display: 'flex', flexDirection: 'column', gap: 8, padding: '18px 20px', borderRadius: 8,
                       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
                       transition: 'transform 180ms ease',
@@ -419,12 +737,12 @@ const DesignSystem = () => {
                       onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                     >
                       <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--fg-tertiary)', textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</span>
-                      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value} ↗</span>
+                      <span style={{ fontSize:16, fontWeight:500, color:'var(--fg-primary)', letterSpacing:'-0.01em' }}>{value}</span>
                     </a>
                   ))}
                 </div>
                 <div style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--fg-tertiary)', lineHeight:1.8 }}>
-                  Hover to activate · conic-gradient cycles ship-red → preview-pink → develop-blue · 3s linear · border-only via ::before (inset −1.5px) + ::after cover (inset 0) + content z-index: 2
+                  Card click opens the destination, top-right icon copies when present. Border treatment remains the same: conic-gradient cycles ship-red → preview-pink → develop-blue · 3s linear · border-only via ::before (inset −1.5px) + ::after cover (inset 0) + foreground content at z-index 2.
                 </div>
               </div>
             </div>
