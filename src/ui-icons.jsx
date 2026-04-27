@@ -1,7 +1,7 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Menu, Moon, Sun, X } from 'lucide-react';
 
-export { ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Moon, Sun, X };
+export { ArrowLeft, ArrowRight, ArrowUpRight, Box, Check, Copy, Menu, Moon, Sun, X };
 
 export const AppIcon = ({ icon: Icon, size = 16, strokeWidth = 2, ...props }) => (
   <Icon
