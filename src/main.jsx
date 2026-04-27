@@ -794,7 +794,7 @@ const Dot = () => (
   </span>
 );
 
-const Hero = ({ galaxy, theme }) => (
+const Hero = ({ galaxy, theme, scrollToSection }) => (
   <section id="top" className="hero-editorial" style={{
     maxWidth: 1200, margin: '0 auto', padding: '32px 24px 72px',
     display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 48,
@@ -821,7 +821,7 @@ const Hero = ({ galaxy, theme }) => (
           View case studies
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
-        <a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} style={{
+        <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500,
           color: 'var(--fg-primary)', padding: '10px 16px', borderRadius: 6, background: 'transparent',
           boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background 150ms',
@@ -2137,6 +2137,20 @@ const App = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const scrollToSection = (id) => {
+    if (window.location.pathname !== '/') {
+      history.pushState(null, '', '/');
+      window.dispatchEvent(new Event('popstate'));
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <>
       <LogoLoader visible={loading} />
@@ -2149,7 +2163,7 @@ const App = () => {
             <CaseStudyPage c={currentCase} onBack={goHome} />
           ) : (
             <>
-              <Hero galaxy={galaxy} theme={theme} />
+              <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />
               <About onOpenDrawer={() => setAboutOpen(true)} />
               <Work onOpenDrawer={() => setWorkOpen(true)} />
               <KeyFacts />
