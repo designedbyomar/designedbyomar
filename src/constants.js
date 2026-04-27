@@ -6,12 +6,6 @@ export const NAV_LINKS = {
   CONTACT: 'Contact',
 };
 
-export const CASE_STUDIES = [
-  { name: 'Plastiq', slug: 'plastiq' },
-  { name: 'Wisdom', slug: 'wisdom' },
-  { name: 'Enterprise', slug: 'enterprise' },
-];
-
 export const THEME = {
   LIGHT: 'light',
   DARK: 'dark',
@@ -29,4 +23,17 @@ export const SECTION_KEYS = {
   WORK: 'work',
   ABOUT: 'about',
   CONTACT: 'contact',
+};
+
+export const LAYOUT = {
+  MOBILE_BREAKPOINT: 600,
+  TABLET_BREAKPOINT: 900,
+  LAYOUT_BREAKPOINT: 1054,
+  MAX_WIDTH: 1200,
+  GRID_DESKTOP: '220px 1fr',
+};
+
+export const ASPECT_RATIOS = {
+  THUMBNAIL: '4/3',
+  WIDE: '16/8',
 };

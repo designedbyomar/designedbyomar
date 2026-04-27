@@ -78,16 +78,16 @@ const ColorSwatch = ({ name, variable, hexLight, hexDark, theme }) => {
   );
 };
 
-const TypoRow = ({ role, font, size, weight, letterSpacing, lineHeight, sample }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr', gap: 24, alignItems: 'center', padding: '24px 0', borderBottom: '1px solid var(--color-gray-100)' }}>
+const TypoRow = ({ role, font, size, weight, letterSpacing, lineHeight, sample, sizeToken, weightToken, lineHeightToken }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 2fr', gap: 24, alignItems: 'center', padding: '24px 0', borderBottom: '1px solid var(--color-gray-100)' }}>
     <div>
       <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 8 }}>{role}</div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', lineHeight: 1.6 }}>
         {font} <br />
-        Size: {size}<br />
-        Weight: {weight}<br />
+        Size: {size}{sizeToken && <span style={{ color: 'var(--fg-secondary)' }}> · <code style={{ color: 'var(--color-develop-blue)' }}>{sizeToken}</code></span>}<br />
+        Weight: {weight}{weightToken && <span style={{ color: 'var(--fg-secondary)' }}> · <code style={{ color: 'var(--color-develop-blue)' }}>{weightToken}</code></span>}<br />
         Tracking: {letterSpacing}<br />
-        Leading: {lineHeight}
+        Leading: {lineHeight}{lineHeightToken && <span style={{ color: 'var(--fg-secondary)' }}> · <code style={{ color: 'var(--color-develop-blue)' }}>{lineHeightToken}</code></span>}
       </div>
     </div>
     <div style={{
@@ -514,17 +514,19 @@ const DesignSystem = () => {
           </div>
 
           <div style={{ borderTop: '1px solid var(--color-gray-100)' }}>
-            <TypoRow role="Display Hero" font="Geist Sans" size="clamp(44px, 7vw, 88px)" weight="600" letterSpacing="-0.04em" lineHeight="0.96" sample="Compression as identity." />
-            <TypoRow role="Section Heading" font="Geist Sans" size="40px" weight="600" letterSpacing="-2.4px" lineHeight="1.20" sample="Feature sections & titles" />
-            <TypoRow role="Sub-heading" font="Geist Sans" size="32px" weight="600" letterSpacing="-1.28px" lineHeight="1.25" sample="Sub-components & cards" />
-            <TypoRow role="Card Title" font="Geist Sans" size="24px" weight="600" letterSpacing="-0.96px" lineHeight="1.33" sample="Focused UI headings" />
-            <TypoRow role="Body Large" font="Geist Sans" size="20px" weight="400" letterSpacing="normal" lineHeight="1.80" sample="The quick brown fox jumps over the lazy dog. Relaxed leading for long-form reading." />
-            <TypoRow role="Body" font="Geist Sans" size="18px" weight="400" letterSpacing="normal" lineHeight="1.56" sample="Standard reading text for paragraphs and generic UI components." />
-            <TypoRow role="Body Small" font="Geist Sans" size="16px" weight="400" letterSpacing="normal" lineHeight="1.50" sample="Secondary reading text and standard UI elements." />
-            <TypoRow role="Body Semibold" font="Geist Sans" size="16px" weight="600" letterSpacing="-0.32px" lineHeight="1.50" sample="Strong functional labels" />
-            <TypoRow role="Button / Link" font="Geist Sans" size="14px" weight="500" letterSpacing="normal" lineHeight="1.43" sample="Actionable elements" />
-            <TypoRow role="Mono Body" font="Geist Mono" size="16px" weight="400" letterSpacing="normal" lineHeight="1.50" sample="console.log('System initialized');" />
-            <TypoRow role="Mono Label" font="Geist Mono" size="12px" weight="500" letterSpacing="0.08em" lineHeight="1.0" sample={<span style={{ textTransform: 'uppercase' }}>Technical Label</span>} />
+            <TypoRow role="Display Hero" font="Geist Sans" size="clamp(44px, 7vw, 88px)" weight="600" letterSpacing="-0.04em" lineHeight="0.96" sample="Compression as identity." sizeToken="--font-size-display-lg" weightToken="--font-weight-semibold" lineHeightToken="--line-height-tight" />
+            <TypoRow role="Section Heading" font="Geist Sans" size="40px" weight="600" letterSpacing="-2.4px" lineHeight="1.20" sample="Feature sections & titles" sizeToken="--font-size-heading-xl" weightToken="--font-weight-semibold" lineHeightToken="--line-height-snug-plus" />
+            <TypoRow role="Sub-heading" font="Geist Sans" size="32px" weight="600" letterSpacing="-1.28px" lineHeight="1.25" sample="Sub-components & cards" sizeToken="--font-size-display-sm" weightToken="--font-weight-semibold" lineHeightToken="--line-height-card" />
+            <TypoRow role="Card Title" font="Geist Sans" size="24px" weight="600" letterSpacing="-0.96px" lineHeight="1.33" sample="Focused UI headings" sizeToken="--font-size-heading-lg" weightToken="--font-weight-semibold" lineHeightToken="--line-height-normal" />
+            <TypoRow role="Body Large" font="Geist Sans" size="20px" weight="400" letterSpacing="normal" lineHeight="1.80" sample="The quick brown fox jumps over the lazy dog. Relaxed leading for long-form reading." sizeToken="--font-size-heading-md" weightToken="--font-weight-regular" lineHeightToken="--line-height-looser" />
+            <TypoRow role="Body" font="Geist Sans" size="18px" weight="400" letterSpacing="normal" lineHeight="1.56" sample="Standard reading text for paragraphs and generic UI components." sizeToken="--font-size-body-xl" weightToken="--font-weight-regular" lineHeightToken="--line-height-relaxed-mid" />
+            <TypoRow role="Body Small" font="Geist Sans" size="16px" weight="400" letterSpacing="normal" lineHeight="1.50" sample="Secondary reading text and standard UI elements." sizeToken="--font-size-body-lg" weightToken="--font-weight-regular" lineHeightToken="--line-height-relaxed" />
+            <TypoRow role="Body Semibold" font="Geist Sans" size="16px" weight="600" letterSpacing="-0.32px" lineHeight="1.50" sample="Strong functional labels" sizeToken="--font-size-body-lg" weightToken="--font-weight-semibold" lineHeightToken="--line-height-relaxed" />
+            <TypoRow role="Button / Link" font="Geist Sans" size="14px" weight="500" letterSpacing="normal" lineHeight="1.43" sample="Actionable elements" sizeToken="--font-size-body-md" weightToken="--font-weight-medium" lineHeightToken="--line-height-button" />
+            <TypoRow role="Caption" font="Geist Sans" size="11px" weight="500" letterSpacing="0.04em" lineHeight="1.33" sample="Captions, badges, and tertiary metadata" sizeToken="--font-size-label-sm" weightToken="--font-weight-medium" lineHeightToken="--line-height-normal" />
+            <TypoRow role="Micro" font="Geist Sans" size="10px" weight="500" letterSpacing="0.08em" lineHeight="1.33" sample={<span style={{ textTransform: 'uppercase' }}>Tiny utility text</span>} sizeToken="--font-size-micro" weightToken="--font-weight-medium" lineHeightToken="--line-height-normal" />
+            <TypoRow role="Mono Body" font="Geist Mono" size="16px" weight="400" letterSpacing="normal" lineHeight="1.50" sample="console.log('System initialized');" sizeToken="--font-size-body-lg" weightToken="--font-weight-regular" lineHeightToken="--line-height-relaxed" />
+            <TypoRow role="Mono Label" font="Geist Mono" size="12px" weight="500" letterSpacing="0.08em" lineHeight="1.0" sample={<span style={{ textTransform: 'uppercase' }}>Technical Label</span>} sizeToken="--font-size-mono-md" weightToken="--font-weight-medium" lineHeightToken="--line-height-solid" />
           </div>
         </section>
 

@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
 import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
@@ -604,10 +605,10 @@ const Reveal = ({ as: Tag = 'div', children, delay = 0, variant = 'soft', once =
   );
 };
 
-const MOBILE_BREAKPOINT = 600;
-const COMPACT_LAYOUT_BREAKPOINT = 1054;
-const WIDE_LAYOUT_BREAKPOINT = 1200;
-const TABLET_BREAKPOINT = 900;
+const MOBILE_BREAKPOINT = LAYOUT.MOBILE_BREAKPOINT;
+const COMPACT_LAYOUT_BREAKPOINT = LAYOUT.LAYOUT_BREAKPOINT;
+const WIDE_LAYOUT_BREAKPOINT = LAYOUT.MAX_WIDTH;
+const TABLET_BREAKPOINT = LAYOUT.TABLET_BREAKPOINT;
 
 const useViewportWidth = () => {
   const [viewportWidth, setViewportWidth] = React.useState(() => (
@@ -714,7 +715,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       boxShadow: scrolled ? 'rgba(127, 127, 127, var(--opacity-18)) 0px -1px 0px 0px inset' : 'none',
       transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
@@ -799,7 +800,7 @@ const Dot = () => (
 
 const Hero = ({ galaxy, theme, scrollToSection }) => (
   <section id="top" className="hero-editorial" style={{
-    maxWidth: 1200, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--layout-2)',
+    maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--layout-2)',
     display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
   }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -896,16 +897,16 @@ const LogoCarousel = () => (
 const About = ({ onOpenDrawer }) => (
   <>
     <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 48px' }}>
-      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '220px 1fr', gap: var(--layout-3), alignItems: 'start' }}>
+      <div className="about-grid" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: LAYOUT.GRID_DESKTOP, gap: 'var(--layout-3)', alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-8), maxWidth: 760 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 760 }}>
           <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-medium)', letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
             {ABOUT_SHORT}
           </p>
           <button onClick={onOpenDrawer} style={{
-            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
+            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
             borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
@@ -949,12 +950,12 @@ const AboutDrawer = ({ open, onClose }) => {
           <h2 style={{ fontSize: 'clamp(28px, 3.2vw, 40px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 20px' }}>
             A longer version,<br /><span style={{ color: 'var(--fg-tertiary)' }}>for the curious.</span>
           </h2>
-          <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-7), maxWidth: 560 }}>
+          <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', maxWidth: 560 }}>
             {ABOUT_LONG.map(s => (
               <div key={s.heading}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
-                <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
+                <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
               </div>
             ))}
           </div>
@@ -990,6 +991,7 @@ const CASE_STUDIES = [
     id: 'posting-asst', num: '02', year: '2025', client: 'Wisdom',
     title: 'Posting Assistant',
     subtitle: 'AI-assisted insurance payment posting workflow that kept specialists in control.',
+    coverImage: '/Images/case-studies/posting-asst/cover.webp',
     role: 'Lead Product Designer',
     tags: ['AI Workflow', 'Research', 'Healthcare SaaS'],
     metrics: [
@@ -1007,6 +1009,7 @@ const CASE_STUDIES = [
     id: 'page-builder', num: '03', year: '2023', client: 'Simplero',
     title: 'Page Builder 2.0',
     subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.',
+    coverVideo: '/Videos/case-studies/page-builder/cover.mp4',
     role: 'Lead Product Designer & Architect',
     tags: ['CRM', 'SaaS', 'Design System'],
     metrics: [
@@ -1024,6 +1027,7 @@ const CASE_STUDIES = [
     id: 'connect-api', num: '04', year: '2021', client: 'Plastiq',
     title: 'Connect API Payments',
     subtitle: 'PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.',
+    coverImage: '/Images/case-studies/connect-api/cover.webp',
     role: 'Lead Product Designer',
     tags: ['Fintech', 'API', 'Developer Experience', 'B2B'],
     metrics: [
@@ -1041,6 +1045,7 @@ const CASE_STUDIES = [
     id: 'athena-ds', num: '05', year: '2021', client: 'Plastiq',
     title: 'Athena Design System 2.0',
     subtitle: 'Enterprise design system that became the foundation for Plastiq\'s IPO-era brand.',
+    coverImage: '/Images/case-studies/athena-ds/cover.webp',
     role: 'Lead Product Designer — Visual, UX & Interaction Design',
     tags: ['Design System', 'Enterprise', 'Cross-functional'],
     metrics: [
@@ -1058,6 +1063,7 @@ const CASE_STUDIES = [
     id: 'plastiq-mktg', num: '06', year: '2022', client: 'Plastiq',
     title: 'Plastiq Marketing Site',
     subtitle: 'Pre-IPO brand relaunch delivered WCAG-compliant in 3–4 weeks.',
+    coverImage: '/Images/case-studies/plastiq-mktg/cover.webp',
     role: 'Lead Product Designer — IA, Interaction, Creative Strategy, Brand',
     tags: ['Brand', 'Website', 'Cross-functional', 'WCAG'],
     metrics: [
@@ -1075,6 +1081,7 @@ const CASE_STUDIES = [
     id: 'disney-cct', num: '07', year: '2020', client: 'The Walt Disney Company',
     title: 'Critical Communication Tool',
     subtitle: 'Enterprise subscription manager used to coordinate 250 critical incidents.',
+    coverImage: '/Images/case-studies/disney-cct/cover.webp',
     role: 'Lead Senior UX Designer',
     tags: ['Enterprise', 'Accessibility', 'Mobile-first', 'Scalable'],
     metrics: [
@@ -1092,6 +1099,7 @@ const CASE_STUDIES = [
     id: 'disney-uap', num: '08', year: '2019–21', client: 'Disney (DTC&I)',
     title: 'Unified Ad Platform',
     subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.',
+    coverVideo: '/Videos/case-studies/disney-uap/cover.mp4',
     role: 'Senior UX Designer',
     tags: ['Enterprise', 'Design System', 'Multi-brand', 'React'],
     metrics: [
@@ -1113,11 +1121,11 @@ const CASE_STUDIES = [
 const CaseCard = ({ c, featured = false }) => {
   const viewportWidth = useViewportWidth();
   const useSharedMobileAspectRatio = viewportWidth <= TABLET_BREAKPOINT;
-  const mediaAspectRatio = useSharedMobileAspectRatio ? '4/3' : featured ? '16/8' : '4/3';
+  const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
 
   return (
     <a href={`/work/${c.id}`} className="case-card" style={{
-      display: 'flex', flexDirection: 'column', gap: var(--space-4), height: '100%',
+      display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%',
       textDecoration: 'none', color: 'inherit',
       borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
     }}>
@@ -1129,35 +1137,59 @@ const CaseCard = ({ c, featured = false }) => {
         boxShadow: 'var(--shadow-card-subtle)',
       }}>
         <div className="case-card-sheen" />
-        {/* stacked "screen" silhouettes */}
-        <div className="case-card-screen" style={{
-          position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
-          background: c.swatch[2],
-          borderRadius: '10px 10px 0 0',
-          boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0, 0, 0, var(--opacity-35))`,
-        }}>
+        {(c.coverImage || c.coverVideo) ? (
           <div style={{
-            position: 'absolute', top: 10, left: 10, right: 10, height: 18,
-            display: 'flex', alignItems: 'center', gap: 5,
-            borderBottom: `1px solid ${c.swatch[3]}22`,
+            position: 'absolute', left: '14%', right: '14%', bottom: '5%', top: '18%',
+            borderRadius: 8, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column',
+            boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,var(--opacity-35))`,
           }}>
-            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[3], opacity: 0.7 }} />
-            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[0], opacity: 0.7 }} />
-            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[1], opacity: 0.7 }} />
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              height: 20, padding: '0 8px', flexShrink: 0,
+              background: 'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
+              borderBottom: '1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(255,95,86,var(--opacity-95))', display: 'inline-block' }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(255,189,46,var(--opacity-95))', display: 'inline-block' }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(39,201,63,var(--opacity-95))', display: 'inline-block' }} />
+            </div>
+            <div style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-page)' }}>
+              {c.coverVideo
+                ? <video src={c.coverVideo} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                : <img src={c.coverImage} alt={`${c.title} preview`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
+            </div>
           </div>
-          <div className="case-card-line case-card-line--full" style={{
-            position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 'var(--radius-subtle)',
-            background: `${c.swatch[3]}22`,
-          }} />
-          <div className="case-card-line case-card-line--left" style={{
-            position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 'var(--radius-subtle)',
-            background: `${c.swatch[0]}44`,
-          }} />
-          <div className="case-card-line case-card-line--right" style={{
-            position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 'var(--radius-subtle)',
-            background: `${c.swatch[3]}22`,
-          }} />
-        </div>
+        ) : (
+          <div className="case-card-screen" style={{
+            position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
+            background: c.swatch[2],
+            borderRadius: '10px 10px 0 0',
+            boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0, 0, 0, var(--opacity-35))`,
+          }}>
+            <div style={{
+              position: 'absolute', top: 10, left: 10, right: 10, height: 18,
+              display: 'flex', alignItems: 'center', gap: 5,
+              borderBottom: `1px solid ${c.swatch[3]}22`,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[3], opacity: 0.7 }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[0], opacity: 0.7 }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[1], opacity: 0.7 }} />
+            </div>
+            <div className="case-card-line case-card-line--full" style={{
+              position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 'var(--radius-subtle)',
+              background: `${c.swatch[3]}22`,
+            }} />
+            <div className="case-card-line case-card-line--left" style={{
+              position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 'var(--radius-subtle)',
+              background: `${c.swatch[0]}44`,
+            }} />
+            <div className="case-card-line case-card-line--right" style={{
+              position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 'var(--radius-subtle)',
+              background: `${c.swatch[3]}22`,
+            }} />
+          </div>
+        )}
         {/* accent tag */}
         <div className="case-card-tag" style={{
           position: 'absolute', top: 16, left: 16,
@@ -1169,7 +1201,7 @@ const CaseCard = ({ c, featured = false }) => {
       </div>
 
       <div style={{ padding: '4px 4px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: var(--space-2), flexWrap: 'wrap', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 10 }}>
           <h3 style={{
             fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
             fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em',
@@ -1192,12 +1224,12 @@ const CaseCard = ({ c, featured = false }) => {
 // ============================================================
 const Work = ({ onOpenDrawer }) => {
   const viewportWidth = useViewportWidth();
-  const workHeadColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr';
+  const workHeadColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
   const secondaryColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
 
   return (
     <section id="work" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
         <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: workHeadColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
@@ -1207,17 +1239,21 @@ const Work = ({ onOpenDrawer }) => {
           </h2>
         </Reveal>
 
-        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: var(--space-8), marginBottom: 32 }}>
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-8)', marginBottom: 32 }}>
           <CaseCard c={CASE_STUDIES[0]} featured />
         </Reveal>
-        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: var(--space-8), marginBottom: 48, alignItems: 'stretch' }}>
+        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 32, alignItems: 'stretch' }}>
           <CaseCard c={CASE_STUDIES[1]} />
           <CaseCard c={CASE_STUDIES[2]} />
         </Reveal>
+        <Reveal delay={180} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 48, alignItems: 'stretch' }}>
+          <CaseCard c={CASE_STUDIES[3]} />
+          <CaseCard c={CASE_STUDIES[4]} />
+        </Reveal>
 
-        <Reveal as="div" delay={180} style={{ display: 'inline-flex' }}>
+        <Reveal as="div" delay={230} style={{ display: 'inline-flex' }}>
           <button onClick={onOpenDrawer} style={{
-            display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
+            display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
             borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
@@ -1260,7 +1296,7 @@ const WorkDrawer = ({ open, onClose }) => {
           </button>
         </div>
         <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: var(--space-6) }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
             {CASE_STUDIES.map(c => (
               <div key={c.id} onClick={onClose}>
                 <CaseCard c={c} />
@@ -1288,7 +1324,7 @@ const CaseStudyPage = ({ c, onBack }) => {
   return (
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-        display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
         marginBottom: 40, transition: 'color var(--duration-fast)',
@@ -1302,12 +1338,12 @@ const CaseStudyPage = ({ c, onBack }) => {
 
       {/* Cover */}
       <div style={{
-        position: 'relative', width: '100%', aspectRatio: '21/9',
+        position: 'relative', width: '100%', aspectRatio: '16/9',
         background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
       }}>
-        {c.coverImage && (
+        {(c.coverImage || c.coverVideo) && (
           <div style={{
             position: 'absolute', inset: '56px 28px 24px',
             borderRadius: 'var(--radius-image)', overflow: 'hidden',
@@ -1331,12 +1367,12 @@ const CaseStudyPage = ({ c, onBack }) => {
             </div>
             <div style={{
               width: '100%', height: 'calc(100% - 34px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflowY: 'auto', overflowX: 'hidden',
               background: 'var(--bg-page)',
             }}>
-              <img src={c.coverImage} alt={`${c.title} dashboard preview`} style={{
-                width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center top', display: 'block',
-              }} />
+              {c.coverVideo
+                ? <video src={c.coverVideo} autoPlay muted loop playsInline style={{ width: '100%', height: 'auto', display: 'block' }} />
+                : <img src={c.coverImage} alt={`${c.title} dashboard preview`} style={{ width: '100%', height: 'auto', display: 'block' }} />}
             </div>
           </div>
         )}
@@ -1384,7 +1420,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: var(--layout-2), maxWidth: 760 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 760 }}>
         {[
           { label: 'Challenge', body: c.challenge },
           { label: 'Approach', body: c.approach },
@@ -1401,7 +1437,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div className="cs-prevnext" style={{
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: var(--space-6),
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)',
       }}>
         <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
@@ -1449,7 +1485,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
       position: 'relative',
-      display: 'flex', flexDirection: 'column', gap: var(--space-2), padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 'var(--radius-comfort)',
+      display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 'var(--radius-comfort)',
       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
       transition: 'transform var(--duration-fast-mid) ease',
     }}
@@ -1577,10 +1613,10 @@ const KeyFacts = () => {
         position: 'absolute', inset: 0, pointerEvents: 'none',
         opacity: 1,
       }} />
-      <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <Reveal className="work-head" variant="section" style={{
           display: 'grid',
-          gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr',
+          gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP,
           gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)',
           alignItems: 'start',
           marginBottom: 'var(--layout-1)',
@@ -1618,14 +1654,14 @@ const KeyFacts = () => {
                 {f.label}
               </div>
               {f.custom ? (
-                <div style={{ fontSize: 'var(--font-size-tall)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
+                <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
                   <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>LinkedIn</a>
                   {' '}and{' '}
                   <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>Substack</a>
                 </div>
               ) : (
-                <div style={{ fontSize: 'var(--font-size-tall)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
+                <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   {f.value}
                 </div>
               )}
@@ -1639,12 +1675,12 @@ const KeyFacts = () => {
 
 const Contact = () => {
   const viewportWidth = useViewportWidth();
-  const contactGridColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : '220px 1fr';
+  const contactGridColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
   const contactCardColumns = viewportWidth <= MOBILE_BREAKPOINT ? '1fr' : viewportWidth <= WIDE_LAYOUT_BREAKPOINT ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))';
 
   return (
     <section id="contact" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6) var(--layout-3)' }}>
-      <Reveal className="contact-grid" variant="section" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
+      <Reveal className="contact-grid" variant="section" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-ship-red)' }}>04 — </span>Contact
         </div>
@@ -1706,9 +1742,9 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
   const footerLinkStyle = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: var(--space-2),
+    gap: 'var(--space-2)',
     width: 'fit-content',
-    fontSize: 'var(--font-size-tall)',
+    fontSize: 'var(--font-size-body-md)',
     fontWeight: 'var(--font-weight-medium)',
     lineHeight: 'var(--line-height-medium)',
     color: 'var(--fg-secondary)',
@@ -1740,24 +1776,24 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
   };
 
   return (
-    <footer style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-1) var(--space-6) var(--layout-2)' }}>
+    <footer style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-2) var(--layout-1)' }}>
       <style dangerouslySetInnerHTML={{
         __html: footerAlienStyles + `
         .site-footer-grid {
           display: grid;
           grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
-          gap: var(--space-10)px 72px;
+          gap: var(--layout-1) var(--layout-2);
         }
         .site-footer-block {
           display: flex;
           flex-direction: column;
-          gap: var(--space-4)px;
+          gap: var(--space-4);
           min-width: 0;
         }
         @media (max-width: 900px) {
           .site-footer-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: var(--layout-1)px 32px;
+            gap: var(--layout-1) var(--layout-1);
           }
           .site-footer-brand {
             grid-column: 1 / -1;
@@ -1766,13 +1802,13 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
         @media (max-width: 600px) {
           .site-footer-grid {
             grid-template-columns: minmax(0, 1fr);
-            gap: var(--space-8)px;
+            gap: var(--layout-1);
           }
         }
       `}} />
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
         <div className="site-footer-grid">
-          <div className="site-footer-block site-footer-brand" style={{ gap: 'var(--space-6)' }}>
+          <div className="site-footer-block site-footer-brand" style={{ gap: 'var(--space-8)' }}>
             <div style={{ display: 'inline-flex', width: 'fit-content' }}>
               <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
             </div>
@@ -1906,7 +1942,7 @@ const PrivacyPolicyPage = ({ theme, onBack }) => (
     }}>← Back to home</a>
     <h1 style={{ fontSize: 'var(--font-size-display-sm)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
 
-    <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-6), color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-tall)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-body-xl)' }}>
       <p>Last updated: April 2026</p>
 
       <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
@@ -1958,7 +1994,7 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: var(--space-6),
+        gap: 'var(--space-6)',
         pointerEvents: 'auto',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(24px) scale(0.98)',
@@ -2079,10 +2115,10 @@ const AppShellErrorFallback = () => (
       <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1, letterSpacing: '-0.04em', margin: '0 0 16px' }}>
         This view failed to load.
       </h1>
-      <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
         Refresh the page or head back home. The issue has been logged for review.
       </p>
-      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: var(--space-2), fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none' }}>
+      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none' }}>
         Back home
       </a>
     </div>

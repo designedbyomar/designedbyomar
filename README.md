@@ -2,6 +2,32 @@
 
 Portfolio site for Omar Tavarez, focused on AI workflows, enterprise systems, fintech, and healthcare SaaS.
 
+## Why this repo exists
+This site is both my portfolio and a public artifact showing how I use AI-assisted tools to move from strategy → design system → production UI.
+
+## What I built
+- Custom React/Vite portfolio
+- Case study routing
+- Design-system reference page
+- Theme system
+- Motion language
+- SEO and share metadata
+- Analytics and performance monitoring
+- Security headers
+
+## AI-assisted workflow
+- Used AI tools for rapid component scaffolding, refactoring, content iteration, and implementation support
+- Manually reviewed layout, accessibility, brand fit, content hierarchy, and final UX decisions
+- Used PRs to isolate changes and document tradeoffs
+
+## Quality checklist
+- Production build passes
+- Responsive behavior reviewed
+- Reduced-motion support included
+- SEO metadata included
+- Error monitoring available
+- Security headers configured
+
 ## Stack
 
 - React
@@ -69,3 +95,5 @@ npm test
 - Minimal browser error monitoring is available via Sentry.
 - Set `VITE_SENTRY_DSN` in your production hosting environment to enable it.
 - If `VITE_SENTRY_DSN` is not set, Sentry stays disabled and the site still builds normally.
+
+
