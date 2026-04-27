@@ -178,6 +178,13 @@ const HERO_STATS = [
     mobile: { bottom: '14%', right: '4%', maxWidth: 138 },
     motion: { phase: 4.6, radiusX: 6, radiusY: 4, boostX: 7, boostY: 5, parallaxX: 0.28, parallaxY: 0.16, rotate: 1.0, rotateBoost: 0.75, rotateDir: 1 },
   },
+  {
+    value: '2',
+    label: 'Design systems founded and completed',
+    desktop: { top: '24%', left: '-8%', maxWidth: 180 },
+    mobile: { top: '22%', left: '0%', maxWidth: 140 },
+    motion: { phase: 2.4, radiusX: 6, radiusY: 5, boostX: 7, boostY: 6, parallaxX: -0.32, parallaxY: -0.12, rotate: 1.1, rotateBoost: 0.8, rotateDir: 1 },
+  },
 ];
 
 const Portrait = ({ galaxy, theme }) => {
