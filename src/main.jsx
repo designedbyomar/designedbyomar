@@ -517,7 +517,7 @@ const LogoLoader = ({ visible }) => {
       position: 'fixed', inset: 0, background: 'var(--bg-page)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       zIndex: 9999, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none',
-      transition: 'opacity 500ms ease',
+      transition: 'opacity var(--duration-slower-xl) ease',
     }}>
       <div className="logo-loader">
         <svg width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg" overflow="visible">
@@ -530,7 +530,7 @@ const LogoLoader = ({ visible }) => {
 
       <div aria-live="polite" aria-atomic="true" style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: 13,
+        fontSize: 'var(--font-size-body-xs)',
         color: 'var(--fg-secondary)',
         height: 20,
         marginTop: 48,
@@ -548,8 +548,8 @@ const LogoLoader = ({ visible }) => {
               style={{
                 display: 'inline-block',
                 animation: isExiting
-                  ? `letterExit 250ms cubic-bezier(0.4, 0, 0.2, 1) ${i * 5}ms forwards`
-                  : `letterEnter 300ms cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
+                  ? `letterExit var(--duration-base-plus) cubic-bezier(0.4, 0, 0.2, 1) ${i * 5}ms forwards`
+                  : `letterEnter var(--duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
                 opacity: 0,
                 willChange: 'transform, opacity, filter'
               }}
@@ -634,7 +634,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       width: 36, height: 36, borderRadius: 9999, background: 'transparent',
       color: 'var(--fg-primary)', border: 'none',
-      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms',
+      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background var(--duration-fast)',
     }}
       onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -700,9 +700,9 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
     scrollToSection(id);
   };
   const navLink = {
-    fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)',
+    fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)',
     textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 6,
-    transition: 'color 150ms, background 150ms', cursor: 'pointer',
+    transition: 'color var(--duration-fast), background var(--duration-fast)', cursor: 'pointer',
     background: 'transparent', border: 'none', fontFamily: 'inherit',
   };
   return (
@@ -712,7 +712,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       backdropFilter: scrolled ? 'blur(12px)' : 'none',
       WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
       boxShadow: scrolled ? 'rgba(127,127,127,0.18) 0px -1px 0px 0px inset' : 'none',
-      transition: 'background 200ms, box-shadow 200ms',
+      transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
@@ -747,7 +747,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 width: 36, height: 36, borderRadius: 9999, background: 'transparent',
                 color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                cursor: 'pointer', transition: 'background 150ms',
+                cursor: 'pointer', transition: 'background var(--duration-fast)',
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -756,8 +756,8 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             </button>
           ) : (
             <a href="#contact" onClick={goSection('contact')} style={{
-              fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
+              fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
+              borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -777,8 +777,8 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
-                borderRadius: 8, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity 150ms',
+                fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
+                borderRadius: 8, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
               }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
             </div>
           </div>
@@ -803,23 +803,23 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
     display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
   }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
       </div>
-      <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+      <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
         Complex systems. <span style={{ color: 'var(--fg-tertiary)' }}>Clear products.</span>
       </h1>
-      <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 400, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
+      <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
         AI, enterprise SaaS, fintech, and healthcare. I turn complex operations into scalable products.
       </p>
-      <div style={{ fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
+      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 300% customer scaling • $20M+ workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 14, fontWeight: 500,
+          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'var(--fg-primary)',
-          textDecoration: 'none', transition: 'opacity 150ms',
+          textDecoration: 'none', transition: 'opacity var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -828,9 +828,9 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
         <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact'); }} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 14, fontWeight: 500,
+          display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'transparent',
-          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background 150ms',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -897,18 +897,18 @@ const About = ({ onOpenDrawer }) => (
   <>
     <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 48px' }}>
       <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '220px 1fr', gap: 64, alignItems: 'start' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 760 }}>
-          <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 500, lineHeight: 1.4, letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
+          <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-medium)', letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
             {ABOUT_SHORT}
           </p>
           <button onClick={onOpenDrawer} style={{
             alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
-            fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', padding: '10px 16px',
+            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
             borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 150ms',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -932,29 +932,29 @@ const AboutDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity 250ms ease' }} />
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
       <aside role="dialog" aria-label="About Omar" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 340ms cubic-bezier(0.22,1,0.36,1)',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) cubic-bezier(0.22,1,0.36,1)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
           <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
         </div>
         <div style={{ padding: '36px 36px 72px', overflowY: 'auto', flex: 1 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 3.2vw, 40px)', fontWeight: 600, lineHeight: 1.05, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 20px' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 3.2vw, 40px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 20px' }}>
             A longer version,<br /><span style={{ color: 'var(--fg-tertiary)' }}>for the curious.</span>
           </h2>
-          <p style={{ fontSize: 17, lineHeight: 1.65, color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
+          <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 560 }}>
             {ABOUT_LONG.map(s => (
               <div key={s.heading}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
-                <p style={{ fontSize: 15, lineHeight: 1.65, color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
+                <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
               </div>
             ))}
           </div>
@@ -1119,7 +1119,7 @@ const CaseCard = ({ c, featured = false }) => {
     <a href={`/work/${c.id}`} className="case-card" style={{
       display: 'flex', flexDirection: 'column', gap: 16, height: '100%',
       textDecoration: 'none', color: 'inherit',
-      borderRadius: 12, transition: 'transform 220ms ease',
+      borderRadius: 12, transition: 'transform var(--duration-base) ease',
     }}>
       <div className="case-card-media" style={{
         position: 'relative', width: '100%',
@@ -1161,7 +1161,7 @@ const CaseCard = ({ c, featured = false }) => {
         {/* accent tag */}
         <div className="case-card-tag" style={{
           position: 'absolute', top: 16, left: 16,
-          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
+          fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', fontWeight: 'var(--font-weight-medium)',
           color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
           background: 'rgba(0,0,0,0.32)', padding: '5px 9px', borderRadius: 4,
           backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
@@ -1172,14 +1172,14 @@ const CaseCard = ({ c, featured = false }) => {
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
           <h3 style={{
             fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
-            fontWeight: 600, letterSpacing: '-0.025em',
-            color: 'var(--fg-primary)', margin: 0, lineHeight: 1.15,
+            fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em',
+            color: 'var(--fg-primary)', margin: 0, lineHeight: 'var(--line-height-snug)',
           }}>{c.title}</h3>
         </div>
-        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: '0 0 14px', maxWidth: 560 }}>{c.subtitle}</p>
+        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: '0 0 14px', maxWidth: 560 }}>{c.subtitle}</p>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
           {c.tags.slice(0, 3).map(t => (
-            <span key={t} style={{ fontSize: 11, fontWeight: 500, padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
           ))}
         </div>
       </div>
@@ -1199,10 +1199,10 @@ const Work = ({ onOpenDrawer }) => {
     <section id="work" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: workHeadColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
           </div>
-          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0, maxWidth: 760 }}>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0, maxWidth: 760 }}>
             A decade of systems work — <span style={{ color: 'var(--fg-tertiary)' }}>across fintech, healthcare, and enterprise.</span>
           </h2>
         </Reveal>
@@ -1218,9 +1218,9 @@ const Work = ({ onOpenDrawer }) => {
         <Reveal as="div" delay={180} style={{ display: 'inline-flex' }}>
           <button onClick={onOpenDrawer} style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', padding: '10px 16px',
+            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
             borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 150ms',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -1246,15 +1246,15 @@ const WorkDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity 250ms ease' }} />
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
       <aside role="dialog" aria-label="All case studies" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 340ms cubic-bezier(0.22,1,0.36,1)',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) cubic-bezier(0.22,1,0.36,1)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
           <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
@@ -1289,9 +1289,9 @@ const CaseStudyPage = ({ c, onBack }) => {
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 8,
-        fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)',
+        fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
-        marginBottom: 40, transition: 'color 150ms',
+        marginBottom: 40, transition: 'color var(--duration-fast)',
       }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
@@ -1342,7 +1342,7 @@ const CaseStudyPage = ({ c, onBack }) => {
         )}
         <div style={{
           position: 'absolute', top: 20, left: 22,
-          fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500,
+          fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)',
           color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
           background: 'rgba(0,0,0,0.32)', padding: '5px 10px', borderRadius: 4,
           backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
@@ -1352,15 +1352,15 @@ const CaseStudyPage = ({ c, onBack }) => {
       {/* Title + meta */}
       <div style={{ marginBottom: 48 }}>
         <h1 style={{
-          fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 600,
-          lineHeight: 1.0, letterSpacing: '-0.04em',
+          fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)',
+          lineHeight: 'var(--line-height-solid)', letterSpacing: '-0.04em',
           color: 'var(--fg-primary)', margin: '0 0 20px',
         }}>{c.title}</h1>
-        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 1.5, color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 760 }}>{c.subtitle}</p>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
+        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 760 }}>{c.subtitle}</p>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {c.tags.map(t => (
-            <span key={t} style={{ fontSize: 11, fontWeight: 500, padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
           ))}
         </div>
       </div>
@@ -1377,8 +1377,8 @@ const CaseStudyPage = ({ c, onBack }) => {
             padding: '32px 24px', textAlign: 'center',
             borderRight: i < c.metrics.length - 1 ? '1px solid var(--color-gray-100)' : 'none',
           }}>
-            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 700, letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
+            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
           </div>
         ))}
       </div>
@@ -1391,8 +1391,8 @@ const CaseStudyPage = ({ c, onBack }) => {
           { label: 'Outcome', body: c.outcome },
         ].map(({ label, body }) => (
           <div key={label}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
-            <p style={{ fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 1.65, color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
+            <p style={{ fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
           </div>
         ))}
       </div>
@@ -1404,14 +1404,14 @@ const CaseStudyPage = ({ c, onBack }) => {
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24,
       }}>
         <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
-          <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
-          <div style={{ fontSize: 13, color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
+          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
+          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
         <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit', textAlign: 'right' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
-          <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
-          <div style={{ fontSize: 13, color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
+          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
+          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
         </a>
       </div>
     </article>
@@ -1451,7 +1451,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
       position: 'relative',
       display: 'flex', flexDirection: 'column', gap: 8, padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 8,
       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
-      transition: 'transform 180ms ease',
+      transition: 'transform var(--duration-fast-mid) ease',
     }}
       onClick={() => {
         if (window.trackAnalyticsEvent && eventName) {
@@ -1479,7 +1479,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
             opacity: 1,
             pointerEvents: 'auto',
             zIndex: 2,
-            transition: 'opacity 150ms ease, color 150ms ease, background 150ms ease',
+            transition: 'opacity var(--duration-fast) ease, color var(--duration-fast) ease, background var(--duration-fast) ease',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.opacity = '1';
@@ -1495,8 +1495,8 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
           <AppIcon icon={copied ? Check : Copy} size={13} />
         </button>
       )}
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
-      <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      <span style={{ fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
     </a>
   );
 };
@@ -1587,14 +1587,14 @@ const KeyFacts = () => {
         }}>
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 12,
+            fontSize: 'var(--font-size-body-sm)',
             color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)',
             textTransform: 'uppercase',
             letterSpacing: '0.08em'
           }}>
             <span style={{ color: 'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
-          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
             The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
           </h2>
         </Reveal>
@@ -1609,23 +1609,23 @@ const KeyFacts = () => {
               borderRadius: 12,
               background: 'var(--bg-subtle)',
               boxShadow: 'var(--shadow-card-subtle)',
-              transition: 'box-shadow 180ms ease, transform 180ms ease',
+              transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
             }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
                 {f.label}
               </div>
               {f.custom ? (
-                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--fg-primary)', lineHeight: 1.5 }}>
+                <div style={{ fontSize: 'var(--font-size-tall)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
                   <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>LinkedIn</a>
                   {' '}and{' '}
                   <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>Substack</a>
                 </div>
               ) : (
-                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--fg-primary)', lineHeight: 1.5 }}>
+                <div style={{ fontSize: 'var(--font-size-tall)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   {f.value}
                 </div>
               )}
@@ -1645,11 +1645,11 @@ const Contact = () => {
   return (
     <section id="contact" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6) var(--layout-3)' }}>
       <Reveal className="contact-grid" variant="section" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-ship-red)' }}>04 — </span>Contact
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 820 }}>
-          <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 600, lineHeight: 0.98, letterSpacing: '-0.04em', color: 'var(--fg-secondary)', margin: 0 }}>
+          <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-secondary)', margin: 0 }}>
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
@@ -1698,7 +1698,7 @@ const FooterAlien = () => {
 const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
   const footerLabelStyle = {
     fontFamily: 'var(--font-mono)',
-    fontSize: 12,
+    fontSize: 'var(--font-size-body-sm)',
     color: 'var(--fg-tertiary)',
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
@@ -1708,12 +1708,12 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
     alignItems: 'center',
     gap: 8,
     width: 'fit-content',
-    fontSize: 15,
-    fontWeight: 500,
-    lineHeight: 1.4,
+    fontSize: 'var(--font-size-tall)',
+    fontWeight: 'var(--font-weight-medium)',
+    lineHeight: 'var(--line-height-medium)',
     color: 'var(--fg-secondary)',
     textDecoration: 'none',
-    transition: 'color 160ms ease, transform 160ms ease',
+    transition: 'color var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
   };
   const footerButtonStyle = {
     ...footerLinkStyle,
@@ -1776,7 +1776,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
             <div style={{ display: 'inline-flex', width: 'fit-content' }}>
               <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
             </div>
-            <p style={{ maxWidth: 360, margin: 0, fontSize: 16, lineHeight: 1.65, color: 'var(--fg-tertiary)' }}>
+            <p style={{ maxWidth: 360, margin: 0, fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-tertiary)' }}>
               Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.
             </p>
             <span className="footer-signoff" style={{
@@ -1786,8 +1786,8 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               flexWrap: 'wrap',
               width: 'fit-content',
               fontFamily: 'var(--font-mono)',
-              fontSize: 12,
-              lineHeight: 1.55,
+              fontSize: 'var(--font-size-body-sm)',
+              lineHeight: 'var(--line-height-relaxed-plus)',
               color: 'var(--fg-tertiary)',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -1885,7 +1885,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
             >
               Substack
             </a>
-            <span style={{ paddingTop: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <span style={{ paddingTop: 8, fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               © 2026 Omar Tavarez
             </span>
           </div>
@@ -1902,23 +1902,23 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
 const PrivacyPolicyPage = ({ theme, onBack }) => (
   <div style={{ maxWidth: 800, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
     <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-      display: 'inline-flex', alignItems: 'center', fontSize: 14, fontWeight: 500, color: 'var(--fg-secondary)', textDecoration: 'none', marginBottom: 48
+      display: 'inline-flex', alignItems: 'center', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)', textDecoration: 'none', marginBottom: 48
     }}>← Back to home</a>
-    <h1 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
+    <h1 style={{ fontSize: 'var(--font-size-display-sm)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
 
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, color: 'var(--fg-secondary)', lineHeight: 1.6, fontSize: 15 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-tall)' }}>
       <p>Last updated: April 2026</p>
 
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
+      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
       <p>This website ("designedbyomar.com") uses Google Analytics 4 to collect basic, anonymized telemetry data such as page views, scroll depth, and interaction events (like theme toggling or external link clicks). This helps me understand which case studies are resonating and improve the overall portfolio experience.</p>
 
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>2. Cookies</h2>
+      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>2. Cookies</h2>
       <p>Google Analytics utilizes cookies to distinguish unique users and sessions. By continuing to use this site, you consent to the use of these tracking mechanisms unless you have disabled cookies in your browser or are using privacy-enhancing browser extensions.</p>
 
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>3. Third-party Links</h2>
+      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>3. Third-party Links</h2>
       <p>This site contains links to other websites, including LinkedIn, GitHub, and Substack. Please be aware that I am not responsible for the privacy practices of such other sites. I encourage users to be aware when they leave my site and to read the privacy statements of any other site that collects personally identifiable information.</p>
 
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--fg-primary)', marginTop: 16 }}>4. Contact</h2>
+      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>4. Contact</h2>
       <p>For any questions regarding this policy, please reach out to <a href="mailto:omar@designedbyomar.com" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none' }}>omar@designedbyomar.com</a>.</p>
     </div>
   </div>
@@ -1962,11 +1962,11 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
         pointerEvents: 'auto',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(24px) scale(0.98)',
-        transition: 'all 600ms cubic-bezier(0.16, 1, 0.3, 1)',
+        transition: 'all var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1)',
         border: '1px solid var(--color-gray-100)',
       }}>
-        <p style={{ fontSize: 14, color: 'var(--fg-secondary)', lineHeight: 1.5, margin: 0 }}>
-          I use cookies to understand how you interact with my work. Learn more in the <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>.
+        <p style={{ fontSize: 'var(--font-size-body-md)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed)', margin: 0 }}>
+          I use cookies to understand how you interact with my work. Learn more in the <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>.
         </p>
         <button 
           onClick={onAccept}
@@ -1975,12 +1975,12 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
             color: 'var(--bg-page)',
             padding: '9px 18px',
             borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: 'var(--font-size-body-xs)',
+            fontWeight: 'var(--font-weight-semibold)',
             border: 'none',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
-            transition: 'transform 150ms ease, opacity 150ms ease'
+            transition: 'transform var(--duration-fast) ease, opacity var(--duration-fast) ease'
           }}
           onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'scale(1.02)'; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
@@ -2073,16 +2073,16 @@ const syncSentryContext = (route, currentCase, theme) => {
 const AppShellErrorFallback = () => (
   <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '32px 24px', background: 'var(--bg-page)', color: 'var(--fg-primary)' }}>
     <div style={{ width: '100%', maxWidth: 720, borderRadius: 16, padding: '32px 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 14 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 14 }}>
         Unexpected error
       </div>
       <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1, letterSpacing: '-0.04em', margin: '0 0 16px' }}>
         This view failed to load.
       </h1>
-      <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
         Refresh the page or head back home. The issue has been logged for review.
       </p>
-      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none' }}>
+      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none' }}>
         Back home
       </a>
     </div>
@@ -2275,7 +2275,7 @@ const App = () => {
   return (
     <>
       <LogoLoader visible={loading} />
-      <div style={{ opacity: loading ? 0 : 1, transition: 'opacity 400ms ease 120ms' }}>
+      <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
         <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
         <main>
           {route.type === 'privacy' ? (
