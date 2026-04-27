@@ -433,15 +433,13 @@ const Portrait = ({ galaxy, theme }) => {
       </div>
       {isLight && (
         <div style={{
-          position: 'absolute', inset: '8% 12% 4%', zIndex: 1, pointerEvents: 'none',
+          position: 'absolute', inset: '8% 12% 4%', zIndex: 2, pointerEvents: 'none',
           borderRadius: '40% 60% 52% 48% / 44% 42% 58% 56%',
           background: 'linear-gradient(155deg, color-mix(in srgb, var(--color-preview-pink) 10%, transparent) 0%, transparent 34%, color-mix(in srgb, var(--color-develop-blue) 11%, transparent) 67%, color-mix(in srgb, var(--color-ship-red) 10%, transparent) 100%)',
           opacity: 0.65,
         }} />
       )}
-      {!isLight && (
-        <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 1, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
-      )}
+      <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 1, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
       <div className="hero-stats-layer" aria-hidden={!statsVisible}>
         {HERO_STATS.map((stat, index) => {
           const position = isTouchLayout ? stat.mobile : stat.desktop;
