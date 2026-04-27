@@ -2131,7 +2131,23 @@ const App = () => {
     const performScroll = () => {
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const headerHeight = 64;
+        const paddingMap = {
+          'about': 96,
+          'work': 96,
+          'contact': 120
+        };
+        const paddingTop = paddingMap[id] || 0;
+        const offset = paddingTop - headerHeight;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = el.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition + offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     };
 
