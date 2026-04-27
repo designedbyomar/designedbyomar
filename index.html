@@ -113,6 +113,141 @@
   --layout-2: 64px;
   --layout-3: 96px;
   --layout-4: 120px;
+
+  /* Shadow tokens */
+  --shadow-ring: inset 0 0 0 1px rgba(127, 127, 127, 0.18);
+
+  /* Opacity tokens — for rgba color variations */
+  --opacity-5: 0.05;
+  --opacity-8: 0.08;
+  --opacity-10: 0.10;
+  --opacity-12: 0.12;
+  --opacity-16: 0.16;
+  --opacity-18: 0.18;
+  --opacity-22: 0.22;
+  --opacity-26: 0.26;
+  --opacity-28: 0.28;
+  --opacity-32: 0.32;
+  --opacity-35: 0.35;
+  --opacity-42: 0.42;
+  --opacity-45: 0.45;
+  --opacity-55: 0.55;
+  --opacity-60: 0.60;
+  --opacity-68: 0.68;
+  --opacity-95: 0.95;
+
+  /* Border radius tokens */
+  --radius-micro: 2px;
+  --radius-subtle: 4px;
+  --radius-standard: 6px;
+  --radius-comfort: 8px;
+  --radius-image: 12px;
+  --radius-large: 14px;
+  --radius-xl: 16px;
+  --radius-circle: 9999px;
+
+  /* Motion & timing tokens */
+  --duration-fast: 150ms;
+  --duration-fastest: 120ms;
+  --duration-fast-mid: 160ms;
+  --duration-fast-plus: 180ms;
+  --duration-base-short: 200ms;
+  --duration-base: 220ms;
+  --duration-base-plus: 250ms;
+  --duration-base-plus-xl: 260ms;
+  --duration-slow: 300ms;
+  --duration-slower: 320ms;
+  --duration-slowest: 340ms;
+  --duration-slowest-xl: 360ms;
+  --duration-very-slow: 400ms;
+  --duration-slower-xl: 500ms;
+  --duration-slowest-xxl: 600ms;
+  --easing-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-ease-linear: linear;
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 50;
+  --z-modal-backdrop: 100;
+  --z-modal: 101;
+  --z-popover: 102;
+  --z-tooltip: 103;
+  --z-critical: 9999;
+
+  /* Blur tokens */
+  --blur-subtle: blur(4px);
+  --blur-base: blur(6px);
+  --blur-medium: blur(10px);
+  --blur-strong: blur(12px);
+  --blur-heavy: blur(16px);
+
+  /* Gradient tokens */
+  --gradient-hero-radial-blur: radial-gradient(circle at 50% 38%, color-mix(in srgb, #fff2d8 82%, var(--color-preview-pink) 18%) 0%, color-mix(in srgb, #fff4e6 76%, var(--color-ship-red) 24%) 34%, color-mix(in srgb, #f6f7ff 80%, var(--color-develop-blue) 20%) 72%, rgba(255,255,255,0) 100%);
+  --gradient-hero-overlay-pink: radial-gradient(circle, color-mix(in srgb, var(--color-preview-pink) 22%, white) 0%, rgba(255,255,255,0) 72%);
+  --gradient-mask-fade-vertical: linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.6) 82%, rgba(0,0,0,0) 100%);
+  --gradient-overlay-diagonal: linear-gradient(155deg, color-mix(in srgb, var(--color-preview-pink) 10%, transparent) 0%, transparent 34%, color-mix(in srgb, var(--color-develop-blue) 11%, transparent) 67%, color-mix(in srgb, var(--color-ship-red) 10%, transparent) 100%);
+
+  /* Typography — Display sizes */
+  --font-size-display-lg: 88px;
+  --font-size-display-md: 44px;
+  --font-size-display-sm: 32px;
+
+  /* Typography — Heading sizes */
+  --font-size-heading-xl: 40px;
+  --font-size-heading-lg: 24px;
+  --font-size-heading-md: 20px;
+  --font-size-heading-sm: 16px;
+
+  /* Typography — Body sizes */
+  --font-size-body-xl: 18px;
+  --font-size-body-lg: 16px;
+  --font-size-body-md: 14px;
+  --font-size-body-sm: 12px;
+  --font-size-body-xs: 13px;
+  --font-size-body-micro: 10px;
+
+  /* Typography — Label/Caption sizes */
+  --font-size-label-lg: 14px;
+  --font-size-label-md: 12px;
+  --font-size-label-sm: 11px;
+
+  /* Typography — Mono/Code sizes */
+  --font-size-mono-lg: 14px;
+  --font-size-mono-md: 12px;
+  --font-size-mono-sm: 11px;
+  --font-size-mono-xs: 13px;
+  --font-size-mono-micro: 10px;
+
+  /* Typography — Extra sizes (for special cases) */
+  --font-size-xs: 13px;
+  --font-size-micro: 10px;
+
+  /* Typography — Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Typography — Line heights */
+  --line-height-tight: 0.96;
+  --line-height-semi-tight: 0.98;
+  --line-height-solid: 1.0;
+  --line-height-compact: 1.05;
+  --line-height-snug: 1.15;
+  --line-height-snug-plus: 1.20;
+  --line-height-card: 1.25;
+  --line-height-normal: 1.33;
+  --line-height-medium: 1.4;
+  --line-height-button: 1.43;
+  --line-height-relaxed: 1.5;
+  --line-height-relaxed-plus: 1.55;
+  --line-height-relaxed-mid: 1.56;
+  --line-height-relaxed-xl: 1.6;
+  --line-height-loose: 1.65;
+  --line-height-looser: 1.8;
 }
 
 [data-theme="dark"] {
@@ -134,6 +269,7 @@
   --color-develop-blue: #3291ff;
   --shadow-card-subtle: rgba(255,255,255,0.12) 0px 0px 0px 1px, rgba(0,0,0,0.40) 0px 2px 2px;
   --shadow-card-full:   rgba(255,255,255,0.12) 0px 0px 0px 1px, rgba(0,0,0,0.40) 0px 2px 2px, rgba(0,0,0,0.60) 0px 8px 8px -8px, rgba(255,255,255,0.04) 0px 0px 0px 1px inset;
+  --shadow-ring: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   color-scheme: dark;
 }
 
