@@ -24,6 +24,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
   const rafRef = React.useRef(0);
   const activeRef = React.useRef(false);
   React.useEffect(() => {
+    activeRef.current = false;
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
