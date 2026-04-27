@@ -33,6 +33,23 @@ const ColorSwatch = ({ name, variable, hexLight, hexDark, theme }) => {
   const isDark = theme === 'dark';
   const color = `var(${variable})`;
   const displayHex = isDark && hexDark ? hexDark : hexLight;
+  const [copied, setCopied] = React.useState(false);
+  const resetTimerRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+  }, []);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displayHex);
+      setCopied(true);
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = window.setTimeout(() => setCopied(false), 1200);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="swatch" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -41,12 +58,17 @@ const ColorSwatch = ({ name, variable, hexLight, hexDark, theme }) => {
         boxShadow: 'var(--shadow-card-subtle)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 12
       }}>
-        <button className="copy-button" onClick={() => navigator.clipboard.writeText(displayHex)}
+        <button className="copy-button" onClick={handleCopy}
+          title={copied ? 'Copied!' : 'Copy hex'}
           style={{
             background: 'rgba(255,255,255,0.2)', border: 'none', backdropFilter: 'blur(4px)',
             padding: '6px 10px', borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: 11,
-            cursor: 'pointer', color: 'white', textShadow: '0 1px 2px rgba(0,0,0,0.5)'
-          }}>Copy Hex</button>
+            cursor: 'pointer', color: copied ? '#4ade80' : 'white',
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            transition: 'color 150ms ease'
+          }}>
+          {copied ? '✓ Copied' : 'Copy Hex'}
+        </button>
       </div>
       <div>
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 4 }}>{name}</div>
@@ -721,6 +743,274 @@ const DesignSystem = () => {
             <MotionRow name="Logo Marquee" timing="44s linear" note="Company logos scroll as a masked, continuously moving strip. Reduced motion stops the marquee and leaves the marks in a stable state." />
             <MotionRow name="Facts Mesh Gradient" timing="rAF driven" note="The At a Glance section background is not a static fill. It is a live radial-mesh composition driven by time and pointer position." />
             <MotionRow name="Footer Alien Arrival" timing="1.0s / 1.1s / 0.5s / 0.9s" note="The footer animation is the canonical narrative motion moment: UFO in, beam pulse, alien lands, UFO out. Reduced motion shows the landed state instead." />
+          </div>
+        </section>
+
+        {/* Opacity System */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Opacity System</h2>
+          </div>
+
+          <div className="mono-label">Transparency scale for color variations</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 16 }}>
+            {[
+              { name: '5%', value: 0.05 },
+              { name: '8%', value: 0.08 },
+              { name: '10%', value: 0.10 },
+              { name: '12%', value: 0.12 },
+              { name: '16%', value: 0.16 },
+              { name: '18%', value: 0.18 },
+              { name: '22%', value: 0.22 },
+              { name: '26%', value: 0.26 },
+              { name: '28%', value: 0.28 },
+              { name: '32%', value: 0.32 },
+              { name: '35%', value: 0.35 },
+              { name: '42%', value: 0.42 },
+              { name: '45%', value: 0.45 },
+              { name: '55%', value: 0.55 },
+              { name: '60%', value: 0.60 },
+              { name: '68%', value: 0.68 },
+              { name: '95%', value: 0.95 },
+            ].map(level => (
+              <div key={level.name} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{
+                  width: '100%', height: 80, borderRadius: 8, background: `rgba(10, 114, 239, ${level.value})`,
+                  boxShadow: 'var(--shadow-card-subtle)', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 8
+                }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>var(--opacity-{Math.round(level.value * 100)})</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--fg-primary)', textAlign: 'center' }}>{level.name}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Motion & Timing Tokens */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Motion & Timing Tokens</h2>
+          </div>
+
+          <div className="mono-label">Duration scale and easing functions</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            {/* Durations */}
+            <div style={{ borderTop: '1px solid var(--color-gray-100)', paddingTop: 24 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 24 }}>Duration tokens</div>
+              {[
+                { name: 'fastest', value: '120ms' },
+                { name: 'fast-mid', value: '160ms' },
+                { name: 'fast', value: '150ms' },
+                { name: 'fast-plus', value: '180ms' },
+                { name: 'base-short', value: '200ms' },
+                { name: 'base', value: '220ms' },
+                { name: 'base-plus', value: '250ms' },
+                { name: 'base-plus-xl', value: '260ms' },
+                { name: 'slow', value: '300ms' },
+                { name: 'slower', value: '320ms' },
+                { name: 'slowest', value: '340ms' },
+                { name: 'slowest-xl', value: '360ms' },
+                { name: 'very-slow', value: '400ms' },
+                { name: 'slower-xl', value: '500ms' },
+                { name: 'slowest-xxl', value: '600ms' },
+              ].map(dur => (
+                <div key={dur.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--color-gray-100)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)' }}>--duration-{dur.name}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)' }}>{dur.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Easing */}
+            <div style={{ borderTop: '1px solid var(--color-gray-100)', paddingTop: 24 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 24 }}>Easing functions</div>
+              {[
+                { name: 'ease-out', value: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+                { name: 'ease-in-out', value: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+                { name: 'ease-linear', value: 'linear' },
+              ].map(easing => (
+                <div key={easing.name} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '16px 0', borderBottom: '1px solid var(--color-gray-100)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)' }}>--easing-{easing.name}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)' }}>{easing.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Z-Index Scale */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Z-Index Scale</h2>
+          </div>
+
+          <div className="mono-label">Stacking context hierarchy</div>
+          <div style={{ border: '1px solid var(--color-gray-100)', borderRadius: 12, overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 14 }}>
+              <thead style={{ background: 'var(--bg-subtle)', color: 'var(--fg-tertiary)', fontFamily: 'var(--font-mono)', fontSize: 11, textTransform: 'uppercase' }}>
+                <tr>
+                  <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Token</th>
+                  <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Value</th>
+                  <th style={{ padding: '14px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>Use Case</th>
+                </tr>
+              </thead>
+              <tbody style={{ color: 'var(--fg-secondary)' }}>
+                {[
+                  { token: 'z-base', value: '0', use: 'Default layer' },
+                  { token: 'z-dropdown', value: '10', use: 'Dropdowns, popovers' },
+                  { token: 'z-sticky', value: '20', use: 'Sticky headers, sidebars' },
+                  { token: 'z-fixed', value: '50', use: 'Fixed navigation' },
+                  { token: 'z-modal-backdrop', value: '100', use: 'Modal background overlay' },
+                  { token: 'z-modal', value: '101', use: 'Modal dialogs' },
+                  { token: 'z-popover', value: '102', use: 'Popovers above modals' },
+                  { token: 'z-tooltip', value: '103', use: 'Tooltips (topmost)' },
+                  { token: 'z-critical', value: '9999', use: 'Emergency/global alerts' },
+                ].map(row => (
+                  <tr key={row.token}>
+                    <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', color: 'var(--fg-primary)', fontFamily: 'var(--font-mono)' }}>--{row.token}</td>
+                    <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)', fontFamily: 'var(--font-mono)' }}>{row.value}</td>
+                    <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-gray-100)' }}>{row.use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Blur Effects */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Blur Effects</h2>
+          </div>
+
+          <div className="mono-label">Backdrop & filter blur strengths</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24 }}>
+            {[
+              { name: 'Subtle', token: '--blur-subtle', value: 'blur(4px)' },
+              { name: 'Base', token: '--blur-base', value: 'blur(6px)' },
+              { name: 'Medium', token: '--blur-medium', value: 'blur(10px)' },
+              { name: 'Strong', token: '--blur-strong', value: 'blur(12px)' },
+              { name: 'Heavy', token: '--blur-heavy', value: 'blur(16px)' },
+            ].map(blur => (
+              <div key={blur.token} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{
+                  width: '100%', height: 140, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)',
+                  background: `linear-gradient(135deg, var(--color-develop-blue), var(--color-preview-pink))`,
+                  position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <div style={{
+                    position: 'absolute', inset: 0, backdropFilter: blur.value,
+                    WebkitBackdropFilter: blur.value, background: 'rgba(255,255,255,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>Blurred content</span>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 4 }}>{blur.name}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{blur.token}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-secondary)' }}>{blur.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Gradient Patterns */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Gradient Patterns</h2>
+          </div>
+
+          <div className="mono-label">Static gradient tokens for hero & overlays</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+            {[
+              { name: 'Hero Radial Blur', token: '--gradient-hero-radial-blur', desc: 'Soft radial blur for hero background with pink, red, blue bleed.' },
+              { name: 'Hero Overlay Pink', token: '--gradient-hero-overlay-pink', desc: 'Radial pink circle overlay for hero foreground depth.' },
+              { name: 'Mask Fade Vertical', token: '--gradient-mask-fade-vertical', desc: 'Vertical fade mask for image bottoms.' },
+              { name: 'Overlay Diagonal', token: '--gradient-overlay-diagonal', desc: 'Subtle diagonal multi-color overlay (155deg).' },
+            ].map(grad => (
+              <div key={grad.token} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{
+                  width: '100%', height: 160, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)',
+                  background: `var(${grad.token})`, overflow: 'hidden', position: 'relative'
+                }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px 12px', background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{grad.token}</span>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg-primary)', marginBottom: 4 }}>{grad.name}</div>
+                  <div style={{ fontSize: 13, color: 'var(--fg-secondary)', lineHeight: 1.5 }}>{grad.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Text Constants */}
+        <section style={{ marginBottom: 160 }}>
+          <div className="section-head">
+            <h2 style={{ fontSize: 32, fontWeight: 600, letterSpacing: '-1.28px', color: 'var(--fg-primary)', margin: 0 }}>Text Constants</h2>
+          </div>
+
+          <div className="mono-label">Exported from <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>src/constants.js</code></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
+            <div style={{ padding: 20, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>NAV_LINKS</div>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+{`{
+  WORK: 'Work',
+  ABOUT: 'About',
+  CONTACT: 'Contact'
+}`}
+              </pre>
+            </div>
+
+            <div style={{ padding: 20, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>CASE_STUDIES</div>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+{`[
+  { name: 'Plastiq', slug: 'plastiq' },
+  { name: 'Wisdom', slug: 'wisdom' },
+  { name: 'Enterprise', slug: 'enterprise' }
+]`}
+              </pre>
+            </div>
+
+            <div style={{ padding: 20, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>THEME</div>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+{`{
+  LIGHT: 'light',
+  DARK: 'dark'
+}`}
+              </pre>
+            </div>
+
+            <div style={{ padding: 20, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>ROUTES</div>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+{`{
+  PRIVACY: '/privacy',
+  WORK: 'work',
+  CONTACT: 'contact',
+  SECTION: 'section'
+}`}
+              </pre>
+            </div>
+
+            <div style={{ padding: 20, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>SECTION_KEYS</div>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-secondary)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+{`{
+  TOP: 'top',
+  WORK: 'work',
+  ABOUT: 'about',
+  CONTACT: 'contact'
+}`}
+              </pre>
+            </div>
           </div>
         </section>
 

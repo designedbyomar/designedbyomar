@@ -335,14 +335,14 @@ const Portrait = ({ galaxy, theme }) => {
 
   const cardBaseStyle = isLight
     ? {
-      background: 'rgba(255,255,255,0.68)',
-      border: '1px solid rgba(23,23,23,0.10)',
-      boxShadow: '0 18px 36px rgba(10,114,239,0.10), 0 10px 24px rgba(255,91,79,0.08)',
+      background: 'rgba(255, 255, 255, var(--opacity-68))',
+      border: '1px solid rgba(23, 23, 23, var(--opacity-10))',
+      boxShadow: '0 18px 36px rgba(10, 114, 239, var(--opacity-10)), 0 10px 24px rgba(255, 91, 79, var(--opacity-8))',
     }
     : {
-      background: 'rgba(10,10,10,0.42)',
-      border: '1px solid rgba(255,255,255,0.12)',
-      boxShadow: '0 18px 44px rgba(0,0,0,0.26)',
+      background: 'rgba(10, 10, 10, var(--opacity-42))',
+      border: '1px solid rgba(255, 255, 255, var(--opacity-12))',
+      boxShadow: '0 18px 44px rgba(0, 0, 0, var(--opacity-26))',
     };
 
   const updatePointerMotion = (clientX, clientY, timestamp = performance.now()) => {
@@ -418,13 +418,13 @@ const Portrait = ({ galaxy, theme }) => {
             position: 'absolute', inset: '11% 8% 18%', zIndex: 0, pointerEvents: 'none',
             borderRadius: '48% 52% 46% 54% / 42% 46% 54% 58%',
             background: 'var(--gradient-hero-radial-blur)',
-            filter: 'blur(26px)', opacity: 0.95,
+            filter: 'var(--blur-heavy)', opacity: 0.95,
           }} />
           <div style={{
             position: 'absolute', inset: '4% 10% auto auto', width: '34%', height: '30%', zIndex: 0, pointerEvents: 'none',
             borderRadius: '9999px',
             background: 'var(--gradient-hero-overlay-pink)',
-            filter: 'blur(18px)', opacity: 0.7,
+            filter: 'var(--blur-heavy)', opacity: 0.7,
           }} />
         </>
       )}
@@ -432,8 +432,8 @@ const Portrait = ({ galaxy, theme }) => {
         <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
-            ? 'drop-shadow(0 18px 44px rgba(10,114,239,0.16)) drop-shadow(0 26px 48px rgba(255,91,79,0.12)) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
-            : 'drop-shadow(0 20px 60px rgba(0,0,0,0.55))',
+            ? 'drop-shadow(0 18px 44px rgba(10, 114, 239, var(--opacity-16))) drop-shadow(0 26px 48px rgba(255, 91, 79, var(--opacity-12))) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
+            : 'drop-shadow(0 20px 60px rgba(0, 0, 0, var(--opacity-55)))',
           userSelect: 'none', pointerEvents: 'none',
           WebkitMaskImage: 'var(--gradient-mask-fade-vertical)',
           maskImage: 'var(--gradient-mask-fade-vertical)',
@@ -548,7 +548,7 @@ const LogoLoader = ({ visible }) => {
               style={{
                 display: 'inline-block',
                 animation: isExiting
-                  ? `letterExit var(--duration-base-plus) cubic-bezier(0.4, 0, 0.2, 1) ${i * 5}ms forwards`
+                  ? `letterExit var(--duration-base-plus) var(--easing-ease-in-out-strong) ${i * 5}ms forwards`
                   : `letterEnter var(--duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
                 opacity: 0,
                 willChange: 'transform, opacity, filter'
@@ -632,7 +632,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
   return (
     <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+      width: 36, height: 36, borderRadius: 'var(--radius-circle)', background: 'transparent',
       color: 'var(--fg-primary)', border: 'none',
       boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background var(--duration-fast)',
     }}
@@ -652,7 +652,7 @@ const NavLogo = ({ onClick }) => {
   const shapeStyle = (delay) => ({
     transformBox: 'fill-box',
     transformOrigin: 'bottom center',
-    animation: key > 0 ? `navShapeBounce 580ms cubic-bezier(0.22,1,0.36,1) ${delay}ms both` : 'none',
+    animation: key > 0 ? `navShapeBounce var(--duration-nav) var(--easing-ease-out-bouncy) ${delay}ms both` : 'none',
     fill: 'var(--fg-primary)',
   });
   return (
@@ -701,7 +701,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
   };
   const navLink = {
     fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)',
-    textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 6,
+    textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 'var(--radius-standard)',
     transition: 'color var(--duration-fast), background var(--duration-fast)', cursor: 'pointer',
     background: 'transparent', border: 'none', fontFamily: 'inherit',
   };
@@ -709,9 +709,9 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
     <header style={{
       position: 'sticky', top: 0, zIndex: 50,
       background: scrolled ? 'color-mix(in oklab, var(--bg-page) 82%, transparent)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(12px)' : 'none',
-      WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-      boxShadow: scrolled ? 'rgba(127,127,127,0.18) 0px -1px 0px 0px inset' : 'none',
+      backdropFilter: scrolled ? 'var(--blur-strong)' : 'none',
+      WebkitBackdropFilter: scrolled ? 'var(--blur-strong)' : 'none',
+      boxShadow: scrolled ? 'rgba(127, 127, 127, var(--opacity-18)) 0px -1px 0px 0px inset' : 'none',
       transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
@@ -745,7 +745,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onClick={() => setIsMobileMenuOpen(open => !open)}
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+                width: 36, height: 36, borderRadius: 'var(--radius-circle)', background: 'transparent',
                 color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
                 cursor: 'pointer', transition: 'background var(--duration-fast)',
               }}
@@ -757,7 +757,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
           ) : (
             <a href="#contact" onClick={goSection('contact')} style={{
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
+              borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -767,9 +767,9 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
         {isMobile && isMobileMenuOpen && (
           <div style={{
             position: 'absolute', top: 'calc(100% + 8px)', left: 24, right: 24, zIndex: 60,
-            padding: 'var(--space-3)', borderRadius: 14, background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
+            padding: 'var(--space-3)', borderRadius: 'var(--radius-large)', background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
             boxShadow: 'var(--shadow-card-full)', border: '1px solid var(--color-gray-100)',
-            backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+            backdropFilter: 'var(--blur-heavy)', WebkitBackdropFilter: 'var(--blur-heavy)',
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
@@ -778,7 +778,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               <a href="#contact" onClick={goSection('contact')} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
-                borderRadius: 8, background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
+                borderRadius: 'var(--radius-comfort)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
               }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
             </div>
           </div>
@@ -793,7 +793,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
 // ============================================================
 const Dot = () => (
   <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-    <span style={{ width: 6, height: 6, borderRadius: 9999, background: '#22c55e', boxShadow: '0 0 0 3px rgba(34,197,94,0.22)', display: 'inline-block' }} />
+    <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: '#22c55e', boxShadow: '0 0 0 3px rgba(34, 197, 94, var(--opacity-22))', display: 'inline-block' }} />
   </span>
 );
 
@@ -818,7 +818,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
-          color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'var(--fg-primary)',
+          color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
           textDecoration: 'none', transition: 'opacity var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
@@ -829,7 +829,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         </a>
         <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
-          color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 6, background: 'transparent',
+          color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'transparent',
           boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -896,18 +896,18 @@ const LogoCarousel = () => (
 const About = ({ onOpenDrawer }) => (
   <>
     <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 48px' }}>
-      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '220px 1fr', gap: 64, alignItems: 'start' }}>
+      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '220px 1fr', gap: var(--layout-3), alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 760 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-8), maxWidth: 760 }}>
           <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-medium)', letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
             {ABOUT_SHORT}
           </p>
           <button onClick={onOpenDrawer} style={{
-            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
+            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -932,16 +932,16 @@ const AboutDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
       <aside role="dialog" aria-label="About Omar" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
-        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) cubic-bezier(0.22,1,0.36,1)',
+        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
         </div>
@@ -950,7 +950,7 @@ const AboutDrawer = ({ open, onClose }) => {
             A longer version,<br /><span style={{ color: 'var(--fg-tertiary)' }}>for the curious.</span>
           </h2>
           <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 560 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-7), maxWidth: 560 }}>
             {ABOUT_LONG.map(s => (
               <div key={s.heading}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
@@ -1117,15 +1117,15 @@ const CaseCard = ({ c, featured = false }) => {
 
   return (
     <a href={`/work/${c.id}`} className="case-card" style={{
-      display: 'flex', flexDirection: 'column', gap: 16, height: '100%',
+      display: 'flex', flexDirection: 'column', gap: var(--space-4), height: '100%',
       textDecoration: 'none', color: 'inherit',
-      borderRadius: 12, transition: 'transform var(--duration-base) ease',
+      borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
     }}>
       <div className="case-card-media" style={{
         position: 'relative', width: '100%',
         aspectRatio: mediaAspectRatio,
         background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
-        borderRadius: 12, overflow: 'hidden',
+        borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
       }}>
         <div className="case-card-sheen" />
@@ -1134,27 +1134,27 @@ const CaseCard = ({ c, featured = false }) => {
           position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
           background: c.swatch[2],
           borderRadius: '10px 10px 0 0',
-          boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,0.35)`,
+          boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0, 0, 0, var(--opacity-35))`,
         }}>
           <div style={{
             position: 'absolute', top: 10, left: 10, right: 10, height: 18,
             display: 'flex', alignItems: 'center', gap: 5,
             borderBottom: `1px solid ${c.swatch[3]}22`,
           }}>
-            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[3], opacity: 0.7 }} />
-            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[0], opacity: 0.7 }} />
-            <span style={{ width: 6, height: 6, borderRadius: 9999, background: c.swatch[1], opacity: 0.7 }} />
+            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[3], opacity: 0.7 }} />
+            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[0], opacity: 0.7 }} />
+            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[1], opacity: 0.7 }} />
           </div>
           <div className="case-card-line case-card-line--full" style={{
-            position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 3,
+            position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 'var(--radius-subtle)',
             background: `${c.swatch[3]}22`,
           }} />
           <div className="case-card-line case-card-line--left" style={{
-            position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 3,
+            position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 'var(--radius-subtle)',
             background: `${c.swatch[0]}44`,
           }} />
           <div className="case-card-line case-card-line--right" style={{
-            position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 3,
+            position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 'var(--radius-subtle)',
             background: `${c.swatch[3]}22`,
           }} />
         </div>
@@ -1163,13 +1163,13 @@ const CaseCard = ({ c, featured = false }) => {
           position: 'absolute', top: 16, left: 16,
           fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', fontWeight: 'var(--font-weight-medium)',
           color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
-          background: 'rgba(0,0,0,0.32)', padding: '5px 9px', borderRadius: 4,
-          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+          background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 9px', borderRadius: 'var(--radius-subtle)',
+          backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
         }}>{c.num} · {c.year} · {c.client}</div>
       </div>
 
       <div style={{ padding: '4px 4px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: var(--space-2), flexWrap: 'wrap', marginBottom: 10 }}>
           <h3 style={{
             fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
             fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em',
@@ -1179,7 +1179,7 @@ const CaseCard = ({ c, featured = false }) => {
         <p style={{ fontSize: featured ? 16 : 14, lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: '0 0 14px', maxWidth: 560 }}>{c.subtitle}</p>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
           {c.tags.slice(0, 3).map(t => (
-            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 'var(--radius-circle)', color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
           ))}
         </div>
       </div>
@@ -1207,19 +1207,19 @@ const Work = ({ onOpenDrawer }) => {
           </h2>
         </Reveal>
 
-        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32, marginBottom: 32 }}>
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: var(--space-8), marginBottom: 32 }}>
           <CaseCard c={CASE_STUDIES[0]} featured />
         </Reveal>
-        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 32, marginBottom: 48, alignItems: 'stretch' }}>
+        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: var(--space-8), marginBottom: 48, alignItems: 'stretch' }}>
           <CaseCard c={CASE_STUDIES[1]} />
           <CaseCard c={CASE_STUDIES[2]} />
         </Reveal>
 
         <Reveal as="div" delay={180} style={{ display: 'inline-flex' }}>
           <button onClick={onOpenDrawer} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
+            display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            borderRadius: 6, background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -1246,21 +1246,21 @@ const WorkDrawer = ({ open, onClose }) => {
   }, [open, onClose]);
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0,0,0,0.45)' : 'transparent', backdropFilter: open ? 'blur(4px)' : 'none', WebkitBackdropFilter: open ? 'blur(4px)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
       <aside role="dialog" aria-label="All case studies" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
-        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0,0,0,0.35), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) cubic-bezier(0.22,1,0.36,1)',
+        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 9999, display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
         </div>
         <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: var(--space-6) }}>
             {CASE_STUDIES.map(c => (
               <div key={c.id} onClick={onClose}>
                 <CaseCard c={c} />
@@ -1288,7 +1288,7 @@ const CaseStudyPage = ({ c, onBack }) => {
   return (
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-        display: 'inline-flex', alignItems: 'center', gap: 8,
+        display: 'inline-flex', alignItems: 'center', gap: var(--space-2),
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
         marginBottom: 40, transition: 'color var(--duration-fast)',
@@ -1304,15 +1304,15 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div style={{
         position: 'relative', width: '100%', aspectRatio: '21/9',
         background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
-        borderRadius: 16, overflow: 'hidden',
+        borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
       }}>
         {c.coverImage && (
           <div style={{
             position: 'absolute', inset: '56px 28px 24px',
-            borderRadius: 12, overflow: 'hidden',
+            borderRadius: 'var(--radius-image)', overflow: 'hidden',
             background: 'var(--bg-page)',
-            boxShadow: '0 18px 48px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.08)',
+            boxShadow: '0 18px 48px rgba(0, 0, 0, var(--opacity-28)), inset 0 0 0 1px rgba(255, 255, 255, var(--opacity-8))',
           }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6,
@@ -1320,11 +1320,11 @@ const CaseStudyPage = ({ c, onBack }) => {
               background: 'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
               borderBottom: '1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
             }}>
-              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(255,95,86,0.95)', display: 'inline-block' }} />
-              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(255,189,46,0.95)', display: 'inline-block' }} />
-              <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'rgba(39,201,63,0.95)', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-circle)', background: 'rgba(255, 95, 86, var(--opacity-95))', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-circle)', background: 'rgba(255, 189, 46, var(--opacity-95))', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-circle)', background: 'rgba(39, 201, 63, var(--opacity-95))', display: 'inline-block' }} />
               <div style={{
-                marginLeft: 10, flex: 1, height: 12, borderRadius: 9999,
+                marginLeft: 10, flex: 1, height: 12, borderRadius: 'var(--radius-circle)',
                 background: 'color-mix(in oklab, var(--color-gray-100) 92%, transparent)',
                 opacity: 0.78,
               }} />
@@ -1344,8 +1344,8 @@ const CaseStudyPage = ({ c, onBack }) => {
           position: 'absolute', top: 20, left: 22,
           fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)',
           color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
-          background: 'rgba(0,0,0,0.32)', padding: '5px 10px', borderRadius: 4,
-          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+          background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 10px', borderRadius: 'var(--radius-subtle)',
+          backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
         }}>{c.num} · {c.year} · {c.client}</div>
       </div>
 
@@ -1360,7 +1360,7 @@ const CaseStudyPage = ({ c, onBack }) => {
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {c.tags.map(t => (
-            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 9999, color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 'var(--radius-circle)', color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
           ))}
         </div>
       </div>
@@ -1368,7 +1368,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       {/* Metrics strip */}
       <div className="cs-metrics-grid" style={{
         display: 'grid', gridTemplateColumns: `repeat(${c.metrics.length}, 1fr)`,
-        borderRadius: 12, overflow: 'hidden',
+        borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
         background: 'var(--bg-page)', marginBottom: 64,
       }}>
@@ -1384,7 +1384,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 56, maxWidth: 760 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: var(--layout-2), maxWidth: 760 }}>
         {[
           { label: 'Challenge', body: c.challenge },
           { label: 'Approach', body: c.approach },
@@ -1401,7 +1401,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div className="cs-prevnext" style={{
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24,
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: var(--space-6),
       }}>
         <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
@@ -1449,7 +1449,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
       position: 'relative',
-      display: 'flex', flexDirection: 'column', gap: 8, padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 8,
+      display: 'flex', flexDirection: 'column', gap: var(--space-2), padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 'var(--radius-comfort)',
       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
       transition: 'transform var(--duration-fast-mid) ease',
     }}
@@ -1470,7 +1470,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
           onClick={handleCopy}
           style={{
             position: 'absolute', top: 12, right: 12,
-            width: 28, height: 28, borderRadius: 9999,
+            width: 28, height: 28, borderRadius: 'var(--radius-circle)',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             border: 'none', cursor: 'pointer',
             background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
@@ -1606,7 +1606,7 @@ const KeyFacts = () => {
           {facts.map((f, i) => (
             <div key={i} style={{
               padding: 'var(--space-6) var(--space-5)',
-              borderRadius: 12,
+              borderRadius: 'var(--radius-image)',
               background: 'var(--bg-subtle)',
               boxShadow: 'var(--shadow-card-subtle)',
               transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
@@ -1706,7 +1706,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
   const footerLinkStyle = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 8,
+    gap: var(--space-2),
     width: 'fit-content',
     fontSize: 'var(--font-size-tall)',
     fontWeight: 'var(--font-weight-medium)',
@@ -1746,18 +1746,18 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
         .site-footer-grid {
           display: grid;
           grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
-          gap: 40px 72px;
+          gap: var(--space-10)px 72px;
         }
         .site-footer-block {
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          gap: var(--space-4)px;
           min-width: 0;
         }
         @media (max-width: 900px) {
           .site-footer-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 36px 32px;
+            gap: var(--layout-1)px 32px;
           }
           .site-footer-brand {
             grid-column: 1 / -1;
@@ -1766,7 +1766,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
         @media (max-width: 600px) {
           .site-footer-grid {
             grid-template-columns: minmax(0, 1fr);
-            gap: 32px;
+            gap: var(--space-8)px;
           }
         }
       `}} />
@@ -1906,7 +1906,7 @@ const PrivacyPolicyPage = ({ theme, onBack }) => (
     }}>← Back to home</a>
     <h1 style={{ fontSize: 'var(--font-size-display-sm)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
 
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-tall)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: var(--space-6), color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-tall)' }}>
       <p>Last updated: April 2026</p>
 
       <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
@@ -1950,15 +1950,15 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
         maxWidth: 580,
         width: '100%',
         background: 'color-mix(in oklab, var(--bg-page) 82%, transparent)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backdropFilter: 'var(--blur-heavy)',
+        WebkitBackdropFilter: 'var(--blur-heavy)',
         boxShadow: 'var(--shadow-card-full)',
-        borderRadius: 16,
+        borderRadius: 'var(--radius-xl)',
         padding: '18px 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: 24,
+        gap: var(--space-6),
         pointerEvents: 'auto',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(24px) scale(0.98)',
@@ -1974,7 +1974,7 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
             background: 'var(--fg-primary)',
             color: 'var(--bg-page)',
             padding: '9px 18px',
-            borderRadius: 8,
+            borderRadius: 'var(--radius-comfort)',
             fontSize: 'var(--font-size-body-xs)',
             fontWeight: 'var(--font-weight-semibold)',
             border: 'none',
@@ -2072,7 +2072,7 @@ const syncSentryContext = (route, currentCase, theme) => {
 
 const AppShellErrorFallback = () => (
   <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '32px 24px', background: 'var(--bg-page)', color: 'var(--fg-primary)' }}>
-    <div style={{ width: '100%', maxWidth: 720, borderRadius: 16, padding: '32px 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+    <div style={{ width: '100%', maxWidth: 720, borderRadius: 'var(--radius-xl)', padding: '32px 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 14 }}>
         Unexpected error
       </div>
@@ -2082,7 +2082,7 @@ const AppShellErrorFallback = () => (
       <p style={{ fontSize: 'var(--font-size-tall)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
         Refresh the page or head back home. The issue has been logged for review.
       </p>
-      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 6, background: 'var(--fg-primary)', textDecoration: 'none' }}>
+      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: var(--space-2), fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none' }}>
         Back home
       </a>
     </div>
