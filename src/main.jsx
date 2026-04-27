@@ -807,13 +807,13 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
       </div>
       <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 600, lineHeight: 0.96, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-        Designing the systems <span style={{ color: 'var(--fg-tertiary)' }}>behind high-performing products.</span>
+        Complex systems. <span style={{ color: 'var(--fg-tertiary)' }}>Clear products.</span>
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 400, lineHeight: 1.55, color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
-        I lead design across AI and SaaS platforms—aligning product strategy, UX, and systems to turn complex operations into scalable products.
+        AI, enterprise SaaS, fintech, and healthcare. I turn complex operations into scalable products.
       </p>
       <div style={{ fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
-        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% efficiency gains • 900+ locations supported • $20M+ MRR workflows</span>
+        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 300% customer scaling • $20M+ workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
