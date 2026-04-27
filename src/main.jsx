@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Analytics } from '@vercel/analytics/react';
 import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 
@@ -2171,5 +2172,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <App />
     </Sentry.ErrorBoundary>
     <SpeedInsights />
+    <Analytics />
   </>
 );
