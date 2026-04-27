@@ -2114,8 +2114,13 @@ const App = () => {
     syncSentryContext(route, currentCase, theme);
   }, [route, currentCase, theme]);
 
+  const isHomePath = () => {
+    const p = window.location.pathname;
+    return p === '/' || p === '/index.html' || p === '' || p.endsWith('/index.html');
+  };
+
   const goHome = () => {
-    if (window.location.pathname !== '/') {
+    if (!isHomePath()) {
       history.pushState(null, '', '/');
       window.dispatchEvent(new Event('popstate'));
     }
@@ -2123,16 +2128,20 @@ const App = () => {
   };
 
   const scrollToSection = (id) => {
-    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname === '';
-    if (!isHome) {
+    const performScroll = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+
+    if (!isHomePath()) {
       history.pushState(null, '', '/');
       window.dispatchEvent(new Event('popstate'));
-      setTimeout(() => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 40);
-      return;
+      setTimeout(performScroll, 120);
+    } else {
+      performScroll();
     }
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
