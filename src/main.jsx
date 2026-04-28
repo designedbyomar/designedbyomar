@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X, Sparkles, Target, Rocket, NotebookPen } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
@@ -845,14 +845,14 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
 // ============================================================
 // About
 // ============================================================
-const ABOUT_SHORT = `I build and scale complex product systems that drive revenue and operational efficiency. With 10+ years across fintech, healthcare SaaS, AI workflows, and enterprise platforms, I've led 0→1 products, scaled design systems, and partnered with executive teams to turn strategy into measurable impact.`;
+const ABOUT_SHORT = `I build and scale complex product systems that drive revenue, reduce operational drag, and turn messy workflows into usable software. With 15+ years across fintech, healthcare SaaS, AI workflows, enterprise platforms, ad sales, media, and e-commerce, I've led 0→1 products, built design systems, and partnered with product, engineering, and executive teams to move strategy into shipped work.`;
 
 const ABOUT_LONG = [
-  { heading: 'Background', body: `I grew up in Brooklyn as an artist — I taught myself design through Photoshop and eventually found my way into product through the front door: HTML, CSS, and small agency work. Over the past decade I've worked across E-commerce, SaaS, Fintech, and Media. I care most about the space where design meets business outcomes — where decisions are hard and the stakes are real.` },
-  { heading: 'How I work', body: `I'm a generalist who leans toward structure. Early days are spent in plain text: writing, outlining, narrowing the problem. Prototypes come early, even ugly ones. I prefer a working artifact in a teammate's hands over a polished deck in a meeting. I've led teams, run workshops, and managed design systems end-to-end — not for process's sake, but so teams can ship faster without tripping over inconsistency.` },
-  { heading: 'Currently', body: `Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform. Leading design for a Management Portal that replaces 200+ spreadsheets with real-time operational intelligence, and an AI-assisted payment posting workflow that cut manual processing time by 40%. Previously: Plastiq, Disney, Simplero, GoNation.` },
-  { heading: 'Tools & craft', body: `Figma, React, Framer, Protopie, Principle. I write real code when the prototype needs to breathe — enough HTML/CSS/JS to ship and enough to collaborate fluently with engineers. I use Obsidian for thinking, Linear for tracking, and Notion for documentation.` },
-  { heading: 'Off the clock', body: `Amateur boxer, music producer, dedicated father. I'll talk your ear off about systems thinking, the cognitive science of decision-making, and why Brooklyn is the best city on earth.` },
+  { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
+  { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.` },
+  { heading: 'Currently', body: `I'm a Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform focused on AI-powered dental operations. I lead design across products including Management Portal, Reporting, Insurance Verification, and Posting Assistant.\n\nRecent work includes replacing 200+ spreadsheets with centralized operational tooling and designing an AI-assisted payment posting workflow that reduced manual processing time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
+  { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
+  { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
 ];
 
 const COMPANY_LOGOS = [
@@ -972,7 +972,7 @@ const CASE_STUDIES = [
   {
     id: 'mgmt-portal', num: '01', year: '2025', client: 'Wisdom',
     title: 'Management Portal',
-    subtitle: 'Ops command center replacing 200+ spreadsheets with real-time operational intelligence.',
+    subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.',
     coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp',
     role: 'Lead Product Designer — Strategy & UX Architecture',
     tags: ['B2B SaaS', 'Systems Design', '0→1', 'AI'],
@@ -1337,8 +1337,8 @@ const CaseStudyPage = ({ c, onBack }) => {
       </a>
 
       {/* Cover */}
-      <div style={{
-        position: 'relative', width: '100%', aspectRatio: '16/9',
+      <div className="cs-cover" style={{
+        position: 'relative', width: '100%',
         background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
@@ -1403,7 +1403,6 @@ const CaseStudyPage = ({ c, onBack }) => {
 
       {/* Metrics strip */}
       <div className="cs-metrics-grid" style={{
-        display: 'grid', gridTemplateColumns: `repeat(${c.metrics.length}, 1fr)`,
         borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
         background: 'var(--bg-page)', marginBottom: 64,
@@ -1411,7 +1410,6 @@ const CaseStudyPage = ({ c, onBack }) => {
         {c.metrics.map((m, i) => (
           <div key={i} style={{
             padding: '32px 24px', textAlign: 'center',
-            borderRight: i < c.metrics.length - 1 ? '1px solid var(--color-gray-100)' : 'none',
           }}>
             <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
@@ -1437,14 +1435,13 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div className="cs-prevnext" style={{
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)',
       }}>
         <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit', textAlign: 'right' }}>
+        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
@@ -1589,14 +1586,24 @@ const KeyFacts = () => {
   }, []);
 
   const facts = [
-    { label: 'Core Expertise', value: 'AI Workflows, Design Systems, Enterprise UX, Fintech, Healthcare SaaS', icon: Sparkles },
-    { label: 'Role Focus', value: 'Principal Designer / Head of Design in the Making — Product Strategy, IA, Interaction & Prototyping, 0→1 Delivery', icon: Target },
-    { label: 'Experience', value: 'Impactful work at Disney, Plastiq, Simplero, and Wisdom (2019–Present)', icon: Rocket },
+    { label: 'Core Expertise', value: 'AI workflows, design systems, enterprise UX, fintech, healthcare SaaS.', icon: Sparkles },
+    { label: 'Role Focus', value: 'Principal, Lead, and Design Manager roles across 0→1 product delivery.', icon: Target },
+    { label: 'Experience', value: 'Disney, Plastiq, Simplero, Wisdom — enterprise platforms to AI ops.', icon: Rocket },
     { label: 'Writing', value: null, custom: true, icon: NotebookPen },
   ];
 
   return (
-    <section
+    <>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <defs>
+          <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--color-ship-red)" />
+            <stop offset="50%" stopColor="var(--color-preview-pink)" />
+            <stop offset="100%" stopColor="var(--color-develop-blue)" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <section
       ref={sectionRef}
       id="facts"
       className="facts-section"
@@ -1640,7 +1647,7 @@ const KeyFacts = () => {
             <span style={{ color: 'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
           <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
-            The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
+            The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>I design systems, workflows, and products that scale.</span>
           </h2>
         </Reveal>
         <Reveal variant="section" className="facts-grid" style={{
@@ -1662,11 +1669,9 @@ const KeyFacts = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                <AppIcon icon={f.icon} size={24} stroke="url(#fact-icon-gradient)" />
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  {f.label}
-                </div>
+              <AppIcon icon={f.icon} size={24} stroke="url(#fact-icon-gradient)" style={{ marginBottom: 'var(--space-4)', display: 'block', flexShrink: 0 }} />
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
+                {f.label}
               </div>
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -1685,6 +1690,7 @@ const KeyFacts = () => {
         </Reveal>
       </div>
     </section>
+    </>
   );
 };
 
@@ -2325,6 +2331,72 @@ const App = () => {
 
   return (
     <>
+      <style>{`
+        /* Responsive case study layout */
+        .cs-cover {
+          aspect-ratio: 16 / 9;
+        }
+        @media (max-width: 768px) {
+          .cs-cover {
+            aspect-ratio: 4 / 3;
+            min-height: 280px;
+          }
+        }
+        @media (max-width: 480px) {
+          .cs-cover {
+            aspect-ratio: 3 / 2;
+            min-height: 240px;
+          }
+        }
+
+        /* Metrics grid responsive — mobile-first, single column by default */
+        .cs-metrics-grid {
+          display: grid !important;
+          grid-template-columns: 1fr !important;
+        }
+        .cs-metrics-grid > div {
+          border-right: none !important;
+          border-bottom: 1px solid var(--color-gray-100);
+        }
+        .cs-metrics-grid > div:last-child {
+          border-bottom: none;
+        }
+        @media (min-width: 768px) {
+          .cs-metrics-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .cs-metrics-grid > div {
+            border-right: 1px solid var(--color-gray-100) !important;
+            border-bottom: none !important;
+          }
+          .cs-metrics-grid > div:last-child {
+            border-right: none !important;
+          }
+        }
+        @media (min-width: 1280px) {
+          .cs-metrics-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .cs-metrics-grid > div:nth-child(3n) {
+            border-right: none !important;
+          }
+        }
+
+        /* Prev/Next nav — always side by side, text wraps, next right-aligned */
+        .cs-prevnext {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: var(--space-6);
+        }
+        .cs-prevnext > a {
+          min-width: 0;
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+        .cs-prevnext > a:last-child {
+          text-align: right;
+        }
+      `}</style>
       <LogoLoader visible={loading} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
         <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />

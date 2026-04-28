@@ -19,6 +19,8 @@
   --fg-tertiary: #8f8f8f;
   --color-gray-100: #2e2e2e;
   --color-develop-blue: #3291ff;
+  --color-ship-red: #ff6b60;
+  --color-preview-pink: #ff3da0;
   --font-sans: 'Geist', Arial, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
@@ -34,54 +36,137 @@ html, body {
 body {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+}
+.page-header {
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+}
+.page-header a {
+  display: inline-flex;
+  text-decoration: none;
+  color: var(--fg-primary);
+}
+.page-main {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  padding: 32px 24px 64px;
 }
 .shell {
   width: 100%;
-  max-width: 860px;
-  border-radius: 16px;
-  background: color-mix(in oklab, var(--bg-subtle) 58%, transparent);
-  box-shadow: inset 0 0 0 1px var(--color-gray-100);
-  padding: 40px 32px;
+  max-width: 720px;
+  text-align: center;
 }
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--fg-tertiary);
-  margin-bottom: 18px;
+  margin-bottom: 32px;
 }
+.eyebrow .code { color: var(--color-develop-blue); }
+
+.scene {
+  position: relative;
+  height: 180px;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.scene .ufo {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-260%);
+  opacity: 0;
+  width: 88px;
+  animation: ufo-arrive 1.2s cubic-bezier(.2,.7,.2,1) 0.2s forwards,
+             ufo-leave 1.0s cubic-bezier(.6,.0,.7,.3) 3.2s forwards;
+}
+.scene .beam {
+  position: absolute;
+  top: 56px;
+  left: 50%;
+  width: 64px;
+  height: 96px;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top center;
+  opacity: 0;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--color-preview-pink) 70%, transparent),
+    color-mix(in oklab, var(--color-preview-pink) 8%, transparent));
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  mix-blend-mode: screen;
+  animation: beam-pulse 1.4s ease-in-out 1.4s forwards;
+}
+.scene .alien {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  width: 64px;
+  animation: alien-land 0.6s cubic-bezier(.2,.9,.3,1.4) 2.0s both;
+}
+@keyframes ufo-arrive {
+  from { transform: translateX(-260%); opacity: 0; }
+  to   { transform: translateX(-50%);  opacity: 1; }
+}
+@keyframes ufo-leave {
+  from { transform: translateX(-50%);  opacity: 1; }
+  to   { transform: translateX(280%);  opacity: 0; }
+}
+@keyframes beam-pulse {
+  0%   { transform: translateX(-50%) scaleY(0); opacity: 0; }
+  25%  { transform: translateX(-50%) scaleY(1); opacity: 0.85; }
+  75%  { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
+  100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+}
+@keyframes alien-land {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-40px) scale(0.5); }
+  60%  { opacity: 1; transform: translateX(-50%) translateY(4px)  scale(1.05); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene .ufo, .scene .beam, .scene .alien { animation: none; opacity: 1; transform: translateX(-50%); }
+  .scene .beam { transform: translateX(-50%) scaleY(1); opacity: 0.4; }
+}
+
 h1 {
-  font-size: clamp(40px, 7vw, 72px);
-  line-height: 0.96;
+  font-size: clamp(36px, 6.5vw, 64px);
+  line-height: 1.0;
   letter-spacing: -0.04em;
   margin-bottom: 16px;
 }
 p {
-  max-width: 620px;
-  font-size: clamp(17px, 2vw, 20px);
+  max-width: 520px;
+  margin: 0 auto 32px;
+  font-size: clamp(16px, 1.8vw, 18px);
   line-height: 1.6;
   color: var(--fg-secondary);
-  margin-bottom: 28px;
 }
 .actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 .button,
 .button-secondary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 11px 18px;
   border-radius: 6px;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
+  transition: opacity 150ms ease;
 }
 .button {
   background: var(--fg-primary);
@@ -92,20 +177,95 @@ p {
   box-shadow: inset 0 0 0 1px var(--color-gray-100);
 }
 .button:hover,
-.button-secondary:hover {
-  opacity: 0.88;
+.button-secondary:hover { opacity: 0.85; }
+
+@media (max-width: 540px) {
+  .page-header { padding: 20px 20px; }
+  .scene { height: 160px; margin-bottom: 24px; }
+  .scene .ufo { width: 72px; }
+  .scene .alien { width: 56px; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .button, .button-secondary { justify-content: center; }
 }
 </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T7W0PFD3HD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-T7W0PFD3HD', { send_page_view: false });
+  gtag('config', 'GT-T56BGFG', { send_page_view: false });
+</script>
 </head>
 <body>
-  <main class="shell">
-    <div class="eyebrow"><span style="color: var(--color-develop-blue)">404</span> · Page not found</div>
-    <h1>This page wandered off.</h1>
-    <p>The link may be outdated, the URL may be wrong, or the page has not been published yet. Head back home or jump straight into the work.</p>
-    <div class="actions">
-      <a class="button" href="index.html">Back home</a>
-      <a class="button-secondary" href="index.html#work">View work</a>
-      <a class="button-secondary" href="mailto:omar@designedbyomar.com">Contact Omar</a>
+  <header class="page-header">
+    <a href="/" aria-label="designedbyomar — Home">
+      <svg width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" fill="currentColor"/>
+        <path d="M39.9286 0H21.5V18H39.9286V0Z" fill="currentColor"/>
+        <path d="M53.75 0L64.5 18H43L53.75 0Z" fill="currentColor"/>
+        <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" fill="currentColor"/>
+      </svg>
+    </a>
+  </header>
+
+  <main class="page-main">
+    <div class="shell">
+      <div class="eyebrow"><span class="code">404</span> · Page not found</div>
+
+      <div class="scene" aria-hidden="true">
+        <!-- UFO -->
+        <svg class="ufo" viewBox="0 0 11 5" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+          <g fill="var(--color-ship-red)">
+            <rect x="3" y="0" width="5" height="1"/>
+            <rect x="2" y="1" width="7" height="1"/>
+            <rect x="0" y="2" width="11" height="1"/>
+            <rect x="1" y="3" width="9" height="1"/>
+          </g>
+          <g fill="var(--color-preview-pink)">
+            <rect x="2" y="4" width="1" height="1"/>
+            <rect x="4" y="4" width="1" height="1"/>
+            <rect x="6" y="4" width="1" height="1"/>
+            <rect x="8" y="4" width="1" height="1"/>
+          </g>
+        </svg>
+        <!-- Tractor beam -->
+        <div class="beam"></div>
+        <!-- Alien -->
+        <svg class="alien" viewBox="0 0 11 8" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+          <g fill="var(--color-develop-blue)">
+            <rect x="3" y="0" width="1" height="1"/>
+            <rect x="7" y="0" width="1" height="1"/>
+            <rect x="4" y="1" width="1" height="1"/>
+            <rect x="6" y="1" width="1" height="1"/>
+            <rect x="2" y="2" width="7" height="1"/>
+            <rect x="1" y="3" width="2" height="1"/>
+            <rect x="4" y="3" width="3" height="1"/>
+            <rect x="8" y="3" width="2" height="1"/>
+            <rect x="0" y="4" width="11" height="1"/>
+            <rect x="0" y="5" width="1" height="1"/>
+            <rect x="2" y="5" width="7" height="1"/>
+            <rect x="10" y="5" width="1" height="1"/>
+            <rect x="0" y="6" width="1" height="1"/>
+            <rect x="2" y="6" width="1" height="1"/>
+            <rect x="8" y="6" width="1" height="1"/>
+            <rect x="10" y="6" width="1" height="1"/>
+            <rect x="3" y="7" width="2" height="1"/>
+            <rect x="6" y="7" width="2" height="1"/>
+          </g>
+        </svg>
+      </div>
+
+      <h1>This page hasn't landed yet.</h1>
+      <p>It may have been moved, removed, or never published. Pick a destination below.</p>
+
+      <div class="actions">
+        <a class="button" href="/">Back home</a>
+        <a class="button-secondary" href="/#case-studies">View work</a>
+        <a class="button-secondary" href="mailto:omar@designedbyomar.com">Contact Omar</a>
+      </div>
     </div>
   </main>
 </body>

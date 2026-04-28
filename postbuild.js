@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const CASE_STUDIES = [
-  { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time operational intelligence.', client: 'Wisdom' },
+  { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.', client: 'Wisdom' },
   { id: 'posting-asst', title: 'Posting Assistant', subtitle: 'AI-assisted insurance payment posting workflow that kept specialists in control.', client: 'Wisdom' },
   { id: 'page-builder', title: 'Page Builder 2.0', subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.', client: 'Simplero' },
   { id: 'connect-api', title: 'Connect API Payments', subtitle: 'PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.', client: 'Plastiq' },
