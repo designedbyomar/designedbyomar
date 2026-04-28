@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
 import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -16,136 +17,6 @@ if (SENTRY_ENABLED) {
     environment: 'production',
   });
 }
-
-// ============================================================
-// Galaxy — canvas pixel orbit
-// ============================================================
-const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', theme = 'dark' }) => {
-  const canvasRef = React.useRef(null);
-  const rafRef = React.useRef(0);
-  const activeRef = React.useRef(false);
-  React.useEffect(() => {
-    activeRef.current = false;
-    const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const DPR = Math.min(window.devicePixelRatio || 1, 2);
-    const styles = getComputedStyle(document.documentElement);
-    const token = (name, fallback) => styles.getPropertyValue(name).trim() || fallback;
-    const toAlpha = (color, alpha) => {
-      const value = color.trim();
-      if (value.startsWith('#')) {
-        let hex = value.slice(1);
-        if (hex.length === 3) hex = hex.split('').map((char) => char + char).join('');
-        const int = Number.parseInt(hex, 16);
-        return `rgba(${(int >> 16) & 255}, ${(int >> 8) & 255}, ${int & 255}, ${alpha})`;
-      }
-      const match = value.match(/rgba?\(([^)]+)\)/);
-      if (match) {
-        const [r, g, b] = match[1].split(',').map((part) => part.trim());
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-      }
-      return value;
-    };
-    const fgPrimary = token('--fg-primary', theme === 'dark' ? '#ededed' : '#171717');
-    const fgSecondary = token('--fg-secondary', theme === 'dark' ? '#a1a1a1' : '#4d4d4d');
-    const fgTertiary = token('--fg-tertiary', theme === 'dark' ? '#8f8f8f' : '#666666');
-    const bgPage = token('--bg-page', theme === 'dark' ? '#0a0a0a' : '#ffffff');
-    const developBlue = token('--color-develop-blue', theme === 'dark' ? '#3291ff' : '#0a72ef');
-    const previewPink = token('--color-preview-pink', theme === 'dark' ? '#ff3da0' : '#de1d8d');
-    const shipRed = token('--color-ship-red', theme === 'dark' ? '#ff6b60' : '#ff5b4f');
-    let w = 0, h = 0, cx = 0, cy = 0, rMin = 0, rMax = 0;
-    let inView = true;
-    let pageVisible = document.visibilityState === 'visible';
-    let last = performance.now();
-    let tick = () => { };
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      w = rect.width; h = rect.height;
-      canvas.width = Math.floor(w * DPR); canvas.height = Math.floor(h * DPR);
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      cx = w / 2; cy = h * 0.61;
-      rMin = Math.min(w, h) * 0.36; rMax = Math.min(w, h) * 0.57;
-      rebuild();
-    };
-    const palettes = {
-      mono: [fgPrimary, fgSecondary, fgTertiary],
-      photo: [developBlue, previewPink, shipRed, fgPrimary, fgSecondary],
-      workflow: [developBlue, previewPink, shipRed, fgPrimary, fgTertiary],
-    };
-    let particles = [];
-    const rebuild = () => {
-      particles = new Array(Math.round(140 * density)).fill(0).map(() => mk());
-      if (style === 'ethereal') for (let i = 0; i < 60 * density; i++) particles.push(mk(true));
-    };
-    const mk = (outer = false) => {
-      const rp = Math.random(), ring = rp < 0.45 ? 0 : rp < 0.8 ? 1 : 2;
-      const ringR = rMin + (rMax - rMin) * (ring === 0 ? 0.05 : ring === 1 ? 0.45 : 0.9);
-      const r = ringR + (Math.random() - 0.5) * (rMax - rMin) * 0.22;
-      const dir = Math.random() < 0.85 ? 1 : -1;
-      const ringSpeed = ring === 0 ? 0.00055 : ring === 1 ? 0.00038 : 0.00024;
-      return {
-        a: Math.random() * Math.PI * 2, r,
-        av: dir * ringSpeed * (0.7 + Math.random() * 0.8),
-        tilt: 0.32 + Math.random() * 0.08,
-        size: style === 'pixel' ? (Math.random() < 0.55 ? 2 : Math.random() < 0.85 ? 3 : 4) : style === 'ethereal' ? 0.6 + Math.random() * 1.8 : (Math.random() < 0.6 ? 2 : 3),
-        color: palettes[accent][Math.floor(Math.random() * palettes[accent].length)],
-        twinkle: Math.random() * Math.PI * 2, tv: 0.01 + Math.random() * 0.03,
-        outer: !!outer, z: 0.5 + Math.random() * 0.9,
-      };
-    };
-    const updateRunning = () => {
-      const shouldRun = inView && pageVisible;
-      if (shouldRun === activeRef.current) return;
-      activeRef.current = shouldRun;
-      if (shouldRun) {
-        last = performance.now();
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = 0;
-      }
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    const observer = typeof IntersectionObserver === 'undefined'
-      ? null
-      : new IntersectionObserver((entries) => {
-        inView = entries[0]?.isIntersecting ?? true;
-        updateRunning();
-      }, { threshold: 0.05 });
-    observer?.observe(canvas);
-    const onVisibilityChange = () => {
-      pageVisible = document.visibilityState === 'visible';
-      updateRunning();
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    tick = (now) => {
-      if (!activeRef.current) return;
-      const dt = Math.min(40, now - last); last = now;
-      if (style === 'ethereal') { ctx.fillStyle = toAlpha(bgPage, theme === 'dark' ? 0.18 : 0.22); ctx.fillRect(0, 0, w, h); }
-      else ctx.clearRect(0, 0, w, h);
-      for (const p of particles) {
-        p.a += p.av * dt * speed; p.twinkle += p.tv;
-        const x = cx + Math.cos(p.a) * p.r, y = cy + Math.sin(p.a) * p.r * p.tilt;
-        const back = Math.sin(p.a) < 0;
-        ctx.globalAlpha = Math.max(0, Math.min(1, (back ? 0.22 : 1) * (0.55 + Math.sin(p.twinkle) * 0.45) * (p.outer ? 0.45 : 1)));
-        ctx.fillStyle = p.color;
-        const s = p.size * (back ? 0.85 : 1);
-        ctx.fillRect(Math.round(x - s / 2), Math.round(y - s / 2), s, s);
-      }
-      ctx.globalAlpha = 1;
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    updateRunning();
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      observer?.disconnect();
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('resize', resize);
-    };
-  }, [density, speed, style, accent, theme]);
-  return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />;
-};
 
 // ============================================================
 // Portrait
@@ -1054,7 +925,7 @@ const CASE_STUDIES = [
       { value: 'IPO', label: 'Foundation for readiness' },
     ],
     accent: '#9f6bff',
-    swatch: ['#7928ca', '#ff3da0', '#0a0a0a', '#3291ff'],
+    swatch: ['#ff3da0', '#ff3da0', '#0a0a0a', '#3291ff'],
     challenge: `Siloed teams creating inconsistent patterns, duplicate work, and a confusing product experience. Design had no process. Engineering couldn't pick up components. Product was shipping features faster than the system could absorb them.`,
     approach: `Co-led workshops to establish design system principles and KPIs. Audited all products holistically. Built documentation around layout grid, dashboard components, payment widget, and feedback indicators. Collaborated with Engineering to build a Storybook equivalent. Created foundational elements: Type, Color, Brand, Spacing — all scoped to scale across multiple products and marketing channels.`,
     outcome: `Engineering pickup time for global components dropped significantly. Design and product teams aligned on goals. Consistent brand language across all DS-adopted surfaces. The DS became Plastiq's foundation for its IPO-era brand evolution.`,
@@ -1090,13 +961,13 @@ const CASE_STUDIES = [
       { value: '250', label: 'Critical incidents covered' },
     ],
     accent: '#22c55e',
-    swatch: ['#22c55e', '#3291ff', '#0a0a0a', '#ededed'],
+    swatch: ['#3291ff', '#3291ff', '#0a0a0a', '#ededed'],
     challenge: `A 2019 fire in Italy disrupted Disney network coverage — and the right people were never notified. The support tool was broken: key stakeholders either missed notifications entirely or were flooded with irrelevant ones. With Disney+ launching in months and the Fox acquisition underway, the stakes for fixing this were enormous.`,
     approach: `Led all UX activities solo across a large cross-functional team. Designed a self-service subscription manager that was scalable (infinitely addable brands/tags), flexible (no architecture changes for new assignments), responsive (mobile-first for commuting execs), and intuitive (correct on first login). Used hierarchical toggles, progressive disclosure, and modals to manage cognitive load. Ran usability testing and a full WCAG 2.0 compliance audit before launch.`,
     outcome: `1,600+ users signed up. 200,000+ emails sent. 250 critical incidents communicated — covering NBA Finals, Presidential Debate, NFL Draft, Emmys, and more. SVP of Software Engineering and SVP of Technology Business Operations Strategy both praised the design publicly. Zero major bugs post-launch.`,
   },
   {
-    id: 'disney-uap', num: '08', year: '2019–21', client: 'Disney (DTC&I)',
+    id: 'disney-uap', num: '08', year: '2019–21', client: 'Disney (DTCI)',
     title: 'Unified Ad Platform',
     subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.',
     coverVideo: '/Videos/case-studies/disney-uap/cover.mp4',
@@ -1108,7 +979,7 @@ const CASE_STUDIES = [
       { value: '2', label: 'Designers led' },
     ],
     accent: '#f59e0b',
-    swatch: ['#f59e0b', '#ff6b60', '#0a0a0a', '#ededed'],
+    swatch: ['#ff6b60', '#ff6b60', '#0a0a0a', '#ededed'],
     challenge: `ESPN, Freeform, FX Networks, and National Geographic each had their own ad sales platform. No standardization, no cross-brand collaboration, no efficiency. Booking ads across Disney's portfolio required navigating completely different systems.`,
     approach: `Audited and analyzed complex data sets across all four brands: reporting, client relations, dashboards, internal communications. Unified nomenclature, process, and front-end UI aligned to backend architecture. Led a team of two designers. Built React components designed to plug into the Adapt design system — laying the foundation for a future-proof cross-brand system.`,
     outcome: `All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library.`,
@@ -1132,7 +1003,7 @@ const CaseCard = ({ c, featured = false }) => {
       <div className="case-card-media" style={{
         position: 'relative', width: '100%',
         aspectRatio: mediaAspectRatio,
-        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
+        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, color-mix(in oklab, ${c.swatch[0]} 70%, white) 100%)`,
         borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
       }}>
@@ -1208,7 +1079,7 @@ const CaseCard = ({ c, featured = false }) => {
             color: 'var(--fg-primary)', margin: 0, lineHeight: 'var(--line-height-snug)',
           }}>{c.title}</h3>
         </div>
-        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: '0 0 14px', maxWidth: 560 }}>{c.subtitle}</p>
+        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: '0 0 14px' }}>{c.subtitle}</p>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
           {c.tags.slice(0, 3).map(t => (
             <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 'var(--radius-circle)', color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
@@ -1339,7 +1210,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       {/* Cover */}
       <div className="cs-cover" style={{
         position: 'relative', width: '100%',
-        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
+        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, color-mix(in oklab, ${c.swatch[0]} 70%, white) 100%)`,
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
       }}>
@@ -2349,36 +2220,29 @@ const App = () => {
           }
         }
 
-        /* Metrics grid responsive — mobile-first, single column by default */
+        /* Metrics grid — 3 cols by default, break straight to 1 col on narrow viewports */
         .cs-metrics-grid {
           display: grid !important;
-          grid-template-columns: 1fr !important;
+          grid-template-columns: repeat(3, 1fr) !important;
         }
         .cs-metrics-grid > div {
-          border-right: none !important;
-          border-bottom: 1px solid var(--color-gray-100);
-        }
-        .cs-metrics-grid > div:last-child {
+          border-right: 1px solid var(--color-gray-100);
           border-bottom: none;
         }
-        @media (min-width: 768px) {
+        .cs-metrics-grid > div:nth-child(3n),
+        .cs-metrics-grid > div:last-child {
+          border-right: none;
+        }
+        @media (max-width: 640px) {
           .cs-metrics-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: 1fr !important;
           }
           .cs-metrics-grid > div {
-            border-right: 1px solid var(--color-gray-100) !important;
-            border-bottom: none !important;
+            border-right: none !important;
+            border-bottom: 1px solid var(--color-gray-100);
           }
           .cs-metrics-grid > div:last-child {
-            border-right: none !important;
-          }
-        }
-        @media (min-width: 1280px) {
-          .cs-metrics-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .cs-metrics-grid > div:nth-child(3n) {
-            border-right: none !important;
+            border-bottom: none;
           }
         }
 
