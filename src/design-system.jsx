@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X, Sparkles, Target, Rocket, NotebookPen } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 
 const ThemeToggle = ({ theme, setTheme }) => {
@@ -382,6 +382,10 @@ const ICON_SET = [
   { label: 'Close', icon: X },
   { label: 'Sun', icon: Sun },
   { label: 'Moon', icon: Moon },
+  { label: 'Sparkles', icon: Sparkles },
+  { label: 'Target', icon: Target },
+  { label: 'Rocket', icon: Rocket },
+  { label: 'Writing', icon: NotebookPen },
 ];
 
 const IconCard = ({ label, icon }) => (

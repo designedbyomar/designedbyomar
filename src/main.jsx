@@ -1615,6 +1615,15 @@ const KeyFacts = () => {
         background: 'var(--color-develop-blue)',
       }}
     >
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--color-ship-red)" />
+            <stop offset="50%" stopColor="var(--color-preview-pink)" />
+            <stop offset="100%" stopColor="var(--color-develop-blue)" />
+          </linearGradient>
+        </defs>
+      </svg>
       {/* Swirling mesh gradient — rAF driven, no CSS transition needed */}
       <div ref={gradRef} style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -1653,6 +1662,9 @@ const KeyFacts = () => {
               background: 'var(--bg-subtle)',
               boxShadow: 'var(--shadow-card-subtle)',
               transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-4)',
             }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
