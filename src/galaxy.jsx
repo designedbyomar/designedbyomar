@@ -1,9 +1,6 @@
 import React from 'react';
 
-// ============================================================
-// Galaxy — canvas pixel orbit
-// ============================================================
-export const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', theme = 'dark' }) => {
+const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', theme = 'dark' }) => {
   const canvasRef = React.useRef(null);
   const rafRef = React.useRef(0);
   const activeRef = React.useRef(false);
@@ -129,3 +126,5 @@ export const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono
   }, [density, speed, style, accent, theme]);
   return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />;
 };
+
+export { Galaxy };
