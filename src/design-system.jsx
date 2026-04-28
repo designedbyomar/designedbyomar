@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+import { Galaxy } from './galaxy.jsx';
 
 const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
@@ -164,19 +165,21 @@ const FooterAlienArrivalDemo = () => {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', alignItems: 'center' }}>
       <style>{footerAlienStyles + `
-        .ds-faa-wrapper { 
-          --faa-ufo-w: 5.6em;
-          width: 4.6em; 
-          height: 3.6em; 
+        .ds-faa-wrapper {
+          --faa-ufo-w: 3.2em;
+          width: 2.6em;
+          height: 2em;
+          font-size: 14px;
         }
         .ds-faa-wrapper .faa-ufo { top: -0.9em; width: var(--faa-ufo-w); }
-        .ds-faa-wrapper .faa-beam { top: 0.15em; width: 3.2em; height: 2.4em; }
+        .ds-faa-wrapper .faa-beam { top: 0.15em; width: 1.8em; height: 1.4em; }
       `}</style>
       <div style={{
-        minHeight: 170,
-        borderRadius: 12,
+        width: '100%',
+        minHeight: 120,
+        borderRadius: 10,
         boxShadow: 'var(--shadow-ring)',
         display: 'grid',
         placeItems: 'center',
@@ -187,56 +190,54 @@ const FooterAlienArrivalDemo = () => {
           className="ds-faa-wrapper"
           aria-label="Pixel alien footer arrival animation"
         >
-          <FooterArrival played={true} ufoSize="5.6em" alienSize="4.6em" />
+          <FooterArrival played={true} ufoSize="3.2em" alienSize="2.6em" />
         </span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.7 }}>
-          Sequence: UFO arrive 1.0s, beam pulse 1.1s at 0.9s delay, alien land 0.5s at 1.4s delay, UFO exit 0.9s at 2.0s delay.<br />
-          Colors: ship-red UFO body, preview-pink beam, develop-blue alien. Reduced motion shows the final landed state without motion.
-        </div>
-        <button
-          type="button"
-          onClick={() => !prefersReducedMotion && setRunId(id => id + 1)}
-          disabled={prefersReducedMotion}
-          style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            padding: '10px 14px', borderRadius: 8, border: 'none', cursor: prefersReducedMotion ? 'not-allowed' : 'pointer',
-            background: prefersReducedMotion ? 'var(--bg-subtle)' : 'var(--fg-primary)',
-            color: prefersReducedMotion ? 'var(--fg-disabled)' : 'var(--bg-page)',
-            fontSize: 13, fontWeight: 600, boxShadow: 'var(--shadow-card-subtle)'
-          }}
-        >
-          {prefersReducedMotion ? 'Reduced motion enabled' : 'Replay animation'}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => !prefersReducedMotion && setRunId(id => id + 1)}
+        disabled={prefersReducedMotion}
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          padding: '8px 14px', borderRadius: 8, border: 'none', cursor: prefersReducedMotion ? 'not-allowed' : 'pointer',
+          background: prefersReducedMotion ? 'var(--bg-subtle)' : 'var(--fg-primary)',
+          color: prefersReducedMotion ? 'var(--fg-disabled)' : 'var(--bg-page)',
+          fontSize: 12, fontWeight: 600, boxShadow: 'var(--shadow-card-subtle)'
+        }}
+      >
+        {prefersReducedMotion ? 'Reduced motion' : 'Replay animation'}
+      </button>
     </div>
   );
 };
 
-const PixelOrbitPreview = () => (
-  <div style={{
-    position: 'relative', width: 160, height: 120, borderRadius: 16,
-    background: 'radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--bg-subtle) 90%, transparent) 0%, transparent 72%)'
-  }}>
-    {[
-      { left: '18%', top: '56%', color: 'var(--color-develop-blue)' },
-      { left: '28%', top: '26%', color: 'var(--color-preview-pink)' },
-      { left: '42%', top: '18%', color: 'var(--fg-primary)' },
-      { left: '62%', top: '22%', color: 'var(--fg-secondary)' },
-      { left: '76%', top: '44%', color: 'var(--color-ship-red)' },
-      { left: '68%', top: '66%', color: 'var(--color-develop-blue)' },
-      { left: '46%', top: '74%', color: 'var(--fg-primary)' },
-      { left: '24%', top: '70%', color: 'var(--color-preview-pink)' },
-      { left: '10%', top: '44%', color: 'var(--fg-secondary)' },
-    ].map((dot, index) => (
-      <span key={index} style={{
-        position: 'absolute', left: dot.left, top: dot.top, width: index % 3 === 0 ? 4 : 3, height: index % 3 === 0 ? 4 : 3,
-        background: dot.color, display: 'block', boxShadow: '0 0 0 1px rgba(0,0,0,0.02)'
-      }} />
-    ))}
-  </div>
-);
+const PixelOrbitPreview = () => {
+  const theme = typeof document !== 'undefined'
+    ? (document.documentElement.getAttribute('data-theme') || 'dark')
+    : 'dark';
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      minHeight: 180,
+      overflow: 'visible',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: '-12%',
+        right: '-12%',
+        bottom: '-12%',
+        left: '-12%',
+        pointerEvents: 'none',
+      }}>
+        <Galaxy density={1.9} speed={0.75} style="pixel" accent="workflow" theme={theme} />
+      </div>
+    </div>
+  );
+};
 
 const CustomElementCard = ({ label, note, children }) => (
   <div style={{ padding: 28, borderRadius: 12, boxShadow: 'var(--shadow-card-subtle)', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', gap: 18 }}>
