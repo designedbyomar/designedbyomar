@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
@@ -845,14 +845,14 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
 // ============================================================
 // About
 // ============================================================
-const ABOUT_SHORT = `I build and scale complex product systems that drive revenue and operational efficiency. With 10+ years across fintech, healthcare SaaS, AI workflows, and enterprise platforms, I've led 0→1 products, scaled design systems, and partnered with executive teams to turn strategy into measurable impact.`;
+const ABOUT_SHORT = `I build and scale complex product systems that drive revenue, reduce operational drag, and turn messy workflows into usable software. With 15+ years across fintech, healthcare SaaS, AI workflows, enterprise platforms, ad sales, media, and e-commerce, I've led 0→1 products, built design systems, and partnered with product, engineering, and executive teams to move strategy into shipped work.`;
 
 const ABOUT_LONG = [
-  { heading: 'Background', body: `I grew up in Brooklyn as an artist — I taught myself design through Photoshop and eventually found my way into product through the front door: HTML, CSS, and small agency work. Over the past decade I've worked across E-commerce, SaaS, Fintech, and Media. I care most about the space where design meets business outcomes — where decisions are hard and the stakes are real.` },
-  { heading: 'How I work', body: `I'm a generalist who leans toward structure. Early days are spent in plain text: writing, outlining, narrowing the problem. Prototypes come early, even ugly ones. I prefer a working artifact in a teammate's hands over a polished deck in a meeting. I've led teams, run workshops, and managed design systems end-to-end — not for process's sake, but so teams can ship faster without tripping over inconsistency.` },
-  { heading: 'Currently', body: `Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform. Leading design for a Management Portal that replaces 200+ spreadsheets with real-time operational intelligence, and an AI-assisted payment posting workflow that cut manual processing time by 40%. Previously: Plastiq, Disney, Simplero, GoNation.` },
-  { heading: 'Tools & craft', body: `Figma, React, Framer, Protopie, Principle. I write real code when the prototype needs to breathe — enough HTML/CSS/JS to ship and enough to collaborate fluently with engineers. I use Obsidian for thinking, Linear for tracking, and Notion for documentation.` },
-  { heading: 'Off the clock', body: `Amateur boxer, music producer, dedicated father. I'll talk your ear off about systems thinking, the cognitive science of decision-making, and why Brooklyn is the best city on earth.` },
+  { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
+  { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.` },
+  { heading: 'Currently', body: `I'm a Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform focused on AI-powered dental operations. I lead design across products including Management Portal, Reporting, Insurance Verification, and Posting Assistant.\n\nRecent work includes replacing 200+ spreadsheets with centralized operational tooling and designing an AI-assisted payment posting workflow that reduced manual processing time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
+  { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
+  { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
 ];
 
 const COMPANY_LOGOS = [
@@ -972,7 +972,7 @@ const CASE_STUDIES = [
   {
     id: 'mgmt-portal', num: '01', year: '2025', client: 'Wisdom',
     title: 'Management Portal',
-    subtitle: 'Ops command center replacing 200+ spreadsheets with real-time operational intelligence.',
+    subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.',
     coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp',
     role: 'Lead Product Designer — Strategy & UX Architecture',
     tags: ['B2B SaaS', 'Systems Design', '0→1', 'AI'],
@@ -1589,10 +1589,10 @@ const KeyFacts = () => {
   }, []);
 
   const facts = [
-    { label: 'Core Expertise', value: 'AI Workflows, Design Systems, Enterprise UX, Fintech, Healthcare SaaS' },
-    { label: 'Role Focus', value: 'Principal Designer / Head of Design in the Making — Product Strategy, IA, Interaction & Prototyping, 0→1 Delivery' },
-    { label: 'Experience', value: 'Impactful work at Disney, Plastiq, Simplero, and Wisdom (2019–Present)' },
-    { label: 'Writing', value: null, custom: true },
+    { label: 'Core Expertise', value: 'AI workflows, design systems, enterprise UX, fintech, healthcare SaaS.', icon: Sparkles },
+    { label: 'Role Focus', value: 'Principal, Lead, and Design Manager roles across 0→1 product delivery.', icon: Target },
+    { label: 'Experience', value: 'Disney, Plastiq, Simplero, Wisdom — enterprise platforms to AI ops.', icon: Rocket },
+    { label: 'Writing', value: null, custom: true, icon: NotebookPen },
   ];
 
   return (
@@ -1631,7 +1631,7 @@ const KeyFacts = () => {
             <span style={{ color: 'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
           <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
-            The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>systems thinking, product depth, and cross-functional range.</span>
+            The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>I design systems, workflows, and products that scale.</span>
           </h2>
         </Reveal>
         <Reveal variant="section" className="facts-grid" style={{
@@ -1650,6 +1650,13 @@ const KeyFacts = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
+              <div style={{
+                width: 36, height: 36, borderRadius: 'var(--radius-standard)', marginBottom: 'var(--space-4)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: 'conic-gradient(from 135deg, var(--color-ship-red), var(--color-preview-pink), var(--color-develop-blue), var(--color-ship-red))',
+              }}>
+                <AppIcon icon={f.icon} size={16} style={{ color: '#fff' }} />
+              </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
                 {f.label}
               </div>
