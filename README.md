@@ -4,7 +4,7 @@ Portfolio site for **Omar Tavarez** — product design for AI workflows, design 
 
 🌐 **Live:** [designedbyomar.com](https://designedbyomar.com)
 ✉️ **Contact:** [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
-🧑‍💼 **Hiring:** open to senior / staff / fractional product design and design-engineering roles.
+🧑‍💼 **Hiring:** open to Head of Design, Principal Product Designer, and senior / staff / fractional product design and design-engineering roles.
 
 ---
 
