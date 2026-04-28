@@ -851,7 +851,7 @@ const ABOUT_LONG = [
   { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
   { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.` },
   { heading: 'Currently', body: `I'm a Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform focused on AI-powered dental operations. I lead design across products including Management Portal, Reporting, Insurance Verification, and Posting Assistant.\n\nRecent work includes replacing 200+ spreadsheets with centralized operational tooling and designing an AI-assisted payment posting workflow that reduced manual processing time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
-  { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
+  { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
   { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
 ];
 
@@ -1337,8 +1337,8 @@ const CaseStudyPage = ({ c, onBack }) => {
       </a>
 
       {/* Cover */}
-      <div style={{
-        position: 'relative', width: '100%', aspectRatio: '16/9',
+      <div className="cs-cover" style={{
+        position: 'relative', width: '100%',
         background: `linear-gradient(135deg, ${c.swatch[0]} 0%, ${c.swatch[1]} 100%)`,
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
@@ -1403,7 +1403,6 @@ const CaseStudyPage = ({ c, onBack }) => {
 
       {/* Metrics strip */}
       <div className="cs-metrics-grid" style={{
-        display: 'grid', gridTemplateColumns: `repeat(${c.metrics.length}, 1fr)`,
         borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
         background: 'var(--bg-page)', marginBottom: 64,
@@ -1411,7 +1410,6 @@ const CaseStudyPage = ({ c, onBack }) => {
         {c.metrics.map((m, i) => (
           <div key={i} style={{
             padding: '32px 24px', textAlign: 'center',
-            borderRight: i < c.metrics.length - 1 ? '1px solid var(--color-gray-100)' : 'none',
           }}>
             <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
@@ -1437,14 +1435,13 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div className="cs-prevnext" style={{
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)',
       }}>
         <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit', textAlign: 'right' }}>
+        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
@@ -2322,6 +2319,72 @@ const App = () => {
 
   return (
     <>
+      <style>{`
+        /* Responsive case study layout */
+        .cs-cover {
+          aspect-ratio: 16 / 9;
+        }
+        @media (max-width: 768px) {
+          .cs-cover {
+            aspect-ratio: 4 / 3;
+            min-height: 280px;
+          }
+        }
+        @media (max-width: 480px) {
+          .cs-cover {
+            aspect-ratio: 3 / 2;
+            min-height: 240px;
+          }
+        }
+
+        /* Metrics grid responsive — mobile-first, single column by default */
+        .cs-metrics-grid {
+          display: grid !important;
+          grid-template-columns: 1fr !important;
+        }
+        .cs-metrics-grid > div {
+          border-right: none !important;
+          border-bottom: 1px solid var(--color-gray-100);
+        }
+        .cs-metrics-grid > div:last-child {
+          border-bottom: none;
+        }
+        @media (min-width: 768px) {
+          .cs-metrics-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .cs-metrics-grid > div {
+            border-right: 1px solid var(--color-gray-100) !important;
+            border-bottom: none !important;
+          }
+          .cs-metrics-grid > div:last-child {
+            border-right: none !important;
+          }
+        }
+        @media (min-width: 1280px) {
+          .cs-metrics-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .cs-metrics-grid > div:nth-child(3n) {
+            border-right: none !important;
+          }
+        }
+
+        /* Prev/Next nav — always side by side, text wraps, next right-aligned */
+        .cs-prevnext {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: var(--space-6);
+        }
+        .cs-prevnext > a {
+          min-width: 0;
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+        .cs-prevnext > a:last-child {
+          text-align: right;
+        }
+      `}</style>
       <LogoLoader visible={loading} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
         <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
