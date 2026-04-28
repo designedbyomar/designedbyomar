@@ -1596,7 +1596,17 @@ const KeyFacts = () => {
   ];
 
   return (
-    <section
+    <>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <defs>
+          <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--color-ship-red)" />
+            <stop offset="50%" stopColor="var(--color-preview-pink)" />
+            <stop offset="100%" stopColor="var(--color-develop-blue)" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <section
       ref={sectionRef}
       id="facts"
       className="facts-section"
@@ -1650,13 +1660,7 @@ const KeyFacts = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{
-                width: 36, height: 36, borderRadius: 'var(--radius-standard)', marginBottom: 'var(--space-4)',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                background: 'conic-gradient(from 135deg, var(--color-ship-red), var(--color-preview-pink), var(--color-develop-blue), var(--color-ship-red))',
-              }}>
-                <AppIcon icon={f.icon} size={16} style={{ color: '#fff' }} />
-              </div>
+              <AppIcon icon={f.icon} size={24} stroke="url(#fact-icon-gradient)" style={{ marginBottom: 'var(--space-4)', display: 'block', flexShrink: 0 }} />
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
                 {f.label}
               </div>
@@ -1677,6 +1681,7 @@ const KeyFacts = () => {
         </Reveal>
       </div>
     </section>
+    </>
   );
 };
 
