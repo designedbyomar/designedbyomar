@@ -1,99 +1,127 @@
 # designedbyomar
 
-Portfolio site for Omar Tavarez, focused on AI workflows, enterprise systems, fintech, and healthcare SaaS.
+Portfolio site for **Omar Tavarez** — product design for AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
 
-## Why this repo exists
-This site is both my portfolio and a public artifact showing how I use AI-assisted tools to move from strategy → design system → production UI.
+🌐 **Live:** [designedbyomar.com](https://designedbyomar.com)
+✉️ **Contact:** [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
+🧑‍💼 **Hiring:** open to senior / staff / fractional product design and design-engineering roles.
 
-## What I built
-- Custom React/Vite portfolio
-- Case study routing
-- Design-system reference page
-- Theme system
-- Motion language
-- SEO and share metadata
-- Analytics and performance monitoring
-- Security headers
+---
 
-## AI-assisted workflow
-- Used AI tools for rapid component scaffolding, refactoring, content iteration, and implementation support
-- Manually reviewed layout, accessibility, brand fit, content hierarchy, and final UX decisions
-- Used PRs to isolate changes and document tradeoffs
+## Why this repo is public
 
-## Quality checklist
-- Production build passes
-- Responsive behavior reviewed
-- Reduced-motion support included
-- SEO metadata included
-- Error monitoring available
-- Security headers configured
+This site is both my portfolio and a public artifact showing how I work today: using AI-assisted tools to move from strategy → design system → production UI, while keeping product judgment, brand, and UX decisions human-led.
+
+If you're a hiring manager or founder, the things to look at are:
+
+1. The site itself — [designedbyomar.com](https://designedbyomar.com)
+2. The case studies in [`postbuild.js`](./postbuild.js) — each gets its own crawlable, SEO-tagged route.
+3. The design-system reference page at [`/design-system.html`](https://designedbyomar.com/design-system.html).
+4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
+
+## Screenshots
+
+| Homepage | Case study | Design system |
+|---|---|---|
+| ![Homepage](./public/Images/share-square.png) | _see [/work/athena-ds](https://designedbyomar.com/work/athena-ds)_ | _see [/design-system.html](https://designedbyomar.com/design-system.html)_ |
+
+(Embedded screenshots above use `share-square.png` as a stand-in until dedicated repo screenshots land in `docs/screenshots/`.)
+
+## What's in here
+
+- **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
+- **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
+- **Design system reference page** at `/design-system.html` documenting tokens, spacing, typography, motion, iconography, and theming. The codebase is mid-migration to fully tokenized values (see recent commits — gradient, typography, motion, and spacing token phases).
+- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
+- **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Sentry (gated on `VITE_SENTRY_DSN`).
+- **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
+- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) and a Swift script [`scripts/generate-social-images.swift`](./scripts/generate-social-images.swift) for OG image generation on macOS.
 
 ## Stack
 
-- React
-- Vite
-- Static hosting via Netlify or Vercel
-- Post-build route generation in `postbuild.js`
+| Concern | Tool |
+|---|---|
+| Framework | React 19 |
+| Build | Vite 8 (multi-entry) |
+| Hosting | Vercel (canonical) |
+| Analytics | `@vercel/analytics`, `@vercel/speed-insights` |
+| Error monitoring | `@sentry/react` (optional) |
+| Icons | `lucide-react` |
+| Image optimization | `sharp` |
+| Social image generation | Swift + macOS Core Graphics |
 
-## Local Development
-
-Install dependencies:
+## Local development
 
 ```bash
+nvm use            # uses .nvmrc → Node 20+
 npm install
-```
-
-Start the dev server:
-
-```bash
 npm run dev
 ```
 
-## Production Build
-
-Build the site and generate static routes:
+## Production build
 
 ```bash
-npm run build
+npm run build      # vite build → dist/, then postbuild.js generates per-case-study routes
+npm run preview    # preview the built dist/ locally
 ```
 
-Preview the built output locally:
+## Smoke test
 
-```bash
-npm run preview
-```
-
-## Smoke Test
-
-There is no dedicated unit test suite yet. For now, `npm test` runs the production build as a smoke test:
+There is no unit test suite yet. `npm test` runs the production build as a smoke test:
 
 ```bash
 npm test
 ```
 
-## Key Files
-
-- `src/main.jsx` — main site app, routes, content, and UI
-- `src/design-system.jsx` — design system reference page app
-- `index.html` — main app entry and shared SEO shell
-- `design-system.html` — design system entry point
-- `404.html` — static 404 page
-- `postbuild.js` — generates static route output after Vite build
-
-## Assets
-
-- Images live in `public/Images/`
-- Resume lives at `public/Omar Tavarez Resume.pdf`
-
 ## Deploy
+
+Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](./vercel.json) with security headers and a single rewrite to the SPA shell.
 
 - Build command: `npm run build`
 - Output directory: `dist`
+- Env: set `VITE_SENTRY_DSN` to enable Sentry. Without it, the site builds and ships normally.
 
-## Error Monitoring
+## Quality checklist
 
-- Minimal browser error monitoring is available via Sentry.
-- Set `VITE_SENTRY_DSN` in your production hosting environment to enable it.
-- If `VITE_SENTRY_DSN` is not set, Sentry stays disabled and the site still builds normally.
+- [x] Production build passes
+- [x] Responsive layout reviewed across mobile / tablet / desktop breakpoints
+- [x] Reduced-motion respected for the canvas / motion components
+- [x] SEO metadata: canonical, OG, Twitter, JSON-LD, sitemap, robots, llms.txt
+- [x] Error monitoring wired (optional via env)
+- [x] Security headers configured
+- [ ] Unit / E2E test suite (intentionally deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
+- [ ] CI workflow (planned)
 
+## Project layout
 
+```
+.
+├── index.html                      # main app entry
+├── design-system.html              # design system entry
+├── 404.html                        # static 404
+├── postbuild.js                    # per-case-study route generation
+├── vite.config.js                  # multi-entry rollup config
+├── vercel.json                     # security headers + SPA rewrite
+├── public/
+│   ├── Images/                     # portrait, OG, share assets
+│   ├── Videos/                     # case study cover videos
+│   ├── Omar Tavarez Resume.pdf
+│   ├── llms.txt                    # AI crawler directive
+│   ├── robots.txt
+│   └── sitemap.xml
+├── scripts/
+│   ├── optimize-image.mjs          # sharp-based image optimizer
+│   └── generate-social-images.swift  # macOS social card generator
+├── src/
+│   ├── main.jsx                    # main site app (in active token migration)
+│   ├── design-system.jsx           # design system reference page
+│   ├── footer-alien.jsx
+│   ├── ui-icons.jsx
+│   └── constants.js                # nav / route / breakpoint constants
+└── docs/
+    └── ai-workflow.md              # how AI is used in this repo
+```
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
