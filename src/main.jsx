@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X, Sparkles, Target, Rocket, NotebookPen } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
@@ -1589,10 +1589,10 @@ const KeyFacts = () => {
   }, []);
 
   const facts = [
-    { label: 'Core Expertise', value: 'AI Workflows, Design Systems, Enterprise UX, Fintech, Healthcare SaaS' },
-    { label: 'Role Focus', value: 'Principal Designer / Head of Design in the Making — Product Strategy, IA, Interaction & Prototyping, 0→1 Delivery' },
-    { label: 'Experience', value: 'Impactful work at Disney, Plastiq, Simplero, and Wisdom (2019–Present)' },
-    { label: 'Writing', value: null, custom: true },
+    { label: 'Core Expertise', value: 'AI Workflows, Design Systems, Enterprise UX, Fintech, Healthcare SaaS', icon: Sparkles },
+    { label: 'Role Focus', value: 'Principal Designer / Head of Design in the Making — Product Strategy, IA, Interaction & Prototyping, 0→1 Delivery', icon: Target },
+    { label: 'Experience', value: 'Impactful work at Disney, Plastiq, Simplero, and Wisdom (2019–Present)', icon: Rocket },
+    { label: 'Writing', value: null, custom: true, icon: NotebookPen },
   ];
 
   return (
@@ -1608,6 +1608,15 @@ const KeyFacts = () => {
         background: 'var(--color-develop-blue)',
       }}
     >
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--color-ship-red)" />
+            <stop offset="50%" stopColor="var(--color-preview-pink)" />
+            <stop offset="100%" stopColor="var(--color-develop-blue)" />
+          </linearGradient>
+        </defs>
+      </svg>
       {/* Swirling mesh gradient — rAF driven, no CSS transition needed */}
       <div ref={gradRef} style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -1646,12 +1655,18 @@ const KeyFacts = () => {
               background: 'var(--bg-subtle)',
               boxShadow: 'var(--shadow-card-subtle)',
               transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-4)',
             }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-full)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
-                {f.label}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <AppIcon icon={f.icon} size={24} stroke="url(#fact-icon-gradient)" />
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {f.label}
+                </div>
               </div>
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
