@@ -33,7 +33,7 @@ If you're a hiring manager or founder, the things to look at are:
 - **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
-- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) and a Swift script [`scripts/generate-social-images.swift`](./scripts/generate-social-images.swift) for OG image generation on macOS.
+- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization.
 
 ## Stack
 
@@ -46,7 +46,6 @@ If you're a hiring manager or founder, the things to look at are:
 | Error monitoring | `@sentry/react` (optional) |
 | Icons | `lucide-react` |
 | Image optimization | `sharp` |
-| Social image generation | Swift + macOS Core Graphics |
 
 ## Local development
 
@@ -108,8 +107,7 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 │   ├── robots.txt
 │   └── sitemap.xml
 ├── scripts/
-│   ├── optimize-image.mjs          # sharp-based image optimizer
-│   └── generate-social-images.swift  # macOS social card generator
+│   └── optimize-image.mjs          # sharp-based image optimizer
 ├── src/
 │   ├── main.jsx                    # main site app (in active token migration)
 │   ├── design-system.jsx           # design system reference page

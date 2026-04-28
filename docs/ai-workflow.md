@@ -13,7 +13,7 @@ The point of this artifact is to be honest about that boundary.
 | ChatGPT | Strategy framing, copy direction, case-study messaging, repo critique |
 | Claude / Codex / similar | Implementation assistance — component scaffolding, refactors, regex transforms, postbuild route generation |
 | Figma | Source of truth for visual design, component specs, and design tokens before they land in code |
-| Sharp + Swift Core Graphics | Deterministic image and OG-card generation (`scripts/optimize-image.mjs`, `scripts/generate-social-images.swift`) |
+| Sharp | Image optimization (`scripts/optimize-image.mjs`) |
 | Vercel Analytics / Speed Insights / Sentry | Production feedback — what real users hit, what's slow, what errors fire |
 
 ---
