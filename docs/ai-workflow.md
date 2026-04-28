@@ -47,7 +47,7 @@ The point of this artifact is to be honest about that boundary.
 ## What I deliberately did not do
 
 - **No automated test suite yet.** A portfolio site with eight static case studies and one design-system reference page does not earn its keep with unit tests. `npm test` runs the production build as a smoke test, which catches the failures that actually matter for this surface (broken imports, broken postbuild templates, type errors). When the surface area justifies it, I'll add Playwright over the built `dist/`.
-- **No CI yet.** Planned. Will run `npm ci && npm run build` on PR + main. Lighthouse CI is the obvious next add.
+- **Minimal CI.** `.github/workflows/ci.yml` runs `npm ci && npm run build` on every PR and push to main. Lighthouse CI is the obvious next add.
 - **No premature splitting of `main.jsx`.** The file is large because the site is a single, content-heavy SPA. Splitting it into 20 micro-components before the token migration finishes would create merge conflicts with in-flight work without making anything more correct. The split happens after the token migration lands.
 
 ---

@@ -23,9 +23,7 @@ If you're a hiring manager or founder, the things to look at are:
 
 | Homepage | Case study | Design system |
 |---|---|---|
-| ![Homepage](./public/Images/share-square.png) | _see [/work/athena-ds](https://designedbyomar.com/work/athena-ds)_ | _see [/design-system.html](https://designedbyomar.com/design-system.html)_ |
-
-(Embedded screenshots above use `share-square.png` as a stand-in until dedicated repo screenshots land in `docs/screenshots/`.)
+| ![Homepage](./docs/screenshots/homepage.png) | ![Case study](./docs/screenshots/case-study.png) | ![Design system](./docs/screenshots/design-system.png) |
 
 ## What's in here
 
@@ -90,7 +88,7 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 - [x] Error monitoring wired (optional via env)
 - [x] Security headers configured
 - [ ] Unit / E2E test suite (intentionally deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
-- [ ] CI workflow (planned)
+- [x] CI workflow — build runs on every PR and push to main
 
 ## Project layout
 
