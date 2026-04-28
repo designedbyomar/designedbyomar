@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/work", "destination": "/#case-studies" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
