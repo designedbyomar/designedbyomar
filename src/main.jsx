@@ -1194,7 +1194,7 @@ const CaseStudyPage = ({ c, onBack }) => {
 
   return (
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
-      <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
+      <a href="/#work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -2032,12 +2032,7 @@ const useRoute = () => {
   React.useEffect(() => {
     const on = () => {
       const next = parse(window.location.pathname);
-      setRoute(prev => {
-        if (prev.type !== next.type || (prev.type === 'case' && prev.id !== next.id)) {
-          window.scrollTo(0, 0);
-        }
-        return next;
-      });
+      setRoute(next);
     };
     window.addEventListener('popstate', on);
     return () => window.removeEventListener('popstate', on);
@@ -2065,6 +2060,16 @@ const useRoute = () => {
   }, []);
 
   return route;
+};
+
+const routeKey = (route) => `${route.type}:${route.id || ''}`;
+
+const instantScrollToTop = () => {
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  root.style.scrollBehavior = previousScrollBehavior;
 };
 
 // ============================================================
@@ -2104,7 +2109,6 @@ const App = () => {
     setWorkOpen(false);
     history.pushState(null, '', '/privacy');
     window.dispatchEvent(new Event('popstate'));
-    window.scrollTo(0, 0);
   };
 
   React.useEffect(() => {
@@ -2143,6 +2147,7 @@ const App = () => {
 
   const route = useRoute();
   const currentCase = route.type === 'case' ? CASE_STUDIES.find(c => c.id === route.id) : null;
+  const previousRouteKeyRef = React.useRef(null);
 
   React.useEffect(() => {
     const meta = getRouteMeta(route, currentCase);
@@ -2154,6 +2159,61 @@ const App = () => {
     syncSentryContext(route, currentCase, theme);
   }, [route, currentCase, theme]);
 
+  const scrollToSectionElement = (id, behavior = 'smooth') => {
+    const el = document.getElementById(id);
+    if (!el) return false;
+
+    const headerHeight = 64;
+    const paddingMap = {
+      'about': 96,
+      'work': 96,
+      'contact': 120
+    };
+    const paddingTop = paddingMap[id] || 0;
+    const offset = paddingTop - headerHeight;
+    const bodyRect = document.body.getBoundingClientRect().top;
+    const elementRect = el.getBoundingClientRect().top;
+    const elementPosition = elementRect - bodyRect;
+    const offsetPosition = elementPosition + offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior
+    });
+
+    return true;
+  };
+
+  React.useEffect(() => {
+    if (!('scrollRestoration' in history)) return undefined;
+    const previousScrollRestoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    return () => {
+      history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  React.useLayoutEffect(() => {
+    const nextRouteKey = routeKey(route);
+    if (previousRouteKeyRef.current === nextRouteKey) return undefined;
+
+    previousRouteKeyRef.current = nextRouteKey;
+
+    if (route.type === 'home' && window.location.hash) {
+      const id = window.location.hash.slice(1);
+      const frame = window.requestAnimationFrame(() => {
+        scrollToSectionElement(id, 'auto');
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      instantScrollToTop();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [route]);
+
   const isHomePath = () => {
     const p = window.location.pathname;
     return p === '/' || p === '/index.html' || p === '' || p.endsWith('/index.html');
@@ -2163,38 +2223,22 @@ const App = () => {
     if (!isHomePath()) {
       history.pushState(null, '', '/');
       window.dispatchEvent(new Event('popstate'));
+      return;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const scrollToSection = (id) => {
     const performScroll = () => {
-      const el = document.getElementById(id);
-      if (el) {
-        const headerHeight = 64;
-        const paddingMap = {
-          'about': 96,
-          'work': 96,
-          'contact': 120
-        };
-        const paddingTop = paddingMap[id] || 0;
-        const offset = paddingTop - headerHeight;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = el.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition + offset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-      }
+      scrollToSectionElement(id, 'smooth');
     };
 
     if (!isHomePath()) {
       history.pushState(null, '', '/');
       window.dispatchEvent(new Event('popstate'));
-      setTimeout(performScroll, 120);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(performScroll);
+      });
     } else {
       performScroll();
     }
@@ -2268,7 +2312,7 @@ const App = () => {
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
           ) : currentCase ? (
-            <CaseStudyPage c={currentCase} onBack={goHome} />
+            <CaseStudyPage c={currentCase} onBack={() => scrollToSection('work')} />
           ) : (
             <>
               <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />

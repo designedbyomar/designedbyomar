@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/work", "destination": "/#case-studies" }
+    { "source": "/work", "destination": "/#work" }
   ],
   "headers": [
     {
