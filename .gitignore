@@ -144,7 +144,11 @@ dist/
 
 # Developer tooling / internal docs
 CLAUDE.md
+AGENTS.md
 .DS_Store
 DEPLOYMENT_ROADMAP.md
 DEPLOYMENT_RUNBOOK.md
+.claude/
+.kilo/
 .gstack/
+source-assets/
