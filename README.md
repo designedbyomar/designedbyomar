@@ -16,7 +16,7 @@ If you're a hiring manager or founder, the things to look at are:
 
 1. The site itself — [designedbyomar.com](https://designedbyomar.com)
 2. The case studies in [`postbuild.js`](./postbuild.js) — each gets its own crawlable, SEO-tagged route.
-3. The design-system reference page at [`/design-system.html`](https://designedbyomar.com/design-system.html).
+3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the visual reference page at [`/design-system.html`](https://designedbyomar.com/design-system.html).
 4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
 
 ## Screenshots
@@ -29,7 +29,7 @@ If you're a hiring manager or founder, the things to look at are:
 
 - **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
 - **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
-- **Design system reference page** at `/design-system.html` documenting tokens, spacing, typography, motion, iconography, and theming. The codebase is mid-migration to fully tokenized values (see recent commits — gradient, typography, motion, and spacing token phases).
+- **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a visual reference page at `/design-system.html` documenting tokens, spacing, typography, motion, iconography, and theming. The codebase is mid-migration to fully tokenized values (see recent commits — gradient, typography, motion, and spacing token phases).
 - **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
@@ -94,6 +94,7 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 ```
 .
 ├── index.html                      # main app entry
+├── DESIGN.md                       # agent-readable design system guide
 ├── design-system.html              # design system entry
 ├── 404.html                        # static 404
 ├── postbuild.js                    # per-case-study route generation
