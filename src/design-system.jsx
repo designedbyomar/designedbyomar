@@ -627,19 +627,15 @@ const DesignSystemFAQAccordion = () => {
             </div>
           );
         })}
-        <a
-          href="#faq"
-          role="button"
+        <button
+          type="button"
           aria-expanded={showAllQuestions}
           className="text-link faq-view-all-link"
-          onClick={(event) => {
-            event.preventDefault();
-            toggleQuestionVisibility();
-          }}
+          onClick={() => toggleQuestionVisibility()}
         >
           {showAllQuestions ? 'Show fewer questions' : 'View all questions'}
           <AppIcon icon={ChevronDown} size={14} style={{ transform: showAllQuestions ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-        </a>
+        </button>
       </div>
     </div>
   );
