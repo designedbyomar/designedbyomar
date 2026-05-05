@@ -890,6 +890,7 @@ const CASE_STUDIES = [
     title: 'Page Builder 2.0',
     subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.',
     coverVideo: '/Videos/case-studies/page-builder/cover.mp4',
+    ogImage: '/Images/case-studies/page-builder/cover.webp',
     role: 'Lead Product Designer & Architect',
     tags: ['CRM', 'SaaS', 'Design System'],
     metrics: [
@@ -984,6 +985,7 @@ const CASE_STUDIES = [
     title: 'Unified Ad Platform',
     subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.',
     coverVideo: '/Videos/case-studies/disney-uap/cover.mp4',
+    ogImage: '/Images/case-studies/disney-uap/cover.webp',
     role: 'Senior UX Designer',
     tags: ['Enterprise', 'Design System', 'Multi-brand', 'React'],
     metrics: [
@@ -1637,10 +1639,19 @@ const FAQ_ITEMS = [
 
 const DEFAULT_VISIBLE_FAQ_INDICES = [0, 1, 2, 3, 4, 7];
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const FAQAnswer = ({ item }) => {
   if (!item.links?.length) return item.answer;
 
-  const segments = item.answer.split(/(Posting Assistant|Management Portal|Connect API Payments|Critical Communication Tool|Unified Ad Platform|Athena Design System 2\.0)/g);
+  const linkLabels = item.links
+    .map(link => link.label)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  if (!linkLabels.length) return item.answer;
+
+  const segments = item.answer.split(new RegExp(`(${linkLabels.map(escapeRegExp).join('|')})`, 'g'));
   const linkByLabel = new Map(item.links.map(link => [link.label, link.href]));
 
   return (
@@ -2160,7 +2171,7 @@ const personSchema = {
   name: 'Omar Tavarez',
   url: `${SITE_ORIGIN}/`,
   jobTitle: 'Product Designer',
-  email: 'mailto:omar@designedbyomar.com',
+  email: 'omar@designedbyomar.com',
   sameAs: [
     'https://www.linkedin.com/in/omartavarez/',
     'https://github.com/designedbyomar',

@@ -6,12 +6,12 @@ const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const CASE_STUDIES = [
   { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.', client: 'Wisdom', ogImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp' },
   { id: 'posting-asst', title: 'Posting Assistant', subtitle: 'AI-assisted insurance payment posting workflow that kept specialists in control.', client: 'Wisdom', ogImage: '/Images/case-studies/posting-asst/cover.webp' },
-  { id: 'page-builder', title: 'Page Builder 2.0', subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.', client: 'Simplero' },
+  { id: 'page-builder', title: 'Page Builder 2.0', subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.', client: 'Simplero', ogImage: '/Images/case-studies/page-builder/cover.webp' },
   { id: 'connect-api', title: 'Connect API Payments', subtitle: 'PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.', client: 'Plastiq', ogImage: '/Images/case-studies/connect-api/cover.webp' },
   { id: 'athena-ds', title: 'Athena Design System 2.0', subtitle: "Enterprise design system that became the foundation for Plastiq's IPO-era brand.", client: 'Plastiq', ogImage: '/Images/case-studies/athena-ds/cover.webp' },
   { id: 'plastiq-mktg', title: 'Plastiq Marketing Site', subtitle: 'Pre-IPO brand relaunch delivered WCAG-compliant in 3–4 weeks.', client: 'Plastiq', ogImage: '/Images/case-studies/plastiq-mktg/cover.webp' },
   { id: 'disney-cct', title: 'Critical Communication Tool', subtitle: 'Enterprise subscription manager used to coordinate 250 critical incidents.', client: 'The Walt Disney Company', ogImage: '/Images/case-studies/disney-cct/cover.webp' },
-  { id: 'disney-uap', title: 'Unified Ad Platform', subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.', client: 'Disney (DTC&I)' },
+  { id: 'disney-uap', title: 'Unified Ad Platform', subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.', client: 'Disney (DTC&I)', ogImage: '/Images/case-studies/disney-uap/cover.webp' },
 ];
 
 const personSchema = {
@@ -19,7 +19,7 @@ const personSchema = {
   name: 'Omar Tavarez',
   url: `${SITE_ORIGIN}/`,
   jobTitle: 'Product Designer',
-  email: 'mailto:omar@designedbyomar.com',
+  email: 'omar@designedbyomar.com',
   sameAs: [
     'https://www.linkedin.com/in/omartavarez/',
     'https://github.com/designedbyomar',
