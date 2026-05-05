@@ -848,8 +848,7 @@ const COMPANY_LOGOS = [
 ];
 
 const LogoCarousel = () => (
-  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '18px 0 40px' }}>
-    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', marginBottom: 14 }}>Built across startups, scaleups, and enterprise teams.</div>
+  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '0 0 40px' }}>
     <div className="logo-carousel">
       <div className="logo-track">
         {[...COMPANY_LOGOS, ...COMPANY_LOGOS].map((logo, index) => {
@@ -877,7 +876,7 @@ const LogoCarousel = () => (
 
 const About = ({ onOpenDrawer }) => (
   <>
-    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 48px' }}>
+    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 24px' }}>
       <div className="about-grid" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: LAYOUT.GRID_DESKTOP, gap: 'var(--layout-3)', alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
@@ -892,18 +891,30 @@ const About = ({ onOpenDrawer }) => (
           <p style={{ fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>
             {ABOUT_SHORT}
           </p>
-          <button onClick={onOpenDrawer} style={{
-            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            Read more about me
-            <AppIcon icon={ArrowUpRight} size={12} />
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+            <button onClick={onOpenDrawer} style={{
+              alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+              fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
+              minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              Read more about me
+              <AppIcon icon={ArrowUpRight} size={12} />
+            </button>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--font-size-body-xs)',
+              color: 'var(--fg-tertiary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginTop: 'var(--space-2)'
+            }}>
+              Built across startups, scaleups, and enterprise teams.
+            </div>
+          </div>
         </div>
       </div>
     </Reveal>
