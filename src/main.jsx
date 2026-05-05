@@ -789,10 +789,10 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         Complex systems. <span style={{ color: 'var(--fg-tertiary)' }}>Clear products.</span>
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
-        AI, enterprise SaaS, fintech, and healthcare. I turn complex operations into scalable products.
+        AI, enterprise SaaS, fintech, healthcare. Built to scale real-world operations.
       </p>
       <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
-        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 300% customer scaling • $20M+ workflows</span>
+        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
@@ -823,7 +823,9 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
 // ============================================================
 // About
 // ============================================================
-const ABOUT_SHORT = `I build and scale complex product systems that drive revenue, reduce operational drag, and turn messy workflows into usable software. With 15+ years across fintech, healthcare SaaS, AI workflows, enterprise platforms, ad sales, media, and e-commerce, I've led 0→1 products, built design systems, and partnered with product, engineering, and executive teams to move strategy into shipped work.`;
+const ABOUT_HEADER = `I work on the part most teams avoid.`;
+const ABOUT_SUBHEAD = `Messy workflows, edge cases, and systems that don't scale — that's where design actually matters.`;
+const ABOUT_SHORT = `I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. Over 15+ years, I've led 0→1 products, built design systems, and partnered with product, engineering, and leadership to move strategy into real product outcomes.`;
 
 const ABOUT_LONG = [
   { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
@@ -847,6 +849,7 @@ const COMPANY_LOGOS = [
 
 const LogoCarousel = () => (
   <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '18px 0 40px' }}>
+    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', marginBottom: 14 }}>Built across startups, scaleups, and enterprise teams.</div>
     <div className="logo-carousel">
       <div className="logo-track">
         {[...COMPANY_LOGOS, ...COMPANY_LOGOS].map((logo, index) => {
@@ -879,8 +882,14 @@ const About = ({ onOpenDrawer }) => (
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 760 }}>
-          <p style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-medium)', letterSpacing: '-0.02em', color: 'var(--fg-primary)', margin: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 760 }}>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+            {ABOUT_HEADER}
+          </h2>
+          <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0 }}>
+            {ABOUT_SUBHEAD}
+          </p>
+          <p style={{ fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>
             {ABOUT_SHORT}
           </p>
           <button onClick={onOpenDrawer} style={{
@@ -1220,9 +1229,14 @@ const Work = ({ onOpenDrawer }) => {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
           </div>
-          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0, maxWidth: 760 }}>
-            A decade of systems work — <span style={{ color: 'var(--fg-tertiary)' }}>across fintech, healthcare, and enterprise.</span>
-          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+              Selected work. <span style={{ color: 'var(--fg-tertiary)' }}>Real systems. Measurable impact.</span>
+            </h2>
+            <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
+              A few examples of turning messy operations into clear, scalable product experiences.
+            </p>
+          </div>
         </Reveal>
 
         <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-8)', marginBottom: 32 }}>
@@ -1809,10 +1823,10 @@ const FAQ = ({ scrollToSection }) => {
               <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
             </div>
             <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-              Questions founders and design leaders usually ask
+              Questions founders and hiring teams usually ask.
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              A quick read on how I work, where I fit, and the kinds of product problems I solve best.
+              Quick answers on how I work, where I add value, and what kind of products I'm best suited for.
             </p>
           </div>
           <a href="#contact" onClick={(event) => {
