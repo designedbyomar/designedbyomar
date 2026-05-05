@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, Sun, X, Sparkles, Target, Rocket, NotebookPen } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, Sun, X, Sparkles, Target, Rocket, NotebookPen } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 
@@ -9,7 +9,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
   return (
     <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 36, height: 36, borderRadius: 9999, background: 'transparent',
+      width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 9999, background: 'transparent',
       color: 'var(--fg-primary)', border: 'none',
       boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms',
     }}
@@ -23,7 +23,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
 
 const Header = ({ theme, setTheme }) => (
   <header style={{ padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: 1200, margin: '0 auto' }}>
-    <a href="index.html" style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500, textDecoration: 'none', color: 'var(--fg-primary)' }}>
+    <a href="index.html" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500, textDecoration: 'none', color: 'var(--fg-primary)' }}>
       ← Back to Site
     </a>
     <ThemeToggle theme={theme} setTheme={setTheme} />
@@ -463,6 +463,181 @@ const DesignSystemContactCard = ({ label, value, copyValue }) => {
       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
       <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
     </a>
+  );
+};
+
+const DesignSystemFAQAccordion = () => {
+  const [openIndex, setOpenIndex] = React.useState(-1);
+  const [showAllQuestions, setShowAllQuestions] = React.useState(false);
+  const items = [
+    {
+      question: 'What kind of product designer is Omar?',
+      answer: 'I am a principal product designer for complex B2B products, AI workflows, enterprise systems, fintech, healthcare SaaS, and design systems.',
+    },
+    {
+      question: 'How does Omar approach design systems?',
+      answer: 'I treat design systems as product infrastructure: reusable foundations that improve consistency, engineering alignment, speed, governance, and long-term quality.',
+    },
+    {
+      question: 'What is Omar’s experience with AI and healthcare SaaS?',
+      answer: 'At Wisdom, I designed AI-assisted dental operations workflows, management tools, and operational systems for scale.',
+    },
+    {
+      question: 'What is Omar’s experience with fintech and embedded payments?',
+      answer: 'At Plastiq, I led 0 to 1 design for embedded payments and API workflows supporting meaningful payment volume.',
+    },
+    {
+      question: 'What enterprise product experience does Omar have?',
+      answer: 'At Disney, I designed workflow and communication tools for large cross-brand media teams.',
+    },
+    {
+      question: 'How does Omar work with founders and engineers?',
+      answer: 'I clarify ambiguous ideas, map workflows, prototype quickly, document edge cases, and partner with engineering early enough to ship.',
+    },
+    {
+      question: 'What business outcomes has Omar influenced?',
+      answer: 'My work has contributed to faster workflows, stronger adoption, reduced operational drag, and clearer product foundations.',
+    },
+  ];
+  const defaultVisibleIndices = [0, 1, 2, 3, 4, 5];
+  const visibleItems = showAllQuestions
+    ? items.map((item, index) => ({ item, index }))
+    : defaultVisibleIndices.map(index => ({ item: items[index], index }));
+  const toggleQuestionVisibility = () => {
+    setShowAllQuestions(showingAll => {
+      const nextShowingAll = !showingAll;
+      if (!nextShowingAll && !defaultVisibleIndices.includes(openIndex)) setOpenIndex(-1);
+      return nextShowingAll;
+    });
+  };
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+      gap: 32,
+      alignItems: 'start',
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
+        </div>
+        <h3 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 0.98, letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+          Questions founders and design leaders usually ask
+        </h3>
+        <p style={{ fontSize: 16, lineHeight: 1.65, color: 'var(--fg-secondary)', margin: 0 }}>
+          A quick read on how I work, where I fit, and the kinds of product problems I solve best.
+        </p>
+        <a href="#" style={{
+          alignSelf: 'flex-start',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 14,
+          fontWeight: 500,
+          color: 'var(--fg-primary)',
+          padding: '10px 14px',
+          minHeight: 44,
+          borderRadius: 6,
+          background: 'transparent',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+          textDecoration: 'none',
+        }}>
+          Start a conversation
+          <AppIcon icon={ArrowUpRight} size={12} />
+        </a>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+        {visibleItems.map(({ item, index }) => {
+          const isOpen = openIndex === index;
+          const answerId = `ds-faq-answer-${index}`;
+          const buttonId = `ds-faq-question-${index}`;
+          return (
+            <div
+              key={item.question}
+              className={`faq-item${isOpen ? ' is-open' : ''}`}
+              style={{
+                borderRadius: 8,
+                boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
+                transition: 'box-shadow 180ms ease, transform 180ms ease',
+              }}
+            >
+              <button
+                id={buttonId}
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={answerId}
+                onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                style={{
+                  width: '100%',
+                  minHeight: 60,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 16,
+                  padding: '18px 20px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--fg-primary)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  fontFamily: 'inherit',
+                }}
+              >
+                <span style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  lineHeight: 1.25,
+                  color: isOpen ? 'var(--fg-primary)' : 'var(--fg-secondary)',
+                  transition: 'color 180ms ease',
+                }}>
+                  {item.question}
+                </span>
+                <AppIcon icon={ChevronDown} size={17} style={{
+                  flexShrink: 0,
+                  color: isOpen ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
+                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 180ms ease, color 180ms ease',
+                }} />
+              </button>
+              <div
+                id={answerId}
+                role="region"
+                aria-labelledby={buttonId}
+                className="faq-answer"
+                style={{
+                  maxHeight: isOpen ? 180 : 0,
+                  opacity: isOpen ? 1 : 0,
+                  overflow: 'hidden',
+                  transition: 'max-height 240ms ease, opacity 180ms ease',
+                }}
+              >
+                <p style={{
+                  margin: 0,
+                  padding: '0 20px 20px',
+                  fontSize: 15,
+                  lineHeight: 1.65,
+                  color: 'var(--fg-secondary)',
+                  maxWidth: 680,
+                }}>
+                  {item.answer}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+        <button
+          type="button"
+          aria-expanded={showAllQuestions}
+          className="text-link faq-view-all-link"
+          onClick={() => toggleQuestionVisibility()}
+        >
+          {showAllQuestions ? 'Show fewer questions' : 'View all questions'}
+          <AppIcon icon={ChevronDown} size={14} style={{ transform: showAllQuestions ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+        </button>
+      </div>
+    </div>
   );
 };
 
@@ -969,6 +1144,7 @@ const DesignSystem = () => {
 {`{
   WORK: 'Work',
   ABOUT: 'About',
+  FAQ: 'FAQ',
   CONTACT: 'Contact'
 }`}
               </pre>
@@ -1014,6 +1190,8 @@ const DesignSystem = () => {
   TOP: 'top',
   WORK: 'work',
   ABOUT: 'about',
+  AT_A_GLANCE: 'at-a-glance',
+  FAQ: 'faq',
   CONTACT: 'contact'
 }`}
               </pre>
@@ -1046,7 +1224,7 @@ const DesignSystem = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
                 <button style={{
                   background: 'var(--fg-primary)', color: 'var(--bg-page)',
-                  padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
+                  minHeight: 44, padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
                   border: 'none', cursor: 'pointer', transition: 'opacity 150ms', fontFamily: 'inherit'
                 }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
                   Primary Action
@@ -1054,11 +1232,24 @@ const DesignSystem = () => {
 
                 <button style={{
                   background: 'transparent', color: 'var(--fg-primary)',
-                  padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
+                  minHeight: 44, padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
                   border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms', fontFamily: 'inherit'
                 }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   Secondary Action
                 </button>
+
+                <button style={{
+                  background: 'transparent', color: 'var(--fg-primary)',
+                  minHeight: 44, padding: '10px 16px', borderRadius: 6, fontSize: 14, fontWeight: 500,
+                  border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background 150ms', fontFamily: 'inherit'
+                }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  Read more about me
+                </button>
+
+                <a href="#" className="text-link" onClick={(event) => event.preventDefault()}>
+                  Text link
+                  <AppIcon icon={ArrowUpRight} size={12} />
+                </a>
 
                 <div style={{
                   background: theme === 'dark' ? 'rgba(50, 145, 255, 0.15)' : '#ebf5ff',
@@ -1067,6 +1258,9 @@ const DesignSystem = () => {
                 }}>
                   Status Pill
                 </div>
+              </div>
+              <div style={{ marginTop: 16, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                Primary and secondary action buttons use a 44px minimum height. Drawer-opening actions like Read more about me use the secondary button pattern. Shared text links use the <code>.text-link</code> class: fg-secondary text, fg-primary hover, and a 4px horizontal shift. Footer links and FAQ view-all use this treatment.
               </div>
             </div>
 
@@ -1096,6 +1290,17 @@ const DesignSystem = () => {
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
                   Card click opens the destination, top-right icon copies when present. Border treatment remains the same: conic-gradient cycles ship-red → preview-pink → develop-blue · 3s linear · border-only via ::before (inset −1.5px) + ::after cover (inset 0) + foreground content at z-index 2.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Accordion */}
+            <div>
+              <div className="mono-label">FAQ Accordion — Animated Disclosure</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 16 }}>
+                <DesignSystemFAQAccordion />
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
+                  Disclosure rows use a quiet bg-subtle surface on hover. Open rows keep bg-subtle plus a light token-based outline. View all is a <code>.text-link</code> disclosure control with aria-expanded; preserve labelled answer regions.
                 </div>
               </div>
             </div>

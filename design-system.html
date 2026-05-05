@@ -54,6 +54,12 @@
   --layout-2: 64px;
   --layout-3: 96px;
   --layout-4: 120px;
+
+  /* Shared primitive tokens used by reference classes */
+  --font-size-body-md: 14px;
+  --font-weight-medium: 500;
+  --line-height-medium: 1.4;
+  --duration-fast-mid: 160ms;
 }
 
 [data-theme="dark"] {
@@ -94,6 +100,31 @@ html, body {
 body { transition: background 320ms ease, color 320ms ease; }
 a { color: inherit; }
 ::selection { background: var(--fg-primary); color: var(--bg-page); }
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  font-family: inherit;
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-medium);
+  color: var(--fg-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease;
+}
+.text-link:hover {
+  color: var(--fg-primary);
+  transform: translateX(4px);
+}
+.faq-view-all-link {
+  align-self: flex-start;
+}
 
 /* Typography Globals */
 .tnum { font-feature-settings: "tnum" 1, "liga" 1; }
@@ -165,17 +196,39 @@ a { color: inherit; }
 }
 .contact-card:hover::before { opacity: 1; }
 
+.faq-item {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg-page);
+  transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+.faq-item:hover,
+.faq-item.is-open {
+  background: var(--bg-subtle);
+}
+.faq-item:hover {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card::before {
+    animation: none !important;
+  }
+  .faq-item,
+  .faq-answer,
+  .faq-item svg,
+  .text-link {
+    transition: none !important;
+  }
+  .faq-item:hover {
+    transform: none;
+  }
+  .text-link:hover {
+    transform: none;
+  }
+}
+
 </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T7W0PFD3HD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', 'G-T7W0PFD3HD', { send_page_view: false });
-  gtag('config', 'GT-T56BGFG', { send_page_view: false });
-</script>
 </head>
 <body>
 <div id="root"></div>
