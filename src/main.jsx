@@ -10,12 +10,112 @@ import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
+const ANALYTICS_CONSENT_KEY = 'omar.analyticsConsent';
+const LEGACY_CONSENT_KEY = 'omar.consent';
+const ANALYTICS_ACCEPTED = 'accepted';
+const ANALYTICS_DECLINED = 'declined';
+const GA_SCRIPT_ID = 'omar-ga4-script';
+const GA_MEASUREMENT_IDS = ['G-T7W0PFD3HD', 'GT-T56BGFG'];
 
 if (SENTRY_ENABLED) {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: 'production',
   });
+}
+
+const getStoredAnalyticsConsent = () => {
+  if (typeof window !== 'undefined') {
+    const sessionConsent = window.__omarAnalyticsConsent;
+    if (sessionConsent === ANALYTICS_ACCEPTED || sessionConsent === ANALYTICS_DECLINED) return sessionConsent;
+  }
+
+  try {
+    const stored = localStorage.getItem(ANALYTICS_CONSENT_KEY);
+    if (stored === ANALYTICS_ACCEPTED || stored === ANALYTICS_DECLINED) {
+      if (typeof window !== 'undefined') window.__omarAnalyticsConsent = stored;
+      return stored;
+    }
+
+    if (localStorage.getItem(LEGACY_CONSENT_KEY) === 'true') {
+      localStorage.setItem(ANALYTICS_CONSENT_KEY, ANALYTICS_ACCEPTED);
+      localStorage.removeItem(LEGACY_CONSENT_KEY);
+      if (typeof window !== 'undefined') window.__omarAnalyticsConsent = ANALYTICS_ACCEPTED;
+      return ANALYTICS_ACCEPTED;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
+const storeAnalyticsConsent = (value) => {
+  if (typeof window !== 'undefined') window.__omarAnalyticsConsent = value;
+
+  try {
+    localStorage.setItem(ANALYTICS_CONSENT_KEY, value);
+    localStorage.removeItem(LEGACY_CONSENT_KEY);
+  } catch {
+    // Consent state still updates for this session through React state.
+  }
+};
+
+const hasAcceptedAnalytics = () => getStoredAnalyticsConsent() === ANALYTICS_ACCEPTED;
+
+const setupAnalyticsQueue = () => {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function gtag() {
+    window.dataLayer.push(arguments);
+  };
+};
+
+const configureGoogleAnalytics = () => {
+  setupAnalyticsQueue();
+  if (window.__omarGaConfigured) return;
+
+  window.gtag('js', new Date());
+  GA_MEASUREMENT_IDS.forEach((id) => {
+    window.gtag('config', id, { send_page_view: false });
+  });
+  window.__omarGaConfigured = true;
+};
+
+const loadGoogleAnalytics = () => {
+  if (typeof window === 'undefined') return Promise.resolve(false);
+  if (!hasAcceptedAnalytics()) return Promise.resolve(false);
+  if (window.__omarGaReady) return Promise.resolve(true);
+  if (window.__omarGaLoadPromise) return window.__omarGaLoadPromise;
+
+  window.__omarGaLoadPromise = new Promise((resolve) => {
+    configureGoogleAnalytics();
+
+    if (document.getElementById(GA_SCRIPT_ID)) {
+      window.__omarGaReady = true;
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = GA_SCRIPT_ID;
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_IDS[0]}`;
+    script.onload = () => {
+      window.__omarGaReady = true;
+      resolve(true);
+    };
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
+  });
+
+  return window.__omarGaLoadPromise;
+};
+
+if (typeof window !== 'undefined') {
+  window.trackAnalyticsEvent = (eventName, params) => {
+    if (!hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
+    window.gtag('event', eventName, params);
+  };
 }
 
 // ============================================================
@@ -2054,41 +2154,137 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
 // ============================================================
 // Privacy Policy Page
 // ============================================================
-const PrivacyPolicyPage = ({ theme, onBack }) => (
-  <div style={{ maxWidth: 800, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
-    <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
-      display: 'inline-flex', alignItems: 'center', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)', textDecoration: 'none', marginBottom: 48
-    }}>← Back to home</a>
-    <h1 style={{ fontSize: 'var(--font-size-display-sm)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.03em', color: 'var(--fg-primary)', marginBottom: 32 }}>Privacy Policy</h1>
+const PrivacyPolicyPage = ({ onBack }) => {
+  const sectionHeadingStyle = {
+    fontSize: 'var(--font-size-heading-md)',
+    fontWeight: 'var(--font-weight-semibold)',
+    color: 'var(--fg-primary)',
+    margin: 'var(--space-5) 0 0',
+  };
+  const listStyle = {
+    margin: 0,
+    paddingLeft: '1.2em',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-2)',
+  };
+  const privacyLinkStyle = {
+    color: 'var(--fg-primary)',
+    fontWeight: 'var(--font-weight-medium)',
+    textDecoration: 'underline',
+    textUnderlineOffset: '3px',
+  };
 
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-body-xl)' }}>
-      <p>Last updated: April 2026</p>
+  return (
+    <div style={{ maxWidth: 820, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
+      <a href="#" className="text-link" onClick={(e) => { e.preventDefault(); onBack(); }} style={{ marginBottom: 48 }}>← Back to home</a>
+      <div style={{ marginBottom: 40 }}>
+        <h1 style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-4)' }}>Privacy Policy</h1>
+        <p style={{ fontSize: 'var(--font-size-heading-lg)', lineHeight: 'var(--line-height-snug-plus)', color: 'var(--fg-secondary)', margin: 0 }}>No creepy tracking</p>
+      </div>
 
-      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>1. Data Collection</h2>
-      <p>This website ("designedbyomar.com") uses Google Analytics 4 to collect basic, anonymized telemetry data such as page views, scroll depth, and interaction events (like theme toggling or external link clicks). This helps me understand which case studies are resonating and improve the overall portfolio experience.</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-body-xl)' }}>
+        <p style={{ margin: 0 }}>Last updated: May 4, 2026</p>
 
-      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>2. Cookies</h2>
-      <p>Google Analytics utilizes cookies to distinguish unique users and sessions. By continuing to use this site, you consent to the use of these tracking mechanisms unless you have disabled cookies in your browser or are using privacy-enhancing browser extensions.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <p style={{ margin: 0 }}>This site uses a very small amount of analytics to understand what people look at, what pages are useful, and where the experience can be improved.</p>
+          <ul style={listStyle}>
+            <li>No ads.</li>
+            <li>No selling data.</li>
+            <li>No tracking you across the internet.</li>
+            <li>No weird stuff.</li>
+          </ul>
+          <p style={{ margin: 0 }}>The analytics are only here to help make the site better.</p>
+        </div>
 
-      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>3. Third-party Links</h2>
-      <p>This site contains links to other websites, including LinkedIn, GitHub, and Substack. Please be aware that I am not responsible for the privacy practices of such other sites. I encourage users to be aware when they leave my site and to read the privacy statements of any other site that collects personally identifiable information.</p>
+        <h2 style={sectionHeadingStyle}>Cookies</h2>
+        <p style={{ margin: 0 }}>This site may use cookies or similar technologies for analytics. When you visit the site, you may see a cookie banner that lets you choose whether to allow analytics cookies. If you decline, analytics will not run and the site will still work normally.</p>
+        <p style={{ margin: 0 }}>You can change your choice at any time by clearing cookies or site data in your browser, or by adjusting your browser privacy settings.</p>
 
-      <h2 style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--fg-primary)', marginTop: 16 }}>4. Contact</h2>
-      <p>For any questions regarding this policy, please reach out to <a href="mailto:omar@designedbyomar.com" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none' }}>omar@designedbyomar.com</a>.</p>
+        <h2 style={sectionHeadingStyle}>Analytics</h2>
+        <p style={{ margin: 0 }}>This site uses Google Analytics 4, Vercel Analytics, and Vercel Speed Insights to understand how people interact with the site, including things like:</p>
+        <ul style={listStyle}>
+          <li>which pages are visited</li>
+          <li>what links or sections people engage with</li>
+          <li>how long people stay</li>
+          <li>what devices or browsers are being used</li>
+          <li>general location, such as country or city-level information</li>
+        </ul>
+        <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
+
+        <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
+        <p style={{ margin: 0 }}>Google Analytics 4 helps measure site activity and performance. GA4 may use cookies to collect analytics information after you accept analytics. This data is processed by Google on my behalf and may be stored or processed in locations outside your country, depending on Google's systems and infrastructure.</p>
+        <p style={{ margin: 0 }}>Google provides controls and safeguards for analytics data, including data retention settings and privacy-focused measurement options.</p>
+
+        <h2 style={sectionHeadingStyle}>Vercel Analytics And Speed Insights</h2>
+        <p style={{ margin: 0 }}>Vercel Analytics and Speed Insights help measure basic site performance and visitor behavior, such as page views, referrers, browser type, device information, and real-world performance metrics.</p>
+        <p style={{ margin: 0 }}>They are used to understand how the site performs in the real world and to make improvements to speed, usability, and content.</p>
+
+        <h2 style={sectionHeadingStyle}>Sentry Error Monitoring</h2>
+        <p style={{ margin: 0 }}>This site may use Sentry for production error monitoring. Sentry helps identify broken pages, JavaScript errors, browser context, route information, and theme state when something fails.</p>
+        <p style={{ margin: 0 }}>Sentry is used to debug production issues and keep the site working. It is not used for advertising, profiling, or retargeting.</p>
+
+        <h2 style={sectionHeadingStyle}>Contact</h2>
+        <p style={{ margin: 0 }}>If you contact me through an email link or any other method on this site, I collect the information you choose to share, such as your name, email address, company, and message.</p>
+        <p style={{ margin: 0 }}>That information is only used to respond to your inquiry and any related follow-up. I do not sell or share contact messages with advertisers. Messages may be stored in my email inbox or related communication tools for as long as needed to manage the conversation.</p>
+
+        <h2 style={sectionHeadingStyle}>Legal Basis</h2>
+        <p style={{ margin: 0 }}>Where required by privacy laws, analytics cookies are used based on your consent. Contact messages are processed based on legitimate interest: responding to people who reach out about work, services, collaboration, hiring, or general inquiries.</p>
+
+        <h2 style={sectionHeadingStyle}>Sharing And Selling Data</h2>
+        <p style={{ margin: 0 }}>I do not sell your personal data. I do not share your personal data with advertisers. The third-party services currently used for analytics, performance measurement, and error monitoring are Google Analytics 4, Vercel Analytics, Vercel Speed Insights, and Sentry.</p>
+
+        <h2 style={sectionHeadingStyle}>Your Rights</h2>
+        <p style={{ margin: 0 }}>Depending on where you live, you may have the right to request access to, correction of, or deletion of personal information connected to you. To make a request, contact me at <a href="mailto:omar@designedbyomar.com" style={privacyLinkStyle}>omar@designedbyomar.com</a>.</p>
+
+        <h2 style={sectionHeadingStyle}>Updates</h2>
+        <p style={{ margin: 0 }}>This policy may be updated occasionally as the site changes or as tools are added or removed. The latest version will always be available on this page.</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ============================================================
 // Cookie Banner
 // ============================================================
-const CookieBanner = ({ onAccept, onPrivacy }) => {
+const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
+  const viewportWidth = useViewportWidth();
   const [isVisible, setIsVisible] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  const isNarrow = viewportWidth <= 640;
 
   React.useEffect(() => {
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return undefined;
+    }
     const timer = setTimeout(() => setIsVisible(true), 1200);
     return () => clearTimeout(timer);
+  }, [prefersReducedMotion]);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (event) => setPrefersReducedMotion(event.matches);
+    mediaQuery.addEventListener?.('change', onChange);
+    return () => mediaQuery.removeEventListener?.('change', onChange);
   }, []);
+
+  const baseButtonStyle = {
+    minHeight: 44,
+    padding: '10px 16px',
+    borderRadius: 'var(--radius-comfort)',
+    fontSize: 'var(--font-size-body-xs)',
+    fontWeight: 'var(--font-weight-semibold)',
+    border: 'none',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    fontFamily: 'inherit',
+    transition: prefersReducedMotion ? 'none' : 'transform var(--duration-fast) ease, opacity var(--duration-fast) ease, background var(--duration-fast) ease',
+  };
 
   return (
     <div style={{
@@ -2111,37 +2307,54 @@ const CookieBanner = ({ onAccept, onPrivacy }) => {
         borderRadius: 'var(--radius-xl)',
         padding: '18px 24px',
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: isNarrow ? 'column' : 'row',
+        alignItems: isNarrow ? 'flex-start' : 'center',
         justifyContent: 'space-between',
-        gap: 'var(--space-6)',
+        gap: isNarrow ? 'var(--space-4)' : 'var(--space-6)',
         pointerEvents: 'auto',
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateY(0)' : 'translateY(24px) scale(0.98)',
-        transition: 'all var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1)',
+        transform: prefersReducedMotion || isVisible ? 'none' : 'translateY(24px) scale(0.98)',
+        transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1), transform var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1)',
         border: '1px solid var(--color-gray-100)',
       }}>
         <p style={{ fontSize: 'var(--font-size-body-md)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed)', margin: 0 }}>
-          I use cookies to understand how you interact with my work. Learn more in the <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>.
+          This site uses simple analytics cookies to improve the experience. No ads, no creepy tracking, no selling your data. <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>
         </p>
-        <button 
-          onClick={onAccept}
-          style={{
-            background: 'var(--fg-primary)',
-            color: 'var(--bg-page)',
-            padding: '9px 18px',
-            borderRadius: 'var(--radius-comfort)',
-            fontSize: 'var(--font-size-body-xs)',
-            fontWeight: 'var(--font-weight-semibold)',
-            border: 'none',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'transform var(--duration-fast) ease, opacity var(--duration-fast) ease'
-          }}
-          onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'scale(1.02)'; }}
-          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
-        >
-          Accept
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: isNarrow ? 'flex-end' : 'center', gap: 'var(--space-3)', width: isNarrow ? '100%' : 'auto' }}>
+          <button
+            type="button"
+            onClick={onDecline}
+            style={{
+              ...baseButtonStyle,
+              background: 'transparent',
+              color: 'var(--fg-primary)',
+              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            Decline
+          </button>
+          <button
+            type="button"
+            onClick={onAccept}
+            style={{
+              ...baseButtonStyle,
+              background: 'var(--fg-primary)',
+              color: 'var(--bg-page)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.opacity = '0.9';
+              if (!prefersReducedMotion) e.currentTarget.style.transform = 'scale(1.02)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            Accept
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -2325,7 +2538,7 @@ const syncRouteHead = (meta) => {
 };
 
 const trackPageView = (meta, route, currentCase) => {
-  if (typeof window.gtag !== 'function') return;
+  if (!hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
 
   window.gtag('event', 'page_view', {
     page_title: meta.title,
@@ -2456,21 +2669,20 @@ const App = () => {
     }
   });
 
-  const [cookieConsent, setCookieConsent] = React.useState(() => {
-    try {
-      return localStorage.getItem('omar.consent') === 'true';
-    } catch {
-      return true; // Default to true if storage fails to avoid annoying users
-    }
-  });
+  const [analyticsConsent, setAnalyticsConsent] = React.useState(() => getStoredAnalyticsConsent());
+  const [analyticsReady, setAnalyticsReady] = React.useState(false);
+  const analyticsAccepted = analyticsConsent === ANALYTICS_ACCEPTED;
+  const showCookieBanner = analyticsConsent === null;
 
   const handleAcceptCookies = () => {
-    try {
-      localStorage.setItem('omar.consent', 'true');
-      setCookieConsent(true);
-    } catch (e) {
-      setCookieConsent(true);
-    }
+    storeAnalyticsConsent(ANALYTICS_ACCEPTED);
+    setAnalyticsConsent(ANALYTICS_ACCEPTED);
+  };
+
+  const handleDeclineCookies = () => {
+    storeAnalyticsConsent(ANALYTICS_DECLINED);
+    setAnalyticsConsent(ANALYTICS_DECLINED);
+    setAnalyticsReady(false);
   };
 
   const showPrivacy = () => {
@@ -2522,8 +2734,29 @@ const App = () => {
     const meta = getRouteMeta(route, currentCase);
     syncRouteHead(meta);
     syncStructuredData(route, currentCase);
-    trackPageView(meta, route, currentCase);
   }, [route, currentCase]);
+
+  React.useEffect(() => {
+    if (!analyticsAccepted) {
+      setAnalyticsReady(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    loadGoogleAnalytics().then((ready) => {
+      if (!cancelled) setAnalyticsReady(Boolean(ready));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [analyticsAccepted]);
+
+  React.useEffect(() => {
+    if (!analyticsAccepted || !analyticsReady) return;
+    const meta = getRouteMeta(route, currentCase);
+    trackPageView(meta, route, currentCase);
+  }, [route, currentCase, analyticsAccepted, analyticsReady]);
 
   React.useEffect(() => {
     syncSentryContext(route, currentCase, theme);
@@ -2702,7 +2935,13 @@ const App = () => {
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />
-      {!cookieConsent && <CookieBanner onAccept={handleAcceptCookies} onPrivacy={showPrivacy} />}
+      {showCookieBanner && <CookieBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} onPrivacy={showPrivacy} />}
+      {analyticsAccepted && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )}
     </>
   );
 };
@@ -2712,7 +2951,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Sentry.ErrorBoundary fallback={<AppShellErrorFallback />}>
       <App />
     </Sentry.ErrorBoundary>
-    <SpeedInsights />
-    <Analytics />
   </>
 );
