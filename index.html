@@ -40,7 +40,7 @@
     gtag('event', eventName, params);
   };
 </script>
-<script type="application/ld+json">
+<script id="structured-data" type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
@@ -68,6 +68,91 @@
         "Fintech",
         "Healthcare SaaS",
         "Enterprise UX"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What kind of product designer is Omar?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "I am a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. I work across strategy, research, UX architecture, prototyping, UI systems, and launch execution."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What types of companies is Omar best suited for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "I am strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Omar more of a design leader or an individual contributor?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Both. I operate at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What kinds of problems should a team bring Omar in to solve?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bring me in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. My work is especially useful when teams need senior design judgment and hands-on execution at the same time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Omar’s experience with AI and healthcare SaaS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. The work helped reduce manual posting time by about 40%, replace 200+ spreadsheets, and support growth from 260 to 900+ offices."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Omar’s experience with fintech and embedded payments?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At Plastiq, I led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What enterprise product experience does Omar have?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At Disney, I designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Omar approach design systems?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "I treat design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, I co-led Athena Design System 2.0."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Omar work with founders and engineers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "I move between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What business outcomes has Omar influenced?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions, 200+ spreadsheets replaced, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications."
+          }
+        }
       ]
     }
   ]
@@ -293,6 +378,26 @@ body { transition: background 320ms ease, color 320ms ease; }
 a { color: inherit; }
 ::selection { background: var(--fg-primary); color: var(--bg-page); }
 
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-medium);
+  color: var(--fg-secondary);
+  text-decoration: none;
+  transition: color var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease;
+}
+.text-link:hover {
+  color: var(--fg-primary);
+  transform: translateX(4px);
+}
+.faq-view-all-link {
+  align-self: flex-start;
+}
+
 /* ACCESSIBILITY: KEYBOARD FOCUS */
 *:focus-visible {
   outline: 2px solid var(--color-develop-blue);
@@ -473,6 +578,20 @@ button:focus-visible, a:focus-visible {
 }
 .contact-card:hover::before { opacity: 1; }
 
+.faq-item {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg-page);
+  transition: background var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease, box-shadow var(--duration-fast-mid) ease;
+}
+.faq-item:hover,
+.faq-item.is-open {
+  background: var(--bg-subtle);
+}
+.faq-item:hover {
+  transform: translateY(-1px);
+}
+
 .case-card { transition: transform 220ms ease; }
 .case-card-media { isolation: isolate; }
 .case-card-screen {
@@ -574,7 +693,8 @@ button:focus-visible, a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .logo-loader path { animation: none; transform: translateY(0%); }
   .logo-track { animation: none; transform: translateX(0); }
-  .case-card, .case-card-screen, .case-card-line, .case-card-tag, .case-card-sheen, .hero-stat-card, .reveal { transition: none; }
+  .case-card, .case-card-screen, .case-card-line, .case-card-tag, .case-card-sheen, .hero-stat-card, .faq-item, .faq-answer, .faq-item svg, .text-link, .reveal { transition: none !important; }
+  .contact-card::before { animation: none !important; }
   .case-card:hover,
   .case-card:hover .case-card-screen,
   .case-card:hover .case-card-line,
@@ -585,6 +705,8 @@ button:focus-visible, a:focus-visible {
   .case-card:hover .case-card-sheen { opacity: 0; }
   .hero-stat-card,
   .hero-stat-card.is-visible { transform: none; }
+  .faq-item:hover { transform: none; }
+  .text-link:hover { transform: none; }
   .reveal,
   .reveal.is-visible { opacity: 1; transform: none; }
   @keyframes letterEnter { 0% { opacity: 0; transform: none; filter: none; } 100% { opacity: 1; transform: none; filter: none; } }

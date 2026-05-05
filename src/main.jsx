@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
@@ -504,7 +504,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
   return (
     <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 36, height: 36, borderRadius: 'var(--radius-circle)', background: 'transparent',
+      width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
       color: 'var(--fg-primary)', border: 'none',
       boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background var(--duration-fast)',
     }}
@@ -530,7 +530,7 @@ const NavLogo = ({ onClick }) => {
   return (
     <a href="#" onClick={onClick}
       onMouseEnter={() => setKey(k => k + 1)}
-      style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', cursor: 'pointer' }}
+      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer' }}
       aria-label="designedbyomar"
     >
       <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -569,9 +569,10 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
     e.preventDefault();
     e.stopPropagation();
     closeMobileMenu();
-    scrollToSection(id);
+    scrollToSection(id, isMobile ? 'mobile_nav' : 'nav');
   };
   const navLink = {
+    display: 'inline-flex', alignItems: 'center', minHeight: 44,
     fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)',
     textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 'var(--radius-standard)',
     transition: 'color var(--duration-fast), background var(--duration-fast)', cursor: 'pointer',
@@ -587,7 +588,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
     }}>
       <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-        <NavLogo onClick={(e) => { e.preventDefault(); onHome(); }} />
+        <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
             <a href="#work" onClick={goSection('work')} style={navLink}
@@ -598,6 +599,10 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >About</button>
+            <a href="#faq" onClick={goSection('faq')} style={navLink}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            >FAQ</a>
             <a href="#contact" onClick={goSection('contact')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
@@ -617,7 +622,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onClick={() => setIsMobileMenuOpen(open => !open)}
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 36, height: 36, borderRadius: 'var(--radius-circle)', background: 'transparent',
+                width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
                 color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
                 cursor: 'pointer', transition: 'background var(--duration-fast)',
               }}
@@ -628,6 +633,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             </button>
           ) : (
             <a href="#contact" onClick={goSection('contact')} style={{
+              display: 'inline-flex', alignItems: 'center', minHeight: 44,
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
               borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
             }}
@@ -646,9 +652,10 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
+              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44,
                 fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
                 borderRadius: 'var(--radius-comfort)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
               }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
@@ -688,10 +695,10 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 300% customer scaling • $20M+ workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work'); }} style={{
+        <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
-          textDecoration: 'none', transition: 'opacity var(--duration-fast)',
+          minHeight: 44, textDecoration: 'none', transition: 'opacity var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -699,10 +706,10 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           View case studies
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
-        <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact'); }} style={{
+        <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'transparent',
-          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
+          minHeight: 44, boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -779,7 +786,7 @@ const About = ({ onOpenDrawer }) => (
           <button onClick={onOpenDrawer} style={{
             alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -845,6 +852,7 @@ const CASE_STUDIES = [
     title: 'Management Portal',
     subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.',
     coverImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp',
+    ogImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp',
     role: 'Lead Product Designer — Strategy & UX Architecture',
     tags: ['B2B SaaS', 'Systems Design', '0→1', 'AI'],
     metrics: [
@@ -863,6 +871,7 @@ const CASE_STUDIES = [
     title: 'Posting Assistant',
     subtitle: 'AI-assisted insurance payment posting workflow that kept specialists in control.',
     coverImage: '/Images/case-studies/posting-asst/cover.webp',
+    ogImage: '/Images/case-studies/posting-asst/cover.webp',
     role: 'Lead Product Designer',
     tags: ['AI Workflow', 'Research', 'Healthcare SaaS'],
     metrics: [
@@ -899,6 +908,7 @@ const CASE_STUDIES = [
     title: 'Connect API Payments',
     subtitle: 'PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.',
     coverImage: '/Images/case-studies/connect-api/cover.webp',
+    ogImage: '/Images/case-studies/connect-api/cover.webp',
     role: 'Lead Product Designer',
     tags: ['Fintech', 'API', 'Developer Experience', 'B2B'],
     metrics: [
@@ -917,6 +927,7 @@ const CASE_STUDIES = [
     title: 'Athena Design System 2.0',
     subtitle: 'Enterprise design system that became the foundation for Plastiq\'s IPO-era brand.',
     coverImage: '/Images/case-studies/athena-ds/cover.webp',
+    ogImage: '/Images/case-studies/athena-ds/cover.webp',
     role: 'Lead Product Designer — Visual, UX & Interaction Design',
     tags: ['Design System', 'Enterprise', 'Cross-functional'],
     metrics: [
@@ -935,6 +946,7 @@ const CASE_STUDIES = [
     title: 'Plastiq Marketing Site',
     subtitle: 'Pre-IPO brand relaunch delivered WCAG-compliant in 3–4 weeks.',
     coverImage: '/Images/case-studies/plastiq-mktg/cover.webp',
+    ogImage: '/Images/case-studies/plastiq-mktg/cover.webp',
     role: 'Lead Product Designer — IA, Interaction, Creative Strategy, Brand',
     tags: ['Brand', 'Website', 'Cross-functional', 'WCAG'],
     metrics: [
@@ -953,6 +965,7 @@ const CASE_STUDIES = [
     title: 'Critical Communication Tool',
     subtitle: 'Enterprise subscription manager used to coordinate 250 critical incidents.',
     coverImage: '/Images/case-studies/disney-cct/cover.webp',
+    ogImage: '/Images/case-studies/disney-cct/cover.webp',
     role: 'Lead Senior UX Designer',
     tags: ['Enterprise', 'Accessibility', 'Mobile-first', 'Scalable'],
     metrics: [
@@ -1126,7 +1139,7 @@ const Work = ({ onOpenDrawer }) => {
           <button onClick={onOpenDrawer} style={{
             display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -1476,7 +1489,7 @@ const KeyFacts = () => {
       </svg>
       <section
       ref={sectionRef}
-      id="facts"
+      id="at-a-glance"
       className="facts-section"
       onMouseMove={handleMouseMove}
       style={{
@@ -1565,6 +1578,256 @@ const KeyFacts = () => {
   );
 };
 
+const FAQ_ITEMS = [
+  {
+    question: 'What kind of product designer is Omar?',
+    answer: 'I am a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. I work across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
+  },
+  {
+    question: 'What types of companies is Omar best suited for?',
+    answer: 'I am strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
+  },
+  {
+    question: 'Is Omar more of a design leader or an individual contributor?',
+    answer: 'Both. I operate at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
+  },
+  {
+    question: 'What kinds of problems should a team bring Omar in to solve?',
+    answer: 'Bring me in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. My work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
+  },
+  {
+    question: 'What is Omar’s experience with AI and healthcare SaaS?',
+    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. The work helped reduce manual posting time by about 40%, replace 200+ spreadsheets, and support growth from 260 to 900+ offices.',
+    links: [
+      { label: 'Posting Assistant', href: '/work/posting-asst/' },
+      { label: 'Management Portal', href: '/work/mgmt-portal/' },
+    ],
+  },
+  {
+    question: 'What is Omar’s experience with fintech and embedded payments?',
+    answer: 'At Plastiq, I led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
+    links: [
+      { label: 'Connect API Payments', href: '/work/connect-api/' },
+    ],
+  },
+  {
+    question: 'What enterprise product experience does Omar have?',
+    answer: 'At Disney, I designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
+    links: [
+      { label: 'Critical Communication Tool', href: '/work/disney-cct/' },
+      { label: 'Unified Ad Platform', href: '/work/disney-uap/' },
+    ],
+  },
+  {
+    question: 'How does Omar approach design systems?',
+    answer: 'I treat design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, I co-led Athena Design System 2.0.',
+    links: [
+      { label: 'Athena Design System 2.0', href: '/work/athena-ds/' },
+    ],
+  },
+  {
+    question: 'How does Omar work with founders and engineers?',
+    answer: 'I move between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
+  },
+  {
+    question: 'What business outcomes has Omar influenced?',
+    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions, 200+ spreadsheets replaced, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
+  },
+];
+
+const DEFAULT_VISIBLE_FAQ_INDICES = [0, 1, 2, 3, 4, 7];
+
+const FAQAnswer = ({ item }) => {
+  if (!item.links?.length) return item.answer;
+
+  const segments = item.answer.split(/(Posting Assistant|Management Portal|Connect API Payments|Critical Communication Tool|Unified Ad Platform|Athena Design System 2\.0)/g);
+  const linkByLabel = new Map(item.links.map(link => [link.label, link.href]));
+
+  return (
+    <>
+      {segments.map((segment, index) => {
+        const href = linkByLabel.get(segment);
+        if (!href) return <React.Fragment key={`${segment}-${index}`}>{segment}</React.Fragment>;
+        return (
+          <a key={segment} href={href} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+            {segment}
+          </a>
+        );
+      })}
+    </>
+  );
+};
+
+const FAQ = ({ scrollToSection }) => {
+  const viewportWidth = useViewportWidth();
+  const [openIndex, setOpenIndex] = React.useState(-1);
+  const [showAllQuestions, setShowAllQuestions] = React.useState(false);
+  const isStacked = viewportWidth <= TABLET_BREAKPOINT;
+  const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
+  const visibleFaqItems = showAllQuestions
+    ? FAQ_ITEMS.map((item, index) => ({ item, index }))
+    : DEFAULT_VISIBLE_FAQ_INDICES.map(index => ({ item: FAQ_ITEMS[index], index }));
+  const toggleQuestionVisibility = () => {
+    setShowAllQuestions(showingAll => {
+      const nextShowingAll = !showingAll;
+      if (!nextShowingAll && !DEFAULT_VISIBLE_FAQ_INDICES.includes(openIndex)) setOpenIndex(-1);
+      return nextShowingAll;
+    });
+  };
+
+  return (
+    <section id="faq" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6)' }}>
+      <Reveal className="faq-grid" variant="section" style={{
+        maxWidth: LAYOUT.MAX_WIDTH,
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: faqColumns,
+        gap: isStacked ? 'var(--space-8)' : 'var(--layout-2)',
+        alignItems: 'start',
+      }}>
+        <div style={{
+          position: isStacked ? 'relative' : 'sticky',
+          top: 96,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-6)',
+          maxWidth: isStacked ? 760 : 440,
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
+            </div>
+            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+              Questions founders and design leaders usually ask
+            </h2>
+            <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
+              A quick read on how I work, where I fit, and the kinds of product problems I solve best.
+            </p>
+          </div>
+          <a href="#contact" onClick={(event) => {
+            event.preventDefault();
+            scrollToSection('contact', 'faq_cta');
+          }} style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            minHeight: 44,
+            fontSize: 'var(--font-size-body-md)',
+            fontWeight: 'var(--font-weight-medium)',
+            color: 'var(--fg-primary)',
+            padding: '10px 16px',
+            borderRadius: 'var(--radius-standard)',
+            background: 'transparent',
+            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            textDecoration: 'none',
+            transition: 'background var(--duration-fast)',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            Start a conversation
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
+          {visibleFaqItems.map(({ item, index }) => {
+            const isOpen = openIndex === index;
+            const answerId = `faq-answer-${index}`;
+            const buttonId = `faq-question-${index}`;
+            return (
+              <div key={item.question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'} style={{
+                borderRadius: 'var(--radius-comfort)',
+                boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
+                transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
+              }}>
+                <button
+                  id={buttonId}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={answerId}
+                  onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                  style={{
+                    width: '100%',
+                    minHeight: 68,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 'var(--space-4)',
+                    padding: 'var(--space-5) var(--space-6)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--fg-primary)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <span style={{
+                    fontSize: 'var(--font-size-body-lg)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    lineHeight: 'var(--line-height-snug)',
+                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-secondary)',
+                    transition: 'color var(--duration-fast-mid) ease',
+                  }}>
+                    {item.question}
+                  </span>
+                  <AppIcon icon={ChevronDown} size={18} style={{
+                    flexShrink: 0,
+                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform var(--duration-fast-mid) ease, color var(--duration-fast-mid) ease',
+                  }} />
+                </button>
+                <div
+                  id={answerId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  className="faq-answer"
+                  style={{
+                    maxHeight: isOpen ? 520 : 0,
+                    opacity: isOpen ? 1 : 0,
+                    overflow: 'hidden',
+                    transition: 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
+                  }}
+                >
+                  <p style={{
+                    margin: 0,
+                    padding: '0 var(--space-6) var(--space-6)',
+                    fontSize: 'var(--font-size-body-lg)',
+                    lineHeight: 'var(--line-height-loose)',
+                    color: 'var(--fg-secondary)',
+                    maxWidth: 720,
+                  }}>
+                    <FAQAnswer item={item} />
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+          <a
+            href="#faq"
+            role="button"
+            aria-expanded={showAllQuestions}
+            className="text-link faq-view-all-link"
+            onClick={(event) => {
+              event.preventDefault();
+              toggleQuestionVisibility();
+            }}
+          >
+            {showAllQuestions ? 'Show fewer questions' : 'View all questions'}
+            <AppIcon icon={ChevronDown} size={14} style={{
+              transform: showAllQuestions ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform var(--duration-fast-mid) ease',
+            }} />
+          </a>
+        </div>
+      </Reveal>
+    </section>
+  );
+};
+
 const Contact = () => {
   const viewportWidth = useViewportWidth();
   const contactGridColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
@@ -1574,7 +1837,7 @@ const Contact = () => {
     <section id="contact" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6) var(--layout-3)' }}>
       <Reveal className="contact-grid" variant="section" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          <span style={{ color: 'var(--color-ship-red)' }}>04 — </span>Contact
+          <span style={{ color: 'var(--color-ship-red)' }}>05 — </span>Contact
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 820 }}>
           <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-secondary)', margin: 0 }}>
@@ -1631,40 +1894,10 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
   };
-  const footerLinkStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 'var(--space-2)',
-    width: 'fit-content',
-    fontSize: 'var(--font-size-body-md)',
-    fontWeight: 'var(--font-weight-medium)',
-    lineHeight: 'var(--line-height-medium)',
-    color: 'var(--fg-secondary)',
-    textDecoration: 'none',
-    transition: 'color var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
-  };
-  const footerButtonStyle = {
-    ...footerLinkStyle,
-    padding: 0,
-    background: 'transparent',
-    border: 'none',
-    fontFamily: 'inherit',
-    cursor: 'pointer',
-  };
-
-  const enhanceLink = (event, color = 'var(--fg-primary)') => {
-    event.currentTarget.style.color = color;
-    event.currentTarget.style.transform = 'translateX(4px)';
-  };
-
-  const resetLink = (event, color = 'var(--fg-secondary)') => {
-    event.currentTarget.style.color = color;
-    event.currentTarget.style.transform = 'translateX(0)';
-  };
 
   const goSection = (id) => (event) => {
     event.preventDefault();
-    scrollToSection(id);
+    scrollToSection(id, 'footer');
   };
 
   return (
@@ -1702,7 +1935,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
         <div className="site-footer-grid">
           <div className="site-footer-block site-footer-brand" style={{ gap: 'var(--space-8)' }}>
             <div style={{ display: 'inline-flex', width: 'fit-content' }}>
-              <NavLogo onClick={(event) => { event.preventDefault(); onHome(); }} />
+              <NavLogo onClick={(event) => { event.preventDefault(); trackSectionNavigation('top', 'footer_logo'); onHome(); }} />
             </div>
             <p style={{ maxWidth: 360, margin: 0, fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-tertiary)' }}>
               Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.
@@ -1727,52 +1960,44 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
 
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Site Links</span>
-            <button
-              type="button"
-              className="site-footer-link"
+            <a
+              href="#work"
+              className="text-link site-footer-link"
               onClick={goSection('work')}
-              style={footerButtonStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
             >
               Work
-            </button>
-            <button
-              type="button"
-              className="site-footer-link"
-              onClick={onOpenAbout}
-              style={footerButtonStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
+            </a>
+            <a
+              href="#about"
+              className="text-link site-footer-link"
+              onClick={goSection('about')}
             >
               About
-            </button>
+            </a>
+            <a
+              href="#faq"
+              className="text-link site-footer-link"
+              onClick={goSection('faq')}
+            >
+              FAQ
+            </a>
             <a
               href="#contact"
-              className="site-footer-link"
+              className="text-link site-footer-link"
               onClick={goSection('contact')}
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
             >
               Contact
             </a>
             <a
               href="/privacy"
-              className="site-footer-link"
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
+              className="text-link site-footer-link"
             >
               Privacy Policy
             </a>
             <a
               href="design-system.html"
-              className="site-footer-link"
+              className="text-link site-footer-link"
               aria-label="See Design System"
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
             >
               Design System
             </a>
@@ -1784,10 +2009,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               href="https://www.linkedin.com/in/omartavarez/"
               target="_blank"
               rel="noopener noreferrer"
-              className="site-footer-link"
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
+              className="text-link site-footer-link"
             >
               LinkedIn
             </a>
@@ -1795,10 +2017,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               href="https://github.com/designedbyomar"
               target="_blank"
               rel="noopener noreferrer"
-              className="site-footer-link"
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
+              className="text-link site-footer-link"
             >
               GitHub
             </a>
@@ -1806,10 +2025,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               href="https://substack.com/@designedbyomar"
               target="_blank"
               rel="noopener noreferrer"
-              className="site-footer-link"
-              style={footerLinkStyle}
-              onMouseEnter={(event) => enhanceLink(event)}
-              onMouseLeave={(event) => resetLink(event)}
+              className="text-link site-footer-link"
             >
               Substack
             </a>
@@ -1927,9 +2143,126 @@ const SITE_ORIGIN = 'https://designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
+const toAbsoluteUrl = (pathOrUrl) => {
+  if (!pathOrUrl) return DEFAULT_OG_IMAGE;
+  if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
+  return `${SITE_ORIGIN}${pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`}`;
+};
+
+const imageType = (imageUrl) => {
+  if (imageUrl.endsWith('.webp')) return 'image/webp';
+  if (imageUrl.endsWith('.jpg') || imageUrl.endsWith('.jpeg')) return 'image/jpeg';
+  return 'image/png';
+};
+
+const personSchema = {
+  '@type': 'Person',
+  name: 'Omar Tavarez',
+  url: `${SITE_ORIGIN}/`,
+  jobTitle: 'Product Designer',
+  email: 'mailto:omar@designedbyomar.com',
+  sameAs: [
+    'https://www.linkedin.com/in/omartavarez/',
+    'https://github.com/designedbyomar',
+    'https://substack.com/@designedbyomar',
+  ],
+  knowsAbout: [
+    'Product Design',
+    'Design Systems',
+    'AI Workflows',
+    'Fintech',
+    'Healthcare SaaS',
+    'Enterprise UX',
+  ],
+};
+
+const buildHomeStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      name: 'designedbyomar',
+      url: `${SITE_ORIGIN}/`,
+      description: 'Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
+    },
+    personSchema,
+    {
+      '@type': 'FAQPage',
+      mainEntity: FAQ_ITEMS.map(item => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+  ],
+});
+
+const buildRouteStructuredData = (route, currentCase) => {
+  if (currentCase) {
+    const url = `${SITE_ORIGIN}/work/${currentCase.id}/`;
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebPage',
+          name: `${currentCase.title} — Omar Tavarez`,
+          url,
+          description: currentCase.subtitle,
+          image: toAbsoluteUrl(currentCase.ogImage),
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'designedbyomar',
+            url: `${SITE_ORIGIN}/`,
+          },
+        },
+        {
+          '@type': 'CreativeWork',
+          name: currentCase.title,
+          url,
+          description: currentCase.subtitle,
+          creator: personSchema,
+          about: currentCase.tags,
+        },
+        personSchema,
+      ],
+    };
+  }
+
+  if (route.type === 'privacy') {
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebPage',
+          name: 'Privacy Policy — Omar Tavarez',
+          url: `${SITE_ORIGIN}/privacy`,
+          description: 'Privacy policy and data collection details for designedbyomar.com.',
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'designedbyomar',
+            url: `${SITE_ORIGIN}/`,
+          },
+        },
+        personSchema,
+      ],
+    };
+  }
+
+  return buildHomeStructuredData();
+};
+
 const setHeadValue = (selector, attribute, value) => {
   const element = document.head.querySelector(selector);
   if (element && value) element.setAttribute(attribute, value);
+};
+
+const syncStructuredData = (route, currentCase) => {
+  const script = document.head.querySelector('#structured-data') || document.head.querySelector('script[type="application/ld+json"]');
+  if (!script) return;
+  script.textContent = JSON.stringify(buildRouteStructuredData(route, currentCase), null, 2);
 };
 
 const getRouteMeta = (route, currentCase) => {
@@ -1939,6 +2272,8 @@ const getRouteMeta = (route, currentCase) => {
       description: 'Privacy policy and data collection details for designedbyomar.com.',
       url: `${SITE_ORIGIN}/privacy`,
       robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
     };
   }
 
@@ -1948,6 +2283,8 @@ const getRouteMeta = (route, currentCase) => {
       description: currentCase.subtitle,
       url: `${SITE_ORIGIN}/work/${currentCase.id}/`,
       robots: 'index,follow,max-image-preview:large',
+      image: toAbsoluteUrl(currentCase.ogImage),
+      imageType: imageType(toAbsoluteUrl(currentCase.ogImage)),
     };
   }
 
@@ -1956,6 +2293,8 @@ const getRouteMeta = (route, currentCase) => {
     description: 'Omar Tavarez is a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.',
     url: `${SITE_ORIGIN}/`,
     robots: 'index,follow,max-image-preview:large',
+    image: DEFAULT_OG_IMAGE,
+    imageType: imageType(DEFAULT_OG_IMAGE),
   };
 };
 
@@ -1967,10 +2306,11 @@ const syncRouteHead = (meta) => {
   setHeadValue('meta[property="og:title"]', 'content', meta.title);
   setHeadValue('meta[property="og:description"]', 'content', meta.description);
   setHeadValue('meta[property="og:url"]', 'content', meta.url);
-  setHeadValue('meta[property="og:image"]', 'content', DEFAULT_OG_IMAGE);
+  setHeadValue('meta[property="og:image"]', 'content', meta.image);
+  setHeadValue('meta[property="og:image:type"]', 'content', meta.imageType);
   setHeadValue('meta[name="twitter:title"]', 'content', meta.title);
   setHeadValue('meta[name="twitter:description"]', 'content', meta.description);
-  setHeadValue('meta[name="twitter:image"]', 'content', DEFAULT_OG_IMAGE);
+  setHeadValue('meta[name="twitter:image"]', 'content', meta.image);
 };
 
 const trackPageView = (meta, route, currentCase) => {
@@ -2072,6 +2412,24 @@ const instantScrollToTop = () => {
   root.style.scrollBehavior = previousScrollBehavior;
 };
 
+const SECTION_LABELS = {
+  top: 'Top',
+  about: 'About',
+  work: 'Work',
+  'at-a-glance': 'At a Glance',
+  faq: 'FAQ',
+  contact: 'Contact',
+};
+
+const trackSectionNavigation = (id, source) => {
+  if (!source || typeof window.trackAnalyticsEvent !== 'function') return;
+  window.trackAnalyticsEvent('section_navigation_click', {
+    section_id: id,
+    section_label: SECTION_LABELS[id] || id,
+    source,
+  });
+};
+
 // ============================================================
 // App
 // ============================================================
@@ -2152,6 +2510,7 @@ const App = () => {
   React.useEffect(() => {
     const meta = getRouteMeta(route, currentCase);
     syncRouteHead(meta);
+    syncStructuredData(route, currentCase);
     trackPageView(meta, route, currentCase);
   }, [route, currentCase]);
 
@@ -2167,6 +2526,8 @@ const App = () => {
     const paddingMap = {
       'about': 96,
       'work': 96,
+      'at-a-glance': 120,
+      'faq': 120,
       'contact': 120
     };
     const paddingTop = paddingMap[id] || 0;
@@ -2228,7 +2589,9 @@ const App = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id, source) => {
+    trackSectionNavigation(id, source);
+
     const performScroll = () => {
       scrollToSectionElement(id, 'smooth');
     };
@@ -2312,13 +2675,14 @@ const App = () => {
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
           ) : currentCase ? (
-            <CaseStudyPage c={currentCase} onBack={() => scrollToSection('work')} />
+            <CaseStudyPage c={currentCase} onBack={() => scrollToSection('work', 'case_back')} />
           ) : (
             <>
               <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />
               <About onOpenDrawer={() => setAboutOpen(true)} />
               <Work onOpenDrawer={() => setWorkOpen(true)} />
               <KeyFacts />
+              <FAQ scrollToSection={scrollToSection} />
               <Contact />
             </>
           )}
