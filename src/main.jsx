@@ -876,7 +876,7 @@ const LogoCarousel = () => (
 
 const About = ({ onOpenDrawer }) => (
   <>
-    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 24px' }}>
+    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 64px' }}>
       <div className="about-grid" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: LAYOUT.GRID_DESKTOP, gap: 'var(--layout-3)', alignItems: 'start' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
@@ -910,7 +910,7 @@ const About = ({ onOpenDrawer }) => (
               color: 'var(--fg-tertiary)',
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
-              marginTop: 'var(--space-2)'
+              marginTop: 'var(--space-8)'
             }}>
               Built across startups, scaleups, and enterprise teams.
             </div>
