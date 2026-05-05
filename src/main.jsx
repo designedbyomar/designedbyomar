@@ -825,7 +825,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
 // ============================================================
 const ABOUT_HEADER = `I work on the part most teams avoid.`;
 const ABOUT_SUBHEAD = `Messy workflows, edge cases, and systems that don't scale — that's where design actually matters.`;
-const ABOUT_SHORT = `I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. Over 15+ years, I've led 0→1 products, built design systems, and partnered with product, engineering, and leadership to move strategy into real product outcomes.`;
+const ABOUT_SHORT = `I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 15+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.`;
 
 const ABOUT_LONG = [
   { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
