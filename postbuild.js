@@ -70,6 +70,8 @@ const setMeta = (html, { title, description, url, image }) => {
   next = replaceTag(next, /<meta property="og:url" content=".*?">/, `<meta property="og:url" content="${escapedUrl}">`);
   next = replaceTag(next, /<meta property="og:image" content=".*?">/, `<meta property="og:image" content="${escapedImage}">`);
   next = replaceTag(next, /<meta property="og:image:type" content=".*?">/, `<meta property="og:image:type" content="${imageType(ogImage)}">`);
+  next = next.replace(/<meta property="og:image:width" content="[^"]*">\n?/, '');
+  next = next.replace(/<meta property="og:image:height" content="[^"]*">\n?/, '');
   next = replaceTag(next, /<meta name="twitter:title" content=".*?">/, `<meta name="twitter:title" content="${escapedTitle}">`);
   next = replaceTag(next, /<meta name="twitter:description" content=".*?">/, `<meta name="twitter:description" content="${escapedDescription}">`);
   next = replaceTag(next, /<meta name="twitter:image" content=".*?">/, `<meta name="twitter:image" content="${escapedImage}">`);
