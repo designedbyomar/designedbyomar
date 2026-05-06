@@ -1878,7 +1878,7 @@ const FAQ = ({ scrollToSection }) => {
           </a>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
+        <div id="faq-questions-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           {visibleFaqItems.map(({ item, index }) => {
             const isOpen = openIndex === index;
             const answerId = `faq-answer-${index}`;
@@ -1956,6 +1956,7 @@ const FAQ = ({ scrollToSection }) => {
           <button
             type="button"
             aria-expanded={showAllQuestions}
+            aria-controls="faq-questions-list"
             className="text-link faq-view-all-link"
             onClick={() => toggleQuestionVisibility()}
           >
