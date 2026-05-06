@@ -1798,9 +1798,17 @@ const FAQ = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
   const [openIndex, setOpenIndex] = React.useState(-1);
   const [showAllQuestions, setShowAllQuestions] = React.useState(false);
-  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  }, []);
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
   const visibleFaqItems = showAllQuestions
