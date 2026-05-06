@@ -1798,6 +1798,9 @@ const FAQ = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
   const [openIndex, setOpenIndex] = React.useState(-1);
   const [showAllQuestions, setShowAllQuestions] = React.useState(false);
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
   const visibleFaqItems = showAllQuestions
@@ -1876,7 +1879,7 @@ const FAQ = ({ scrollToSection }) => {
               <div key={item.question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'} style={{
                 borderRadius: 'var(--radius-comfort)',
                 boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
-                transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
+                transition: prefersReducedMotion ? 'none' : 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
               }}>
                 <button
                   id={buttonId}
@@ -1925,7 +1928,7 @@ const FAQ = ({ scrollToSection }) => {
                     maxHeight: isOpen ? 520 : 0,
                     opacity: isOpen ? 1 : 0,
                     overflow: 'hidden',
-                    transition: 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
+                    transition: prefersReducedMotion ? 'none' : 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
                   }}
                 >
                   <p style={{
