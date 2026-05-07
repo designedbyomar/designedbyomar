@@ -13,8 +13,9 @@ The point of this artifact is to be honest about that boundary.
 | ChatGPT | Strategy framing, copy direction, case-study messaging, repo critique |
 | Claude / Codex / similar | Implementation assistance — component scaffolding, refactors, regex transforms, postbuild route generation |
 | Figma | Source of truth for visual design, component specs, and design tokens before they land in code |
+| CodeRabbit / Greptile | External PR review passes for code quality, repo-specific risks, and missed regressions |
 | Sharp | Image optimization (`scripts/optimize-image.mjs`) |
-| Vercel Analytics / Speed Insights / Sentry | Production feedback — what real users hit, what's slow, what errors fire |
+| Google Analytics 4 / Vercel Analytics / Speed Insights / Sentry | Production feedback — what real users hit, what's useful, what's slow, what errors fire |
 
 ---
 
@@ -38,9 +39,10 @@ The point of this artifact is to be honest about that boundary.
 1. **Small PRs, scoped commits.** Recent history (gradient tokens, typography migration, spacing migration, hero copy refresh) is split across many small commits so each change is reviewable.
 2. **Token migrations done in phases.** Typography → motion → spacing → gradient — each phase is its own PR so I can verify visual diffs incrementally instead of one monster refactor.
 3. **Visual review on every diff.** Every UI-affecting PR is checked against the live site before merge. No "looks right in code" merges.
-4. **Production telemetry.** Sentry catches what made it through. Speed Insights flags performance regressions before they show up in Lighthouse.
-5. **Postbuild SEO verification.** After each build, `dist/work/*/index.html` is spot-checked to confirm canonical, OG, and JSON-LD are correctly templated per case study.
-6. **Reduced-motion + responsive checks.** The canvas / motion components honor `prefers-reduced-motion`; layout is reviewed at mobile, tablet, layout, and desktop breakpoints (see `LAYOUT` constants in [`src/constants.js`](../src/constants.js)).
+4. **External review passes.** CodeRabbit and Greptile review PRs for issues I may have missed, while human review still owns taste, scope, and final judgment.
+5. **Production telemetry.** GA4 and Vercel Analytics show which pages and interactions are useful. Speed Insights flags real-user performance regressions before they show up in Lighthouse. Sentry catches what made it through.
+6. **Postbuild SEO verification.** After each build, `dist/work/*/index.html` is spot-checked to confirm canonical, OG, and JSON-LD are correctly templated per case study.
+7. **Reduced-motion + responsive checks.** The canvas / motion components honor `prefers-reduced-motion`; layout is reviewed at mobile, tablet, layout, and desktop breakpoints (see `LAYOUT` constants in [`src/constants.js`](../src/constants.js)).
 
 ---
 

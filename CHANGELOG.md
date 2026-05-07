@@ -2,6 +2,17 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [1.1.1] - 2026-05-06
+
+### Fixed
+- Footer social links (LinkedIn, GitHub, Substack) now fire named GA4 events instead of generic `click`
+- At-a-glance section inline links (LinkedIn, Substack) now fire named GA4 events
+- Theme toggle `aria-label` and `title` updated to `Switch to light/dark mode` — communicates the action and improves accessibility
+
+### Changed
+- FAQ section header block gets extra bottom padding on mobile (`var(--space-4)`) for more breathing room above the CTA button when stacked
+- README and `docs/ai-workflow.md` updated to reflect full analytics stack (GA4 + Vercel Analytics + Speed Insights) and external code review tooling (CodeRabbit, Greptile)
+
 ## [1.1.0] - 2026-05-06
 
 ### Added

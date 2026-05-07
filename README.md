@@ -44,6 +44,7 @@ If you're a hiring manager or founder, the things to look at are:
 | Hosting | Vercel (canonical) |
 | Analytics | `@vercel/analytics`, `@vercel/speed-insights`, Google Analytics 4 (consent-gated) |
 | Error monitoring | `@sentry/react` (optional) |
+| Code review | CodeRabbit, Greptile, human review |
 | Icons | `lucide-react` |
 | Image optimization | `sharp` |
 
@@ -84,7 +85,9 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 - [x] Responsive layout reviewed across mobile / tablet / desktop breakpoints
 - [x] Reduced-motion respected for the canvas / motion components
 - [x] SEO metadata: canonical, OG, Twitter, JSON-LD, sitemap, robots, llms.txt
+- [x] Analytics wired: GA4, Vercel Analytics, and Vercel Speed Insights
 - [x] Error monitoring wired (optional via env)
+- [x] External code review wired through CodeRabbit and Greptile
 - [x] Security headers configured
 - [ ] Unit / E2E test suite (intentionally deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
 - [x] CI workflow — build runs on every PR and push to main
