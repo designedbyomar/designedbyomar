@@ -30,8 +30,8 @@ If you're a hiring manager or founder, the things to look at are:
 - **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
 - **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
 - **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a visual reference page at `/design-system.html` documenting tokens, spacing, typography, motion, iconography, and theming. The codebase is mid-migration to fully tokenized values (see recent commits — gradient, typography, motion, and spacing token phases).
-- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
-- **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Sentry (gated on `VITE_SENTRY_DSN`).
+- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
+- **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
 - **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization.
 
@@ -42,7 +42,7 @@ If you're a hiring manager or founder, the things to look at are:
 | Framework | React 19 |
 | Build | Vite 8 (multi-entry) |
 | Hosting | Vercel (canonical) |
-| Analytics | `@vercel/analytics`, `@vercel/speed-insights` |
+| Analytics | `@vercel/analytics`, `@vercel/speed-insights`, Google Analytics 4 (consent-gated) |
 | Error monitoring | `@sentry/react` (optional) |
 | Icons | `lucide-react` |
 | Image optimization | `sharp` |

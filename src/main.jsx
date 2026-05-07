@@ -1798,6 +1798,17 @@ const FAQ = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
   const [openIndex, setOpenIndex] = React.useState(-1);
   const [showAllQuestions, setShowAllQuestions] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  }, []);
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
   const visibleFaqItems = showAllQuestions
@@ -1867,7 +1878,7 @@ const FAQ = ({ scrollToSection }) => {
           </a>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
+        <div id="faq-questions-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           {visibleFaqItems.map(({ item, index }) => {
             const isOpen = openIndex === index;
             const answerId = `faq-answer-${index}`;
@@ -1876,7 +1887,7 @@ const FAQ = ({ scrollToSection }) => {
               <div key={item.question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'} style={{
                 borderRadius: 'var(--radius-comfort)',
                 boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
-                transition: 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
+                transition: prefersReducedMotion ? 'none' : 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
               }}>
                 <button
                   id={buttonId}
@@ -1925,7 +1936,7 @@ const FAQ = ({ scrollToSection }) => {
                     maxHeight: isOpen ? 520 : 0,
                     opacity: isOpen ? 1 : 0,
                     overflow: 'hidden',
-                    transition: 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
+                    transition: prefersReducedMotion ? 'none' : 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
                   }}
                 >
                   <p style={{
