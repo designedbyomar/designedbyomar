@@ -1465,7 +1465,7 @@ const CaseStudyPage = ({ c, onBack }) => {
 // ============================================================
 // Contact + Footer
 // ============================================================
-const ContactCard = ({ label, value, href, eventName, copyValue }) => {
+const ContactCard = ({ label, value, href, eventName, copyValue, section }) => {
   const [copied, setCopied] = React.useState(false);
   const resetTimerRef = React.useRef(null);
 
@@ -1499,7 +1499,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue }) => {
     }}
       onClick={() => {
         if (window.trackAnalyticsEvent && eventName) {
-          window.trackAnalyticsEvent(eventName, { link_url: href });
+          window.trackAnalyticsEvent(eventName, { link_url: href, ...(section && { section }) });
         }
       }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -1687,9 +1687,9 @@ const KeyFacts = () => {
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/' }); }}>LinkedIn</a>
+                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'at_a_glance' }); }}>LinkedIn</a>
                   {' '}and{' '}
-                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar' }); }}>Substack</a>
+                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'at_a_glance' }); }}>Substack</a>
                 </div>
               ) : (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -1989,9 +1989,9 @@ const Contact = () => {
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
             <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
             <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
-            <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" />
-            <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" />
-            <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" />
+            <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" section="contact" />
+            <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" section="contact" />
+            <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" section="contact" />
           </div>
         </div>
       </Reveal>
@@ -2153,7 +2153,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'footer' }); }}
             >
               LinkedIn
             </a>
@@ -2162,7 +2162,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: 'https://github.com/designedbyomar' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: 'https://github.com/designedbyomar', section: 'footer' }); }}
             >
               GitHub
             </a>
@@ -2171,7 +2171,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'footer' }); }}
             >
               Substack
             </a>
