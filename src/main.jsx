@@ -1133,7 +1133,7 @@ const CaseCard = ({ c, featured = false }) => {
   const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
 
   return (
-    <a href={`/work/${c.id}`} className="case-card" style={{
+    <a href={`/work/${c.id}/`} className="case-card" style={{
       display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%',
       textDecoration: 'none', color: 'inherit',
       borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
@@ -1450,12 +1450,12 @@ const CaseStudyPage = ({ c, onBack }) => {
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
       }}>
-        <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a href={`/work/${prev.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a href={`/work/${next.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
