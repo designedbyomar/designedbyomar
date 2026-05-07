@@ -151,8 +151,13 @@ function generateRoutes() {
       image: c.ogImage,
     });
     // Strip width/height only for case studies — WebP dimensions differ from the home PNG.
-    html = html.replace(/<meta property="og:image:width" content="[^"]*">\n?/, '');
-    html = html.replace(/<meta property="og:image:height" content="[^"]*">\n?/, '');
+    const withoutWidth = html.replace(/<meta property="og:image:width" content="[^"]*"\s*\/?>\r?\n?/, '');
+    if (withoutWidth === html) console.warn('⚠️  og:image:width tag not found — check index.html template');
+    html = withoutWidth;
+
+    const withoutHeight = html.replace(/<meta property="og:image:height" content="[^"]*"\s*\/?>\r?\n?/, '');
+    if (withoutHeight === html) console.warn('⚠️  og:image:height tag not found — check index.html template');
+    html = withoutHeight;
     html = setStructuredData(html, caseStudyStructuredData(c));
 
     fs.writeFileSync(`${dir}/index.html`, html);

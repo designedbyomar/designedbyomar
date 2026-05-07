@@ -2,7 +2,7 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [1.1.0.0] - 2026-05-06
+## [1.1.0] - 2026-05-06
 
 ### Added
 - **FAQ section** — collapsible accordion at the bottom of the page with 10 hiring-context Q&As; default view shows 6, "View all" reveals the rest; two-column layout on desktop, stacked on mobile

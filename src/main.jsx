@@ -1956,7 +1956,6 @@ const FAQ = ({ scrollToSection }) => {
           <button
             type="button"
             aria-expanded={showAllQuestions}
-            aria-controls="faq-questions-list"
             className="text-link faq-view-all-link"
             onClick={() => toggleQuestionVisibility()}
           >
