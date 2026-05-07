@@ -1,7 +1,6 @@
 {
   "redirects": [
-    { "source": "/work", "destination": "/#work", "permanent": true },
-    { "source": "/work/", "destination": "/#work", "permanent": true },
+    { "source": "/work/", "destination": "/work", "permanent": true },
     { "source": "/work/mgmt-portal", "destination": "/work/mgmt-portal/", "permanent": true },
     { "source": "/work/posting-asst", "destination": "/work/posting-asst/", "permanent": true },
     { "source": "/work/page-builder", "destination": "/work/page-builder/", "permanent": true },

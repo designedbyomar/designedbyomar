@@ -694,7 +694,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
         <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
-            <a href="#work" onClick={goSection('work')} style={navLink}
+            <a href="/work" onClick={goSection('work')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Work</a>
@@ -753,7 +753,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             backdropFilter: 'var(--blur-heavy)', WebkitBackdropFilter: 'var(--blur-heavy)',
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
+              <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
@@ -798,7 +798,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
+        <a href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
           minHeight: 44, textDecoration: 'none', transition: 'opacity var(--duration-fast)',
@@ -1337,7 +1337,7 @@ const CaseStudyPage = ({ c, onBack }) => {
 
   return (
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
-      <a href="/#work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
+      <a href="/work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -2107,7 +2107,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Site Links</span>
             <a
-              href="#work"
+              href="/work"
               className="text-link site-footer-link"
               onClick={goSection('work')}
             >
@@ -2403,6 +2403,9 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
 // ============================================================
 const SITE_ORIGIN = 'https://designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
+const WORK_TITLE = 'Selected Work — Omar Tavarez';
+const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
+const WORK_URL = `${SITE_ORIGIN}/work`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
 const toAbsoluteUrl = (pathOrUrl) => {
@@ -2462,6 +2465,24 @@ const buildHomeStructuredData = () => ({
   ],
 });
 
+const buildWorkStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: WORK_TITLE,
+      url: WORK_URL,
+      description: WORK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
 const buildRouteStructuredData = (route, currentCase) => {
   if (currentCase) {
     const url = `${SITE_ORIGIN}/work/${currentCase.id}/`;
@@ -2513,6 +2534,10 @@ const buildRouteStructuredData = (route, currentCase) => {
     };
   }
 
+  if (route.type === 'work') {
+    return buildWorkStructuredData();
+  }
+
   return buildHomeStructuredData();
 };
 
@@ -2528,6 +2553,17 @@ const syncStructuredData = (route, currentCase) => {
 };
 
 const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'work') {
+    return {
+      title: WORK_TITLE,
+      description: WORK_DESCRIPTION,
+      url: WORK_URL,
+      robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
+    };
+  }
+
   if (route.type === 'privacy') {
     return {
       title: 'Privacy Policy — Omar Tavarez',
@@ -2626,6 +2662,7 @@ const AppShellErrorFallback = () => (
 const useRoute = () => {
   const parse = (path) => {
     if (path.match(/^\/privacy\/?$/)) return { type: 'privacy' };
+    if (path.match(/^\/work\/?$/)) return { type: 'work' };
     const m = path.match(/^\/work\/(.+?)(\/)?$/);
     return m ? { type: 'case', id: m[1] } : { type: 'home' };
   };
@@ -2647,7 +2684,7 @@ const useRoute = () => {
         const url = new URL(a.href);
         if (url.origin === window.location.origin) {
           if (url.pathname === window.location.pathname && url.hash) return;
-          if (url.pathname.startsWith('/work/') || url.pathname === '/privacy' || url.pathname === '/') {
+          if (url.pathname === '/work' || url.pathname.startsWith('/work/') || url.pathname === '/privacy' || url.pathname === '/') {
             e.preventDefault();
             history.pushState(null, '', url.pathname + url.search + url.hash);
             window.dispatchEvent(new Event('popstate'));
@@ -2850,6 +2887,13 @@ const App = () => {
       return () => window.cancelAnimationFrame(frame);
     }
 
+    if (route.type === 'work') {
+      const frame = window.requestAnimationFrame(() => {
+        scrollToSectionElement('work', 'auto');
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
     const frame = window.requestAnimationFrame(() => {
       instantScrollToTop();
     });
@@ -2860,6 +2904,11 @@ const App = () => {
   const isHomePath = () => {
     const p = window.location.pathname;
     return p === '/' || p === '/index.html' || p === '' || p.endsWith('/index.html');
+  };
+
+  const isWorkPath = () => {
+    const p = window.location.pathname;
+    return p === '/work' || p === '/work/';
   };
 
   const goHome = () => {
@@ -2877,6 +2926,19 @@ const App = () => {
     const performScroll = () => {
       scrollToSectionElement(id, 'smooth');
     };
+
+    if (id === 'work') {
+      if (!isWorkPath()) {
+        history.pushState(null, '', '/work');
+        window.dispatchEvent(new Event('popstate'));
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(performScroll);
+        });
+      } else {
+        performScroll();
+      }
+      return;
+    }
 
     if (!isHomePath()) {
       history.pushState(null, '', '/');

@@ -7,6 +7,7 @@ Contact: omar@designedbyomar.com
 
 ## Primary pages
 - / : homepage, background, selected work, contact
+- /work : selected work and case studies
 - /work/mgmt-portal/ : Management Portal case study
 - /work/posting-asst/ : Posting Assistant case study
 - /work/page-builder/ : Page Builder 2.0 case study
