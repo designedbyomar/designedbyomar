@@ -602,7 +602,7 @@ const useViewportWidth = () => {
 const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
   return (
-    <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme" style={{
+    <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} title={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
       color: 'var(--fg-primary)', border: 'none',
@@ -1687,9 +1687,9 @@ const KeyFacts = () => {
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>LinkedIn</a>
+                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/' }); }}>LinkedIn</a>
                   {' '}and{' '}
-                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }}>Substack</a>
+                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar' }); }}>Substack</a>
                 </div>
               ) : (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -1840,7 +1840,7 @@ const FAQ = ({ scrollToSection }) => {
           gap: 'var(--space-6)',
           maxWidth: isStacked ? 760 : 440,
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', paddingBottom: isStacked ? 'var(--space-4)' : 0 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
             </div>
@@ -2153,6 +2153,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/' }); }}
             >
               LinkedIn
             </a>
@@ -2161,6 +2162,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: 'https://github.com/designedbyomar' }); }}
             >
               GitHub
             </a>
@@ -2169,6 +2171,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar' }); }}
             >
               Substack
             </a>
