@@ -16,6 +16,9 @@ const ANALYTICS_ACCEPTED = 'accepted';
 const ANALYTICS_DECLINED = 'declined';
 const GA_SCRIPT_ID = 'omar-ga4-script';
 const GA_MEASUREMENT_IDS = ['G-T7W0PFD3HD', 'GT-T56BGFG'];
+const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
+const GITHUB_URL = 'https://github.com/designedbyomar';
+const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
 
 if (SENTRY_ENABLED) {
   Sentry.init({
@@ -1687,9 +1690,9 @@ const KeyFacts = () => {
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'at_a_glance' }); }}>LinkedIn</a>
+                  <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'at_a_glance' }); }}>LinkedIn</a>
                   {' '}and{' '}
-                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'at_a_glance' }); }}>Substack</a>
+                  <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'at_a_glance' }); }}>Substack</a>
                 </div>
               ) : (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -1989,9 +1992,9 @@ const Contact = () => {
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
             <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
             <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
-            <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" section="contact" />
-            <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" section="contact" />
-            <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" section="contact" />
+            <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
+            <ContactCard label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
+            <ContactCard label="Substack" value="@designedbyomar" href={SUBSTACK_URL} eventName="contact_click_substack" section="contact" />
           </div>
         </div>
       </Reveal>
@@ -2149,29 +2152,29 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Social</span>
             <a
-              href="https://www.linkedin.com/in/omartavarez/"
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'footer' }); }}
             >
               LinkedIn
             </a>
             <a
-              href="https://github.com/designedbyomar"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: 'https://github.com/designedbyomar', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: GITHUB_URL, section: 'footer' }); }}
             >
               GitHub
             </a>
             <a
-              href="https://substack.com/@designedbyomar"
+              href={SUBSTACK_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'footer' }); }}
             >
               Substack
             </a>
@@ -2421,9 +2424,9 @@ const personSchema = {
   jobTitle: 'Product Designer',
   email: 'omar@designedbyomar.com',
   sameAs: [
-    'https://www.linkedin.com/in/omartavarez/',
-    'https://github.com/designedbyomar',
-    'https://substack.com/@designedbyomar',
+    LINKEDIN_URL,
+    GITHUB_URL,
+    SUBSTACK_URL,
   ],
   knowsAbout: [
     'Product Design',
