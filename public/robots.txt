@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://designedbyomar.com/sitemap.xml
+Sitemap: https://www.designedbyomar.com/sitemap.xml

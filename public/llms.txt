@@ -2,7 +2,7 @@
 
 > Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
 
-Site: https://designedbyomar.com/
+Site: https://www.designedbyomar.com/
 Contact: omar@designedbyomar.com
 
 ## Primary pages
