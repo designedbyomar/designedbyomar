@@ -141,6 +141,8 @@ vite.config.ts.timestamp-*
 # Build output and dependencies
 node_modules/
 dist/
+playwright-report/
+test-results/
 
 # Developer tooling / internal docs
 CLAUDE.md
