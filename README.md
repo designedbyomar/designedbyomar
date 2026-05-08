@@ -2,7 +2,7 @@
 
 Portfolio site for **Omar Tavarez** — product design for AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
 
-🌐 **Live:** [designedbyomar.com](https://designedbyomar.com)
+🌐 **Live:** [designedbyomar.com](https://www.designedbyomar.com)
 ✉️ **Contact:** [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
 🧑‍💼 **Hiring:** open to Head of Design, Principal Product Designer, and senior / staff / fractional product design and design-engineering roles.
 
@@ -14,9 +14,9 @@ This site is both my portfolio and a public artifact showing how I work today: u
 
 If you're a hiring manager or founder, the things to look at are:
 
-1. The site itself — [designedbyomar.com](https://designedbyomar.com)
+1. The site itself — [designedbyomar.com](https://www.designedbyomar.com)
 2. The case studies in [`postbuild.js`](./postbuild.js) — each gets its own crawlable, SEO-tagged route.
-3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the visual reference page at [`/design-system.html`](https://designedbyomar.com/design-system.html).
+3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the visual reference page at [`/design-system.html`](https://www.designedbyomar.com/design-system.html).
 4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
 
 ## Screenshots

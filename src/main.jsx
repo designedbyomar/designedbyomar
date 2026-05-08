@@ -2401,7 +2401,7 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
 // ============================================================
 // Route metadata + analytics
 // ============================================================
-const SITE_ORIGIN = 'https://designedbyomar.com';
+const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
