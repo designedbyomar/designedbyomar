@@ -100,5 +100,5 @@ test('all sitemap pages have indexable metadata and matching structured data', (
 
 test('robots discovery points to the canonical sitemap', () => {
   const robots = readDist('robots.txt');
-  assert.match(robots, new RegExp(`Sitemap: ${SITE_ORIGIN}/sitemap\\.xml`));
+  assert.ok(robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`));
 });
