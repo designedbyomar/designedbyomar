@@ -63,12 +63,24 @@ npm run build      # vite build → dist/, then postbuild.js generates per-case-
 npm run preview    # preview the built dist/ locally
 ```
 
-## Smoke test
+## Automated tests
 
-There is no unit test suite yet. `npm test` runs the production build as a smoke test:
+`npm test` runs the production build, SEO/static assertions, and Chromium Playwright E2E tests:
 
 ```bash
-npm test
+npm test            # full automated suite
+npm run test:build  # production build smoke test only
+npm run test:seo    # generated metadata, sitemap, and discovery checks
+npm run test:e2e    # build, preview, and Playwright browser checks
+npm run test:e2e:ui # optional interactive Playwright UI
+```
+
+GitHub Actions runs the full suite automatically on every pull request and every push to `main`. Playwright's UI mode is local-only and requires user interaction.
+
+If Playwright browsers are not installed locally yet, run:
+
+```bash
+npx playwright install chromium
 ```
 
 ## Deploy
@@ -78,6 +90,26 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 - Build command: `npm run build`
 - Output directory: `dist`
 - Env: set `VITE_SENTRY_DSN` to enable Sentry. Without it, the site builds and ships normally.
+
+## Branch workflow
+
+Keep `main` protected and deployable. Use short-lived feature branches for one focused change at a time, then merge through a pull request.
+
+Branch prefixes:
+
+- `fix/...` — broken behavior, SEO cleanup, redirects, bugs
+- `feature/...` — new sections or new functionality
+- `content/...` — copy, case studies, resume/about edits
+- `design/...` — visual, theme, typography, spacing, or design-system changes
+- `chore/...` — tooling, docs, dependency maintenance
+
+Example:
+
+```bash
+git switch main
+git pull
+git switch -c fix/canonical-host
+```
 
 ## Quality checklist
 
@@ -89,8 +121,9 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 - [x] Error monitoring wired (optional via env)
 - [x] External code review wired through CodeRabbit and Greptile
 - [x] Security headers configured
-- [ ] Unit / E2E test suite (intentionally deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
-- [x] CI workflow — build runs on every PR and push to main
+- [x] Automated E2E + SEO regression tests
+- [ ] Unit tests for extracted route / metadata helpers (deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
+- [x] CI workflow — full automated suite runs on every PR and push to main
 
 ## Project layout
 

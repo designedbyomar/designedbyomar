@@ -36,7 +36,7 @@ The point of this artifact is to be honest about that boundary.
 
 ## How I keep quality up
 
-1. **Small PRs, scoped commits.** Recent history (gradient tokens, typography migration, spacing migration, hero copy refresh) is split across many small commits so each change is reviewable.
+1. **Small PRs, scoped commits.** Recent history (gradient tokens, typography migration, spacing migration, hero copy refresh) is split across many small commits so each change is reviewable. Branches use explicit prefixes (`fix/...`, `feature/...`, `content/...`, `design/...`, `chore/...`) so the intent is clear before review.
 2. **Token migrations done in phases.** Typography → motion → spacing → gradient — each phase is its own PR so I can verify visual diffs incrementally instead of one monster refactor.
 3. **Visual review on every diff.** Every UI-affecting PR is checked against the live site before merge. No "looks right in code" merges.
 4. **External review passes.** CodeRabbit and Greptile review PRs for issues I may have missed, while human review still owns taste, scope, and final judgment.
@@ -48,8 +48,8 @@ The point of this artifact is to be honest about that boundary.
 
 ## What I deliberately did not do
 
-- **No automated test suite yet.** A portfolio site with eight static case studies and one design-system reference page does not earn its keep with unit tests. `npm test` runs the production build as a smoke test, which catches the failures that actually matter for this surface (broken imports, broken postbuild templates, type errors). When the surface area justifies it, I'll add Playwright over the built `dist/`.
-- **Minimal CI.** `.github/workflows/ci.yml` runs `npm ci && npm run build` on every PR and push to main. Lighthouse CI is the obvious next add.
+- **No broad unit suite yet.** A portfolio site with static case studies and route-specific metadata earns more from regression checks than component-level unit tests right now. `npm test` runs the production build, generated SEO/static assertions, and Chromium Playwright checks over the built preview.
+- **Focused CI.** `.github/workflows/ci.yml` runs `npm ci`, installs Chromium for Playwright, and runs `npm test` on every PR and push to main. Lighthouse CI is the obvious next add.
 - **No premature splitting of `main.jsx`.** The file is large because the site is a single, content-heavy SPA. Splitting it into 20 micro-components before the token migration finishes would create merge conflicts with in-flight work without making anything more correct. The split happens after the token migration lands.
 
 ---

@@ -31,7 +31,11 @@
     "dev": "vite",
     "build": "vite build && node postbuild.js",
     "preview": "vite preview",
-    "test": "npm run build",
+    "test": "npm run test:build && npm run test:seo && playwright test",
+    "test:build": "npm run build",
+    "test:seo": "node --test tests/seo-static.test.mjs",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "npm run build && playwright test --ui",
     "optimize:image": "node scripts/optimize-image.mjs"
   },
   "dependencies": {
@@ -43,6 +47,7 @@
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@vitejs/plugin-react": "^6.0.1",
     "sharp": "^0.34.5",
     "vite": "^8.0.10"
