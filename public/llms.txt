@@ -7,14 +7,15 @@ Contact: omar@designedbyomar.com
 
 ## Primary pages
 - / : homepage, background, selected work, contact
-- /work/mgmt-portal : Management Portal case study
-- /work/posting-asst : Posting Assistant case study
-- /work/page-builder : Page Builder 2.0 case study
-- /work/connect-api : Connect API Payments case study
-- /work/athena-ds : Athena Design System 2.0 case study
-- /work/plastiq-mktg : Plastiq Marketing Site case study
-- /work/disney-cct : Critical Communication Tool case study
-- /work/disney-uap : Unified Ad Platform case study
+- /work : selected work and case studies
+- /work/mgmt-portal/ : Management Portal case study
+- /work/posting-asst/ : Posting Assistant case study
+- /work/page-builder/ : Page Builder 2.0 case study
+- /work/connect-api/ : Connect API Payments case study
+- /work/athena-ds/ : Athena Design System 2.0 case study
+- /work/plastiq-mktg/ : Plastiq Marketing Site case study
+- /work/disney-cct/ : Critical Communication Tool case study
+- /work/disney-uap/ : Unified Ad Platform case study
 - /design-system.html : design system and brand reference page
 - /privacy : privacy policy and data collection details
 

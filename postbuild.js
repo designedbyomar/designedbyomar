@@ -2,6 +2,9 @@ const fs = require('fs');
 
 const SITE_ORIGIN = 'https://designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
+const WORK_TITLE = 'Selected Work — Omar Tavarez';
+const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
+const WORK_URL = `${SITE_ORIGIN}/work`;
 
 const CASE_STUDIES = [
   { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.', client: 'Wisdom', ogImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp' },
@@ -134,11 +137,42 @@ const privacyStructuredData = () => ({
   ],
 });
 
+const workStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: WORK_TITLE,
+      url: WORK_URL,
+      description: WORK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
 function generateRoutes() {
   const distDir = './dist';
   if (!fs.existsSync(distDir)) return;
 
   const indexHtml = fs.readFileSync(`${distDir}/index.html`, 'utf8');
+
+  const workDir = `${distDir}/work`;
+  fs.mkdirSync(workDir, { recursive: true });
+  const workHtml = setStructuredData(
+    setMeta(indexHtml, {
+      title: WORK_TITLE,
+      description: WORK_DESCRIPTION,
+      url: WORK_URL,
+      image: DEFAULT_OG_IMAGE,
+    }),
+    workStructuredData(),
+  );
+  fs.writeFileSync(`${workDir}/index.html`, workHtml);
 
   CASE_STUDIES.forEach((c) => {
     const dir = `${distDir}/work/${c.id}`;

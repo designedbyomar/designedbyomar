@@ -16,6 +16,9 @@ const ANALYTICS_ACCEPTED = 'accepted';
 const ANALYTICS_DECLINED = 'declined';
 const GA_SCRIPT_ID = 'omar-ga4-script';
 const GA_MEASUREMENT_IDS = ['G-T7W0PFD3HD', 'GT-T56BGFG'];
+const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
+const GITHUB_URL = 'https://github.com/designedbyomar';
+const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
 
 if (SENTRY_ENABLED) {
   Sentry.init({
@@ -691,7 +694,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
         <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
-            <a href="#work" onClick={goSection('work')} style={navLink}
+            <a href="/work" onClick={goSection('work')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Work</a>
@@ -750,7 +753,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             backdropFilter: 'var(--blur-heavy)', WebkitBackdropFilter: 'var(--blur-heavy)',
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <a href="#work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
+              <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
@@ -795,7 +798,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
       </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <a href="#work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
+        <a href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
           minHeight: 44, textDecoration: 'none', transition: 'opacity var(--duration-fast)',
@@ -1130,7 +1133,7 @@ const CaseCard = ({ c, featured = false }) => {
   const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
 
   return (
-    <a href={`/work/${c.id}`} className="case-card" style={{
+    <a href={`/work/${c.id}/`} className="case-card" style={{
       display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%',
       textDecoration: 'none', color: 'inherit',
       borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
@@ -1334,7 +1337,7 @@ const CaseStudyPage = ({ c, onBack }) => {
 
   return (
     <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
-      <a href="/#work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
+      <a href="/work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -1447,12 +1450,12 @@ const CaseStudyPage = ({ c, onBack }) => {
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
       }}>
-        <a href={`/work/${prev.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a href={`/work/${prev.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a href={`/work/${next.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
@@ -1687,9 +1690,9 @@ const KeyFacts = () => {
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href="https://www.linkedin.com/in/omartavarez/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'at_a_glance' }); }}>LinkedIn</a>
+                  <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'at_a_glance' }); }}>LinkedIn</a>
                   {' '}and{' '}
-                  <a href="https://substack.com/@designedbyomar" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'at_a_glance' }); }}>Substack</a>
+                  <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'at_a_glance' }); }}>Substack</a>
                 </div>
               ) : (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -1989,9 +1992,9 @@ const Contact = () => {
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
             <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
             <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
-            <ContactCard label="LinkedIn" value="in/omartavarez" href="https://www.linkedin.com/in/omartavarez/" eventName="contact_click_linkedin" section="contact" />
-            <ContactCard label="GitHub" value="designedbyomar" href="https://github.com/designedbyomar" eventName="contact_click_github" section="contact" />
-            <ContactCard label="Substack" value="@designedbyomar" href="https://substack.com/@designedbyomar" eventName="contact_click_substack" section="contact" />
+            <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
+            <ContactCard label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
+            <ContactCard label="Substack" value="@designedbyomar" href={SUBSTACK_URL} eventName="contact_click_substack" section="contact" />
           </div>
         </div>
       </Reveal>
@@ -2104,7 +2107,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Site Links</span>
             <a
-              href="#work"
+              href="/work"
               className="text-link site-footer-link"
               onClick={goSection('work')}
             >
@@ -2149,29 +2152,29 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           <div className="site-footer-block">
             <span style={footerLabelStyle}>Social</span>
             <a
-              href="https://www.linkedin.com/in/omartavarez/"
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: 'https://www.linkedin.com/in/omartavarez/', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'footer' }); }}
             >
               LinkedIn
             </a>
             <a
-              href="https://github.com/designedbyomar"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: 'https://github.com/designedbyomar', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: GITHUB_URL, section: 'footer' }); }}
             >
               GitHub
             </a>
             <a
-              href="https://substack.com/@designedbyomar"
+              href={SUBSTACK_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: 'https://substack.com/@designedbyomar', section: 'footer' }); }}
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'footer' }); }}
             >
               Substack
             </a>
@@ -2400,6 +2403,9 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
 // ============================================================
 const SITE_ORIGIN = 'https://designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
+const WORK_TITLE = 'Selected Work — Omar Tavarez';
+const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
+const WORK_URL = `${SITE_ORIGIN}/work`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
 const toAbsoluteUrl = (pathOrUrl) => {
@@ -2421,9 +2427,9 @@ const personSchema = {
   jobTitle: 'Product Designer',
   email: 'omar@designedbyomar.com',
   sameAs: [
-    'https://www.linkedin.com/in/omartavarez/',
-    'https://github.com/designedbyomar',
-    'https://substack.com/@designedbyomar',
+    LINKEDIN_URL,
+    GITHUB_URL,
+    SUBSTACK_URL,
   ],
   knowsAbout: [
     'Product Design',
@@ -2456,6 +2462,24 @@ const buildHomeStructuredData = () => ({
         },
       })),
     },
+  ],
+});
+
+const buildWorkStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: WORK_TITLE,
+      url: WORK_URL,
+      description: WORK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
   ],
 });
 
@@ -2510,6 +2534,10 @@ const buildRouteStructuredData = (route, currentCase) => {
     };
   }
 
+  if (route.type === 'work') {
+    return buildWorkStructuredData();
+  }
+
   return buildHomeStructuredData();
 };
 
@@ -2525,6 +2553,17 @@ const syncStructuredData = (route, currentCase) => {
 };
 
 const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'work') {
+    return {
+      title: WORK_TITLE,
+      description: WORK_DESCRIPTION,
+      url: WORK_URL,
+      robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
+    };
+  }
+
   if (route.type === 'privacy') {
     return {
       title: 'Privacy Policy — Omar Tavarez',
@@ -2623,6 +2662,7 @@ const AppShellErrorFallback = () => (
 const useRoute = () => {
   const parse = (path) => {
     if (path.match(/^\/privacy\/?$/)) return { type: 'privacy' };
+    if (path.match(/^\/work\/?$/)) return { type: 'work' };
     const m = path.match(/^\/work\/(.+?)(\/)?$/);
     return m ? { type: 'case', id: m[1] } : { type: 'home' };
   };
@@ -2644,7 +2684,7 @@ const useRoute = () => {
         const url = new URL(a.href);
         if (url.origin === window.location.origin) {
           if (url.pathname === window.location.pathname && url.hash) return;
-          if (url.pathname.startsWith('/work/') || url.pathname === '/privacy' || url.pathname === '/') {
+          if (url.pathname === '/work' || url.pathname.startsWith('/work/') || url.pathname === '/privacy' || url.pathname === '/') {
             e.preventDefault();
             history.pushState(null, '', url.pathname + url.search + url.hash);
             window.dispatchEvent(new Event('popstate'));
@@ -2847,6 +2887,13 @@ const App = () => {
       return () => window.cancelAnimationFrame(frame);
     }
 
+    if (route.type === 'work') {
+      const frame = window.requestAnimationFrame(() => {
+        scrollToSectionElement('work', 'auto');
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
     const frame = window.requestAnimationFrame(() => {
       instantScrollToTop();
     });
@@ -2857,6 +2904,11 @@ const App = () => {
   const isHomePath = () => {
     const p = window.location.pathname;
     return p === '/' || p === '/index.html' || p === '' || p.endsWith('/index.html');
+  };
+
+  const isWorkPath = () => {
+    const p = window.location.pathname;
+    return p === '/work' || p === '/work/';
   };
 
   const goHome = () => {
@@ -2874,6 +2926,19 @@ const App = () => {
     const performScroll = () => {
       scrollToSectionElement(id, 'smooth');
     };
+
+    if (id === 'work') {
+      if (!isWorkPath()) {
+        history.pushState(null, '', '/work');
+        window.dispatchEvent(new Event('popstate'));
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(performScroll);
+        });
+      } else {
+        performScroll();
+      }
+      return;
+    }
 
     if (!isHomePath()) {
       history.pushState(null, '', '/');
