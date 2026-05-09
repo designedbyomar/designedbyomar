@@ -15,17 +15,17 @@ const LEGACY_CONSENT_KEY = 'omar.consent';
 const ANALYTICS_ACCEPTED = 'accepted';
 const ANALYTICS_DECLINED = 'declined';
 const GA_SCRIPT_ID = 'omar-ga4-script';
-const GA_MEASUREMENT_IDS = ['G-T7W0PFD3HD', 'GT-T56BGFG'];
+const GA_MEASUREMENT_ID = 'G-T7W0PFD3HD';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
 const GITHUB_URL = 'https://github.com/designedbyomar';
 const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
 
-if (SENTRY_ENABLED) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: 'production',
-  });
-}
+let sentryInitialized = false;
+const initSentryIfEnabled = () => {
+  if (!SENTRY_ENABLED || sentryInitialized) return;
+  Sentry.init({ dsn: SENTRY_DSN, environment: 'production' });
+  sentryInitialized = true;
+};
 
 const getStoredAnalyticsConsent = () => {
   if (typeof window !== 'undefined') {
@@ -78,9 +78,7 @@ const configureGoogleAnalytics = () => {
   if (window.__omarGaConfigured) return;
 
   window.gtag('js', new Date());
-  GA_MEASUREMENT_IDS.forEach((id) => {
-    window.gtag('config', id, { send_page_view: false });
-  });
+  window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false });
   window.__omarGaConfigured = true;
 };
 
@@ -102,7 +100,7 @@ const loadGoogleAnalytics = () => {
     const script = document.createElement('script');
     script.id = GA_SCRIPT_ID;
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_IDS[0]}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
     script.onload = () => {
       window.__omarGaReady = true;
       resolve(true);
@@ -513,7 +511,7 @@ const LogoLoader = ({ visible }) => {
         justifyContent: 'center',
         textAlign: 'center'
       }}>
-        <div style={{ display: 'none' }}>{phrases[index]}</div>
+        <div style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>{phrases[index]}</div>
         {phrases[index].split('').map((char, i) => {
           if (char === ' ') return <span key={`${index}-${i}-space`} style={{ width: '0.4em' }}>&nbsp;</span>;
           return (
@@ -775,7 +773,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
 // ============================================================
 const Dot = () => (
   <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-    <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: '#22c55e', boxShadow: '0 0 0 3px rgba(34, 197, 94, var(--opacity-22))', display: 'inline-block' }} />
+    <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--color-status-online)', boxShadow: '0 0 0 3px color-mix(in srgb, var(--color-status-online) 22%, transparent)', display: 'inline-block' }} />
   </span>
 );
 
@@ -926,6 +924,15 @@ const About = ({ onOpenDrawer }) => (
 );
 
 const AboutDrawer = ({ open, onClose }) => {
+  const triggerRef = React.useRef(null);
+  React.useEffect(() => {
+    if (open) {
+      triggerRef.current = document.activeElement;
+    } else if (triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [open]);
   React.useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     if (open) document.addEventListener('keydown', onKey);
@@ -1289,6 +1296,15 @@ const Work = ({ onOpenDrawer }) => {
 // WorkDrawer — all case studies
 // ============================================================
 const WorkDrawer = ({ open, onClose }) => {
+  const triggerRef = React.useRef(null);
+  React.useEffect(() => {
+    if (open) {
+      triggerRef.current = document.activeElement;
+    } else if (triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [open]);
   React.useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     if (open) document.addEventListener('keydown', onKey);
@@ -1610,15 +1626,6 @@ const KeyFacts = () => {
 
   return (
     <>
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-        <defs>
-          <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--color-ship-red)" />
-            <stop offset="50%" stopColor="var(--color-preview-pink)" />
-            <stop offset="100%" stopColor="var(--color-develop-blue)" />
-          </linearGradient>
-        </defs>
-      </svg>
       <section
       ref={sectionRef}
       id="at-a-glance"
@@ -1631,7 +1638,7 @@ const KeyFacts = () => {
         background: 'var(--color-develop-blue)',
       }}
     >
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="var(--color-ship-red)" />
@@ -1671,8 +1678,8 @@ const KeyFacts = () => {
           gridTemplateColumns: factsColumns,
           gap: 'var(--space-5)',
         }}>
-          {facts.map((f, i) => (
-            <div key={i} style={{
+          {facts.map((f) => (
+            <div key={f.label} style={{
               padding: 'var(--space-6) var(--space-5)',
               borderRadius: 'var(--radius-image)',
               background: 'var(--bg-subtle)',
@@ -2224,7 +2231,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-body-xl)' }}>
-        <p style={{ margin: 0 }}>Last updated: May 4, 2026</p>
+        <p style={{ margin: 0 }}>Last updated: May 8, 2026</p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <p style={{ margin: 0 }}>This site uses a very small amount of analytics to understand what people look at, what pages are useful, and where the experience can be improved.</p>
@@ -2261,7 +2268,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
         <p style={{ margin: 0 }}>They are used to understand how the site performs in the real world and to make improvements to speed, usability, and content.</p>
 
         <h2 style={sectionHeadingStyle}>Sentry Error Monitoring</h2>
-        <p style={{ margin: 0 }}>This site may use Sentry for production error monitoring. Sentry helps identify broken pages, JavaScript errors, browser context, route information, and theme state when something fails.</p>
+        <p style={{ margin: 0 }}>This site uses Sentry for production error monitoring. Sentry only initializes after you accept analytics. It helps identify broken pages, JavaScript errors, browser context, route information, and theme state when something fails.</p>
         <p style={{ margin: 0 }}>Sentry is used to debug production issues and keep the site working. It is not used for advertising, profiling, or retargeting.</p>
 
         <h2 style={sectionHeadingStyle}>Contact</h2>
@@ -2834,6 +2841,10 @@ const App = () => {
     const meta = getRouteMeta(route, currentCase);
     trackPageView(meta, route, currentCase);
   }, [route, currentCase, analyticsAccepted, analyticsReady]);
+
+  React.useEffect(() => {
+    if (analyticsAccepted) initSentryIfEnabled();
+  }, [analyticsAccepted]);
 
   React.useEffect(() => {
     syncSentryContext(route, currentCase, theme);
