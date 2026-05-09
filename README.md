@@ -77,6 +77,8 @@ npm run test:e2e:ui # optional interactive Playwright UI
 
 GitHub Actions runs the full suite automatically on every pull request and every push to `main`. Playwright's UI mode is local-only and requires user interaction.
 
+Future unit tests should be added when route parsing, metadata generation, or analytics helpers are extracted from `src/main.jsx` / `postbuild.js`.
+
 If Playwright browsers are not installed locally yet, run:
 
 ```bash
@@ -122,7 +124,6 @@ git switch -c fix/canonical-host
 - [x] External code review wired through CodeRabbit and Greptile
 - [x] Security headers configured
 - [x] Automated E2E + SEO regression tests
-- [ ] Unit tests for extracted route / metadata helpers (deferred — see [`docs/ai-workflow.md`](./docs/ai-workflow.md))
 - [x] CI workflow — full automated suite runs on every PR and push to main
 
 ## Project layout
