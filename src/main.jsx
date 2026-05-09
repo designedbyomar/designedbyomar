@@ -969,6 +969,12 @@ const AboutDrawer = ({ open, onClose }) => {
 // ============================================================
 // Case Studies — data
 // ============================================================
+const CASE_ACCENTS = {
+  develop: 'var(--color-develop-blue)',
+  preview: 'var(--color-preview-pink)',
+  ship: 'var(--color-ship-red)',
+};
+
 const CASE_STUDIES = [
   {
     id: 'mgmt-portal', num: '01', year: '2025', client: 'Wisdom',
@@ -983,8 +989,7 @@ const CASE_STUDIES = [
       { value: '260→900', label: 'Office scale supported' },
       { value: '90%+', label: 'Weekly active usage' },
     ],
-    accent: '#3291ff',
-    swatch: ['#3291ff', '#0a0a0a', '#ededed', '#ff3da0'],
+    accent: CASE_ACCENTS.develop,
     challenge: `Wisdom's ops team managed 260+ offices across 9 Team Leads using 200+ interconnected Google Sheets. Risk was invisible until it became a crisis — at-risk clients were caught too late, capacity was opaque, and manual reconciliation was creating payroll and billing errors.`,
     approach: `Designed a centralized Management Portal as an ops command center. Built an LLM-powered Office Watchlist that detects A/R aging signals and ranks offices by urgency before issues escalate. Added workforce capacity views, per-specialist performance tracking, centralized profiles, and executive portfolio dashboards — replacing manual PDFs and spreadsheets with in-app reporting.`,
     outcome: `Platform in development for Q1–Q2 2026 rollout. Designed to support 260→900 office scale, achieve 90%+ WAU among Team Leads, reduce churn from 1.8% to below 1.0%, and decommission 200+ operational spreadsheets. Shifts the ops model from reactive firefighting to proactive risk management.`,
@@ -1002,8 +1007,7 @@ const CASE_STUDIES = [
       { value: '40+', label: 'User interviews' },
       { value: '3', label: 'Workflow stacks shipped' },
     ],
-    accent: '#ff3da0',
-    swatch: ['#ff3da0', '#ff6b60', '#0a0a0a', '#3291ff'],
+    accent: CASE_ACCENTS.preview,
     challenge: `Insurance payment posting was chaotic — documents came in every format, specialists jumped between screens comparing EOBs, and every posting required manual judgment calls. Slow, error-prone, and impossible to scale.`,
     approach: `Instead of jumping to full automation, started with an assistive workflow: OCR + LLMs extracted key data from scanned insurance documents and surfaced it in a structured review interface. Preserved specialist control while reducing cognitive load. Used OBS Studio to run observational research across multiple monitors. Once trust was established, integrated with Open Dental for deeper automation.`,
     outcome: `40% reduction in manual posting time. Transformed a messy multi-screen workflow into a structured AI-assisted tool. Created a path to scale without adding headcount, and a strong foundation for full automation in the next phase.`,
@@ -1021,8 +1025,7 @@ const CASE_STUDIES = [
       { value: '2 mo.', label: 'Delivery speed' },
       { value: '4', label: 'Core capabilities shipped' },
     ],
-    accent: '#ff5b4f',
-    swatch: ['#ff5b4f', '#f59e0b', '#0a0a0a', '#ededed'],
+    accent: CASE_ACCENTS.ship,
     challenge: `Users found Simplero's page builder so limiting they resorted to custom CSS and were threatening to migrate to competitors. The old builder prevented migration from other platforms and was driving churn.`,
     approach: `Led the full redesign from scratch: user and expert interviews, competitive analysis, product requirements (no PM — I owned that role), and close collaboration with the Lead Engineer to ship fast. Delivered a WYSIWYG editor, style guide, color picker, and competitor page import — all in 2 months.`,
     outcome: `9% increase in sales post-launch. Customer migration increased. Engineers shipped with minimal friction. Users who previously exported to external developers stayed on platform. Positioned Simplero as a credible CRM platform, not just a tool.`,
@@ -1040,8 +1043,7 @@ const CASE_STUDIES = [
       { value: '3', label: 'Pre-launch partnerships' },
       { value: '8 wks', label: 'Client onboarding time' },
     ],
-    accent: '#0a72ef',
-    swatch: ['#0a72ef', '#3291ff', '#0a0a0a', '#ededed'],
+    accent: CASE_ACCENTS.develop,
     challenge: `Build a PCI-compliant embedded payments widget that would let enterprise clients integrate card and ACH payments into their own platforms — while eliminating merchant fees, expanding working capital, and onboarding partners in weeks.`,
     approach: `Worked closely with the PM to define the product vision from zero. Designed an end-to-end payment widget and developer portal through iterative wireframing and expert interviews. Baked PCI Level 1 certification into the design process from day one — not as an afterthought. Partnered with Billfire, Brex, and PayGround before launch.`,
     outcome: `$20M+ monthly payment volume exceeded in the first month. Three strategic partnerships secured pre-launch. Clients consistently commented on the solidity and intuitiveness of the partner portal. Clients can get up and running in 8 weeks.`,
@@ -1059,8 +1061,7 @@ const CASE_STUDIES = [
       { value: '1', label: 'Cross-org process built' },
       { value: 'IPO', label: 'Foundation for readiness' },
     ],
-    accent: '#9f6bff',
-    swatch: ['#ff3da0', '#ff3da0', '#0a0a0a', '#3291ff'],
+    accent: CASE_ACCENTS.preview,
     challenge: `Siloed teams creating inconsistent patterns, duplicate work, and a confusing product experience. Design had no process. Engineering couldn't pick up components. Product was shipping features faster than the system could absorb them.`,
     approach: `Co-led workshops to establish design system principles and KPIs. Audited all products holistically. Built documentation around layout grid, dashboard components, payment widget, and feedback indicators. Collaborated with Engineering to build a Storybook equivalent. Created foundational elements: Type, Color, Brand, Spacing — all scoped to scale across multiple products and marketing channels.`,
     outcome: `Engineering pickup time for global components dropped significantly. Design and product teams aligned on goals. Consistent brand language across all DS-adopted surfaces. The DS became Plastiq's foundation for its IPO-era brand evolution.`,
@@ -1078,8 +1079,7 @@ const CASE_STUDIES = [
       { value: '8', label: 'Cross-functional team' },
       { value: 'WCAG', label: 'Compliant at launch' },
     ],
-    accent: '#ff6b60',
-    swatch: ['#ff6b60', '#ff3da0', '#0a0a0a', '#ededed'],
+    accent: CASE_ACCENTS.ship,
     challenge: `Plastiq needed a complete site overhaul in 3–4 weeks ahead of going public. The old site lacked polish, buried products in navigation, and failed to communicate value to investors or ideal customers.`,
     approach: `Took initiative as creative lead despite no formal assignment. Created the visual language, brand direction, and content strategy. Led workshops to align an 8-person cross-functional team (design, copy, marketing, engineering). Built the design system from scratch using my proprietary color system, then directed atomic-scale production across all pages.`,
     outcome: `Delivered on time. WCAG compliant. Drove growth in PayPro (paid tier). Fulfilled the "One Plastiq" unified brand vision. Early analytics and investor feedback overwhelmingly positive.`,
@@ -1097,8 +1097,7 @@ const CASE_STUDIES = [
       { value: '200K+', label: 'Emails sent' },
       { value: '250', label: 'Critical incidents covered' },
     ],
-    accent: '#22c55e',
-    swatch: ['#3291ff', '#3291ff', '#0a0a0a', '#ededed'],
+    accent: CASE_ACCENTS.develop,
     challenge: `A 2019 fire in Italy disrupted Disney network coverage — and the right people were never notified. The support tool was broken: key stakeholders either missed notifications entirely or were flooded with irrelevant ones. With Disney+ launching in months and the Fox acquisition underway, the stakes for fixing this were enormous.`,
     approach: `Led all UX activities solo across a large cross-functional team. Designed a self-service subscription manager that was scalable (infinitely addable brands/tags), flexible (no architecture changes for new assignments), responsive (mobile-first for commuting execs), and intuitive (correct on first login). Used hierarchical toggles, progressive disclosure, and modals to manage cognitive load. Ran usability testing and a full WCAG 2.0 compliance audit before launch.`,
     outcome: `1,600+ users signed up. 200,000+ emails sent. 250 critical incidents communicated — covering NBA Finals, Presidential Debate, NFL Draft, Emmys, and more. SVP of Software Engineering and SVP of Technology Business Operations Strategy both praised the design publicly. Zero major bugs post-launch.`,
@@ -1116,13 +1115,14 @@ const CASE_STUDIES = [
       { value: '$M+', label: 'Booking impact' },
       { value: '2', label: 'Designers led' },
     ],
-    accent: '#f59e0b',
-    swatch: ['#ff6b60', '#ff6b60', '#0a0a0a', '#ededed'],
+    accent: CASE_ACCENTS.ship,
     challenge: `ESPN, Freeform, FX Networks, and National Geographic each had their own ad sales platform. No standardization, no cross-brand collaboration, no efficiency. Booking ads across Disney's portfolio required navigating completely different systems.`,
     approach: `Audited and analyzed complex data sets across all four brands: reporting, client relations, dashboards, internal communications. Unified nomenclature, process, and front-end UI aligned to backend architecture. Led a team of two designers. Built React components designed to plug into the Adapt design system — laying the foundation for a future-proof cross-brand system.`,
     outcome: `All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library.`,
   },
 ];
+
+const caseAccentGradient = (accent) => `linear-gradient(135deg, ${accent} 0%, color-mix(in oklab, ${accent} 70%, white) 100%)`;
 
 // ============================================================
 // CaseCard — gradient cover tile used on homepage + drawer
@@ -1131,6 +1131,7 @@ const CaseCard = ({ c, featured = false }) => {
   const viewportWidth = useViewportWidth();
   const useSharedMobileAspectRatio = viewportWidth <= TABLET_BREAKPOINT;
   const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
+  const accent = c.accent;
 
   return (
     <a href={`/work/${c.id}/`} className="case-card" style={{
@@ -1141,7 +1142,7 @@ const CaseCard = ({ c, featured = false }) => {
       <div className="case-card-media" style={{
         position: 'relative', width: '100%',
         aspectRatio: mediaAspectRatio,
-        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, color-mix(in oklab, ${c.swatch[0]} 70%, white) 100%)`,
+        background: caseAccentGradient(accent),
         borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
       }}>
@@ -1172,30 +1173,30 @@ const CaseCard = ({ c, featured = false }) => {
         ) : (
           <div className="case-card-screen" style={{
             position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
-            background: c.swatch[2],
+            background: 'var(--bg-page)',
             borderRadius: '10px 10px 0 0',
             boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0, 0, 0, var(--opacity-35))`,
           }}>
             <div style={{
               position: 'absolute', top: 10, left: 10, right: 10, height: 18,
               display: 'flex', alignItems: 'center', gap: 5,
-              borderBottom: `1px solid ${c.swatch[3]}22`,
+              borderBottom: `1px solid color-mix(in oklab, ${accent} 18%, transparent)`,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[3], opacity: 0.7 }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[0], opacity: 0.7 }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: c.swatch[1], opacity: 0.7 }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: accent, opacity: 0.7 }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--fg-tertiary)', opacity: 0.7 }} />
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--color-gray-100)', opacity: 0.7 }} />
             </div>
             <div className="case-card-line case-card-line--full" style={{
               position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `${c.swatch[3]}22`,
+              background: `color-mix(in oklab, ${accent} 18%, transparent)`,
             }} />
             <div className="case-card-line case-card-line--left" style={{
               position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `${c.swatch[0]}44`,
+              background: `color-mix(in oklab, ${accent} 30%, transparent)`,
             }} />
             <div className="case-card-line case-card-line--right" style={{
               position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `${c.swatch[3]}22`,
+              background: `color-mix(in oklab, ${accent} 18%, transparent)`,
             }} />
           </div>
         )}
@@ -1331,6 +1332,7 @@ const CaseStudyPage = ({ c, onBack }) => {
     if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('case_study_view', { case_study_id: c.id });
   }, [c.id]);
 
+  const accent = c.accent;
   const idx = CASE_STUDIES.findIndex(x => x.id === c.id);
   const prev = CASE_STUDIES[(idx - 1 + CASE_STUDIES.length) % CASE_STUDIES.length];
   const next = CASE_STUDIES[(idx + 1) % CASE_STUDIES.length];
@@ -1353,7 +1355,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       {/* Cover */}
       <div className="cs-cover" style={{
         position: 'relative', width: '100%',
-        background: `linear-gradient(135deg, ${c.swatch[0]} 0%, color-mix(in oklab, ${c.swatch[0]} 70%, white) 100%)`,
+        background: caseAccentGradient(accent),
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
       }}>
@@ -1425,7 +1427,7 @@ const CaseStudyPage = ({ c, onBack }) => {
           <div key={i} style={{
             padding: '32px 24px', textAlign: 'center',
           }}>
-            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: c.accent, lineHeight: 1 }}>{m.value}</div>
+            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: accent, lineHeight: 1 }}>{m.value}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
           </div>
         ))}
@@ -1439,7 +1441,7 @@ const CaseStudyPage = ({ c, onBack }) => {
           { label: 'Outcome', body: c.outcome },
         ].map(({ label, body }) => (
           <div key={label}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
             <p style={{ fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
           </div>
         ))}
