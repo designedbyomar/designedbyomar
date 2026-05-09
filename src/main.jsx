@@ -1638,7 +1638,7 @@ const KeyFacts = () => {
         background: 'var(--color-develop-blue)',
       }}
     >
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <linearGradient id="fact-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="var(--color-ship-red)" />
