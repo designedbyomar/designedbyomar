@@ -186,11 +186,11 @@ function generateRoutes() {
     });
     // Strip width/height only for case studies — WebP dimensions differ from the home PNG.
     const withoutWidth = html.replace(/<meta property="og:image:width" content="[^"]*"\s*\/?>\r?\n?/, '');
-    if (withoutWidth === html) console.warn('⚠️  og:image:width tag not found — check index.html template');
+    if (withoutWidth === html) throw new Error('og:image:width tag not found in index.html template — check template and rerun build');
     html = withoutWidth;
 
     const withoutHeight = html.replace(/<meta property="og:image:height" content="[^"]*"\s*\/?>\r?\n?/, '');
-    if (withoutHeight === html) console.warn('⚠️  og:image:height tag not found — check index.html template');
+    if (withoutHeight === html) throw new Error('og:image:height tag not found in index.html template — check template and rerun build');
     html = withoutHeight;
     html = setStructuredData(html, caseStudyStructuredData(c));
 

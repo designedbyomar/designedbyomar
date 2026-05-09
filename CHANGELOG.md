@@ -2,6 +2,22 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [1.1.2] - 2026-05-09
+
+### Fixed
+- Sentry now consent-gated — `Sentry.init()` deferred until analytics accepted, matching the GA4 pattern
+- Removed duplicate GA4 measurement ID `GT-T56BGFG`; single constant `GA_MEASUREMENT_ID` used throughout
+- `postbuild.js` OG tag validation now throws instead of `console.warn`, failing the build loudly on missing tags
+- `aria-live` region in `LogoLoader` uses visually-hidden CSS instead of `display:none` so screen readers can read it
+- Focus restored to trigger element when `AboutDrawer` and `WorkDrawer` close (WCAG 2.1 focus management)
+- Duplicate `<svg>` defs block (second `fact-icon-gradient` linearGradient) removed from `KeyFacts`
+- React `key={i}` on static facts list changed to `key={f.label}` for stable identity
+
+### Changed
+- `--color-status-online: #22c55e` added as a CSS variable in `index.html`; `Dot` component references it via `var()` and `color-mix()` instead of hardcoded hex
+- Vercel `/assets/(.*)` now served with `Cache-Control: public, max-age=31536000, immutable` for long-lived hashed asset caching
+- Privacy policy updated to reflect Sentry consent-gating; date bumped to May 8, 2026
+
 ## [1.1.1] - 2026-05-06
 
 ### Fixed
