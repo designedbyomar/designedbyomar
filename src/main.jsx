@@ -181,6 +181,7 @@ const Portrait = ({ galaxy, theme }) => {
   });
   const [desktopStatsVisible, setDesktopStatsVisible] = React.useState(false);
   const [touchStatsVisible, setTouchStatsVisible] = React.useState(false);
+  const [touchHintDismissed, setTouchHintDismissed] = React.useState(false);
   const [isTouchLayout, setIsTouchLayout] = React.useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return false;
     return window.matchMedia('(hover: none), (pointer: coarse)').matches;
@@ -374,12 +375,13 @@ const Portrait = ({ galaxy, theme }) => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
       }}
-      onClick={() => { if (isTouchLayout) setTouchStatsVisible((prev) => !prev); }}
+      onClick={() => { if (isTouchLayout) { setTouchStatsVisible((prev) => !prev); setTouchHintDismissed(true); } }}
       onKeyDown={(event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
         if (isTouchLayout) {
           setTouchStatsVisible((prev) => !prev);
+          setTouchHintDismissed(true);
         } else {
           setDesktopStatsVisible((prev) => !prev);
         }
@@ -447,7 +449,7 @@ const Portrait = ({ galaxy, theme }) => {
           textAlign: 'center',
           fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
           color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
-          opacity: touchStatsVisible ? 0 : 1,
+          opacity: touchHintDismissed ? 0 : 1,
           transition: 'opacity var(--duration-base-plus) ease',
           pointerEvents: 'none',
         }}>
