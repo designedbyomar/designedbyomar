@@ -1620,7 +1620,6 @@ const KeyFacts = () => {
 
   React.useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mq.matches) return;
 
     const loop = (ts) => {
       const t = ts / 1000;
@@ -1648,7 +1647,7 @@ const KeyFacts = () => {
       }
       animRef.current = requestAnimationFrame(loop);
     };
-    animRef.current = requestAnimationFrame(loop);
+    if (!mq.matches) animRef.current = requestAnimationFrame(loop);
 
     const onMotionChange = (e) => {
       if (e.matches) cancelAnimationFrame(animRef.current);

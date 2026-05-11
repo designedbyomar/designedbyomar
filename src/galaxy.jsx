@@ -75,8 +75,6 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
         outer: !!outer, z: 0.5 + Math.random() * 0.9,
       };
     };
-    const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
-    motionMQ.addEventListener('change', onMotionChange);
     const updateRunning = () => {
       const shouldRun = inView && pageVisible && !reducedMotion;
       if (shouldRun === activeRef.current) return;
@@ -89,6 +87,8 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
         rafRef.current = 0;
       }
     };
+    const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
+    motionMQ.addEventListener('change', onMotionChange);
     resize();
     window.addEventListener('resize', resize);
     const observer = typeof IntersectionObserver === 'undefined'
