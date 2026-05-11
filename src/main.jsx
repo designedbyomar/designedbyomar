@@ -882,7 +882,7 @@ const About = ({ onOpenDrawer }) => (
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 760 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 640 }}>
           <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
             {ABOUT_HEADER}
           </h2>
@@ -962,7 +962,7 @@ const AboutDrawer = ({ open, onClose }) => {
       <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="About Omar" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
@@ -1191,7 +1191,7 @@ const CaseCard = ({ c, featured = false }) => {
             <div style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-page)' }}>
               {c.coverVideo
                 ? <video src={c.coverVideo} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
-                : <img src={c.coverImage} alt={`${c.title} preview`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
+                : <img src={c.coverImage} alt={`${c.title} preview`} loading={featured ? 'eager' : 'lazy'} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
             </div>
           </div>
         ) : (
@@ -1228,7 +1228,7 @@ const CaseCard = ({ c, featured = false }) => {
         <div className="case-card-tag" style={{
           position: 'absolute', top: 16, left: 16,
           fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', fontWeight: 'var(--font-weight-medium)',
-          color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
+          color: 'var(--color-white)', textTransform: 'uppercase', letterSpacing: '0.08em',
           background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 9px', borderRadius: 'var(--radius-subtle)',
           backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
         }}>{c.num} · {c.year} · {c.client}</div>
@@ -1268,7 +1268,7 @@ const Work = ({ onOpenDrawer }) => {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
             <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
               Selected work. <span style={{ color: 'var(--fg-tertiary)' }}>Real systems. Measurable impact.</span>
             </h2>
@@ -1349,7 +1349,7 @@ const WorkDrawer = ({ open, onClose }) => {
       <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="All case studies" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
+        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
@@ -1443,7 +1443,7 @@ const CaseStudyPage = ({ c, onBack }) => {
         <div style={{
           position: 'absolute', top: 20, left: 22,
           fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)',
-          color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em',
+          color: 'var(--color-white)', textTransform: 'uppercase', letterSpacing: '0.08em',
           background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 10px', borderRadius: 'var(--radius-subtle)',
           backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
         }}>{c.num} · {c.year} · {c.client}</div>
@@ -1456,7 +1456,7 @@ const CaseStudyPage = ({ c, onBack }) => {
           lineHeight: 'var(--line-height-solid)', letterSpacing: '-0.04em',
           color: 'var(--fg-primary)', margin: '0 0 20px',
         }}>{c.title}</h1>
-        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 760 }}>{c.subtitle}</p>
+        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 640 }}>{c.subtitle}</p>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {c.tags.map(t => (
@@ -1482,7 +1482,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 760 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 640 }}>
         {[
           { label: 'Challenge', body: c.challenge },
           { label: 'Approach', body: c.approach },
@@ -1982,28 +1982,33 @@ const FAQ = ({ scrollToSection }) => {
                     transition: 'transform var(--duration-fast-mid) ease, color var(--duration-fast-mid) ease',
                   }} />
                 </button>
-                <div
-                  id={answerId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  className="faq-answer"
-                  style={{
-                    maxHeight: isOpen ? 520 : 0,
-                    opacity: isOpen ? 1 : 0,
-                    overflow: 'hidden',
-                    transition: prefersReducedMotion ? 'none' : 'max-height var(--duration-base-plus) ease, opacity var(--duration-fast-mid) ease',
-                  }}
-                >
-                  <p style={{
-                    margin: 0,
-                    padding: '0 var(--space-6) var(--space-6)',
-                    fontSize: 'var(--font-size-body-lg)',
-                    lineHeight: 'var(--line-height-loose)',
-                    color: 'var(--fg-secondary)',
-                    maxWidth: 720,
-                  }}>
-                    <FAQAnswer item={item} />
-                  </p>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateRows: isOpen ? '1fr' : '0fr',
+                  transition: prefersReducedMotion ? 'none' : 'grid-template-rows var(--duration-base-plus) ease',
+                }}>
+                  <div
+                    id={answerId}
+                    role="region"
+                    aria-labelledby={buttonId}
+                    className="faq-answer"
+                    style={{
+                      overflow: 'hidden',
+                      opacity: isOpen ? 1 : 0,
+                      transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast-mid) ease',
+                    }}
+                  >
+                    <p style={{
+                      margin: 0,
+                      padding: '0 var(--space-6) var(--space-6)',
+                      fontSize: 'var(--font-size-body-lg)',
+                      lineHeight: 'var(--line-height-loose)',
+                      color: 'var(--fg-secondary)',
+                      maxWidth: 720,
+                    }}>
+                      <FAQAnswer item={item} />
+                    </p>
+                  </div>
                 </div>
               </div>
             );

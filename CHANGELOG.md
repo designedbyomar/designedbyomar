@@ -2,6 +2,18 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [1.1.3] - 2026-05-11
+
+### Fixed
+- FAQ accordion uses `grid-template-rows` transition instead of `max-height` — eliminates per-frame layout recalculation during expand/collapse (both home page and design system demo)
+- CaseCard cover images now include `loading="lazy"` to defer off-screen image loads
+- Accent tag color uses `var(--color-white)` instead of hardcoded `'#fff'` on CaseCard and CaseStudyPage
+
+### Changed
+- Both drawers (About, Work) transition easing changed from `--easing-ease-out-bouncy` (overshoot, y=1.56) to `--easing-ease-out` — panels now feel grounded rather than playful
+- Body copy containers constrained to `maxWidth: 640` (from 760) in About section, Work header, case study subtitle, and case study body — reduces line length from ~95–100ch to ~80ch
+- Added `PRODUCT.md` — brand register, users, purpose, and design principles documentation
+
 ## [1.1.2] - 2026-05-09
 
 ### Fixed
