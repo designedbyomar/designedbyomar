@@ -36,6 +36,8 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
     let w = 0, h = 0, cx = 0, cy = 0, rMin = 0, rMax = 0;
     let inView = true;
     let pageVisible = document.visibilityState === 'visible';
+    const motionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reducedMotion = motionMQ.matches;
     let last = performance.now();
     let tick = () => { };
     const resize = () => {
@@ -74,7 +76,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
       };
     };
     const updateRunning = () => {
-      const shouldRun = inView && pageVisible;
+      const shouldRun = inView && pageVisible && !reducedMotion;
       if (shouldRun === activeRef.current) return;
       activeRef.current = shouldRun;
       if (shouldRun) {
@@ -85,6 +87,8 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
         rafRef.current = 0;
       }
     };
+    const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
+    motionMQ.addEventListener('change', onMotionChange);
     resize();
     window.addEventListener('resize', resize);
     const observer = typeof IntersectionObserver === 'undefined'
@@ -121,6 +125,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
       cancelAnimationFrame(rafRef.current);
       observer?.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      motionMQ.removeEventListener('change', onMotionChange);
       window.removeEventListener('resize', resize);
     };
   }, [density, speed, style, accent, theme]);
