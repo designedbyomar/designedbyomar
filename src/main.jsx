@@ -181,6 +181,7 @@ const Portrait = ({ galaxy, theme }) => {
   });
   const [desktopStatsVisible, setDesktopStatsVisible] = React.useState(false);
   const [touchStatsVisible, setTouchStatsVisible] = React.useState(false);
+  const [touchHintDismissed, setTouchHintDismissed] = React.useState(false);
   const [isTouchLayout, setIsTouchLayout] = React.useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return false;
     return window.matchMedia('(hover: none), (pointer: coarse)').matches;
@@ -374,12 +375,13 @@ const Portrait = ({ galaxy, theme }) => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
       }}
-      onClick={() => { if (isTouchLayout) setTouchStatsVisible((prev) => !prev); }}
+      onClick={() => { if (isTouchLayout) { setTouchStatsVisible((prev) => !prev); setTouchHintDismissed(true); } }}
       onKeyDown={(event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
         if (isTouchLayout) {
           setTouchStatsVisible((prev) => !prev);
+          setTouchHintDismissed(true);
         } else {
           setDesktopStatsVisible((prev) => !prev);
         }
@@ -441,6 +443,19 @@ const Portrait = ({ galaxy, theme }) => {
           );
         })}
       </div>
+      {isTouchLayout && (
+        <p aria-hidden="true" style={{
+          position: 'absolute', bottom: '-28px', left: 0, right: 0, margin: 0,
+          textAlign: 'center',
+          fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
+          color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
+          opacity: touchHintDismissed ? 0 : 1,
+          transition: 'opacity var(--duration-base-plus) ease',
+          pointerEvents: 'none',
+        }}>
+          Tap for highlights
+        </p>
+      )}
     </div>
   );
 };
@@ -792,9 +807,6 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
         AI, enterprise SaaS, fintech, healthcare. Built to scale real-world operations.
       </p>
-      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
-        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
-      </div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
@@ -815,6 +827,24 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >Say hello</a>
+        <a href="/Omar%20Tavarez%20Resume.pdf" target="_blank" rel="noopener noreferrer"
+          onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('resume_download', { section: 'hero' }); }}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)',
+            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
+            color: 'var(--fg-secondary)', minHeight: 44, padding: 'var(--space-2) var(--space-3)',
+            textDecoration: 'none', borderRadius: 'var(--radius-standard)', background: 'transparent',
+            transition: 'color var(--duration-fast)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-secondary)'}
+        >
+          Resume
+          <AppIcon icon={ArrowUpRight} size={12} />
+        </a>
+      </div>
+      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
+        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
       </div>
     </div>
     <Portrait galaxy={galaxy} theme={theme} />
@@ -2162,7 +2192,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           </div>
 
           <div className="site-footer-block">
-            <span style={footerLabelStyle}>Site Links</span>
+            <h3 style={{ ...footerLabelStyle, margin: 0 }}>Site Links</h3>
             <a
               href="/work"
               className="text-link site-footer-link"
@@ -2207,7 +2237,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
           </div>
 
           <div className="site-footer-block">
-            <span style={footerLabelStyle}>Social</span>
+            <h3 style={{ ...footerLabelStyle, margin: 0 }}>Social</h3>
             <a
               href={LINKEDIN_URL}
               target="_blank"
