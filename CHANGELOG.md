@@ -2,6 +2,17 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [1.1.4] - 2026-05-11
+
+### Added
+- Hero CTA row: Resume link surfaced as tertiary action alongside "View case studies" and "Say hello"; fires `resume_download` GA4 event
+- Tertiary button variant added to design system demo — transparent background, `fg-secondary` text, `fg-primary` hover, no border; documented in Buttons section
+- Portrait touch affordance: "TAP FOR HIGHLIGHTS" hint appears below the portrait on touch layout, fades out once stat cards are revealed
+
+### Changed
+- Hero copy flow: CTA buttons now come immediately after the tagline; "Recent impact" metric line demoted to footnote position below the CTA row
+- Footer group labels ("Site Links", "Social") changed from `<span>` to `<h3>` — no visual change, now reachable via screen reader heading navigation
+
 ## [1.1.3] - 2026-05-11
 
 ### Fixed

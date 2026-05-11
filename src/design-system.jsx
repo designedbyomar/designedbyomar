@@ -1251,6 +1251,16 @@ const DesignSystem = () => {
                   Read more about me
                 </button>
 
+                <button style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: 'transparent', color: 'var(--fg-secondary)',
+                  minHeight: 44, padding: '10px 12px', borderRadius: 6, fontSize: 14, fontWeight: 500,
+                  border: 'none', cursor: 'pointer', transition: 'color 150ms', fontFamily: 'inherit'
+                }} onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-secondary)'}>
+                  Tertiary Action
+                  <AppIcon icon={ArrowUpRight} size={12} />
+                </button>
+
                 <a href="#" className="text-link" onClick={(event) => event.preventDefault()}>
                   Text link
                   <AppIcon icon={ArrowUpRight} size={12} />
@@ -1265,7 +1275,7 @@ const DesignSystem = () => {
                 </div>
               </div>
               <div style={{ marginTop: 16, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-tertiary)', lineHeight: 1.8 }}>
-                Primary and secondary action buttons use a 44px minimum height. Drawer-opening actions like Read more about me use the secondary button pattern. Shared text links use the <code>.text-link</code> class: fg-secondary text, fg-primary hover, and a 4px horizontal shift. Footer links and FAQ view-all use this treatment.
+                Three button levels, all 44px minimum height. Primary: filled fg-primary, opacity hover. Secondary: outline inset shadow, bg-subtle hover. Tertiary: no border, fg-secondary text, fg-primary hover — used for low-emphasis actions like Resume. Shared text links use the <code>.text-link</code> class: fg-secondary text, fg-primary hover, and a 4px horizontal shift. Footer links and FAQ view-all use this treatment.
               </div>
             </div>
 
