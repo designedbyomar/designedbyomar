@@ -1191,7 +1191,7 @@ const CaseCard = ({ c, featured = false }) => {
             <div style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-page)' }}>
               {c.coverVideo
                 ? <video src={c.coverVideo} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
-                : <img src={c.coverImage} alt={`${c.title} preview`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
+                : <img src={c.coverImage} alt={`${c.title} preview`} loading={featured ? 'eager' : 'lazy'} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
             </div>
           </div>
         ) : (
