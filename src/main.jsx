@@ -421,7 +421,7 @@ const Portrait = ({ galaxy, theme }) => {
         }} />
       )}
       <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 1, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
-      <div className="hero-stats-layer" aria-hidden={!statsVisible}>
+      <div className="hero-stats-layer" aria-hidden={!statsVisible ? true : undefined}>
         {HERO_STATS.map((stat, index) => {
           const position = isTouchLayout ? stat.mobile : stat.desktop;
           return (
@@ -858,7 +858,7 @@ const LogoCarousel = () => (
             <div
               key={`${logo.name}-${index}`}
               className="logo-mark"
-              aria-hidden={isClone}
+              aria-hidden={isClone ? true : undefined}
               style={{ '--logo-basis': `${logo.basis}px` }}
             >
               <img
@@ -923,26 +923,43 @@ const About = ({ onOpenDrawer }) => (
   </>
 );
 
+const FOCUSABLE_SELECTORS = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
 const AboutDrawer = ({ open, onClose }) => {
   const triggerRef = React.useRef(null);
+  const drawerRef = React.useRef(null);
   React.useEffect(() => {
     if (open) {
       triggerRef.current = document.activeElement;
+      const first = drawerRef.current?.querySelector(FOCUSABLE_SELECTORS);
+      if (first) first.focus();
     } else if (triggerRef.current) {
       triggerRef.current.focus();
       triggerRef.current = null;
     }
   }, [open]);
   React.useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    if (open) document.addEventListener('keydown', onKey);
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+    if (!open) return;
+    const el = drawerRef.current;
+    const trap = (e) => {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab' || !el) return;
+      const nodes = Array.from(el.querySelectorAll(FOCUSABLE_SELECTORS));
+      if (!nodes.length) return;
+      if (e.shiftKey && document.activeElement === nodes[0]) {
+        e.preventDefault(); nodes[nodes.length - 1].focus();
+      } else if (!e.shiftKey && document.activeElement === nodes[nodes.length - 1]) {
+        e.preventDefault(); nodes[0].focus();
+      }
+    };
+    document.addEventListener('keydown', trap);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', trap); document.body.style.overflow = ''; };
   }, [open, onClose]);
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <aside role="dialog" aria-label="About Omar" style={{
+      <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="About Omar" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
         transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
@@ -950,7 +967,7 @@ const AboutDrawer = ({ open, onClose }) => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: 44, height: 44, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
         </div>
@@ -1297,24 +1314,39 @@ const Work = ({ onOpenDrawer }) => {
 // ============================================================
 const WorkDrawer = ({ open, onClose }) => {
   const triggerRef = React.useRef(null);
+  const drawerRef = React.useRef(null);
   React.useEffect(() => {
     if (open) {
       triggerRef.current = document.activeElement;
+      const first = drawerRef.current?.querySelector(FOCUSABLE_SELECTORS);
+      if (first) first.focus();
     } else if (triggerRef.current) {
       triggerRef.current.focus();
       triggerRef.current = null;
     }
   }, [open]);
   React.useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    if (open) document.addEventListener('keydown', onKey);
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+    if (!open) return;
+    const el = drawerRef.current;
+    const trap = (e) => {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab' || !el) return;
+      const nodes = Array.from(el.querySelectorAll(FOCUSABLE_SELECTORS));
+      if (!nodes.length) return;
+      if (e.shiftKey && document.activeElement === nodes[0]) {
+        e.preventDefault(); nodes[nodes.length - 1].focus();
+      } else if (!e.shiftKey && document.activeElement === nodes[nodes.length - 1]) {
+        e.preventDefault(); nodes[0].focus();
+      }
+    };
+    document.addEventListener('keydown', trap);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', trap); document.body.style.overflow = ''; };
   }, [open, onClose]);
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <aside role="dialog" aria-label="All case studies" style={{
+      <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="All case studies" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
         transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out-bouncy)',
@@ -1322,7 +1354,7 @@ const WorkDrawer = ({ open, onClose }) => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: 44, height: 44, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             <AppIcon icon={X} size={14} />
           </button>
         </div>
@@ -1534,8 +1566,8 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section }) => {
           title={copied ? 'Copied' : 'Copy'}
           onClick={handleCopy}
           style={{
-            position: 'absolute', top: 12, right: 12,
-            width: 28, height: 28, borderRadius: 'var(--radius-circle)',
+            position: 'absolute', top: 8, right: 8,
+            width: 36, height: 36, borderRadius: 'var(--radius-circle)',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             border: 'none', cursor: 'pointer',
             background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
@@ -1587,6 +1619,9 @@ const KeyFacts = () => {
   }, []);
 
   React.useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.matches) return;
+
     const loop = (ts) => {
       const t = ts / 1000;
       const mx = mouseRef.current.x;
@@ -1614,7 +1649,16 @@ const KeyFacts = () => {
       animRef.current = requestAnimationFrame(loop);
     };
     animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
+
+    const onMotionChange = (e) => {
+      if (e.matches) cancelAnimationFrame(animRef.current);
+      else animRef.current = requestAnimationFrame(loop);
+    };
+    mq.addEventListener('change', onMotionChange);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      mq.removeEventListener('change', onMotionChange);
+    };
   }, []);
 
   const facts = [
