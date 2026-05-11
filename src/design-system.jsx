@@ -601,28 +601,33 @@ const DesignSystemFAQAccordion = () => {
                   transition: 'transform 180ms ease, color 180ms ease',
                 }} />
               </button>
-              <div
-                id={answerId}
-                role="region"
-                aria-labelledby={buttonId}
-                className="faq-answer"
-                style={{
-                  maxHeight: isOpen ? 180 : 0,
-                  opacity: isOpen ? 1 : 0,
-                  overflow: 'hidden',
-                  transition: 'max-height 240ms ease, opacity 180ms ease',
-                }}
-              >
-                <p style={{
-                  margin: 0,
-                  padding: '0 20px 20px',
-                  fontSize: 15,
-                  lineHeight: 1.65,
-                  color: 'var(--fg-secondary)',
-                  maxWidth: 680,
-                }}>
-                  {item.answer}
-                </p>
+              <div style={{
+                display: 'grid',
+                gridTemplateRows: isOpen ? '1fr' : '0fr',
+                transition: 'grid-template-rows 240ms ease',
+              }}>
+                <div
+                  id={answerId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  className="faq-answer"
+                  style={{
+                    overflow: 'hidden',
+                    opacity: isOpen ? 1 : 0,
+                    transition: 'opacity 180ms ease',
+                  }}
+                >
+                  <p style={{
+                    margin: 0,
+                    padding: '0 20px 20px',
+                    fontSize: 15,
+                    lineHeight: 1.65,
+                    color: 'var(--fg-secondary)',
+                    maxWidth: 680,
+                  }}>
+                    {item.answer}
+                  </p>
+                </div>
               </div>
             </div>
           );
