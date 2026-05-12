@@ -373,7 +373,7 @@ const Portrait = ({ galaxy, theme }) => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
       }}
-      onFocus={() => { if (!isTouchLayout) setDesktopStatsVisible(true); }}
+      onFocus={() => { if (!isTouchLayout) { setDesktopStatsVisible(true); setDesktopHintDismissed(true); } }}
       onBlur={() => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
@@ -470,7 +470,7 @@ const Portrait = ({ galaxy, theme }) => {
             margin: 0, textAlign: 'center',
             fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
             color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
-            animation: prefersReducedMotion ? 'none' : 'hintPulse 2.5s ease-in-out infinite',
+            animation: (prefersReducedMotion || desktopHintDismissed) ? 'none' : 'hintPulse 2.5s ease-in-out infinite',
           }}>
             Hover for highlights
           </p>
