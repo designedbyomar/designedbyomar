@@ -85,34 +85,3 @@ export const TokenSwatch = ({ name, token, value, className = '' }) => (
     </div>
   </div>
 );
-
-export const AccordionNavGroup = ({ title, items, open, onToggle, activeId, onNavigate }) => (
-  <div className="ds-nav-group">
-    <button
-      type="button"
-      className="ds-nav-group__button"
-      aria-expanded={open}
-      aria-controls={`ds-nav-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-      onClick={onToggle}
-    >
-      <span>{title}</span>
-      <span aria-hidden="true">{open ? '-' : '+'}</span>
-    </button>
-    <div
-      id={`ds-nav-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-      className="ds-nav-group__items"
-      hidden={!open}
-    >
-      {items.map((item) => (
-        <a
-          key={item.id}
-          href={`#${item.id}`}
-          className={activeId === item.id ? 'is-active' : undefined}
-          onClick={onNavigate}
-        >
-          {item.label}
-        </a>
-      ))}
-    </div>
-  </div>
-);

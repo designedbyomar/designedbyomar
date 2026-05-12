@@ -474,8 +474,6 @@ const BackToTopButton = () => {
       aria-label="Back to top"
       title="Back to top"
       onPointerDown={scrollToTop}
-      onMouseDown={scrollToTop}
-      onClick={scrollToTop}
     >
       <AppIcon icon={ArrowUp} size={18} />
     </button>
@@ -909,7 +907,7 @@ const PatternsSection = () => (
   </>
 );
 
-const MotionSection = () => (
+const MotionSection = ({ theme }) => (
   <>
     <section id="motion" className="ds-section" aria-labelledby="motion-title">
       <SectionHeader eyebrow="Motion" title="Motion">
@@ -938,8 +936,11 @@ const MotionSection = () => (
         The square-particle field supports the visual identity while remaining pointer-safe and reduced-motion aware.
       </SectionHeader>
       <ExampleFrame label="Canvas motif">
-        <div style={{ position: 'relative', width: '100%', minHeight: 220, overflow: 'hidden', borderRadius: 'var(--radius-image)' }}>
-          <Galaxy density={1.45} speed={0.55} style="pixel" accent="workflow" theme={document.documentElement.dataset.theme || 'dark'} />
+        <div
+          data-design-system-galaxy-theme={theme}
+          style={{ position: 'relative', width: '100%', minHeight: 220, overflow: 'hidden', borderRadius: 'var(--radius-image)' }}
+        >
+          <Galaxy density={1.45} speed={0.55} style="pixel" accent="workflow" theme={theme} />
         </div>
       </ExampleFrame>
     </section>
@@ -1090,7 +1091,7 @@ const DesignSystem = () => {
           <FoundationsSection />
           <ComponentsSection />
           <PatternsSection />
-          <MotionSection />
+          <MotionSection theme={theme} />
           <ContentAccessibilityResources />
         </main>
       </div>

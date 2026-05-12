@@ -122,9 +122,12 @@ test('design system route exposes the public documentation experience', async ({
   await expect(page).toHaveURL(/#motion$/);
   await expect(page.locator('#motion').getByRole('heading', { name: /^Motion$/ })).toBeVisible();
 
+  const galaxyTheme = page.locator('#pixel-orbit [data-design-system-galaxy-theme]');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(galaxyTheme).toHaveAttribute('data-design-system-galaxy-theme', 'dark');
   await page.getByRole('button', { name: /Switch to light mode/i }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(galaxyTheme).toHaveAttribute('data-design-system-galaxy-theme', 'light');
 });
 
 test('design system documents restored foundations and component flow', async ({ page }) => {
