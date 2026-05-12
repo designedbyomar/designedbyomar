@@ -473,7 +473,7 @@ const BackToTopButton = () => {
       className={`ds-icon-button ds-back-to-top${visible ? ' is-visible' : ''}`}
       aria-label="Back to top"
       title="Back to top"
-      onPointerDown={scrollToTop}
+      onClick={scrollToTop}
     >
       <AppIcon icon={ArrowUp} size={18} />
     </button>

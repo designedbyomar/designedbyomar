@@ -8,8 +8,8 @@ export const Button = ({ variant = 'primary', children, icon: Icon, ...props }) 
   </button>
 );
 
-export const IconButton = ({ icon, label, ...props }) => (
-  <button className="ds-icon-button" type="button" aria-label={label} title={label} {...props}>
+export const IconButton = ({ icon, label, className = '', ...props }) => (
+  <button {...props} className={`ds-icon-button ${className}`.trim()} type="button" aria-label={label} title={label}>
     <AppIcon icon={icon} size={16} />
   </button>
 );

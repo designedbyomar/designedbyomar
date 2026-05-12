@@ -764,10 +764,6 @@
   box-shadow: inset 0 0 0 1px var(--color-gray-100);
 }
 
-.ds-mobile-nav-trigger {
-  display: none;
-}
-
 .ds-copy-button {
   min-height: 34px;
   padding: 6px 10px;

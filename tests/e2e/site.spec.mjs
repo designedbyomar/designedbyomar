@@ -54,7 +54,7 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
 });
 
-test('design system route exposes the public documentation experience', async ({ page }) => {
+test('design system route exposes the public header and intro content', async ({ page }) => {
   await page.goto('/design-system');
 
   await expect(page).toHaveURL(/\/design-system$/);
@@ -68,13 +68,20 @@ test('design system route exposes the public documentation experience', async ({
   await expect(page.getByRole('banner').getByRole('link', { name: /^FAQ$/ })).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('link', { name: /^Contact$/ })).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('link', { name: /^Get in touch$/ })).toBeVisible();
-  await expect(page.locator('#quick-links a.ds-contact-surface-card')).toHaveCount(5);
-  await expect(page.locator('#quick-links .ds-signal-gradient-icon')).toHaveCount(5);
-  await expect(page.locator('#quick-links a.ds-contact-surface-card').nth(0)).toHaveAttribute('href', '#foundations');
-  await expect(page.locator('#quick-links a.ds-contact-surface-card').nth(1)).toHaveAttribute('href', '#components');
-  await expect(page.locator('#quick-links a.ds-contact-surface-card').nth(2)).toHaveAttribute('href', '#patterns');
-  await expect(page.locator('#quick-links a.ds-contact-surface-card').nth(3)).toHaveAttribute('href', '#motion');
-  await expect(page.locator('#quick-links a.ds-contact-surface-card').nth(4)).toHaveAttribute('href', '#accessibility');
+});
+
+test('design system quick-links grid exposes the section shortcuts', async ({ page }) => {
+  await page.goto('/design-system');
+
+  const quickLinks = page.locator('#quick-links');
+  const cards = quickLinks.locator('a.ds-contact-surface-card');
+  await expect(cards).toHaveCount(5);
+  await expect(quickLinks.locator('.ds-signal-gradient-icon')).toHaveCount(5);
+  await expect(cards.nth(0)).toHaveAttribute('href', '#foundations');
+  await expect(cards.nth(1)).toHaveAttribute('href', '#components');
+  await expect(cards.nth(2)).toHaveAttribute('href', '#patterns');
+  await expect(cards.nth(3)).toHaveAttribute('href', '#motion');
+  await expect(cards.nth(4)).toHaveAttribute('href', '#accessibility');
   await expect.poll(() => page.locator('#quick-links').evaluate((grid) => {
     const styles = getComputedStyle(grid);
     return {
@@ -105,6 +112,10 @@ test('design system route exposes the public documentation experience', async ({
   await expect.poll(() => page.locator('.ds-doc-card').first().evaluate((card) => (
     getComputedStyle(card).boxShadow.includes('inset')
   ))).toBe(true);
+});
+
+test('design system sidebar categories collapse and expand', async ({ page }) => {
+  await page.goto('/design-system');
 
   const sidebar = page.getByTestId('design-system-sidebar');
   await expect(sidebar).toHaveAttribute('data-sidebar-mode', 'collapsible');
@@ -113,6 +124,12 @@ test('design system route exposes the public documentation experience', async ({
   await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'false');
   await sidebar.getByRole('button', { name: /Components/i }).click();
   await expect(sidebar.getByRole('link', { name: 'designedbyomar' })).toHaveCount(0);
+});
+
+test('design system sidebar links navigate to anchored sections', async ({ page }) => {
+  await page.goto('/design-system');
+
+  const sidebar = page.getByTestId('design-system-sidebar');
 
   await sidebar.getByRole('link', { name: /Buttons/i }).click();
   await expect(page).toHaveURL(/#buttons$/);
@@ -121,6 +138,10 @@ test('design system route exposes the public documentation experience', async ({
   await sidebar.getByRole('link', { name: /Motion overview/i }).click();
   await expect(page).toHaveURL(/#motion$/);
   await expect(page.locator('#motion').getByRole('heading', { name: /^Motion$/ })).toBeVisible();
+});
+
+test('design system theme toggle updates the pixel orbit theme', async ({ page }) => {
+  await page.goto('/design-system');
 
   const galaxyTheme = page.locator('#pixel-orbit [data-design-system-galaxy-theme]');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');

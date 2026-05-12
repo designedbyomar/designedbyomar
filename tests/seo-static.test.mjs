@@ -79,8 +79,12 @@ test('design system route is public and discoverable', () => {
   assert.equal(getCanonical(html), designSystemUrl);
   assert.equal(getMetaByProperty(html, 'og:url'), designSystemUrl);
   assert.match(getMetaByProperty(html, 'og:title'), /designedbyomar Design System/i);
+  assert.match(getMetaByProperty(html, 'og:description'), /design system/i);
   assert.ok(getMetaByProperty(html, 'og:image').startsWith(`${SITE_ORIGIN}/`));
   assert.equal(getMetaByName(html, 'twitter:card'), 'summary_large_image');
+  assert.match(getMetaByName(html, 'twitter:title'), /designedbyomar Design System/i);
+  assert.match(getMetaByName(html, 'twitter:description'), /design system/i);
+  assert.ok(getMetaByName(html, 'twitter:image').startsWith(`${SITE_ORIGIN}/`));
   assert.ok(hasGraphUrl(getStructuredData(html), designSystemUrl), '/design-system JSON-LD contains the canonical URL');
 });
 
