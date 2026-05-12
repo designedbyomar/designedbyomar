@@ -5,7 +5,8 @@ This file is the agent-readable entrypoint for visual and interaction work on `d
 For exact values, rendered examples, and component behavior, inspect:
 
 - `src/design-system.jsx` for the implementation reference page and current token usage.
-- `design-system.html` for the built design-system entry.
+- `/design-system` for the public design-system reference, generated from `design-system.html`.
+- `src/design-tokens.css` for the shared token source used by the portfolio and design-system entries.
 - `src/main.jsx` for how the design language is applied across the portfolio.
 
 ## Purpose
