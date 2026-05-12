@@ -16,7 +16,7 @@ If you're a hiring manager or founder, the things to look at are:
 
 1. The site itself — [designedbyomar.com](https://www.designedbyomar.com)
 2. The case studies in [`postbuild.js`](./postbuild.js) — each gets its own crawlable, SEO-tagged route.
-3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the visual reference page at [`/design-system.html`](https://www.designedbyomar.com/design-system.html).
+3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the public reference page at [`/design-system`](https://www.designedbyomar.com/design-system).
 4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
 
 ## Screenshots
@@ -29,7 +29,7 @@ If you're a hiring manager or founder, the things to look at are:
 
 - **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
 - **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
-- **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a visual reference page at `/design-system.html` documenting tokens, spacing, typography, motion, iconography, and theming. The codebase is mid-migration to fully tokenized values (see recent commits — gradient, typography, motion, and spacing token phases).
+- **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a public reference page at `/design-system` documenting tokens, components, patterns, motion, content, accessibility, and theming.
 - **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
@@ -132,7 +132,7 @@ git switch -c fix/canonical-host
 .
 ├── index.html                      # main app entry
 ├── DESIGN.md                       # agent-readable design system guide
-├── design-system.html              # design system entry
+├── design-system.html              # design system source entry, served publicly at /design-system
 ├── 404.html                        # static 404
 ├── postbuild.js                    # per-case-study route generation
 ├── vite.config.js                  # multi-entry rollup config
@@ -149,6 +149,9 @@ git switch -c fix/canonical-host
 ├── src/
 │   ├── main.jsx                    # main site app (in active token migration)
 │   ├── design-system.jsx           # design system reference page
+│   ├── design-system-primitives.jsx # extracted design system documentation primitives
+│   ├── design-system-page.css      # design system page layout and responsive behavior
+│   ├── design-tokens.css           # shared token source for app entries
 │   ├── footer-alien.jsx
 │   ├── ui-icons.jsx
 │   └── constants.js                # nav / route / breakpoint constants

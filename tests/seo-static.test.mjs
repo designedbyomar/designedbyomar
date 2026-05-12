@@ -66,6 +66,24 @@ test('sitemap and generated case-study routes stay in sync', () => {
   assert.deepEqual(sitemapCasePaths, generatedCasePaths);
 });
 
+test('design system route is public and discoverable', () => {
+  const designSystemUrl = `${SITE_ORIGIN}/design-system`;
+  const urls = sitemapUrls();
+
+  assert.ok(urls.includes(designSystemUrl), '/design-system is included in the sitemap');
+
+  const html = readDist('design-system', 'index.html');
+  assert.match(getTitle(html), /designedbyomar Design System/i);
+  assert.match(getMetaByName(html, 'description'), /design system/i);
+  assert.equal(getMetaByName(html, 'robots'), 'index,follow,max-image-preview:large');
+  assert.equal(getCanonical(html), designSystemUrl);
+  assert.equal(getMetaByProperty(html, 'og:url'), designSystemUrl);
+  assert.match(getMetaByProperty(html, 'og:title'), /designedbyomar Design System/i);
+  assert.ok(getMetaByProperty(html, 'og:image').startsWith(`${SITE_ORIGIN}/`));
+  assert.equal(getMetaByName(html, 'twitter:card'), 'summary_large_image');
+  assert.ok(hasGraphUrl(getStructuredData(html), designSystemUrl), '/design-system JSON-LD contains the canonical URL');
+});
+
 test('all sitemap pages have indexable metadata and matching structured data', () => {
   sitemapUrls().forEach((url) => {
     const htmlPath = pagePathForUrl(url);

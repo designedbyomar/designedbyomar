@@ -16,7 +16,7 @@ Contact: omar@designedbyomar.com
 - /work/plastiq-mktg/ : Plastiq Marketing Site case study
 - /work/disney-cct/ : Critical Communication Tool case study
 - /work/disney-uap/ : Unified Ad Platform case study
-- /design-system.html : design system and brand reference page
+- /design-system : public design system, brand, token, component, pattern, motion, content, and accessibility reference
 - /privacy : privacy policy and data collection details
 
 ## Topics

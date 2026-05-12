@@ -1,5 +1,6 @@
 {
   "redirects": [
+    { "source": "/design-system.html", "destination": "/design-system", "permanent": true },
     { "source": "/work/", "destination": "/work", "permanent": true },
     { "source": "/work/mgmt-portal", "destination": "/work/mgmt-portal/", "permanent": true },
     { "source": "/work/posting-asst", "destination": "/work/posting-asst/", "permanent": true },

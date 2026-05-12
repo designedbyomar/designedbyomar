@@ -5,6 +5,7 @@ const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
+const DESIGN_SYSTEM_URL = `${SITE_ORIGIN}/design-system`;
 
 const CASE_STUDIES = [
   { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.', client: 'Wisdom', ogImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp' },
@@ -155,6 +156,32 @@ const workStructuredData = () => ({
   ],
 });
 
+const designSystemStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: 'designedbyomar Design System',
+      url: DESIGN_SYSTEM_URL,
+      description: 'The design-system reference for the portfolio, case-study storytelling, interaction patterns, and motion language behind designedbyomar.com.',
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    {
+      '@type': 'CreativeWork',
+      name: 'designedbyomar Design System',
+      url: DESIGN_SYSTEM_URL,
+      description: 'A public design-system artifact documenting the tokens, components, patterns, content rules, and accessibility standards behind Omar Tavarez’s portfolio.',
+      creator: personSchema,
+      about: ['Design Systems', 'Portfolio Design', 'Product Design', 'Design Engineering'],
+    },
+    personSchema,
+  ],
+});
+
 function generateRoutes() {
   const distDir = './dist';
   if (!fs.existsSync(distDir)) return;
@@ -209,6 +236,23 @@ function generateRoutes() {
     privacyStructuredData(),
   );
   fs.writeFileSync(`${privacyDir}/index.html`, privacyHtml);
+
+  const designSystemSourcePath = `${distDir}/design-system.html`;
+  if (fs.existsSync(designSystemSourcePath)) {
+    const designSystemDir = `${distDir}/design-system`;
+    fs.mkdirSync(designSystemDir, { recursive: true });
+    const designSystemSource = fs.readFileSync(designSystemSourcePath, 'utf8');
+    const designSystemHtml = setStructuredData(
+      setMeta(designSystemSource, {
+        title: 'designedbyomar Design System',
+        description: 'The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez’s portfolio.',
+        url: DESIGN_SYSTEM_URL,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      designSystemStructuredData(),
+    );
+    fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
+  }
 
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
