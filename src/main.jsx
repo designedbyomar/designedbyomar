@@ -19,6 +19,7 @@ const GA_MEASUREMENT_ID = 'G-T7W0PFD3HD';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
 const GITHUB_URL = 'https://github.com/designedbyomar';
 const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
+const BEHANCE_URL = 'https://www.behance.net/omartavarez';
 
 let sentryInitialized = false;
 const initSentryIfEnabled = () => {
@@ -2082,6 +2083,7 @@ const Contact = () => {
             <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
             <ContactCard label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
             <ContactCard label="Substack" value="@designedbyomar" href={SUBSTACK_URL} eventName="contact_click_substack" section="contact" />
+            <ContactCard label="Behance" value="omartavarez" href={BEHANCE_URL} eventName="contact_click_behance" section="contact" />
           </div>
         </div>
       </Reveal>
@@ -2264,6 +2266,15 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'footer' }); }}
             >
               Substack
+            </a>
+            <a
+              href={BEHANCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link site-footer-link"
+              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_behance', { link_url: BEHANCE_URL, section: 'footer' }); }}
+            >
+              Behance
             </a>
             <span style={{ paddingTop: 8, fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               © 2026 Omar Tavarez
@@ -2517,6 +2528,7 @@ const personSchema = {
     LINKEDIN_URL,
     GITHUB_URL,
     SUBSTACK_URL,
+    BEHANCE_URL,
   ],
   knowsAbout: [
     'Product Design',
