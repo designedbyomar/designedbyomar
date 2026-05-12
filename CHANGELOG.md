@@ -2,6 +2,18 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [1.1.5] - 2026-05-12
+
+### Added
+- Portrait desktop affordance: "HOVER FOR HIGHLIGHTS" hint appears below the portrait on non-touch layout, pulses between 28–50% opacity, fades out permanently on first hover or keyboard focus
+- Behance profile added to Contact section card, footer Social group, and JSON-LD `Person.sameAs` array
+
+### Changed
+- Portrait cursor corrected to `pointer` on desktop (was `default`; portrait is keyboard-focusable and interactive on all layouts)
+- Portrait hints now respect `prefers-reduced-motion` — transition and pulse animation disabled when motion is reduced (both touch and desktop hints)
+- Hero "Recent impact" line: removed `marginTop: -8` so spacing above and below the CTA button row is consistent
+- Footer Design System link corrected from relative `design-system.html` to routed `/design-system`
+
 ## [1.1.4] - 2026-05-11
 
 ### Added

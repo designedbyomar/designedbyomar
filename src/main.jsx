@@ -183,6 +183,7 @@ const Portrait = ({ galaxy, theme }) => {
   const [desktopStatsVisible, setDesktopStatsVisible] = React.useState(false);
   const [touchStatsVisible, setTouchStatsVisible] = React.useState(false);
   const [touchHintDismissed, setTouchHintDismissed] = React.useState(false);
+  const [desktopHintDismissed, setDesktopHintDismissed] = React.useState(false);
   const [isTouchLayout, setIsTouchLayout] = React.useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return false;
     return window.matchMedia('(hover: none), (pointer: coarse)').matches;
@@ -355,7 +356,7 @@ const Portrait = ({ galaxy, theme }) => {
   return (
     <div
       ref={portraitRef}
-      style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1/1', margin: '0 auto', cursor: isTouchLayout ? 'pointer' : 'default' }}
+      style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1/1', margin: '0 auto', cursor: 'pointer' }}
       role="button"
       tabIndex={0}
       aria-label="Show hero highlights"
@@ -363,6 +364,7 @@ const Portrait = ({ galaxy, theme }) => {
       onMouseEnter={(event) => {
         if (!isTouchLayout) {
           setDesktopStatsVisible(true);
+          setDesktopHintDismissed(true);
           updatePointerMotion(event.clientX, event.clientY, event.timeStamp || performance.now());
         }
       }}
@@ -371,7 +373,7 @@ const Portrait = ({ galaxy, theme }) => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
       }}
-      onFocus={() => { if (!isTouchLayout) setDesktopStatsVisible(true); }}
+      onFocus={() => { if (!isTouchLayout) { setDesktopStatsVisible(true); setDesktopHintDismissed(true); } }}
       onBlur={() => {
         if (!isTouchLayout) setDesktopStatsVisible(false);
         resetPointerMotion();
@@ -451,11 +453,28 @@ const Portrait = ({ galaxy, theme }) => {
           fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
           color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
           opacity: touchHintDismissed ? 0 : 1,
-          transition: 'opacity var(--duration-base-plus) ease',
+          transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-base-plus) ease',
           pointerEvents: 'none',
         }}>
           Tap for highlights
         </p>
+      )}
+      {!isTouchLayout && (
+        <div aria-hidden="true" style={{
+          position: 'absolute', bottom: '-28px', left: 0, right: 0,
+          opacity: desktopHintDismissed ? 0 : 1,
+          transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-base-plus) ease',
+          pointerEvents: 'none',
+        }}>
+          <p style={{
+            margin: 0, textAlign: 'center',
+            fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
+            color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
+            animation: (prefersReducedMotion || desktopHintDismissed) ? 'none' : 'hintPulse 2.5s ease-in-out infinite',
+          }}>
+            Hover for highlights
+          </p>
+        </div>
       )}
     </div>
   );
@@ -844,7 +863,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           <AppIcon icon={ArrowUpRight} size={12} />
         </a>
       </div>
-      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: -8 }}>
+      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
       </div>
     </div>
@@ -2230,7 +2249,7 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               Privacy Policy
             </a>
             <a
-              href="design-system.html"
+              href="/design-system"
               className="text-link site-footer-link"
               aria-label="See Design System"
             >
