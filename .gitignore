@@ -16,6 +16,7 @@ node_modules/
 # Lint / type caches
 .eslintcache
 .stylelintcache
+*.tsbuildinfo
 
 # Vite
 vite.config.js.timestamp-*
