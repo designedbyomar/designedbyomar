@@ -1,4 +1,5 @@
 const fs = require('fs');
+const CASE_STUDIES = require('./src/content/case-studies.json');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
@@ -6,17 +7,6 @@ const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
 const DESIGN_SYSTEM_URL = `${SITE_ORIGIN}/design-system`;
-
-const CASE_STUDIES = [
-  { id: 'mgmt-portal', title: 'Management Portal', subtitle: 'Ops command center replacing 200+ spreadsheets with real-time intelligence.', client: 'Wisdom', ogImage: '/Images/case-studies/management-portal/team-lead-dashboard.webp' },
-  { id: 'posting-asst', title: 'Posting Assistant', subtitle: 'AI-assisted insurance payment posting workflow that kept specialists in control.', client: 'Wisdom', ogImage: '/Images/case-studies/posting-asst/cover.webp' },
-  { id: 'page-builder', title: 'Page Builder 2.0', subtitle: 'CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.', client: 'Simplero', ogImage: '/Images/case-studies/page-builder/cover.webp' },
-  { id: 'connect-api', title: 'Connect API Payments', subtitle: 'PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.', client: 'Plastiq', ogImage: '/Images/case-studies/connect-api/cover.webp' },
-  { id: 'athena-ds', title: 'Athena Design System 2.0', subtitle: "Enterprise design system that became the foundation for Plastiq's IPO-era brand.", client: 'Plastiq', ogImage: '/Images/case-studies/athena-ds/cover.webp' },
-  { id: 'plastiq-mktg', title: 'Plastiq Marketing Site', subtitle: 'Pre-IPO brand relaunch delivered WCAG-compliant in 3–4 weeks.', client: 'Plastiq', ogImage: '/Images/case-studies/plastiq-mktg/cover.webp' },
-  { id: 'disney-cct', title: 'Critical Communication Tool', subtitle: 'Enterprise subscription manager used to coordinate 250 critical incidents.', client: 'The Walt Disney Company', ogImage: '/Images/case-studies/disney-cct/cover.webp' },
-  { id: 'disney-uap', title: 'Unified Ad Platform', subtitle: 'Four brand ad-sales platforms consolidated into one cross-brand system.', client: 'Disney (DTC&I)', ogImage: '/Images/case-studies/disney-uap/cover.webp' },
-];
 
 const personSchema = {
   '@type': 'Person',
@@ -113,7 +103,7 @@ const caseStudyStructuredData = (c) => {
         url,
         description: c.subtitle,
         creator: personSchema,
-        about: [c.client],
+        about: c.tags,
       },
       personSchema,
     ],

@@ -67,7 +67,7 @@ test('design system route exposes the public header and intro content', async ({
   await expect(page.getByRole('banner').getByRole('link', { name: /^About$/ })).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('link', { name: /^FAQ$/ })).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('link', { name: /^Contact$/ })).toHaveCount(0);
-  await expect(page.getByRole('banner').getByRole('link', { name: /^Get in touch$/ })).toBeVisible();
+  await expect(page.getByRole('banner').getByRole('button', { name: /design system navigation/i })).toBeVisible();
 });
 
 test('design system quick-links grid exposes the section shortcuts', async ({ page }) => {
@@ -93,17 +93,18 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
     width: expect.any(Number),
   });
   await expect.poll(() => page.locator('#quick-links').evaluate((grid) => Math.round(grid.getBoundingClientRect().width))).toBeGreaterThan(900);
-  await expect.poll(() => page.locator('[data-design-system-alien="signature"] .ds-hero-alien__stage').evaluate((stage) => {
-    const rect = stage.getBoundingClientRect();
+  await expect(page.locator('.ds-pixel-orbit')).toBeVisible();
+  await expect.poll(() => page.locator('.ds-pixel-orbit').evaluate((orbit) => {
+    const rect = orbit.getBoundingClientRect();
     return Math.round(Math.max(rect.width, rect.height));
   })).toBeLessThanOrEqual(220);
   await expect.poll(() => page.evaluate(() => {
-    const copy = document.querySelector('.ds-hero-intro p');
-    const alien = document.querySelector('[data-design-system-alien="signature"]');
-    if (!copy || !alien) return false;
-    const copyRect = copy.getBoundingClientRect();
-    const alienRect = alien.getBoundingClientRect();
-    return copyRect.top < alienRect.bottom && alienRect.top < copyRect.bottom;
+    const orbit = document.querySelector('.ds-pixel-orbit');
+    const h1 = document.querySelector('#overview-title');
+    if (!orbit || !h1) return false;
+    const orbitCenterY = (orbit.getBoundingClientRect().top + orbit.getBoundingClientRect().bottom) / 2;
+    const h1Rect = h1.getBoundingClientRect();
+    return orbitCenterY >= h1Rect.top && orbitCenterY <= h1Rect.bottom;
   })).toBe(true);
   await expect.poll(() => page.evaluate(() => {
     const width = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
@@ -170,6 +171,19 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
 });
 
+test('design system displays visual audit specimens for foundations, patterns, and accessibility', async ({ page }) => {
+  await page.goto('/design-system');
+
+  await expect(page.locator('[data-audit-example="foundation-specimens"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="hero-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="case-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="footer-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="privacy-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="reduced-motion-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="focus-accessibility"]')).toBeVisible();
+  await expect(page.locator('[data-audit-example="contrast-accessibility"]')).toBeVisible();
+});
+
 test('design system quick-link cards match production contact-card hover motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/design-system');
@@ -225,19 +239,15 @@ test('design system quick-link cards remove hover lift under reduced motion', as
   await expect.poll(() => firstCard.evaluate((card) => Number(getComputedStyle(card, '::before').opacity))).toBeGreaterThan(0.8);
 });
 
-test('design system respects reduced motion for the alien signature', async ({ page }) => {
+test('design system hero shows pixel orbit and motion section shows alien replay', async ({ page }) => {
   await page.goto('/design-system');
 
-  const alienSignature = page.locator('[data-design-system-alien="signature"]');
-  await expect(alienSignature).toBeVisible();
-  await expect(alienSignature).toHaveAttribute('data-reduced-motion', 'true');
-  await expect(alienSignature).toHaveAttribute('data-framed', 'false');
-  await expect(alienSignature.locator('canvas')).toHaveCount(0);
-  const heroReplayButton = page.locator('#overview').getByRole('button', { name: /Replay animation/i });
-  await expect(heroReplayButton).toBeVisible();
-  await expect(heroReplayButton).toHaveClass(/ds-replay-button/);
-  await expect(heroReplayButton.locator('.ds-signal-gradient-icon')).toHaveCount(0);
-  await expect.poll(() => heroReplayButton.evaluate((button) => button.textContent.trim())).toBe('');
+  const pixelOrbit = page.locator('.ds-pixel-orbit');
+  await expect(pixelOrbit).toBeVisible();
+  await expect(pixelOrbit.locator('canvas')).toHaveCount(2);
+  await expect(pixelOrbit.locator('.ds-pixel-orbit__icon')).toHaveCount(5);
+  await expect(pixelOrbit.locator('.ds-signal-gradient-icon')).toHaveCount(5);
+  await expect(pixelOrbit.locator('.ds-pixel-orbit__center')).toBeVisible();
 
   await page.locator('#alien-arrival').scrollIntoViewIfNeeded();
   const motionReplayButton = page.locator('#alien-arrival').getByRole('button', { name: /Replay animation/i });

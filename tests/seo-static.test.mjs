@@ -13,6 +13,7 @@ const readDist = (...parts) => fs.readFileSync(path.join(DIST, ...parts), 'utf8'
 
 const sitemapXml = () => readDist('sitemap.xml');
 const sitemapUrls = () => [...sitemapXml().matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
+const caseStudySource = () => JSON.parse(readText('src', 'content', 'case-studies.json'));
 
 const pagePathForUrl = (url) => {
   const { pathname } = new URL(url);
@@ -64,6 +65,20 @@ test('sitemap and generated case-study routes stay in sync', () => {
     .sort();
 
   assert.deepEqual(sitemapCasePaths, generatedCasePaths);
+});
+
+test('case-study routes come from the shared content source', () => {
+  const sourceCasePaths = caseStudySource()
+    .map((caseStudy) => `/work/${caseStudy.id}/`)
+    .sort();
+
+  const generatedCasePaths = fs.readdirSync(path.join(DIST, 'work'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .filter((entry) => fs.existsSync(path.join(DIST, 'work', entry.name, 'index.html')))
+    .map((entry) => `/work/${entry.name}/`)
+    .sort();
+
+  assert.deepEqual(generatedCasePaths, sourceCasePaths);
 });
 
 test('design system route is public and discoverable', () => {
