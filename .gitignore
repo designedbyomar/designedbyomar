@@ -19,16 +19,23 @@ node_modules/
 *.tsbuildinfo
 
 # Vite
+.vite/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Build and test output
 dist/
+coverage/
 playwright-report/
 test-results/
+blob-report/
+.playwright/
 
 # macOS
 .DS_Store
+
+# Hosting
+.vercel/
 
 # Developer tooling — local only, not for the repo
 .claude/

@@ -401,6 +401,7 @@ button:focus-visible, a:focus-visible {
   overflow: hidden;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  transform: translateZ(0);
 }
 .logo-track {
   display: flex;
@@ -629,7 +630,7 @@ button:focus-visible, a:focus-visible {
   .about-grid, .contact-grid, .work-head { grid-template-columns: 1fr !important; gap: 20px !important; }
   .cs-metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .cs-prevnext { grid-template-columns: 1fr !important; }
-  .logo-track { gap: 20px; }
+  .logo-track { gap: 20px; animation-duration: 28s; }
   .logo-mark { flex-basis: var(--logo-basis, 110px); height: 36px; }
   .logo-mark img { max-height: 22px; }
   .hero-stat-card { width: min(166px, 44vw); padding: 10px 12px; border-radius: 12px; }

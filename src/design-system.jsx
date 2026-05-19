@@ -51,6 +51,7 @@ const NAV_GROUPS = [
       { id: 'typography', label: 'Typography' },
       { id: 'spacing', label: 'Spacing' },
       { id: 'radius-elevation', label: 'Radius and elevation' },
+      { id: 'foundation-specimens', label: 'Specimens' },
       { id: 'blur', label: 'Blur' },
       { id: 'motion-tokens', label: 'Motion tokens' },
     ],
@@ -199,6 +200,26 @@ const BLUR_TOKENS = [
   ['--blur-medium', 'blur(10px)'],
   ['--blur-strong', 'blur(12px)'],
   ['--blur-heavy', 'blur(16px)'],
+];
+
+const OPACITY_SPECIMENS = [
+  ['--opacity-8', '0.08'],
+  ['--opacity-18', '0.18'],
+  ['--opacity-35', '0.35'],
+  ['--opacity-60', '0.60'],
+];
+
+const Z_INDEX_SPECIMENS = [
+  ['Sticky', '--z-sticky'],
+  ['Fixed', '--z-fixed'],
+  ['Modal', '--z-modal'],
+  ['Tooltip', '--z-tooltip'],
+];
+
+const BREAKPOINT_SPECIMENS = [
+  ['Mobile', '600px'],
+  ['Tablet', '900px'],
+  ['Layout', '1054px'],
 ];
 
 const POWER_ITEMS = [
@@ -443,6 +464,199 @@ const AlienSignature = () => (
   />
 );
 
+const ORBIT_ICON_LIST = [Palette, Box, Search, Zap, ShieldCheck];
+const ORBIT_ICON_HALF = 9; // half of 18px icon size
+
+const PixelOrbitIcons = ({ theme = 'dark' }) => {
+  const canvasBackRef = React.useRef(null);
+  const canvasFrontRef = React.useRef(null);
+  const iconRefs = React.useRef([]);
+  const rafRef = React.useRef(0);
+  const activeRef = React.useRef(false);
+
+  React.useEffect(() => {
+    activeRef.current = false;
+    const canvasBack = canvasBackRef.current;
+    const canvasFront = canvasFrontRef.current;
+    if (!canvasBack || !canvasFront) return;
+    const ctxBack = canvasBack.getContext('2d');
+    const ctxFront = canvasFront.getContext('2d');
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const styles = getComputedStyle(document.documentElement);
+    const token = (name, fb) => styles.getPropertyValue(name).trim() || fb;
+    const fgPrimary  = token('--fg-primary',  theme === 'dark' ? '#ededed' : '#171717');
+    const fgTertiary = token('--fg-tertiary', theme === 'dark' ? '#8f8f8f' : '#666666');
+    const blue  = token('--color-develop-blue',  theme === 'dark' ? '#3291ff' : '#0a72ef');
+    const pink  = token('--color-preview-pink',  theme === 'dark' ? '#ff3da0' : '#de1d8d');
+    const red   = token('--color-ship-red',      theme === 'dark' ? '#ff6b60' : '#ff5b4f');
+    const palette = [blue, pink, red, fgPrimary, fgTertiary];
+
+    // Orbit tilted 135° counter-clockwise so "behind" particles land near "ar"
+    const ROT = -135 * Math.PI / 180;
+    const cosR = Math.cos(ROT); const sinR = Math.sin(ROT);
+
+    let w = 0, h = 0, cx = 0, cy = 0, rMin = 0, rMax = 0;
+    let inView = true;
+    let pageVisible = document.visibilityState === 'visible';
+    const motionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reducedMotion = motionMQ.matches;
+    let last = performance.now();
+    let tick = () => {};
+    let particles = [];
+    let iconParticles = [];
+
+    // Rotate orbit point around canvas center
+    const rot = (x, y) => [
+      cx + cosR * (x - cx) - sinR * (y - cy),
+      cy + sinR * (x - cx) + cosR * (y - cy),
+    ];
+
+    const mk = () => {
+      const rp = Math.random(), ring = rp < 0.45 ? 0 : rp < 0.8 ? 1 : 2;
+      const ringR = rMin + (rMax - rMin) * (ring === 0 ? 0.05 : ring === 1 ? 0.45 : 0.9);
+      const r = ringR + (Math.random() - 0.5) * (rMax - rMin) * 0.22;
+      const dir = Math.random() < 0.85 ? 1 : -1;
+      const rs = ring === 0 ? 0.00055 : ring === 1 ? 0.00038 : 0.00024;
+      return {
+        a: Math.random() * Math.PI * 2, r,
+        av: dir * rs * (0.7 + Math.random() * 0.8),
+        tilt: 0.32 + Math.random() * 0.08,
+        size: Math.random() < 0.55 ? 2 : Math.random() < 0.85 ? 3 : 4,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        twinkle: Math.random() * Math.PI * 2,
+        tv: 0.01 + Math.random() * 0.03,
+      };
+    };
+
+    // Each icon is pinned to a distinct ring so their speeds never converge
+    const ICON_RINGS = [
+      { rFrac: 0.08, av: 0.00052, tilt: 0.30 },
+      { rFrac: 0.88, av: 0.00024, tilt: 0.37 },
+      { rFrac: 0.45, av: 0.00038, tilt: 0.33 },
+      { rFrac: 0.20, av: 0.00047, tilt: 0.31 },
+      { rFrac: 0.68, av: 0.00029, tilt: 0.35 },
+    ];
+    const rebuild = () => {
+      particles = new Array(140).fill(0).map(() => mk());
+      iconParticles = ORBIT_ICON_LIST.map((_, i) => {
+        const cfg = ICON_RINGS[i];
+        return {
+          a: (i / ORBIT_ICON_LIST.length) * Math.PI * 2,
+          r: rMin + (rMax - rMin) * cfg.rFrac,
+          av: cfg.av,
+          tilt: cfg.tilt,
+        };
+      });
+    };
+
+    const resize = () => {
+      const rect = canvasBack.getBoundingClientRect();
+      w = rect.width; h = rect.height;
+      for (const [cv, ct] of [[canvasBack, ctxBack], [canvasFront, ctxFront]]) {
+        cv.width = Math.floor(w * DPR); cv.height = Math.floor(h * DPR);
+        ct.setTransform(DPR, 0, 0, DPR, 0, 0);
+      }
+      cx = w / 2; cy = h * 0.50;
+      rMin = Math.min(w, h) * 0.36; rMax = Math.min(w, h) * 0.57;
+      rebuild();
+    };
+
+    const positionIcons = (dt) => {
+      const speed = 0.55;
+      for (let i = 0; i < iconParticles.length; i++) {
+        const p = iconParticles[i];
+        if (dt > 0) p.a += p.av * dt * speed;
+        const [rx, ry] = rot(cx + Math.cos(p.a) * p.r, cy + Math.sin(p.a) * p.r * p.tilt);
+        const back = Math.sin(p.a) < 0;
+        const el = iconRefs.current[i];
+        if (el) {
+          el.style.transform = `translate(${rx - ORBIT_ICON_HALF}px, ${ry - ORBIT_ICON_HALF}px)`;
+          el.style.opacity = back ? '0.25' : '0.92';
+          el.style.zIndex = back ? '0' : '2';
+        }
+      }
+    };
+
+    const updateRunning = () => {
+      const shouldRun = inView && pageVisible && !reducedMotion;
+      if (shouldRun === activeRef.current) return;
+      activeRef.current = shouldRun;
+      if (shouldRun) {
+        last = performance.now();
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+        if (reducedMotion) {
+          ctxBack.clearRect(0, 0, w, h); ctxFront.clearRect(0, 0, w, h);
+          for (const p of particles) {
+            const [rx, ry] = rot(cx + Math.cos(p.a) * p.r, cy + Math.sin(p.a) * p.r * p.tilt);
+            const back = Math.sin(p.a) < 0;
+            const ctx = back ? ctxBack : ctxFront;
+            ctx.globalAlpha = back ? 0.15 : 0.5;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(Math.round(rx - p.size / 2), Math.round(ry - p.size / 2), p.size, p.size);
+          }
+          ctxBack.globalAlpha = 1; ctxFront.globalAlpha = 1;
+          positionIcons(0);
+        }
+      }
+    };
+
+    tick = (now) => {
+      if (!activeRef.current) return;
+      const dt = Math.min(40, now - last); last = now;
+      const speed = 0.55;
+      ctxBack.clearRect(0, 0, w, h); ctxFront.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.a += p.av * dt * speed; p.twinkle += p.tv;
+        const [rx, ry] = rot(cx + Math.cos(p.a) * p.r, cy + Math.sin(p.a) * p.r * p.tilt);
+        const back = Math.sin(p.a) < 0;
+        const ctx = back ? ctxBack : ctxFront;
+        ctx.globalAlpha = Math.max(0, Math.min(1, (back ? 0.22 : 1) * (0.55 + Math.sin(p.twinkle) * 0.45)));
+        ctx.fillStyle = p.color;
+        const s = p.size * (back ? 0.85 : 1);
+        ctx.fillRect(Math.round(rx - s / 2), Math.round(ry - s / 2), s, s);
+      }
+      ctxBack.globalAlpha = 1; ctxFront.globalAlpha = 1;
+      positionIcons(dt);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
+    motionMQ.addEventListener('change', onMotionChange);
+    resize();
+    window.addEventListener('resize', resize);
+    const observer = typeof IntersectionObserver === 'undefined' ? null
+      : new IntersectionObserver((entries) => { inView = entries[0]?.isIntersecting ?? true; updateRunning(); }, { threshold: 0.05 });
+    observer?.observe(canvasBack);
+    const onVis = () => { pageVisible = document.visibilityState === 'visible'; updateRunning(); };
+    document.addEventListener('visibilitychange', onVis);
+    updateRunning();
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', onVis);
+      motionMQ.removeEventListener('change', onMotionChange);
+      window.removeEventListener('resize', resize);
+    };
+  }, [theme]);
+
+  const CV = { position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'block' };
+  return (
+    <div className="ds-pixel-orbit" aria-hidden="true">
+      <canvas ref={canvasBackRef} style={{ ...CV, zIndex: 0 }} />
+      <canvas ref={canvasFrontRef} style={{ ...CV, zIndex: 2 }} />
+      {ORBIT_ICON_LIST.map((icon, i) => (
+        <span key={i} ref={(el) => { iconRefs.current[i] = el; }} className="ds-pixel-orbit__icon">
+          <SignalGradientIcon icon={icon} size={18} />
+        </span>
+      ))}
+      <span className="ds-pixel-orbit__center" />
+    </div>
+  );
+};
+
 const BackToTopButton = () => {
   const reducedMotion = usePrefersReducedMotion();
   const [visible, setVisible] = React.useState(false);
@@ -480,7 +694,7 @@ const BackToTopButton = () => {
   );
 };
 
-const TopBar = ({ theme, setTheme, mobileOpen, setMobileOpen }) => {
+const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
@@ -494,6 +708,15 @@ const TopBar = ({ theme, setTheme, mobileOpen, setMobileOpen }) => {
     <header className={`ds-site-header${scrolled ? ' is-scrolled' : ''}`}>
       <div className="ds-site-header__inner">
         <div className="ds-site-header__brand">
+          <button
+            type="button"
+            className="ds-icon-button ds-mobile-nav-trigger"
+            aria-label={navOpen ? 'Close design system navigation' : 'Open design system navigation'}
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((open) => !open)}
+          >
+            <AppIcon icon={navOpen ? X : Menu} size={17} />
+          </button>
           <NavLogo />
           <a href="/" className="ds-back-link">
             <AppIcon icon={ArrowLeft} size={13} />
@@ -502,16 +725,6 @@ const TopBar = ({ theme, setTheme, mobileOpen, setMobileOpen }) => {
         </div>
         <div className="ds-site-header__actions">
           <ThemeToggle theme={theme} setTheme={setTheme} />
-          <button
-            type="button"
-            className="ds-icon-button ds-mobile-nav-trigger"
-            aria-label={mobileOpen ? 'Close design system navigation' : 'Open design system navigation'}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((open) => !open)}
-          >
-            <AppIcon icon={mobileOpen ? X : Menu} size={17} />
-          </button>
-          <a href="/#contact" className="ds-header-cta">Get in touch</a>
         </div>
       </div>
     </header>
@@ -563,6 +776,110 @@ const BlurTokenCard = ({ token, value }) => (
   </DocCard>
 );
 
+const FoundationSpecimens = () => (
+  <div className="ds-specimen-grid" data-audit-example="foundation-specimens">
+    <DocCard title="Radius and elevation" meta="Visual scale">
+      <div className="ds-radius-stack">
+        {[
+          ['6px', 'Control'],
+          ['8px', 'Panel'],
+          ['12px', 'Media'],
+        ].map(([radius, label]) => (
+          <span key={radius} style={{ borderRadius: radius }}>{label}</span>
+        ))}
+      </div>
+    </DocCard>
+    <DocCard title="Opacity" meta="Overlay steps">
+      <div className="ds-opacity-stack">
+        {OPACITY_SPECIMENS.map(([token, value]) => (
+          <span key={token} style={{ '--specimen-opacity': value }}>
+            {token}
+          </span>
+        ))}
+      </div>
+    </DocCard>
+    <DocCard title="Z-index" meta="Layer order">
+      <div className="ds-z-stack">
+        {Z_INDEX_SPECIMENS.map(([label, token], index) => (
+          <span key={token} style={{ '--layer-index': index }}>
+            {label}<small>{token}</small>
+          </span>
+        ))}
+      </div>
+    </DocCard>
+    <DocCard title="Breakpoints" meta="Responsive rhythm">
+      <div className="ds-breakpoint-stack">
+        {BREAKPOINT_SPECIMENS.map(([label, value]) => (
+          <span key={label}>
+            <strong>{label}</strong>
+            <small>{value}</small>
+          </span>
+        ))}
+      </div>
+    </DocCard>
+  </div>
+);
+
+const PatternPreview = ({ kind }) => (
+  <div className={`ds-pattern-preview ds-pattern-preview--${kind}`} data-audit-example={`${kind}-pattern`}>
+    {kind === 'hero' && (
+      <>
+        <div className="mono-label">Hero system</div>
+        <h3>Complex systems. Clear products.</h3>
+        <p>Editorial type, proof copy, and signature motion stay in balance.</p>
+      </>
+    )}
+    {kind === 'case' && (
+      <>
+        <span className="ds-pattern-preview__chip">01 · 2025 · Wisdom</span>
+        <div className="ds-pattern-preview__browser">
+          <span />
+          <span />
+          <span />
+        </div>
+      </>
+    )}
+    {kind === 'footer' && (
+      <>
+        <NavLogo href="/" />
+        <div className="ds-pattern-preview__links">
+          <span>Work</span>
+          <span>About</span>
+          <span>Contact</span>
+        </div>
+      </>
+    )}
+    {kind === 'privacy' && (
+      <>
+        <p>This site uses simple analytics cookies to improve the experience.</p>
+        <div className="ds-pattern-preview__actions">
+          <Button variant="secondary">Decline</Button>
+          <Button>Accept</Button>
+        </div>
+      </>
+    )}
+  </div>
+);
+
+const AccessibilityPreview = ({ kind }) => (
+  <div className={`ds-accessibility-preview ds-accessibility-preview--${kind}`} data-audit-example={`${kind}-accessibility`}>
+    {kind === 'focus' ? (
+      <>
+        <button type="button">Focusable action</button>
+        <span>Visible focus, 44px target, real button semantics.</span>
+      </>
+    ) : (
+      <>
+        <div>
+          <strong>Primary text</strong>
+          <span>Secondary copy remains readable across themes.</span>
+        </div>
+        <small>AA contrast floor</small>
+      </>
+    )}
+  </div>
+);
+
 const FAQAccordionDemo = () => {
   const [openIndex, setOpenIndex] = React.useState(0);
   const reducedMotion = usePrefersReducedMotion();
@@ -604,16 +921,23 @@ const FAQAccordionDemo = () => {
   );
 };
 
-const HomeSection = () => (
+const HomeSection = ({ theme }) => (
   <>
     <section id="overview" className="ds-section ds-hero" aria-labelledby="overview-title">
-      <h1 id="overview-title">designedbyomar Design System</h1>
+      <h1 id="overview-title" className="ds-hero-title">
+        <span className="ds-hero-title__line1">
+          <span className="ds-hero-title__text">designedbyomar</span>
+          <span className="ds-hero-title__orbit-slot" aria-hidden="true">
+            <PixelOrbitIcons theme={theme} />
+          </span>
+        </span>
+        <span className="ds-hero-title__line2">Design System</span>
+      </h1>
       <div className="ds-hero-intro">
         <p>
           The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns,
           motion language, and public design-engineering workflow.
         </p>
-        <AlienSignature />
       </div>
       <div id="quick-links" className="ds-quick-links" aria-label="Quick links">
         {QUICK_LINK_CARDS.map(([label, href, body, icon]) => (
@@ -722,6 +1046,13 @@ const FoundationsSection = () => (
           </DocCard>
         ))}
       </div>
+    </section>
+
+    <section id="foundation-specimens" className="ds-section" aria-labelledby="foundation-specimens-title">
+      <SectionHeader eyebrow="Foundations" title="Visual specimens">
+        Radius, opacity, layering, and breakpoint rules are shown as rendered objects so token behavior is easier to audit.
+      </SectionHeader>
+      <FoundationSpecimens />
     </section>
 
     <section id="blur" className="ds-section" aria-labelledby="blur-title">
@@ -895,13 +1226,16 @@ const PatternsSection = () => (
     </section>
 
     {[
-      ['hero-system', 'Hero system', 'The hero is the primary portfolio signal. It should explain Omar clearly before the motion or media gets attention.'],
-      ['case-study-covers', 'Case-study covers', 'Covers sell the work quickly, then step aside. Metadata and tags must stay readable at small widths.'],
-      ['footer-system', 'Footer system', 'The footer is a structured utility system with a small signature animation, not a loose collection of links.'],
-      ['privacy-consent', 'Privacy and consent', 'Privacy surfaces use plain language and preserve the current analytics behavior.'],
-    ].map(([id, title, body]) => (
+      ['hero-system', 'Hero system', 'The hero is the primary portfolio signal. It should explain Omar clearly before the motion or media gets attention.', 'hero'],
+      ['case-study-covers', 'Case-study covers', 'Covers sell the work quickly, then step aside. Metadata and tags must stay readable at small widths.', 'case'],
+      ['footer-system', 'Footer system', 'The footer is a structured utility system with a small signature animation, not a loose collection of links.', 'footer'],
+      ['privacy-consent', 'Privacy and consent', 'Privacy surfaces use plain language and preserve the current analytics behavior.', 'privacy'],
+    ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
         <SectionHeader eyebrow="Patterns" title={title}>{body}</SectionHeader>
+        <ExampleFrame label={`${title} specimen`}>
+          <PatternPreview kind={kind} />
+        </ExampleFrame>
       </section>
     ))}
   </>
@@ -951,6 +1285,15 @@ const MotionSection = ({ theme }) => (
     ].map(([id, title, body]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
         <SectionHeader eyebrow="Motion" title={title}>{body}</SectionHeader>
+        {id === 'reduced-motion' && (
+          <ExampleFrame label="Stable fallback">
+            <div className="ds-reduced-motion-preview" data-audit-example="reduced-motion-pattern">
+              <span />
+              <strong>No movement required</strong>
+              <p>Final state remains readable when animation is disabled.</p>
+            </div>
+          </ExampleFrame>
+        )}
       </section>
     ))}
   </>
@@ -1003,11 +1346,14 @@ const ContentAccessibilityResources = () => (
     </section>
 
     {[
-      ['focus-keyboard', 'Focus and keyboard', 'The side nav uses real links, while production drawers should trap focus, close on Escape, and restore focus to the trigger.'],
-      ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.'],
-    ].map(([id, title, body]) => (
+      ['focus-keyboard', 'Focus and keyboard', 'The side nav uses real links, while production drawers should trap focus, close on Escape, and restore focus to the trigger.', 'focus'],
+      ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.', 'contrast'],
+    ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
         <SectionHeader eyebrow="Accessibility" title={title}>{body}</SectionHeader>
+        <ExampleFrame label={`${title} specimen`}>
+          <AccessibilityPreview kind={kind} />
+        </ExampleFrame>
       </section>
     ))}
 
@@ -1038,7 +1384,7 @@ const ContentAccessibilityResources = () => (
       <div className="ds-two-column">
         <DocCard title="Documented now" meta="Audit result">
           <ul>
-            <li>Color, typography, spacing, radius, elevation, blur, motion, and theme foundations.</li>
+            <li>Color, typography, spacing, radius, elevation, opacity, layering, breakpoints, blur, motion, and theme foundations.</li>
             <li>Buttons, icon buttons, cards, FAQ-style accordions, copy controls, navigation, drawers, and cookie consent.</li>
             <li>Alien arrival, pixel orbit, loader mark, reveal behavior, hover treatments, and reduced-motion expectations.</li>
           </ul>
@@ -1057,7 +1403,7 @@ const ContentAccessibilityResources = () => (
 
 const DesignSystem = () => {
   const [theme, setTheme] = React.useState(() => localStorage.getItem('omar.theme') || 'dark');
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [navOpen, setNavOpen] = React.useState(() => window.innerWidth > 1054);
   const activeId = useActiveSection();
 
   React.useEffect(() => {
@@ -1065,21 +1411,21 @@ const DesignSystem = () => {
     localStorage.setItem('omar.theme', theme);
   }, [theme]);
 
-  const handleNavigate = () => setMobileOpen(false);
+  const handleNavigate = () => { if (window.innerWidth <= 1054) setNavOpen(false); };
 
   return (
     <div className="ds-shell">
       <style>{footerAlienStyles}</style>
       <SignalGradientDefs />
-      <TopBar theme={theme} setTheme={setTheme} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
-      <div className="ds-mobile-panel" hidden={!mobileOpen}>
+      <TopBar theme={theme} setTheme={setTheme} navOpen={navOpen} setNavOpen={setNavOpen} />
+      <div className="ds-mobile-panel" hidden={!navOpen}>
         <SideNavigation
           activeId={activeId}
           onNavigate={handleNavigate}
         />
       </div>
-      <div className="ds-layout">
-        <aside className="ds-sidebar">
+      <div className={`ds-layout${!navOpen ? ' sidebar-collapsed' : ''}`}>
+        <aside className="ds-sidebar" hidden={!navOpen}>
           <SideNavigation
             activeId={activeId}
             onNavigate={handleNavigate}
@@ -1087,7 +1433,7 @@ const DesignSystem = () => {
           />
         </aside>
         <main className="ds-content">
-          <HomeSection />
+          <HomeSection theme={theme} />
           <FoundationsSection />
           <ComponentsSection />
           <PatternsSection />
