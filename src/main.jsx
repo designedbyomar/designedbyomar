@@ -409,7 +409,7 @@ const Portrait = ({ galaxy, theme }) => {
         </>
       )}
       <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 3 }}>
-        <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" draggable={false} style={{
+        <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10, 114, 239, var(--opacity-16))) drop-shadow(0 26px 48px rgba(255, 91, 79, var(--opacity-12))) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'

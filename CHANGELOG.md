@@ -4,6 +4,11 @@ All notable changes to designedbyomar.com are documented here.
 
 ## [Unreleased] - 2026-05-19
 
+### Changed
+- Performance: Google Fonts stylesheet loaded asynchronously (`rel="preload" as="style"` + `onload` swap) across `index.html`, `design-system.html`, and `404.html` — eliminates render-blocking font CSS fetch, improving FCP
+- Performance: Vite code splitting via `manualChunks` — React/ReactDOM, Sentry, and Vercel analytics now build as separate cached chunks (`vendor-react`, `vendor-sentry`, `vendor-vercel`), reducing main bundle parse time and improving caching on return visits
+- Performance: Hero portrait `<img>` gets `fetchPriority="high"` so the browser fetches the LCP image at maximum priority, overlapping with JS execution
+
 ### Added
 - Design system page: `PixelOrbitIcons` canvas component — five section icons (Palette, Box, Search, Zap, ShieldCheck) orbit a shared center on distinct speed rings, rendered with the same galaxy.jsx elliptical math, respects `prefers-reduced-motion`
 - Design system page: two-canvas depth compositing for pixel orbit — back-layer canvas (z-index 0) passes behind the "ar" letterforms; front-layer canvas (z-index 2) renders above them; `ds-hero-title__text` at z-index 1 acts as the letter mask
