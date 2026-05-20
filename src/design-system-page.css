@@ -164,6 +164,7 @@
 
 .ds-layout.sidebar-collapsed {
   grid-template-columns: minmax(0, 1fr);
+  padding-left: var(--space-6);
 }
 
 .ds-sidebar {
