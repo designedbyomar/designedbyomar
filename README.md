@@ -97,20 +97,28 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 
 Keep `main` protected and deployable. Use short-lived feature branches for one focused change at a time, then merge through a pull request.
 
-Branch prefixes:
+**Rules:**
+- Always branch from `main` — never from another feature branch unless explicitly stacking work.
+- One branch per logical unit of work. If you find unrelated cleanup while working on a feature, open a separate branch for it.
+- Merge and delete promptly. Stale branches add noise; GitHub can auto-delete on merge (repo Settings → General → "Automatically delete head branches").
 
-- `fix/...` — broken behavior, SEO cleanup, redirects, bugs
-- `feature/...` — new sections or new functionality
-- `content/...` — copy, case studies, resume/about edits
-- `design/...` — visual, theme, typography, spacing, or design-system changes
-- `chore/...` — tooling, docs, dependency maintenance
+**Prefixes:**
 
-Example:
+- `feat/` — new sections or new functionality
+- `fix/` — broken behavior, SEO cleanup, redirects, bugs
+- `design/` — visual, theme, typography, spacing, or design-system changes
+- `content/` — copy, case studies, resume/about edits
+- `chore/` — tooling, docs, dependency maintenance
+
+**Example:**
 
 ```bash
 git switch main
 git pull
 git switch -c fix/canonical-host
+# ... make changes ...
+git push -u origin fix/canonical-host
+# open PR → merge → branch auto-deleted
 ```
 
 ## Quality checklist

@@ -2,6 +2,25 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [Unreleased] - 2026-05-19
+
+### Added
+- Design system page: `PixelOrbitIcons` canvas component — five section icons (Palette, Box, Search, Zap, ShieldCheck) orbit a shared center on distinct speed rings, rendered with the same galaxy.jsx elliptical math, respects `prefers-reduced-motion`
+- Design system page: two-canvas depth compositing for pixel orbit — back-layer canvas (z-index 0) passes behind the "ar" letterforms; front-layer canvas (z-index 2) renders above them; `ds-hero-title__text` at z-index 1 acts as the letter mask
+- Design system page: desktop sidebar collapse — hamburger menu now collapses/expands the 292 px sidebar column at all viewport widths; sidebar defaults open on desktop, closed on mobile; nav links keep sidebar open on desktop, close panel on mobile
+
+### Changed
+- Design system header: hamburger `☰` moved to the far-left of the brand group (left of the logo), always visible at all breakpoints; "Get in touch" CTA removed from the header
+- Design system hero h1: "designedbyomar Design System" now renders as two lines — "designedbyomar" on line 1, "Design System" on line 2; pixel orbit is positioned at the right edge of line 1, threading visually through the "ar" letterforms
+- Design system hero h1: font-size at tablet (≤1054 px) increased to `clamp(48px, 12vw, 128px)` so the title spans ~93% of the full-width content area when the sidebar is hidden
+- Pixel orbit: field tilted −135° counter-clockwise (was −110°) for a more dramatic threading angle through the "ar" letterforms
+- Pixel orbit: orbit container scaled up at smaller breakpoints — `1.5em × 1.5em` at tablet (≤1054 px) and `1.6em × 1.6em` at mobile (≤640 px), up from `1em × 1em`; larger size increases visual presence where the font is smallest
+- Homepage: footer horizontal padding corrected to `var(--space-6)` (24 px) to match nav and section padding (was `var(--layout-1)` / 48 px)
+- Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
+
+### Fixed
+- Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
+
 ## [1.1.5] - 2026-05-12
 
 ### Added
