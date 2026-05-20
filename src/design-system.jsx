@@ -1406,8 +1406,11 @@ const DesignSystem = () => {
   const [navOpen, setNavOpen] = React.useState(() => window.innerWidth > 1054);
   const activeId = useActiveSection();
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  React.useEffect(() => {
     localStorage.setItem('omar.theme', theme);
   }, [theme]);
 
