@@ -1406,6 +1406,13 @@ const DesignSystem = () => {
   const [navOpen, setNavOpen] = React.useState(() => window.innerWidth > 1054);
   const activeId = useActiveSection();
 
+  React.useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1054px)');
+    const handler = (e) => setNavOpen(!e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   React.useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
