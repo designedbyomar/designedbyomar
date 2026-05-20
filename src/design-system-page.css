@@ -1205,6 +1205,11 @@
     display: none;
   }
 
+  /* Sidebar is always hidden at ≤1054px — the floating ds-mobile-panel is the only nav surface */
+  .ds-sidebar {
+    display: none;
+  }
+
   .ds-hero h1 {
     font-size: clamp(48px, 12vw, 128px);
   }
