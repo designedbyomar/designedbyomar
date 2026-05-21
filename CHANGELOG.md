@@ -2,9 +2,10 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-05-19
+## [Unreleased] - 2026-05-20
 
 ### Changed
+- Performance: Hero portrait now uses responsive `srcset` — `omar-mobile.webp` (640 px wide, 49 KB) served to mobile viewports instead of the 193 KB desktop image; `imagesrcset`/`imagesizes` on the `<head>` preload ensures the correct variant is fetched before React executes
 - Performance: Google Fonts stylesheet loaded asynchronously (`rel="preload" as="style"` + `onload` swap) across `index.html`, `design-system.html`, and `404.html` — eliminates render-blocking font CSS fetch, improving FCP
 - Performance: Vite code splitting via `manualChunks` — React/ReactDOM, Sentry, and Vercel analytics now build as separate cached chunks (`vendor-react`, `vendor-sentry`, `vendor-vercel`), reducing main bundle parse time and improving caching on return visits
 - Performance: Hero portrait `<img>` gets `fetchPriority="high"` so the browser fetches the LCP image at maximum priority, overlapping with JS execution
