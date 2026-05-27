@@ -172,6 +172,30 @@ const designSystemStructuredData = () => ({
   ],
 });
 
+function generateSitemap(distDir) {
+  const staticPages = [
+    { loc: `${SITE_ORIGIN}/`,              changefreq: 'weekly',  priority: '1.0' },
+    { loc: `${SITE_ORIGIN}/work`,          changefreq: 'weekly',  priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/design-system`, changefreq: 'monthly', priority: '0.7' },
+    { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
+  ];
+  const caseStudyPages = CASE_STUDIES.map((c) => ({
+    loc: `${SITE_ORIGIN}/work/${c.id}/`,
+    changefreq: 'monthly',
+    priority: '0.8',
+  }));
+  const urls = [...staticPages, ...caseStudyPages];
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls.map(({ loc, changefreq, priority }) =>
+      `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+    ),
+    '</urlset>',
+  ].join('\n');
+  fs.writeFileSync(`${distDir}/sitemap.xml`, xml);
+}
+
 function generateRoutes() {
   const distDir = './dist';
   if (!fs.existsSync(distDir)) return;
@@ -244,6 +268,7 @@ function generateRoutes() {
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
+  generateSitemap(distDir);
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
 
