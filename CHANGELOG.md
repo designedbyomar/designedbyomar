@@ -5,7 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-05-27
 
 ### Added
-- Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; ships in report-only mode to validate before enforcing
+- Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
 
 ### Changed
