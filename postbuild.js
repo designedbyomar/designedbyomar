@@ -172,6 +172,21 @@ const designSystemStructuredData = () => ({
   ],
 });
 
+// Escape XML special characters to prevent sitemap corruption
+function escapeXml(str) {
+  return str.replace(/[&<>"'/]/g, (match) => {
+    switch (match) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      case '/': return '&#47;';
+      default: return match;
+    }
+  });
+}
+
 function generateSitemap(distDir) {
   const staticPages = [
     { loc: `${SITE_ORIGIN}/`,              changefreq: 'weekly',  priority: '1.0' },
@@ -180,7 +195,7 @@ function generateSitemap(distDir) {
     { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
   ];
   const caseStudyPages = CASE_STUDIES.map((c) => ({
-    loc: `${SITE_ORIGIN}/work/${c.id}/`,
+    loc: `${SITE_ORIGIN}/work/${escapeXml(c.id)}/`,
     changefreq: 'monthly',
     priority: '0.8',
   }));
