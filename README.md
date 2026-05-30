@@ -15,7 +15,7 @@ This site is both my portfolio and a public artifact showing how I work today: u
 If you're a hiring manager or founder, the things to look at are:
 
 1. The site itself — [designedbyomar.com](https://www.designedbyomar.com)
-2. The case studies in [`postbuild.js`](./postbuild.js) — each gets its own crawlable, SEO-tagged route.
+2. The case studies in [`src/content/case-studies.json`](./src/content/case-studies.json) — shared by the app and static route generator so each gets its own crawlable, SEO-tagged route.
 3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the public reference page at [`/design-system`](https://www.designedbyomar.com/design-system).
 4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
 
@@ -28,9 +28,10 @@ If you're a hiring manager or founder, the things to look at are:
 ## What's in here
 
 - **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
+- **Shared case-study content** in [`src/content/case-studies.json`](./src/content/case-studies.json), consumed by [`src/case-studies.js`](./src/case-studies.js) and [`postbuild.js`](./postbuild.js) so UI content, route metadata, and generated sitemap entries stay aligned.
 - **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
 - **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a public reference page at `/design-system` documenting tokens, components, patterns, motion, content, accessibility, and theming.
-- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, sitemap.xml, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
+- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, generated `sitemap.xml`, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
 - **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization.
@@ -59,7 +60,7 @@ npm run dev
 ## Production build
 
 ```bash
-npm run build      # vite build → dist/, then postbuild.js generates per-case-study routes
+npm run build      # vite build → dist/, then postbuild.js generates routes and sitemap.xml
 npm run preview    # preview the built dist/ locally
 ```
 
@@ -150,12 +151,15 @@ git push -u origin fix/canonical-host
 │   ├── Videos/                     # case study cover videos
 │   ├── Omar Tavarez Resume.pdf
 │   ├── llms.txt                    # AI crawler directive
-│   ├── robots.txt
-│   └── sitemap.xml
+│   └── robots.txt                  # references generated /sitemap.xml
 ├── scripts/
 │   └── optimize-image.mjs          # sharp-based image optimizer
 ├── src/
-│   ├── main.jsx                    # main site app (in active token migration)
+│   ├── main.jsx                    # main site app shell and homepage experience
+│   ├── case-studies.js             # normalized case-study content exports
+│   ├── routes.js                   # route parsing and route metadata helpers
+│   ├── content/
+│   │   └── case-studies.json       # canonical case-study content source
 │   ├── design-system.jsx           # design system reference page
 │   ├── design-system-primitives.jsx # extracted design system documentation primitives
 │   ├── design-system-page.css      # design system page layout and responsive behavior

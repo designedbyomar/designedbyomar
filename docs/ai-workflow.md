@@ -29,7 +29,7 @@ The point of this artifact is to be honest about that boundary.
 | **Components** | Scaffolded initial component shells from prose specs | Reviewed structure, kept behavior idiomatic, kept inline styles consistent with token system |
 | **Content / case studies** | Drafted candidate copy from raw notes | Edited every line; cut anything that read AI-flavored |
 | **SEO / structured data** | Generated schema scaffolds (JSON-LD, OG, Twitter) | Verified every field against real site state and canonical URLs |
-| **Build / postbuild** | Wrote the regex-driven [`postbuild.js`](../postbuild.js) static-route generator | Verified each output URL renders with correct meta in production |
+| **Build / postbuild** | Wrote the regex-driven [`postbuild.js`](../postbuild.js) static-route generator and helped unify case-study content around [`src/content/case-studies.json`](../src/content/case-studies.json) | Verified each output URL renders with correct meta in production |
 | **Refactors** | Performed mechanical transforms | Reviewed diffs, kept changes small and reversible |
 
 ---
@@ -50,7 +50,7 @@ The point of this artifact is to be honest about that boundary.
 
 - **No broad unit suite yet.** A portfolio site with static case studies and route-specific metadata earns more from regression checks than component-level unit tests right now. `npm test` runs the production build, generated SEO/static assertions, and Chromium Playwright checks over the built preview.
 - **Focused CI.** `.github/workflows/ci.yml` runs `npm ci`, installs Chromium for Playwright, and runs `npm test` on every PR and push to main. Lighthouse CI is the obvious next add.
-- **No premature splitting of `main.jsx`.** The file is large because the site is a single, content-heavy SPA. Splitting it into 20 micro-components before the token migration finishes would create merge conflicts with in-flight work without making anything more correct. The split happens after the token migration lands.
+- **Incremental extraction only where it removes drift.** The app is still a content-heavy SPA, but shared case-study content, route helpers/constants, and design-system documentation primitives have been pulled into focused modules where that makes metadata, tests, and future edits easier to reason about.
 
 ---
 
