@@ -164,7 +164,7 @@ const designSystemStructuredData = () => ({
       '@type': 'CreativeWork',
       name: 'designedbyomar Design System',
       url: DESIGN_SYSTEM_URL,
-      description: 'A public design-system artifact documenting the tokens, components, patterns, content rules, and accessibility standards behind Omar Tavarez’s portfolio.',
+      description: "A public design-system artifact documenting the tokens, components, patterns, content rules, and accessibility standards behind Omar Tavarez's portfolio.",
       creator: personSchema,
       about: ['Design Systems', 'Portfolio Design', 'Product Design', 'Design Engineering'],
     },
@@ -211,6 +211,16 @@ function generateSitemap(distDir) {
   fs.writeFileSync(`${distDir}/sitemap.xml`, xml);
 }
 
+const H1_STYLE = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap';
+
+function injectH1(html, text) {
+  const replacement = `<div id="root"><h1 style="${H1_STYLE}">${escapeAttr(text)}</h1></div>`;
+  // Replace either an existing visually-hidden H1 (from the index.html template) or an empty root div
+  const withExisting = html.replace(/<div id="root"><h1 style="[^"]*">[^<]*<\/h1><\/div>/, replacement);
+  if (withExisting !== html) return withExisting;
+  return html.replace('<div id="root"></div>', replacement);
+}
+
 function generateRoutes() {
   const distDir = './dist';
   if (!fs.existsSync(distDir)) return;
@@ -219,7 +229,7 @@ function generateRoutes() {
 
   const workDir = `${distDir}/work`;
   fs.mkdirSync(workDir, { recursive: true });
-  const workHtml = setStructuredData(
+  const workHtml = injectH1(setStructuredData(
     setMeta(indexHtml, {
       title: WORK_TITLE,
       description: WORK_DESCRIPTION,
@@ -227,7 +237,7 @@ function generateRoutes() {
       image: DEFAULT_OG_IMAGE,
     }),
     workStructuredData(),
-  );
+  ), WORK_TITLE);
   fs.writeFileSync(`${workDir}/index.html`, workHtml);
 
   CASE_STUDIES.forEach((c) => {
@@ -236,7 +246,7 @@ function generateRoutes() {
 
     let html = setMeta(indexHtml, {
       title: `${c.title} — Omar Tavarez`,
-      description: c.subtitle,
+      description: c.metaDescription || c.subtitle,
       url: `${SITE_ORIGIN}/work/${c.id}/`,
       image: c.ogImage,
     });
@@ -249,21 +259,22 @@ function generateRoutes() {
     if (withoutHeight === html) throw new Error('og:image:height tag not found in index.html template — check template and rerun build');
     html = withoutHeight;
     html = setStructuredData(html, caseStudyStructuredData(c));
+    html = injectH1(html, `${c.title} — Omar Tavarez`);
 
     fs.writeFileSync(`${dir}/index.html`, html);
   });
 
   const privacyDir = `${distDir}/privacy`;
   fs.mkdirSync(privacyDir, { recursive: true });
-  const privacyHtml = setStructuredData(
+  const privacyHtml = injectH1(setStructuredData(
     setMeta(indexHtml, {
       title: 'Privacy Policy — Omar Tavarez',
-      description: 'Privacy policy and data collection details for designedbyomar.com.',
+      description: 'Privacy policy for designedbyomar.com — what data is collected, how analytics consent works, and how to contact Omar Tavarez with data requests.',
       url: `${SITE_ORIGIN}/privacy`,
       image: DEFAULT_OG_IMAGE,
     }),
     privacyStructuredData(),
-  );
+  ), 'Privacy Policy — Omar Tavarez');
   fs.writeFileSync(`${privacyDir}/index.html`, privacyHtml);
 
   const designSystemSourcePath = `${distDir}/design-system.html`;
@@ -271,15 +282,15 @@ function generateRoutes() {
     const designSystemDir = `${distDir}/design-system`;
     fs.mkdirSync(designSystemDir, { recursive: true });
     const designSystemSource = fs.readFileSync(designSystemSourcePath, 'utf8');
-    const designSystemHtml = setStructuredData(
+    const designSystemHtml = injectH1(setStructuredData(
       setMeta(designSystemSource, {
         title: 'designedbyomar Design System',
-        description: 'The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez’s portfolio.',
+        description: "The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez's portfolio.",
         url: DESIGN_SYSTEM_URL,
         image: DEFAULT_OG_IMAGE,
       }),
       designSystemStructuredData(),
-    );
+    ), 'designedbyomar Design System');
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
