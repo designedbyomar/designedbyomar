@@ -210,14 +210,16 @@ function generateSitemap(distDir) {
   fs.writeFileSync(`${distDir}/sitemap.xml`, xml);
 }
 
-const H1_STYLE = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap';
+const H1_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0';
 
 function injectH1(html, text) {
   const replacement = `<div id="root"><h1 style="${H1_STYLE}">${escapeAttr(text)}</h1></div>`;
   // Replace either an existing visually-hidden H1 (from the index.html template) or an empty root div
   const withExisting = html.replace(/<div id="root"><h1 style="[^"]*">[^<]*<\/h1><\/div>/, replacement);
   if (withExisting !== html) return withExisting;
-  return html.replace('<div id="root"></div>', replacement);
+  const withEmpty = html.replace('<div id="root"></div>', replacement);
+  if (withEmpty === html) throw new Error(`injectH1: no #root div found in template — H1 "${text}" was not injected`);
+  return withEmpty;
 }
 
 function generateRoutes() {
