@@ -174,14 +174,13 @@ const designSystemStructuredData = () => ({
 
 // Escape XML special characters to prevent sitemap corruption
 function escapeXml(str) {
-  return str.replace(/[&<>"'/]/g, (match) => {
+  return str.replace(/[&<>"']/g, (match) => {
     switch (match) {
       case '&': return '&amp;';
       case '<': return '&lt;';
       case '>': return '&gt;';
       case '"': return '&quot;';
       case "'": return '&#39;';
-      case '/': return '&#47;';
       default: return match;
     }
   });
@@ -195,7 +194,7 @@ function generateSitemap(distDir) {
     { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
   ];
   const caseStudyPages = CASE_STUDIES.map((c) => ({
-    loc: `${SITE_ORIGIN}/work/${escapeXml(c.id)}/`,
+    loc: escapeXml(`${SITE_ORIGIN}/work/${encodeURIComponent(c.id)}/`),
     changefreq: 'monthly',
     priority: '0.8',
   }));
