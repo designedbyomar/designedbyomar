@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BookOpen, Box, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Palette, RefreshCcw, Rocket, Search, ShieldCheck, Sparkles, Sun, Target, Type, X, Zap } from 'lucide-react';
 
 export { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BookOpen, Box, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Palette, RefreshCcw, Rocket, Search, ShieldCheck, Sparkles, Sun, Target, Type, X, Zap };

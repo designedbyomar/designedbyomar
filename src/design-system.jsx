@@ -455,15 +455,6 @@ const AlienReplayDemo = ({
   );
 };
 
-const AlienSignature = () => (
-  <AlienReplayDemo
-    signature
-    className="ds-hero-alien--signature"
-    ufoSize="1.35em"
-    alienSize="1.05em"
-  />
-);
-
 const ORBIT_ICON_LIST = [Palette, Box, Search, Zap, ShieldCheck];
 const ORBIT_ICON_HALF = 9; // half of 18px icon size
 

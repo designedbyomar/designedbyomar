@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
@@ -2785,7 +2785,9 @@ const App = () => {
       if (!cancelled) {
         try {
           sessionStorage.setItem(LOADER_SESSION_KEY, 'true');
-        } catch { }
+        } catch {
+          // Session storage can be unavailable in private browsing or locked-down contexts.
+        }
         setLoading(false);
       }
     });
