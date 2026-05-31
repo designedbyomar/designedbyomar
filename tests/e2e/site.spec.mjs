@@ -25,6 +25,16 @@ const expectDrawerOffCanvas = async (drawer) => {
   })).toBe(true);
 };
 
+const expectLatestAnalyticsEvent = async (page, eventName, expectedParams) => {
+  await expect.poll(() => page.evaluate((name) => {
+    const events = window.__omarAnalyticsEvents || [];
+    return events.filter((event) => event.eventName === name).at(-1) || null;
+  }, eventName)).toMatchObject({
+    eventName,
+    params: expect.objectContaining(expectedParams),
+  });
+};
+
 test('homepage renders the primary portfolio experience', async ({ page }) => {
   await page.goto('/');
 
@@ -161,6 +171,76 @@ test('contact section exposes the primary conversion links', async ({ page }) =>
   await expect(contact.getByText('Behance', { exact: true })).toBeVisible();
   await expect(contact.getByRole('link', { name: /Email\s+omar@designedbyomar\.com/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
   await expect(contact.getByRole('link', { name: /Resume \/ CV\s+Open PDF/i })).toHaveAttribute('href', '/Omar%20Tavarez%20Resume.pdf');
+});
+
+test('tracks deeper portfolio interaction analytics after consent', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'accepted');
+    window.__omarAnalyticsConsent = 'accepted';
+    window.__omarGaReady = true;
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          window.__omarCopiedText = value;
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+  await page.evaluate(() => {
+    window.__omarAnalyticsEvents = [];
+  });
+
+  await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
+  await expectLatestAnalyticsEvent(page, 'about_drawer_open', { source: 'nav' });
+  await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
+
+  await page.locator('#work').scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: /See all 8 case studies/i }).click();
+  await expectLatestAnalyticsEvent(page, 'work_drawer_open', { source: 'work_section' });
+  await page.getByRole('dialog', { name: 'All case studies' }).getByRole('button', { name: 'Close' }).click();
+
+  const firstQuestion = page.locator('#faq-question-0');
+  await firstQuestion.click();
+  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
+    faq_index: 0,
+    action: 'open',
+  });
+  await firstQuestion.click();
+  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
+    faq_index: 0,
+    action: 'close',
+  });
+
+  await page.locator('#contact').scrollIntoViewIfNeeded();
+  await page.locator('#contact [data-copy-button="true"]').click();
+  await expectLatestAnalyticsEvent(page, 'copy_email_click', {
+    section: 'contact',
+    copy_target: 'email',
+  });
+  await expect.poll(() => page.evaluate(() => window.__omarCopiedText)).toBe('omar@designedbyomar.com');
+  await expect.poll(() => page.evaluate(() => {
+    const events = window.__omarAnalyticsEvents || [];
+    const event = events.find((entry) => entry.eventName === 'copy_email_click');
+    return JSON.stringify(event?.params || {});
+  })).not.toContain('omar@designedbyomar.com');
+
+  await page.goto('/work/posting-asst/');
+  await page.evaluate(() => {
+    window.__omarAnalyticsEvents = [];
+  });
+  await page.locator('.cs-prevnext').getByRole('link').first().click();
+  await expectLatestAnalyticsEvent(page, 'case_study_next_previous_click', {
+    direction: 'previous',
+    case_study_id: 'posting-asst',
+    target_case_study_id: 'mgmt-portal',
+  });
 });
 
 test('design system route exposes the public header and intro content', async ({ page }) => {

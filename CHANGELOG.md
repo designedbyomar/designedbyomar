@@ -7,6 +7,7 @@ All notable changes to designedbyomar.com are documented here.
 ### Added
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
+- Analytics: deeper portfolio interaction events added for About drawer opens, Work drawer opens, case-study previous/next navigation, FAQ toggles, and email copy actions.
 - SEO: `metaDescription` field added to all 8 case studies in `case-studies.json` — longer, keyword-rich descriptions (120–175 chars) used in `<meta name="description">` and OG/Twitter tags without changing the short on-page subtitles
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
 
