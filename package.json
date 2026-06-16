@@ -50,6 +50,6 @@
     "@playwright/test": "^1.59.1",
     "@vitejs/plugin-react": "^6.0.1",
     "sharp": "^0.34.5",
-    "vite": "^8.0.10"
+    "vite": "^8.0.16"
   }
 }
