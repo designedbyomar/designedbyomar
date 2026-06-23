@@ -10,9 +10,30 @@ const expectWorkSection = async (page) => {
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.addInitScript(() => {
+    if (localStorage.getItem('__preserveOmarThemeForTest') === 'true') {
+      localStorage.removeItem('__preserveOmarThemeForTest');
+      return;
+    }
     localStorage.removeItem('omar.theme');
   });
 });
+
+const expectDrawerOffCanvas = async (drawer) => {
+  await expect.poll(() => drawer.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left >= window.innerWidth - 1;
+  })).toBe(true);
+};
+
+const expectLatestAnalyticsEvent = async (page, eventName, expectedParams) => {
+  await expect.poll(() => page.evaluate((name) => {
+    const events = window.__omarAnalyticsEvents || [];
+    return events.filter((event) => event.eventName === name).at(-1) || null;
+  }, eventName)).toMatchObject({
+    eventName,
+    params: expect.objectContaining(expectedParams),
+  });
+};
 
 test('homepage renders the primary portfolio experience', async ({ page }) => {
   await page.goto('/');
@@ -52,6 +73,183 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible();
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
+});
+
+test('FAQ accordion opens, closes, and toggles the full question list', async ({ page }) => {
+  await page.goto('/');
+
+  const faq = page.locator('#faq');
+  await faq.scrollIntoViewIfNeeded();
+  await expect(faq.locator('.faq-item')).toHaveCount(6);
+
+  const firstQuestion = page.locator('#faq-question-0');
+  const firstAnswer = page.locator('#faq-answer-0');
+  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'false');
+  await expect(firstAnswer).toBeHidden();
+
+  await firstQuestion.click();
+  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'true');
+  await expect(firstAnswer).toBeVisible();
+
+  await firstQuestion.click();
+  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'false');
+  await expect(firstAnswer).toBeHidden();
+
+  await page.getByRole('button', { name: /View all questions/i }).click();
+  await expect(faq.locator('.faq-item')).toHaveCount(10);
+  await expect(page.getByRole('button', { name: /Show fewer questions/i })).toBeVisible();
+
+  await page.getByRole('button', { name: /Show fewer questions/i }).click();
+  await expect(faq.locator('.faq-item')).toHaveCount(6);
+});
+
+test('About drawer opens from nav and section controls, then closes', async ({ page }) => {
+  await page.goto('/');
+
+  const aboutDrawer = page.locator('[role="dialog"][aria-label="About Omar"]');
+
+  await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
+  const navDialog = page.getByRole('dialog', { name: 'About Omar' });
+  await expect(navDialog).toBeVisible();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
+  await expect(navDialog.getByText('About / long-form')).toBeVisible();
+  await navDialog.getByRole('button', { name: 'Close' }).click();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(aboutDrawer);
+
+  await page.locator('#about').scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: /Read more about me/i }).click();
+  const sectionDialog = page.getByRole('dialog', { name: 'About Omar' });
+  await expect(sectionDialog).toBeVisible();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
+  await sectionDialog.getByRole('button', { name: 'Close' }).click();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(aboutDrawer);
+});
+
+test('Work drawer opens from the work section, lists all case studies, and closes', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('#work').scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: /See all 8 case studies/i }).click();
+
+  const workDrawer = page.locator('[role="dialog"][aria-label="All case studies"]');
+  const drawer = page.getByRole('dialog', { name: 'All case studies' });
+  await expect(drawer).toBeVisible();
+  await expect(workDrawer).toHaveAttribute('aria-hidden', 'false');
+  await expect(drawer.locator('.case-card')).toHaveCount(8);
+  await drawer.getByRole('button', { name: 'Close' }).click();
+  await expect(workDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(workDrawer);
+});
+
+test('theme selection persists after reload', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: /Switch to light mode/i }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+  await page.evaluate(() => localStorage.setItem('__preserveOmarThemeForTest', 'true'));
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByRole('button', { name: /Switch to dark mode/i })).toBeVisible();
+});
+
+test('/404.html renders the static not-found experience', async ({ page }) => {
+  await page.goto('/404.html');
+
+  await expect(page).toHaveTitle(/Page Not Found/i);
+  await expect(page.getByRole('heading', { name: "This page hasn't landed yet." })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/');
+  await expect(page.getByRole('link', { name: 'View work' })).toHaveAttribute('href', '/#work');
+  await expect(page.getByRole('link', { name: 'Contact Omar' })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
+});
+
+test('contact section exposes the primary conversion links', async ({ page }) => {
+  await page.goto('/');
+
+  const contact = page.locator('#contact');
+  await contact.scrollIntoViewIfNeeded();
+  await expect(contact.locator('.contact-card')).toHaveCount(6);
+  await expect(contact.getByText('Email', { exact: true })).toBeVisible();
+  await expect(contact.getByText('Resume / CV', { exact: true })).toBeVisible();
+  await expect(contact.getByText('LinkedIn', { exact: true })).toBeVisible();
+  await expect(contact.getByText('GitHub', { exact: true })).toBeVisible();
+  await expect(contact.getByText('Substack', { exact: true })).toBeVisible();
+  await expect(contact.getByText('Behance', { exact: true })).toBeVisible();
+  await expect(contact.getByRole('link', { name: /Email\s+omar@designedbyomar\.com/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
+  await expect(contact.getByRole('link', { name: /Resume \/ CV\s+Open PDF/i })).toHaveAttribute('href', '/Omar%20Tavarez%20Resume.pdf');
+});
+
+test('tracks deeper portfolio interaction analytics after consent', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'accepted');
+    window.__omarAnalyticsConsent = 'accepted';
+    window.__omarGaReady = true;
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          window.__omarCopiedText = value;
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+  await page.evaluate(() => {
+    window.__omarAnalyticsEvents = [];
+  });
+
+  await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
+  await expectLatestAnalyticsEvent(page, 'about_drawer_open', { source: 'nav' });
+  await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
+
+  await page.locator('#work').scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: /See all 8 case studies/i }).click();
+  await expectLatestAnalyticsEvent(page, 'work_drawer_open', { source: 'work_section' });
+  await page.getByRole('dialog', { name: 'All case studies' }).getByRole('button', { name: 'Close' }).click();
+
+  const firstQuestion = page.locator('#faq-question-0');
+  await firstQuestion.click();
+  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
+    faq_index: 0,
+    action: 'open',
+  });
+  await firstQuestion.click();
+  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
+    faq_index: 0,
+    action: 'close',
+  });
+
+  await page.locator('#contact').scrollIntoViewIfNeeded();
+  await page.locator('#contact [data-copy-button="true"]').click();
+  await expectLatestAnalyticsEvent(page, 'copy_email_click', {
+    section: 'contact',
+    copy_target: 'email',
+  });
+  await expect.poll(() => page.evaluate(() => window.__omarCopiedText)).toBe('omar@designedbyomar.com');
+  await expect.poll(() => page.evaluate(() => {
+    const events = window.__omarAnalyticsEvents || [];
+    const event = events.find((entry) => entry.eventName === 'copy_email_click');
+    return JSON.stringify(event?.params || {});
+  })).not.toContain('omar@designedbyomar.com');
+
+  await page.goto('/work/posting-asst/');
+  await page.evaluate(() => {
+    window.__omarAnalyticsEvents = [];
+  });
+  await page.locator('.cs-prevnext').getByRole('link').first().click();
+  await expectLatestAnalyticsEvent(page, 'case_study_next_previous_click', {
+    direction: 'previous',
+    case_study_id: 'posting-asst',
+    target_case_study_id: 'mgmt-portal',
+  });
 });
 
 test('design system route exposes the public header and intro content', async ({ page }) => {

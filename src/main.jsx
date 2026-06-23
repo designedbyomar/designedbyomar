@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
@@ -121,6 +121,11 @@ if (typeof window !== 'undefined') {
     window.gtag('event', eventName, params);
   };
 }
+
+const trackPortfolioEvent = (eventName, params) => {
+  if (typeof window === 'undefined' || typeof window.trackAnalyticsEvent !== 'function') return;
+  window.trackAnalyticsEvent(eventName, params);
+};
 
 // ============================================================
 // Portrait
@@ -485,25 +490,26 @@ const Portrait = ({ galaxy, theme }) => {
 // ============================================================
 // LogoLoader
 // ============================================================
+const LOADER_PHRASES = [
+  "Designing the experience",
+  "Crafting the details",
+  "Shaping the system",
+  "Building the flow",
+  "Refining the interface",
+  "Prototyping ideas",
+  "Polishing the pixels",
+  "Aligning the vision",
+  "Structuring the journey",
+  "Tuning the experience",
+  "Design in progress",
+  "Good design takes a second",
+  "Making complexity feel simple",
+  "Turning systems into clarity",
+  "Building something thoughtful",
+];
+
 const LogoLoader = ({ visible }) => {
-  const phrases = [
-    "Designing the experience",
-    "Crafting the details",
-    "Shaping the system",
-    "Building the flow",
-    "Refining the interface",
-    "Prototyping ideas",
-    "Polishing the pixels",
-    "Aligning the vision",
-    "Structuring the journey",
-    "Tuning the experience",
-    "Design in progress",
-    "Good design takes a second",
-    "Making complexity feel simple",
-    "Turning systems into clarity",
-    "Building something thoughtful",
-  ];
-  const [index, setIndex] = React.useState(() => Math.floor(Math.random() * phrases.length));
+  const [index, setIndex] = React.useState(() => Math.floor(Math.random() * LOADER_PHRASES.length));
   const [isExiting, setIsExiting] = React.useState(false);
 
   React.useEffect(() => {
@@ -512,8 +518,8 @@ const LogoLoader = ({ visible }) => {
       setIsExiting(true);
       setTimeout(() => {
         setIndex((prev) => {
-          let next = Math.floor(Math.random() * phrases.length);
-          if (next === prev) next = (next + 1) % phrases.length;
+          let next = Math.floor(Math.random() * LOADER_PHRASES.length);
+          if (next === prev) next = (next + 1) % LOADER_PHRASES.length;
           return next;
         });
         setIsExiting(false);
@@ -548,8 +554,8 @@ const LogoLoader = ({ visible }) => {
         justifyContent: 'center',
         textAlign: 'center'
       }}>
-        <div style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>{phrases[index]}</div>
-        {phrases[index].split('').map((char, i) => {
+        <div style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>{LOADER_PHRASES[index]}</div>
+        {LOADER_PHRASES[index].split('').map((char, i) => {
           if (char === ' ') return <span key={`${index}-${i}-space`} style={{ width: '0.4em' }}>&nbsp;</span>;
           return (
             <span
@@ -733,7 +739,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Work</a>
-            <button onClick={onOpenAbout} style={navLink}
+            <button onClick={() => onOpenAbout('nav')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >About</button>
@@ -789,7 +795,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
-              <button onClick={() => { closeMobileMenu(); onOpenAbout(); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
+              <button onClick={() => { closeMobileMenu(); onOpenAbout('mobile_nav'); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
@@ -1399,12 +1405,28 @@ const CaseStudyPage = ({ c, onBack }) => {
         marginTop: 96, paddingTop: 32,
         borderTop: '1px solid var(--color-gray-100)',
       }}>
-        <a href={`/work/${prev.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a
+          href={`/work/${prev.id}/`}
+          onClick={() => trackPortfolioEvent('case_study_next_previous_click', {
+            direction: 'previous',
+            case_study_id: c.id,
+            target_case_study_id: prev.id,
+          })}
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
         </a>
-        <a href={`/work/${next.id}/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <a
+          href={`/work/${next.id}/`}
+          onClick={() => trackPortfolioEvent('case_study_next_previous_click', {
+            direction: 'next',
+            case_study_id: c.id,
+            target_case_study_id: next.id,
+          })}
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
           <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
           <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
@@ -1417,7 +1439,7 @@ const CaseStudyPage = ({ c, onBack }) => {
 // ============================================================
 // Contact + Footer
 // ============================================================
-const ContactCard = ({ label, value, href, eventName, copyValue, section }) => {
+const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEventName, copyTarget }) => {
   const [copied, setCopied] = React.useState(false);
   const resetTimerRef = React.useRef(null);
 
@@ -1433,6 +1455,12 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section }) => {
     try {
       await navigator.clipboard.writeText(copyValue);
       setCopied(true);
+      if (copyEventName) {
+        trackPortfolioEvent(copyEventName, {
+          section: section || 'contact',
+          copy_target: copyTarget,
+        });
+      }
       if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
       resetTimerRef.current = window.setTimeout(() => setCopied(false), 1200);
     } catch {
@@ -1848,7 +1876,14 @@ const FAQ = ({ scrollToSection }) => {
                   type="button"
                   aria-expanded={isOpen}
                   aria-controls={answerId}
-                  onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                  onClick={() => {
+                    trackPortfolioEvent('faq_interaction', {
+                      faq_index: index,
+                      faq_question: item.question,
+                      action: isOpen ? 'close' : 'open',
+                    });
+                    setOpenIndex(isOpen ? -1 : index);
+                  }}
                   style={{
                     width: '100%',
                     minHeight: 68,
@@ -1946,7 +1981,7 @@ const Contact = () => {
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
-            <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" />
+            <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
             <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
             <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
             <ContactCard label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
@@ -2073,7 +2108,10 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
             <a
               href="#about"
               className="text-link site-footer-link"
-              onClick={goSection('about')}
+              onClick={(event) => {
+                event.preventDefault();
+                onOpenAbout('footer');
+              }}
             >
               About
             </a>
@@ -2748,7 +2786,9 @@ const App = () => {
       if (!cancelled) {
         try {
           sessionStorage.setItem(LOADER_SESSION_KEY, 'true');
-        } catch { }
+        } catch {
+          // Session storage can be unavailable in private browsing or locked-down contexts.
+        }
         setLoading(false);
       }
     });
@@ -2761,6 +2801,16 @@ const App = () => {
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [workOpen, setWorkOpen] = React.useState(false);
   const galaxy = { density: 1.9, speed: 0.75, style: 'pixel', accent: 'workflow', theme };
+
+  const openAboutDrawer = React.useCallback((source) => {
+    trackPortfolioEvent('about_drawer_open', { source });
+    setAboutOpen(true);
+  }, []);
+
+  const openWorkDrawer = React.useCallback((source) => {
+    trackPortfolioEvent('work_drawer_open', { source });
+    setWorkOpen(true);
+  }, []);
 
   const route = useRoute();
   const currentCase = route.type === 'case' ? CASE_STUDIES.find(c => c.id === route.id) : null;
@@ -2979,7 +3029,7 @@ const App = () => {
       `}</style>
       <LogoLoader visible={loading} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
-        <Nav theme={theme} setTheme={setTheme} onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
+        <Nav theme={theme} setTheme={setTheme} onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
@@ -2988,15 +3038,15 @@ const App = () => {
           ) : (
             <>
               <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />
-              <About onOpenDrawer={() => setAboutOpen(true)} />
-              <Work onOpenDrawer={() => setWorkOpen(true)} />
+              <About onOpenDrawer={() => openAboutDrawer('about_section')} />
+              <Work onOpenDrawer={() => openWorkDrawer('work_section')} />
               <KeyFacts />
               <FAQ scrollToSection={scrollToSection} />
               <Contact />
             </>
           )}
         </main>
-        <SiteFooter onOpenAbout={() => setAboutOpen(true)} onHome={goHome} scrollToSection={scrollToSection} />
+        <SiteFooter onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />

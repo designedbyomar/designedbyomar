@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const AlienPixel = ({ size = '1.4em', title = 'Alien', style, ...rest }) => (
     <svg
         viewBox="0 0 11 8"
