@@ -38,6 +38,8 @@ All notable changes to designedbyomar.com are documented here.
 ### Fixed
 - Build: H1 injection in `postbuild.js` now fails loudly if the expected `#root` element is missing, preventing silent SEO placeholder drift.
 - Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
+- Accessibility: Drawer dialogs now use valid `role="dialog"` host markup and stay hidden from assistive tech until open, clearing the PageSpeed agent accessibility failure while preserving focus management.
+- SEO: `llms.txt` now uses linked Markdown discovery content for AI agents and has regression coverage in the static SEO test suite.
 
 ## [1.1.5] - 2026-05-12
 

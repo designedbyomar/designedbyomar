@@ -2,22 +2,24 @@
 
 > Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
 
-Site: https://www.designedbyomar.com/
-Contact: omar@designedbyomar.com
+Site: [https://www.designedbyomar.com/](https://www.designedbyomar.com/)
+Contact: [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
 
 ## Primary pages
-- / : homepage, background, selected work, contact
-- /work : selected work and case studies
-- /work/mgmt-portal/ : Management Portal case study
-- /work/posting-asst/ : Posting Assistant case study
-- /work/page-builder/ : Page Builder 2.0 case study
-- /work/connect-api/ : Connect API Payments case study
-- /work/athena-ds/ : Athena Design System 2.0 case study
-- /work/plastiq-mktg/ : Plastiq Marketing Site case study
-- /work/disney-cct/ : Critical Communication Tool case study
-- /work/disney-uap/ : Unified Ad Platform case study
-- /design-system : public design system, brand, token, component, pattern, motion, content, and accessibility reference
-- /privacy : privacy policy and data collection details
+- [Homepage](https://www.designedbyomar.com/) : background, selected work, contact
+- [Selected work](https://www.designedbyomar.com/work) : case-study index
+- [Design system](https://www.designedbyomar.com/design-system) : public brand, token, component, pattern, motion, content, and accessibility reference
+- [Privacy policy](https://www.designedbyomar.com/privacy) : data collection and analytics consent details
+
+## Case studies
+- [Management Portal](https://www.designedbyomar.com/work/mgmt-portal/) : healthcare SaaS subscription and notification management
+- [Posting Assistant](https://www.designedbyomar.com/work/posting-asst/) : AI-assisted insurance payment posting workflow
+- [Page Builder 2.0](https://www.designedbyomar.com/work/page-builder/) : no-code restaurant site builder and design system
+- [Connect API Payments](https://www.designedbyomar.com/work/connect-api/) : fintech payments API and developer experience
+- [Athena Design System 2.0](https://www.designedbyomar.com/work/athena-ds/) : enterprise healthcare design system
+- [Plastiq Marketing Site](https://www.designedbyomar.com/work/plastiq-mktg/) : fintech marketing site and conversion flow
+- [Critical Communication Tool](https://www.designedbyomar.com/work/disney-cct/) : enterprise broadcast communication workflow
+- [Unified Ad Platform](https://www.designedbyomar.com/work/disney-uap/) : ad operations and campaign management platform
 
 ## Topics
 - product design
