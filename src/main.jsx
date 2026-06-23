@@ -1011,7 +1011,7 @@ const AboutDrawer = ({ open, onClose }) => {
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="About Omar" style={{
+      <div ref={drawerRef} role="dialog" aria-modal="true" aria-hidden={!open} aria-label="About Omar" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
         transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
@@ -1037,7 +1037,7 @@ const AboutDrawer = ({ open, onClose }) => {
             ))}
           </div>
         </div>
-      </aside>
+      </div>
     </>
   );
 };
@@ -1245,7 +1245,7 @@ const WorkDrawer = ({ open, onClose }) => {
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="All case studies" style={{
+      <div ref={drawerRef} role="dialog" aria-modal="true" aria-hidden={!open} aria-label="All case studies" style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
         background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
         transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
@@ -1266,7 +1266,7 @@ const WorkDrawer = ({ open, onClose }) => {
             ))}
           </div>
         </div>
-      </aside>
+      </div>
     </>
   );
 };

@@ -139,3 +139,22 @@ test('robots discovery points to the canonical sitemap', () => {
   const robots = readDist('robots.txt');
   assert.ok(robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`));
 });
+
+test('llms.txt follows agent discovery recommendations', () => {
+  const llms = readDist('llms.txt');
+  const links = [...llms.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)].map((match) => match[1]);
+
+  assert.match(llms, /^# designedbyomar$/m, 'llms.txt has an H1 title');
+  assert.ok(links.length > 0, 'llms.txt contains Markdown links');
+  assert.ok(links.includes(`${SITE_ORIGIN}/`), 'llms.txt links the canonical homepage');
+  assert.ok(links.includes(`${SITE_ORIGIN}/work`), 'llms.txt links the work index');
+  assert.ok(links.includes(`${SITE_ORIGIN}/design-system`), 'llms.txt links the design system page');
+  assert.ok(links.includes(`${SITE_ORIGIN}/privacy`), 'llms.txt links the privacy page');
+
+  caseStudySource().forEach((caseStudy) => {
+    assert.ok(
+      links.includes(`${SITE_ORIGIN}/work/${caseStudy.id}/`),
+      `llms.txt links the ${caseStudy.id} case-study route`,
+    );
+  });
+});
