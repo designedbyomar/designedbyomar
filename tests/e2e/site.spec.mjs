@@ -106,19 +106,25 @@ test('FAQ accordion opens, closes, and toggles the full question list', async ({
 test('About drawer opens from nav and section controls, then closes', async ({ page }) => {
   await page.goto('/');
 
+  const aboutDrawer = page.locator('[role="dialog"][aria-label="About Omar"]');
+
   await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
   const navDialog = page.getByRole('dialog', { name: 'About Omar' });
   await expect(navDialog).toBeVisible();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
   await expect(navDialog.getByText('About / long-form')).toBeVisible();
   await navDialog.getByRole('button', { name: 'Close' }).click();
-  await expectDrawerOffCanvas(navDialog);
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(aboutDrawer);
 
   await page.locator('#about').scrollIntoViewIfNeeded();
   await page.getByRole('button', { name: /Read more about me/i }).click();
   const sectionDialog = page.getByRole('dialog', { name: 'About Omar' });
   await expect(sectionDialog).toBeVisible();
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
   await sectionDialog.getByRole('button', { name: 'Close' }).click();
-  await expectDrawerOffCanvas(sectionDialog);
+  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(aboutDrawer);
 });
 
 test('Work drawer opens from the work section, lists all case studies, and closes', async ({ page }) => {
@@ -127,11 +133,14 @@ test('Work drawer opens from the work section, lists all case studies, and close
   await page.locator('#work').scrollIntoViewIfNeeded();
   await page.getByRole('button', { name: /See all 8 case studies/i }).click();
 
+  const workDrawer = page.locator('[role="dialog"][aria-label="All case studies"]');
   const drawer = page.getByRole('dialog', { name: 'All case studies' });
   await expect(drawer).toBeVisible();
+  await expect(workDrawer).toHaveAttribute('aria-hidden', 'false');
   await expect(drawer.locator('.case-card')).toHaveCount(8);
   await drawer.getByRole('button', { name: 'Close' }).click();
-  await expectDrawerOffCanvas(drawer);
+  await expect(workDrawer).toHaveAttribute('aria-hidden', 'true');
+  await expectDrawerOffCanvas(workDrawer);
 });
 
 test('theme selection persists after reload', async ({ page }) => {

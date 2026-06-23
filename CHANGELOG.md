@@ -7,7 +7,7 @@ All notable changes to designedbyomar.com are documented here.
 ### Added
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
-- CI: ESLint flat config, `npm run lint`, and CI lint step added with `eslint`, `@eslint/js`, and `globals` dev dependencies.
+- CI: ESLint flat config, React Hooks rules, `npm run lint`, and CI lint step added with `eslint`, `@eslint/js`, `eslint-plugin-react-hooks`, and `globals` dev dependencies.
 - Analytics: deeper portfolio interaction events added for About drawer opens, Work drawer opens, case-study previous/next navigation, FAQ toggles, and email copy actions.
 - SEO: `metaDescription` field added to all 8 case studies in `case-studies.json` — longer, keyword-rich descriptions (120–175 chars) used in `<meta name="description">` and OG/Twitter tags without changing the short on-page subtitles
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
@@ -40,6 +40,8 @@ All notable changes to designedbyomar.com are documented here.
 ### Fixed
 - Build: H1 injection in `postbuild.js` now fails loudly if the expected `#root` element is missing, preventing silent SEO placeholder drift.
 - Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
+- Accessibility: Drawer dialogs now use valid `role="dialog"` host markup and stay hidden from assistive tech until open, clearing the PageSpeed agent accessibility failure while preserving focus management.
+- SEO: `llms.txt` now uses linked Markdown discovery content for AI agents and has regression coverage in the static SEO test suite.
 
 ## [1.1.5] - 2026-05-12
 

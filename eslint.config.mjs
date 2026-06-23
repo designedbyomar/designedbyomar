@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 const moduleLanguageOptions = {
@@ -39,8 +40,13 @@ export default [
         ...globals.browser,
       },
     },
+    plugins: {
+      'react-hooks': reactHooks,
+    },
     rules: {
       'no-unused-vars': noUnusedVars,
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/rules-of-hooks': 'error',
     },
   },
   {
@@ -60,7 +66,6 @@ export default [
     files: [
       '*.config.js',
       '*.config.mjs',
-      'eslint.config.mjs',
       'scripts/**/*.mjs',
       'tests/**/*.mjs',
     ],
