@@ -7,6 +7,8 @@
     { "source": "/work/page-builder", "destination": "/work/page-builder/", "permanent": true },
     { "source": "/work/connect-api", "destination": "/work/connect-api/", "permanent": true },
     { "source": "/work/athena-ds", "destination": "/work/athena-ds/", "permanent": true },
+    { "source": "/work/athena-design-system", "destination": "/work/athena-ds/", "permanent": true },
+    { "source": "/work/athena-design-system/", "destination": "/work/athena-ds/", "permanent": true },
     { "source": "/work/plastiq-mktg", "destination": "/work/plastiq-mktg/", "permanent": true },
     { "source": "/work/disney-cct", "destination": "/work/disney-cct/", "permanent": true },
     { "source": "/work/disney-uap", "destination": "/work/disney-uap/", "permanent": true }
