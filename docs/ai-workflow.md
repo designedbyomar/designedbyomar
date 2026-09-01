@@ -44,6 +44,17 @@ The point of this artifact is to be honest about that boundary.
 6. **Postbuild SEO verification.** After each build, `dist/work/*/index.html` is spot-checked to confirm canonical, OG, and JSON-LD are correctly templated per case study.
 7. **Reduced-motion + responsive checks.** The canvas / motion components honor `prefers-reduced-motion`; layout is reviewed at mobile, tablet, layout, and desktop breakpoints (see `LAYOUT` constants in [`src/constants.js`](../src/constants.js)).
 
+### Automatic commit and PR handoff
+
+After completing and validating a requested change, the AI assistant should finish the Git workflow without waiting for a separate prompt:
+
+1. Review the diff and stage only files that belong to the current task. Preserve unrelated user changes and never commit secrets, generated builds, ignored files, or local tooling state.
+2. Create a small, descriptive commit on a short-lived branch. If work started on `main` or on a branch whose pull request is already merged or closed, create a fresh branch from current `origin/main` first.
+3. Push the branch and check GitHub for an open pull request from that branch.
+4. If an open pull request exists, update it with the new commit. If none exists, create one targeting `main` with a concise summary and verification notes.
+
+The requester can explicitly opt out when they want changes left uncommitted or do not want a pull request created.
+
 ---
 
 ## What I deliberately did not do

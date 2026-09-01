@@ -101,6 +101,9 @@ Keep `main` protected and deployable. Use short-lived feature branches for one f
 **Rules:**
 - Always branch from `main` — never from another feature branch unless explicitly stacking work.
 - One branch per logical unit of work. If you find unrelated cleanup while working on a feature, open a separate branch for it.
+- After a requested change is complete and validated, automatically commit the task-scoped files and push the branch unless the requester explicitly asks to leave the work uncommitted.
+- Reuse and update the branch's open pull request when one exists; otherwise open a new pull request against `main`.
+- Never include unrelated working-tree changes, secrets, generated builds, or ignored local files in an automatic commit.
 - Merge and delete promptly. Stale branches add noise; GitHub can auto-delete on merge (repo Settings → General → "Automatically delete head branches").
 
 **Prefixes:**
