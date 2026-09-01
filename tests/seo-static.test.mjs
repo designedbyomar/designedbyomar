@@ -158,3 +158,39 @@ test('llms.txt follows agent discovery recommendations', () => {
     );
   });
 });
+
+// Mirrors escapeAttr in postbuild.js — injected prose is escaped on the way in.
+const escapeHtml = (value) => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+test('case-study routes ship their prose in the static HTML', () => {
+  caseStudySource().forEach((caseStudy) => {
+    const html = readDist('work', caseStudy.id, 'index.html');
+
+    ['challenge', 'approach', 'outcome'].forEach((field) => {
+      const prose = caseStudy[field];
+      assert.ok(prose, `${caseStudy.id} has ${field} copy in case-studies.json`);
+      assert.ok(
+        html.includes(escapeHtml(prose)),
+        `${caseStudy.id}: ${field} prose is missing from dist/work/${caseStudy.id}/index.html`,
+      );
+    });
+
+    assert.ok(html.includes(`<h1>${escapeHtml(caseStudy.title)}</h1>`), `${caseStudy.id} has a static H1`);
+    ['Challenge', 'Approach', 'Outcome'].forEach((label) => {
+      assert.ok(html.includes(`<h2>${label}</h2>`), `${caseStudy.id} has a static ${label} heading`);
+    });
+  });
+});
+
+test('static prose is scoped to case-study routes only', () => {
+  ['privacy/index.html', 'work/index.html', 'index.html'].forEach((page) => {
+    assert.ok(
+      !readDist(...page.split('/')).includes('<h2>Challenge</h2>'),
+      `${page} does not carry case-study prose`,
+    );
+  });
+});

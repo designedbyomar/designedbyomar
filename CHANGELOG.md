@@ -12,6 +12,7 @@ All notable changes to designedbyomar.com are documented here.
 - Analytics: deeper portfolio interaction events added for About drawer opens, Work drawer opens, case-study previous/next navigation, FAQ toggles, and email copy actions.
 - SEO: `metaDescription` field added to all 8 case studies in `case-studies.json` — longer, keyword-rich descriptions (120–175 chars) used in `<meta name="description">` and OG/Twitter tags without changing the short on-page subtitles
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
+- SEO/AEO: Case-study routes now ship their full prose in the static HTML — title, subtitle, client/year/role, tags, metrics, and the Challenge / Approach / Outcome sections are injected into `<div id="root">` by `postbuild.js` from `case-studies.json`. Previously every `/work/[id]/` URL returned a document containing no case-study writing at all, so AI assistants, ATS scrapers, link-preview bots, reader mode, and non-rendering crawlers saw an empty page. React replaces root content on mount, so the rendered site is unchanged
 
 ### Changed
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.

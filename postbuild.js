@@ -210,16 +210,49 @@ function generateSitemap(distDir) {
   fs.writeFileSync(`${distDir}/sitemap.xml`, xml);
 }
 
-const H1_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0';
+const HIDDEN_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0';
+
+const ROOT_DIV = /<div id="root">[\s\S]*?<\/div>/;
+
+// Writes pre-escaped markup into #root. main.jsx mounts with createRoot().render()
+// rather than hydrateRoot(), so React replaces these children outright and users never
+// see them. They exist for consumers that never execute the bundle: AI assistants, ATS
+// scrapers, link-preview bots, reader mode, and non-rendering crawlers.
+function injectRootContent(html, innerHtml, label) {
+  if (!ROOT_DIV.test(html)) {
+    throw new Error(`injectRootContent: no #root div found in template — "${label}" was not injected`);
+  }
+  // Function replacer: case-study prose contains a literal $20M+, and the dollar sign is
+  // special in a replacement string, so a plain string replacement would corrupt output.
+  return html.replace(ROOT_DIV, () => `<div id="root">${innerHtml}</div>`);
+}
 
 function injectH1(html, text) {
-  const replacement = `<div id="root"><h1 style="${H1_STYLE}">${escapeAttr(text)}</h1></div>`;
-  // Replace either an existing visually-hidden H1 (from the index.html template) or an empty root div
-  const withExisting = html.replace(/<div id="root"><h1 style="[^"]*">[^<]*<\/h1><\/div>/, replacement);
-  if (withExisting !== html) return withExisting;
-  const withEmpty = html.replace('<div id="root"></div>', replacement);
-  if (withEmpty === html) throw new Error(`injectH1: no #root div found in template — H1 "${text}" was not injected`);
-  return withEmpty;
+  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeAttr(text)}</h1>`, text);
+}
+
+// The full case-study record as static HTML. The rendered React view labels these
+// sections with styled divs (src/main.jsx); real headings here give the static version
+// the cleaner document outline, which is what non-rendering consumers actually read.
+function caseStudyContentHtml(c) {
+  const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeAttr).join(' · ');
+  const list = (items) => (items && items.length ? `<ul>${items.join('')}</ul>` : '');
+  const tags = list((c.tags || []).map((t) => `<li>${escapeAttr(t)}</li>`));
+  const metrics = list((c.metrics || []).map((m) => `<li>${escapeAttr(m.value)} — ${escapeAttr(m.label)}</li>`));
+  const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeAttr(body)}</p>` : '');
+
+  return [
+    `<article style="${HIDDEN_STYLE}">`,
+    `<h1>${escapeAttr(c.title)}</h1>`,
+    c.subtitle ? `<p>${escapeAttr(c.subtitle)}</p>` : '',
+    meta ? `<p>${meta}</p>` : '',
+    tags,
+    metrics,
+    section('Challenge', c.challenge),
+    section('Approach', c.approach),
+    section('Outcome', c.outcome),
+    '</article>',
+  ].join('');
 }
 
 function generateRoutes() {
@@ -260,7 +293,7 @@ function generateRoutes() {
     if (withoutHeight === html) throw new Error('og:image:height tag not found in index.html template — check template and rerun build');
     html = withoutHeight;
     html = setStructuredData(html, caseStudyStructuredData(c));
-    html = injectH1(html, `${c.title} — Omar Tavarez`);
+    html = injectRootContent(html, caseStudyContentHtml(c), c.title);
 
     fs.writeFileSync(`${dir}/index.html`, html);
   });
