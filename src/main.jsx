@@ -81,7 +81,7 @@ const configureGoogleAnalytics = () => {
   if (window.__omarGaConfigured) return;
 
   window.gtag('js', new Date());
-  window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false });
+  window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false });
   window.__omarGaConfigured = true;
 };
 
@@ -820,15 +820,20 @@ const Dot = () => (
   </span>
 );
 
+const SHOW_ROLE_STATUS = false;
+const ROLE_STATUS_COPY = 'CURRENTLY LOOKING FOR MY NEXT ROLE.';
+
 const Hero = ({ galaxy, theme, scrollToSection }) => (
   <section id="top" className="hero-editorial" style={{
     maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--layout-2)',
     display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
   }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-        <Dot /> <span>CURRENTLY LOOKING FOR MY NEXT ROLE.</span>
-      </div>
+      {SHOW_ROLE_STATUS && (
+        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <Dot /> <span>{ROLE_STATUS_COPY}</span>
+        </div>
+      )}
       <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
         Complex systems. <span style={{ color: 'var(--fg-tertiary)' }}>Clear products.</span>
       </h1>

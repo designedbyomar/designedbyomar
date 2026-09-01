@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const { injectRootContent } = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -155,6 +159,75 @@ test('llms.txt follows agent discovery recommendations', () => {
     assert.ok(
       links.includes(`${SITE_ORIGIN}/work/${caseStudy.id}/`),
       `llms.txt links the ${caseStudy.id} case-study route`,
+    );
+  });
+});
+
+// Mirrors escapeAttr in postbuild.js — injected prose is escaped on the way in.
+const escapeHtml = (value) => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+test('case-study routes ship their prose in the static HTML', () => {
+  caseStudySource().forEach((caseStudy) => {
+    const html = readDist('work', caseStudy.id, 'index.html');
+
+    ['challenge', 'approach', 'outcome'].forEach((field) => {
+      const prose = caseStudy[field];
+      assert.ok(prose, `${caseStudy.id} has ${field} copy in case-studies.json`);
+      assert.ok(
+        html.includes(escapeHtml(prose)),
+        `${caseStudy.id}: ${field} prose is missing from dist/work/${caseStudy.id}/index.html`,
+      );
+    });
+
+    assert.ok(html.includes(`<h1>${escapeHtml(caseStudy.title)}</h1>`), `${caseStudy.id} has a static H1`);
+    assert.ok(caseStudy.subtitle, `${caseStudy.id} has subtitle copy in case-studies.json`);
+    assert.ok(
+      html.includes(`<p>${escapeHtml(caseStudy.subtitle)}</p>`),
+      `${caseStudy.id} has its static subtitle`,
+    );
+
+    ['client', 'year', 'role'].forEach((field) => {
+      assert.ok(caseStudy[field], `${caseStudy.id} has ${field} metadata in case-studies.json`);
+    });
+    const metadata = [caseStudy.client, caseStudy.year, caseStudy.role].map(escapeHtml).join(' · ');
+    assert.ok(html.includes(`<p>${metadata}</p>`), `${caseStudy.id} has its static client/year/role metadata`);
+
+    assert.ok(caseStudy.tags.length > 0, `${caseStudy.id} has tags in case-studies.json`);
+    caseStudy.tags.forEach((tag) => {
+      assert.ok(html.includes(`<li>${escapeHtml(tag)}</li>`), `${caseStudy.id} has static tag "${tag}"`);
+    });
+
+    assert.ok(caseStudy.metrics.length > 0, `${caseStudy.id} has metrics in case-studies.json`);
+    caseStudy.metrics.forEach((metric) => {
+      const serializedMetric = `${escapeHtml(metric.value)} — ${escapeHtml(metric.label)}`;
+      assert.ok(html.includes(`<li>${serializedMetric}</li>`), `${caseStudy.id} has static metric "${serializedMetric}"`);
+    });
+
+    ['Challenge', 'Approach', 'Outcome'].forEach((label) => {
+      assert.ok(html.includes(`<h2>${label}</h2>`), `${caseStudy.id} has a static ${label} heading`);
+    });
+  });
+});
+
+test('root injection replaces all nested root children without leaving stale markup', () => {
+  const template = '<body><div id="root" data-app="portfolio"><div><div>stale nested content</div></div><p>stale sibling</p></div><div id="after-root">keep me</div></body>';
+  const replacement = '<article><h1>Fresh content</h1></article>';
+
+  assert.equal(
+    injectRootContent(template, replacement, 'nested root fixture'),
+    `<body><div id="root" data-app="portfolio">${replacement}</div><div id="after-root">keep me</div></body>`,
+  );
+});
+
+test('static prose is scoped to case-study routes only', () => {
+  ['privacy/index.html', 'work/index.html', 'index.html'].forEach((page) => {
+    assert.ok(
+      !readDist(...page.split('/')).includes('<h2>Challenge</h2>'),
+      `${page} does not carry case-study prose`,
     );
   });
 });

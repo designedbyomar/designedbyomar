@@ -2,12 +2,12 @@ export const AlienPixel = ({ size = '1.4em', title = 'Alien', style, ...rest }) 
     <svg
         viewBox="0 0 11 8"
         width={size}
-        height="auto"
         role="img"
         shapeRendering="crispEdges"
         xmlns="http://www.w3.org/2000/svg"
         style={{
             display: 'inline-block',
+            height: 'auto',
             verticalAlign: '-0.15em',
             color: 'var(--color-develop-blue)',
             ...style,
@@ -40,11 +40,10 @@ export const UFO = ({ size = '1.8em', style }) => (
     <svg
         viewBox="0 0 11 5"
         width={size}
-        height="auto"
         aria-hidden="true"
         shapeRendering="crispEdges"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ display: 'block', ...style }}
+        style={{ display: 'block', height: 'auto', ...style }}
     >
         <g fill="var(--color-ship-red)">
             <rect x="3" y="0" width="5" height="1" />
