@@ -12,9 +12,21 @@ All notable changes to designedbyomar.com are documented here.
 - Analytics: deeper portfolio interaction events added for About drawer opens, Work drawer opens, case-study previous/next navigation, FAQ toggles, and email copy actions.
 - SEO: `metaDescription` field added to all 8 case studies in `case-studies.json` — longer, keyword-rich descriptions (120–175 chars) used in `<meta name="description">` and OG/Twitter tags without changing the short on-page subtitles
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
+- SEO/AEO: Case-study routes now ship their full prose in the static HTML — title, subtitle, client/year/role, tags, metrics, and the Challenge / Approach / Outcome sections are injected into `<div id="root">` by `postbuild.js` from `case-studies.json`. Previously every `/work/[id]/` URL returned a document containing no case-study writing at all, so AI assistants, ATS scrapers, link-preview bots, reader mode, and non-rendering crawlers saw an empty page. React replaces root content on mount, so the rendered site is unchanged
+
+### Fixed
+- Security: CSP `report-uri` directive removed — the value was single-quoted (`'/csp-report'`), which CSP reserves for keywords like `'self'`, so browsers POSTed violation reports to a literal quoted path that 404ed and no reports were ever collected
+- Security: CSP `connect-src` Sentry host corrected from `https://*.ingest.sentry.io` to `https://*.ingest.us.sentry.io` — the wildcard did not match the regional DSN host `o4511277976649728.ingest.us.sentry.io`, so enforcing the policy would have silently blocked all Sentry error reporting
+- Polish: Saved theme is now applied before first paint by an inline head script in `index.html` and `design-system.html` — both templates ship `data-theme="dark"`, so light-mode visitors saw a dark flash on every page load until React's `useEffect` corrected it after the bundle parsed
+- Performance: Hero portrait preload no longer ships to routes that never render it — it was emitted into all 8 case-study routes and `/privacy` via the shared `postbuild.js` template, costing each a wasted 50 KB fetch at `fetchpriority="high"` that competed with those pages' real LCP content
+- Performance: Hero portrait preload is now theme-aware — it hardcoded the dark-mode srcset while light mode renders `omar-light.webp`, so light-mode visitors fetched an unused 50 KB image alongside the real one and got no LCP benefit
+- Accessibility/markup: `height="auto"` removed from the `AlienPixel` and `UFO` SVGs in `src/footer-alien.jsx` — `auto` is not a valid SVG length, so browsers discarded it and logged two console errors per page load; the same intent is now expressed in CSS, with rendered sizes unchanged
+- Security: CSP `connect-src` now allows `https://www.google.com` — GA4 beacons engagement events to `/g/collect` on that origin regardless of signals configuration, and enforcing without it produced a console error per event
 
 ### Changed
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
+- Security: `Content-Security-Policy` promoted from report-only to enforcing in `vercel.json` after validating every route and interactive surface under the real policy — nothing is blocked
+- Analytics: GA4 `config` now sets `allow_google_signals: false` and `allow_ad_personalization_signals: false` — disables Google signals and ads personalization, matching the privacy policy claim that analytics are not used for advertising, profiling, or cross-site tracking
 - Resume: replaced the public downloadable PDF with Omar Tavarez Resume v3.0.
 - Workflow: documented automatic task-scoped commits and pull-request creation after validated changes.
 - Docs: README, deployment runbook, AI workflow notes, and roadmap now reflect `src/content/case-studies.json` as the canonical case-study source and `postbuild.js` as the generated sitemap source.
@@ -43,6 +55,8 @@ All notable changes to designedbyomar.com are documented here.
 - Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
 
 ### Fixed
+- Static route generation now replaces the complete `#root` subtree when template markup contains nested divs, preventing stale or malformed generated HTML.
+- Static SEO coverage now verifies case-study subtitles, client/year/role metadata, tags, and metrics in generated HTML.
 - Privacy: GA4 on the 404 page is now gated behind analytics consent — `404.html` loaded `gtag.js` and configured two measurement IDs at parse time regardless of consent, so a visitor who declined analytics was still served Google's tag if they hit a 404. The page now mirrors the app's consent check inline before loading anything. No analytics data is lost: both configs already set `send_page_view: false` and nothing sent a manual page view, so the 404 page reported nothing to GA4 either way
 - Build: H1 injection in `postbuild.js` now fails loudly if the expected `#root` element is missing, preventing silent SEO placeholder drift.
 - Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
