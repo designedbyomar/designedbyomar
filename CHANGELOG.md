@@ -14,6 +14,7 @@ All notable changes to designedbyomar.com are documented here.
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
 
 ### Changed
+- Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
 - Resume: replaced the public downloadable PDF with Omar Tavarez Resume v3.0.
 - Workflow: documented automatic task-scoped commits and pull-request creation after validated changes.
 - Docs: README, deployment runbook, AI workflow notes, and roadmap now reflect `src/content/case-studies.json` as the canonical case-study source and `postbuild.js` as the generated sitemap source.
