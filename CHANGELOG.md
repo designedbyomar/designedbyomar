@@ -2,7 +2,7 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-06-23
+## [Unreleased] - 2026-09-01
 
 ### Added
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
@@ -14,6 +14,9 @@ All notable changes to designedbyomar.com are documented here.
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
 
 ### Changed
+- Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
+- Resume: replaced the public downloadable PDF with Omar Tavarez Resume v3.0.
+- Workflow: documented automatic task-scoped commits and pull-request creation after validated changes.
 - Docs: README, deployment runbook, AI workflow notes, and roadmap now reflect `src/content/case-studies.json` as the canonical case-study source and `postbuild.js` as the generated sitemap source.
 - Homepage: hid the "Currently looking for my next role" hero status while preserving the copy behind a source flag for future reuse.
 - SEO: Case-study `metaDescription` copy tightened for cleaner search snippets while preserving the same public claims.
