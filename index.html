@@ -36,8 +36,11 @@
   try { light = localStorage.getItem('omar.theme') === 'light'; } catch (e) { light = false; }
   if (light) document.documentElement.dataset.theme = 'light';
 
+  // Only the homepage renders the hero portrait. /work used to render it too, but
+  // it is now its own case-study index, so preloading there fetched an image the page
+  // never paints.
   var path = location.pathname.replace(/\/+$/, '') || '/';
-  if (path !== '/' && path !== '/work') return;
+  if (path !== '/') return;
 
   var link = document.createElement('link');
   link.rel = 'preload';
