@@ -43,6 +43,7 @@ All notable changes to designedbyomar.com are documented here.
 - Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
 
 ### Fixed
+- Privacy: GA4 on the 404 page is now gated behind analytics consent — `404.html` loaded `gtag.js` and configured two measurement IDs at parse time regardless of consent, so a visitor who declined analytics was still served Google's tag if they hit a 404. The page now mirrors the app's consent check inline before loading anything. No analytics data is lost: both configs already set `send_page_view: false` and nothing sent a manual page view, so the 404 page reported nothing to GA4 either way
 - Build: H1 injection in `postbuild.js` now fails loudly if the expected `#root` element is missing, preventing silent SEO placeholder drift.
 - Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
 - Accessibility: Drawer dialogs now use valid `role="dialog"` host markup and stay hidden from assistive tech until open, clearing the PageSpeed agent accessibility failure while preserving focus management.
