@@ -44,6 +44,8 @@ All notable changes to designedbyomar.com are documented here.
 - Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
 
 ### Fixed
+- Static route generation now replaces the complete `#root` subtree when template markup contains nested divs, preventing stale or malformed generated HTML.
+- Static SEO coverage now verifies case-study subtitles, client/year/role metadata, tags, and metrics in generated HTML.
 - Build: H1 injection in `postbuild.js` now fails loudly if the expected `#root` element is missing, preventing silent SEO placeholder drift.
 - Design system hero h1 on mobile: `overflow-wrap: break-word` prevents "designedbyomar" from clipping at narrow viewports
 - Accessibility: Drawer dialogs now use valid `role="dialog"` host markup and stay hidden from assistive tech until open, clearing the PageSpeed agent accessibility failure while preserving focus management.

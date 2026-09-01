@@ -212,19 +212,35 @@ function generateSitemap(distDir) {
 
 const HIDDEN_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0';
 
-const ROOT_DIV = /<div id="root">[\s\S]*?<\/div>/;
+const ROOT_DIV_OPEN = /<div\b[^>]*\bid\s*=\s*(["'])root\1[^>]*>/i;
+
+function rootContentRange(html, label) {
+  const rootOpen = ROOT_DIV_OPEN.exec(html);
+  if (!rootOpen) {
+    throw new Error(`injectRootContent: no #root div found in template — "${label}" was not injected`);
+  }
+
+  const contentStart = rootOpen.index + rootOpen[0].length;
+  const divTag = /<\/?div\b[^>]*>/gi;
+  divTag.lastIndex = contentStart;
+  let depth = 1;
+  let match;
+
+  while ((match = divTag.exec(html))) {
+    depth += /^<\/div\b/i.test(match[0]) ? -1 : 1;
+    if (depth === 0) return { start: contentStart, end: match.index };
+  }
+
+  throw new Error(`injectRootContent: #root div is not closed in template — "${label}" was not injected`);
+}
 
 // Writes pre-escaped markup into #root. main.jsx mounts with createRoot().render()
 // rather than hydrateRoot(), so React replaces these children outright and users never
 // see them. They exist for consumers that never execute the bundle: AI assistants, ATS
 // scrapers, link-preview bots, reader mode, and non-rendering crawlers.
 function injectRootContent(html, innerHtml, label) {
-  if (!ROOT_DIV.test(html)) {
-    throw new Error(`injectRootContent: no #root div found in template — "${label}" was not injected`);
-  }
-  // Function replacer: case-study prose contains a literal $20M+, and the dollar sign is
-  // special in a replacement string, so a plain string replacement would corrupt output.
-  return html.replace(ROOT_DIV, () => `<div id="root">${innerHtml}</div>`);
+  const { start, end } = rootContentRange(html, label);
+  return `${html.slice(0, start)}${innerHtml}${html.slice(end)}`;
 }
 
 function injectH1(html, text) {
@@ -332,4 +348,6 @@ function generateRoutes() {
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
 
-generateRoutes();
+if (require.main === module) generateRoutes();
+
+module.exports = { injectRootContent };
