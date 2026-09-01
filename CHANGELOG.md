@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-01
 
 ### Added
+- Work: `/work` is now a real case-study index listing all 8 studies in a grid, with its own H1 and intro. It previously rendered the homepage and scrolled to the Selected Work section, so the primary nav item produced a byte-for-byte duplicate of the page the visitor was already on — two URLs competing for the same content, and a nav click that appeared to do nothing
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
@@ -13,7 +14,12 @@ All notable changes to designedbyomar.com are documented here.
 - SEO: `metaDescription` field added to all 8 case studies in `case-studies.json` — longer, keyword-rich descriptions (120–175 chars) used in `<meta name="description">` and OG/Twitter tags without changing the short on-page subtitles
 - SEO: Visually-hidden static H1 injected into `<div id="root">` in `index.html` and all `postbuild.js`-generated pages (`/work`, `/work/[id]/`, `/privacy`, `/design-system`) — gives Ahrefs and non-JS crawlers an H1 signal; React replaces root content on mount so users never see the placeholder
 
+### Removed
+- Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
+
 ### Changed
+- Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
+- Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
 - Resume: replaced the public downloadable PDF with Omar Tavarez Resume v3.0.
 - Workflow: documented automatic task-scoped commits and pull-request creation after validated changes.

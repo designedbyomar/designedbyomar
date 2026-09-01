@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-const expectWorkSection = async (page) => {
-  const workSection = page.locator('#work');
-  await expect(workSection.getByRole('heading', { name: /Selected work\./i })).toBeVisible();
+const expectWorkIndex = async (page) => {
   await expect(page).toHaveURL(/\/work$/);
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+  await expect(page.getByRole('heading', { level: 1, name: /Selected work\./i })).toBeVisible();
+  await expect(page.locator('.case-card')).toHaveCount(8);
 };
 
 test.beforeEach(async ({ page }) => {
@@ -43,17 +42,17 @@ test('homepage renders the primary portfolio experience', async ({ page }) => {
   await expect(page.getByRole('link', { name: /View case studies/i })).toBeVisible();
 });
 
-test('/work loads directly and scrolls to the Work section', async ({ page }) => {
+test('/work loads directly as the full case-study index', async ({ page }) => {
   await page.goto('/work');
 
-  await expectWorkSection(page);
+  await expectWorkIndex(page);
 });
 
 test('desktop Work navigation updates the URL to /work', async ({ page }) => {
   await page.goto('/');
   await page.locator('header nav a[href="/work"]').click();
 
-  await expectWorkSection(page);
+  await expectWorkIndex(page);
 });
 
 test('case-study routes load directly and return to /work', async ({ page }) => {
@@ -64,7 +63,7 @@ test('case-study routes load directly and return to /work', async ({ page }) => 
   await expect(page.getByRole('article').getByText(/AI-assisted insurance payment posting workflow/i)).toBeVisible();
 
   await page.getByRole('link', { name: /Back to work/i }).click();
-  await expectWorkSection(page);
+  await expectWorkIndex(page);
 });
 
 test('/privacy loads the privacy policy route', async ({ page }) => {
@@ -127,20 +126,16 @@ test('About drawer opens from nav and section controls, then closes', async ({ p
   await expectDrawerOffCanvas(aboutDrawer);
 });
 
-test('Work drawer opens from the work section, lists all case studies, and closes', async ({ page }) => {
+test('Work section links to the full case-study index', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('#work').scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: /See all 8 case studies/i }).click();
+  const seeAll = page.getByRole('link', { name: /See all 8 case studies/i });
+  // A real href, so it is keyboard reachable, middle-clickable, and crawlable.
+  await expect(seeAll).toHaveAttribute('href', '/work');
+  await seeAll.click();
 
-  const workDrawer = page.locator('[role="dialog"][aria-label="All case studies"]');
-  const drawer = page.getByRole('dialog', { name: 'All case studies' });
-  await expect(drawer).toBeVisible();
-  await expect(workDrawer).toHaveAttribute('aria-hidden', 'false');
-  await expect(drawer.locator('.case-card')).toHaveCount(8);
-  await drawer.getByRole('button', { name: 'Close' }).click();
-  await expect(workDrawer).toHaveAttribute('aria-hidden', 'true');
-  await expectDrawerOffCanvas(workDrawer);
+  await expectWorkIndex(page);
 });
 
 test('theme selection persists after reload', async ({ page }) => {
@@ -209,11 +204,6 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
   await expectLatestAnalyticsEvent(page, 'about_drawer_open', { source: 'nav' });
   await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
-
-  await page.locator('#work').scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: /See all 8 case studies/i }).click();
-  await expectLatestAnalyticsEvent(page, 'work_drawer_open', { source: 'work_section' });
-  await page.getByRole('dialog', { name: 'All case studies' }).getByRole('button', { name: 'Close' }).click();
 
   const firstQuestion = page.locator('#faq-question-0');
   await firstQuestion.click();
@@ -500,7 +490,7 @@ test.describe('mobile navigation', () => {
     await expect(page.getByRole('button', { name: 'Close navigation menu' })).toBeVisible();
     await page.locator('header a[href="/work"]').click();
 
-    await expectWorkSection(page);
+    await expectWorkIndex(page);
   });
 
   test('design system mobile navigation reaches component docs', async ({ page }) => {
