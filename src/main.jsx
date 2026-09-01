@@ -1166,7 +1166,7 @@ const CaseCard = ({ c, featured = false }) => {
 // ============================================================
 // Work — homepage section
 // ============================================================
-const Work = ({ onOpenDrawer }) => {
+const Work = () => {
   const viewportWidth = useViewportWidth();
   const workHeadColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
   const secondaryColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
@@ -1201,18 +1201,18 @@ const Work = ({ onOpenDrawer }) => {
         </Reveal>
 
         <Reveal as="div" delay={230} style={{ display: 'inline-flex' }}>
-          <button onClick={onOpenDrawer} style={{
+          <a href="/work" style={{
             display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
             minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
+            textDecoration: 'none', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             See all {CASE_STUDIES.length} case studies
             <AppIcon icon={ArrowUpRight} size={12} />
-          </button>
+          </a>
         </Reveal>
       </div>
     </section>
@@ -1220,65 +1220,34 @@ const Work = ({ onOpenDrawer }) => {
 };
 
 // ============================================================
-// WorkDrawer — all case studies
+// WorkIndexPage — the full case-study index at /work
 // ============================================================
-const WorkDrawer = ({ open, onClose }) => {
-  const triggerRef = React.useRef(null);
-  const drawerRef = React.useRef(null);
-  React.useEffect(() => {
-    if (open) {
-      triggerRef.current = document.activeElement;
-      const first = drawerRef.current?.querySelector(FOCUSABLE_SELECTORS);
-      if (first) first.focus();
-    } else if (triggerRef.current) {
-      triggerRef.current.focus();
-      triggerRef.current = null;
-    }
-  }, [open]);
-  React.useEffect(() => {
-    if (!open) return;
-    const el = drawerRef.current;
-    const trap = (e) => {
-      if (e.key === 'Escape') { onClose(); return; }
-      if (e.key !== 'Tab' || !el) return;
-      const nodes = Array.from(el.querySelectorAll(FOCUSABLE_SELECTORS));
-      if (!nodes.length) return;
-      if (e.shiftKey && document.activeElement === nodes[0]) {
-        e.preventDefault(); nodes[nodes.length - 1].focus();
-      } else if (!e.shiftKey && document.activeElement === nodes[nodes.length - 1]) {
-        e.preventDefault(); nodes[0].focus();
-      }
-    };
-    document.addEventListener('keydown', trap);
-    document.body.style.overflow = 'hidden';
-    return () => { document.removeEventListener('keydown', trap); document.body.style.overflow = ''; };
-  }, [open, onClose]);
+const WorkIndexPage = () => {
+  const viewportWidth = useViewportWidth();
+  const headColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
+
   return (
-    <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <div ref={drawerRef} role="dialog" aria-modal="true" aria-hidden={!open} aria-label="All case studies" style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(980px, 96vw)',
-        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
-        display: 'flex', flexDirection: 'column',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>All case studies · {CASE_STUDIES.length}</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 44, height: 44, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <AppIcon icon={X} size={14} />
-          </button>
-        </div>
-        <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
-            {CASE_STUDIES.map(c => (
-              <div key={c.id} onClick={onClose}>
-                <CaseCard c={c} />
-              </div>
-            ))}
+    <section style={{ padding: '40px 24px 96px' }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
+        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: headColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ color: 'var(--color-preview-pink)' }}>All — </span>{CASE_STUDIES.length} case studies
           </div>
-        </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
+            <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+              Selected work. <span style={{ color: 'var(--fg-tertiary)' }}>Real systems. Measurable impact.</span>
+            </h1>
+            <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
+              Every case study in one place, across AI workflows, design systems, fintech, healthcare, and enterprise software.
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-8)', alignItems: 'stretch' }}>
+          {CASE_STUDIES.map((c) => <CaseCard key={c.id} c={c} />)}
+        </Reveal>
       </div>
-    </>
+    </section>
   );
 };
 
@@ -2766,7 +2735,6 @@ const App = () => {
 
   const showPrivacy = () => {
     setAboutOpen(false);
-    setWorkOpen(false);
     history.pushState(null, '', '/privacy');
     window.dispatchEvent(new Event('popstate'));
   };
@@ -2804,17 +2772,11 @@ const App = () => {
   }, [loading, theme]);
 
   const [aboutOpen, setAboutOpen] = React.useState(false);
-  const [workOpen, setWorkOpen] = React.useState(false);
   const galaxy = { density: 1.9, speed: 0.75, style: 'pixel', accent: 'workflow', theme };
 
   const openAboutDrawer = React.useCallback((source) => {
     trackPortfolioEvent('about_drawer_open', { source });
     setAboutOpen(true);
-  }, []);
-
-  const openWorkDrawer = React.useCallback((source) => {
-    trackPortfolioEvent('work_drawer_open', { source });
-    setWorkOpen(true);
   }, []);
 
   const route = useRoute();
@@ -2907,13 +2869,6 @@ const App = () => {
       return () => window.cancelAnimationFrame(frame);
     }
 
-    if (route.type === 'work') {
-      const frame = window.requestAnimationFrame(() => {
-        scrollToSectionElement('work', 'auto');
-      });
-      return () => window.cancelAnimationFrame(frame);
-    }
-
     const frame = window.requestAnimationFrame(() => {
       instantScrollToTop();
     });
@@ -2948,14 +2903,10 @@ const App = () => {
     };
 
     if (id === 'work') {
+      // /work is its own index page now, so this navigates instead of scrolling.
       if (!isWorkPath()) {
         history.pushState(null, '', '/work');
         window.dispatchEvent(new Event('popstate'));
-        window.requestAnimationFrame(() => {
-          window.requestAnimationFrame(performScroll);
-        });
-      } else {
-        performScroll();
       }
       return;
     }
@@ -3038,13 +2989,15 @@ const App = () => {
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
+          ) : route.type === 'work' ? (
+            <WorkIndexPage />
           ) : currentCase ? (
             <CaseStudyPage c={currentCase} onBack={() => scrollToSection('work', 'case_back')} />
           ) : (
             <>
               <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />
               <About onOpenDrawer={() => openAboutDrawer('about_section')} />
-              <Work onOpenDrawer={() => openWorkDrawer('work_section')} />
+              <Work />
               <KeyFacts />
               <FAQ scrollToSection={scrollToSection} />
               <Contact />
@@ -3054,7 +3007,6 @@ const App = () => {
         <SiteFooter onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
       </div>
       <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
-      <WorkDrawer open={workOpen} onClose={() => setWorkOpen(false)} />
       {showCookieBanner && <CookieBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} onPrivacy={showPrivacy} />}
       {analyticsAccepted && (
         <>

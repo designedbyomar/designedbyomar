@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-01
 
 ### Added
+- Work: `/work` is now a real case-study index listing all 8 studies in a grid, with its own H1 and intro. It previously rendered the homepage and scrolled to the Selected Work section, so the primary nav item produced a byte-for-byte duplicate of the page the visitor was already on — two URLs competing for the same content, and a nav click that appeared to do nothing
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
@@ -15,6 +16,7 @@ All notable changes to designedbyomar.com are documented here.
 - SEO/AEO: Case-study routes now ship their full prose in the static HTML — title, subtitle, client/year/role, tags, metrics, and the Challenge / Approach / Outcome sections are injected into `<div id="root">` by `postbuild.js` from `case-studies.json`. Previously every `/work/[id]/` URL returned a document containing no case-study writing at all, so AI assistants, ATS scrapers, link-preview bots, reader mode, and non-rendering crawlers saw an empty page. React replaces root content on mount, so the rendered site is unchanged
 
 ### Fixed
+- Performance: hero portrait preload is now scoped to the homepage only. It previously also ran on `/work`, which was correct while `/work` rendered the homepage hero — now that `/work` is its own case-study index, preloading there fetched a 50 KB image at `fetchpriority="high"` that the page never paints
 - Security: CSP `report-uri` directive removed — the value was single-quoted (`'/csp-report'`), which CSP reserves for keywords like `'self'`, so browsers POSTed violation reports to a literal quoted path that 404ed and no reports were ever collected
 - Security: CSP `connect-src` Sentry host corrected from `https://*.ingest.sentry.io` to `https://*.ingest.us.sentry.io` — the wildcard did not match the regional DSN host `o4511277976649728.ingest.us.sentry.io`, so enforcing the policy would have silently blocked all Sentry error reporting
 - Polish: Saved theme is now applied before first paint by an inline head script in `index.html` and `design-system.html` — both templates ship `data-theme="dark"`, so light-mode visitors saw a dark flash on every page load until React's `useEffect` corrected it after the bundle parsed
@@ -23,7 +25,12 @@ All notable changes to designedbyomar.com are documented here.
 - Accessibility/markup: `height="auto"` removed from the `AlienPixel` and `UFO` SVGs in `src/footer-alien.jsx` — `auto` is not a valid SVG length, so browsers discarded it and logged two console errors per page load; the same intent is now expressed in CSS, with rendered sizes unchanged
 - Security: CSP `connect-src` now allows `https://www.google.com` — GA4 beacons engagement events to `/g/collect` on that origin regardless of signals configuration, and enforcing without it produced a console error per event
 
+### Removed
+- Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
+
 ### Changed
+- Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
+- Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
 - Security: `Content-Security-Policy` promoted from report-only to enforcing in `vercel.json` after validating every route and interactive surface under the real policy — nothing is blocked
 - Analytics: GA4 `config` now sets `allow_google_signals: false` and `allow_ad_personalization_signals: false` — disables Google signals and ads personalization, matching the privacy policy claim that analytics are not used for advertising, profiling, or cross-site tracking
