@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>designedbyomar Design System</title>
+<script>
+// Applies the saved theme before first paint so light-mode visitors don't see a
+// dark flash while the bundle parses. design-system.jsx sets it again on mount.
+(function () {
+  try {
+    if (localStorage.getItem('omar.theme') === 'light') {
+      document.documentElement.dataset.theme = 'light';
+    }
+  } catch (e) {}
+})();
+</script>
 <meta name="description" content="The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez's portfolio.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://www.designedbyomar.com/design-system">
