@@ -41,6 +41,7 @@ test('homepage renders the primary portfolio experience', async ({ page }) => {
   await expect(page).toHaveTitle(/designedbyomar/i);
   await expect(page.getByRole('heading', { name: /Complex systems\.\s*Clear products\./i })).toBeVisible();
   await expect(page.getByRole('link', { name: /View case studies/i })).toBeVisible();
+  await expect(page.getByText('CURRENTLY LOOKING FOR MY NEXT ROLE.')).toHaveCount(0);
 });
 
 test('/work loads directly and scrolls to the Work section', async ({ page }) => {
