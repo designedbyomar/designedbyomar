@@ -909,6 +909,7 @@ const COMPANY_LOGOS = [
   { name: 'Wisdom', src: '/Images/Carousel/Wisdom_Logo_Full-White.svg', maxW: 130, maxH: 34, basis: 115 },
   { name: 'Meredith', src: '/Images/Carousel/meredith-vector-logo.svg', maxW: 120, maxH: 26, basis: 150 },
   { name: 'Simplero', src: '/Images/Carousel/simplero.svg', maxW: 90, maxH: 24, basis: 110 },
+  { name: 'WelcomeLend', src: '/Images/Carousel/welcomelend.svg', maxW: 118, maxH: 24, basis: 145 },
 ];
 
 const LogoCarousel = () => (

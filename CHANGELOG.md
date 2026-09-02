@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-01
 
 ### Added
+- Client carousel: WelcomeLend wordmark added, bringing the logo band to 10 companies. Alt text carries the company name, matching the existing pattern where marquee duplicates stay `aria-hidden` with empty alt
 - Work: `/work` is now a real case-study index listing all 8 studies in a grid, with its own H1 and intro. It previously rendered the homepage and scrolled to the Selected Work section, so the primary nav item produced a byte-for-byte duplicate of the page the visitor was already on — two URLs competing for the same content, and a nav click that appeared to do nothing
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
