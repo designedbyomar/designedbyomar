@@ -7,6 +7,9 @@ All notable changes to designedbyomar.com are documented here.
 ### Added
 - Client carousel: WelcomeLend wordmark added, bringing the logo band to 10 companies. Alt text carries the company name, matching the existing pattern where marquee duplicates stay `aria-hidden` with empty alt
 - Work: `/work` is now a real case-study index listing all 8 studies in a grid, with its own H1 and intro. It previously rendered the homepage and scrolled to the Selected Work section, so the primary nav item produced a byte-for-byte duplicate of the page the visitor was already on — two URLs competing for the same content, and a nav click that appeared to do nothing
+- Navigation: `Design System` added to the desktop and mobile header nav. The documented system powering the site was linked only from the footer, while the site claims design-systems expertise in three separate places
+- About: the "How I work" section now links to the live design system, putting the proof next to the claim
+- Case studies: optional `relatedLink` field on a case study, used by Athena Design System 2.0 to point at the live system as the current version of that thinking
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
@@ -32,6 +35,7 @@ All notable changes to designedbyomar.com are documented here.
 ### Changed
 - Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
 - Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
+- Key facts: design-systems stat raised from 2 to 3, matching the three case studies tagged `Design System` (Simplero Page Builder, Plastiq Athena, Disney Unified Ad Platform)
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
 - Security: `Content-Security-Policy` promoted from report-only to enforcing in `vercel.json` after validating every route and interactive surface under the real policy — nothing is blocked
 - Analytics: GA4 `config` now sets `allow_google_signals: false` and `allow_ad_personalization_signals: false` — disables Google signals and ads personalization, matching the privacy policy claim that analytics are not used for advertising, profiling, or cross-site tracking

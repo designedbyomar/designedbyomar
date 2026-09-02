@@ -505,3 +505,26 @@ test.describe('mobile navigation', () => {
     await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons$/ })).toBeVisible();
   });
 });
+
+test('Design System is reachable from the header nav', async ({ page }) => {
+  await page.goto('/');
+
+  const navLink = page.locator('header nav a[href="/design-system"]');
+  await expect(navLink).toHaveText('Design System');
+  await navLink.click();
+
+  await expect(page).toHaveURL(/\/design-system\/?$/);
+  await expect(page).toHaveTitle(/Design System/i);
+});
+
+test('Athena case study points to the live design system', async ({ page }) => {
+  await page.goto('/work/athena-ds/');
+
+  // Scoped to the article so this cannot pass on the site-wide nav link.
+  const related = page.locator('article a[href="/design-system"]');
+  await expect(related).toHaveText(/See the design system this site runs on/i);
+
+  // The link is specific to this case study, not every one.
+  await page.goto('/work/connect-api/');
+  await expect(page.locator('article a[href="/design-system"]')).toHaveCount(0);
+});
