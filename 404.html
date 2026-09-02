@@ -189,15 +189,36 @@ p {
   .button, .button-secondary { justify-content: center; }
 }
 </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T7W0PFD3HD"></script>
+<!-- Google tag (gtag.js), consent-gated.
+     The React app loads GA4 only after analytics consent is accepted. This page is
+     static with no app bundle, so it repeats that check inline rather than loading
+     the tag outright. Mirrors getStoredAnalyticsConsent() in src/main.jsx, including
+     the legacy omar.consent key, but does not migrate it — that stays the app's job. -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', 'G-T7W0PFD3HD', { send_page_view: false });
-  gtag('config', 'GT-T56BGFG', { send_page_view: false });
+  (function () {
+    var accepted;
+    try {
+      var stored = localStorage.getItem('omar.analyticsConsent');
+      if (stored === 'accepted') accepted = true;
+      else if (stored === 'declined') accepted = false;
+      else accepted = localStorage.getItem('omar.consent') === 'true';
+    } catch (e) {
+      accepted = false;
+    }
+    if (!accepted) return;
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-T7W0PFD3HD', { send_page_view: false });
+    gtag('config', 'GT-T56BGFG', { send_page_view: false });
+
+    var tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://www.googletagmanager.com/gtag/js?id=G-T7W0PFD3HD';
+    document.head.appendChild(tag);
+  })();
 </script>
 </head>
 <body>
