@@ -5,6 +5,9 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-01
 
 ### Added
+- Navigation: `Design System` added to the desktop and mobile header nav. The documented system powering the site was linked only from the footer, while the site claims design-systems expertise in three separate places
+- About: the "How I work" section now links to the live design system, putting the proof next to the claim
+- Case studies: optional `relatedLink` field on a case study, used by Athena Design System 2.0 to point at the live system as the current version of that thinking
 - SEO: Defensive 301 redirects added for `/work/athena-design-system` and `/work/athena-design-system/` → `/work/athena-ds/` to catch any old external links using the full slug
 - Security: `Content-Security-Policy-Report-Only` header added to `vercel.json` — allowlists GA4, Google Fonts, Sentry, and Vercel Analytics; violations appear in browser DevTools console without blocking anything; rename to `Content-Security-Policy` once no violations are observed to enforce
 - CI: `npm audit --audit-level=high` step added to CI workflow — blocks PRs on high and critical dependency vulnerabilities
@@ -24,6 +27,7 @@ All notable changes to designedbyomar.com are documented here.
 - Security: CSP `connect-src` now allows `https://www.google.com` — GA4 beacons engagement events to `/g/collect` on that origin regardless of signals configuration, and enforcing without it produced a console error per event
 
 ### Changed
+- Key facts: design-systems stat raised from 2 to 3, matching the three case studies tagged `Design System` (Simplero Page Builder, Plastiq Athena, Disney Unified Ad Platform)
 - Dependencies: upgraded Sharp to 0.35.4 and refreshed vulnerable transitive packages so the high-severity CI audit gate passes.
 - Security: `Content-Security-Policy` promoted from report-only to enforcing in `vercel.json` after validating every route and interactive surface under the real policy — nothing is blocked
 - Analytics: GA4 `config` now sets `allow_google_signals: false` and `allow_ad_personalization_signals: false` — disables Google signals and ads personalization, matching the privacy policy claim that analytics are not used for advertising, profiling, or cross-site tracking

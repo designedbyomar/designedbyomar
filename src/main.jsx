@@ -146,7 +146,7 @@ const HERO_STATS = [
     motion: { phase: 1.8, radiusX: 7, radiusY: 5, boostX: 8, boostY: 6, parallaxX: -0.36, parallaxY: 0.10, rotate: 1.3, rotateBoost: 0.85, rotateDir: -1 },
   },
   {
-    value: '2 design systems',
+    value: '3 design systems',
     label: 'Consistency at scale',
     desktop: { top: '18%', right: '2%', maxWidth: 180 },
     mobile: { top: '14%', right: '0%', maxWidth: 148 },
@@ -739,6 +739,10 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Work</a>
+            <a href="/design-system" style={navLink}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            >Design System</a>
             <button onClick={() => onOpenAbout('nav')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
@@ -795,6 +799,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
+              <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout('mobile_nav'); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
@@ -893,7 +898,7 @@ const ABOUT_SHORT = `I turn undefined product problems into shipped software acr
 
 const ABOUT_LONG = [
   { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
-  { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.` },
+  { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.`, link: { href: '/design-system', label: 'See the design system this site runs on' } },
   { heading: 'Currently', body: `I'm a Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform focused on AI-powered dental operations. I lead design across products including Management Portal, Reporting, Insurance Verification, and Posting Assistant.\n\nRecent work includes replacing 200+ spreadsheets with centralized operational tooling and designing an AI-assisted payment posting workflow that reduced manual processing time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
   { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
   { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
@@ -1044,6 +1049,12 @@ const AboutDrawer = ({ open, onClose }) => {
               <div key={s.heading}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
                 <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
+                {s.link && (
+                  <a href={s.link.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-4)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
+                    {s.link.label}
+                    <AppIcon icon={ArrowUpRight} size={12} />
+                  </a>
+                )}
               </div>
             ))}
           </div>
@@ -1404,6 +1415,16 @@ const CaseStudyPage = ({ c, onBack }) => {
           </div>
         ))}
       </div>
+
+      {c.relatedLink && (
+        <div style={{ maxWidth: 640, marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
+          <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)' }}>{c.relatedLink.note}</p>
+          <a href={c.relatedLink.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
+            {c.relatedLink.label}
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
+        </div>
+      )}
 
       {/* Prev / Next */}
       <div className="cs-prevnext" style={{

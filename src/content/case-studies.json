@@ -10,11 +10,25 @@
     "coverImage": "/Images/case-studies/management-portal/team-lead-dashboard.webp",
     "ogImage": "/Images/case-studies/management-portal/team-lead-dashboard.webp",
     "role": "Lead Product Designer — Strategy & UX Architecture",
-    "tags": ["B2B SaaS", "Systems Design", "0→1", "AI"],
+    "tags": [
+      "B2B SaaS",
+      "Systems Design",
+      "0→1",
+      "AI"
+    ],
     "metrics": [
-      { "value": "200+", "label": "Excel files replaced" },
-      { "value": "260→900", "label": "Office scale supported" },
-      { "value": "90%+", "label": "Weekly active usage" }
+      {
+        "value": "200+",
+        "label": "Excel files replaced"
+      },
+      {
+        "value": "260→900",
+        "label": "Office scale supported"
+      },
+      {
+        "value": "90%+",
+        "label": "Weekly active usage"
+      }
     ],
     "accent": "develop",
     "challenge": "Wisdom's ops team managed 260+ offices across 9 Team Leads using 200+ interconnected Google Sheets. Risk was invisible until it became a crisis — at-risk clients were caught too late, capacity was opaque, and manual reconciliation was creating payroll and billing errors.",
@@ -32,11 +46,24 @@
     "coverImage": "/Images/case-studies/posting-asst/cover.webp",
     "ogImage": "/Images/case-studies/posting-asst/cover.webp",
     "role": "Lead Product Designer",
-    "tags": ["AI Workflow", "Research", "Healthcare SaaS"],
+    "tags": [
+      "AI Workflow",
+      "Research",
+      "Healthcare SaaS"
+    ],
     "metrics": [
-      { "value": "40%", "label": "Manual time reduced" },
-      { "value": "40+", "label": "User interviews" },
-      { "value": "3", "label": "Workflow stacks shipped" }
+      {
+        "value": "40%",
+        "label": "Manual time reduced"
+      },
+      {
+        "value": "40+",
+        "label": "User interviews"
+      },
+      {
+        "value": "3",
+        "label": "Workflow stacks shipped"
+      }
     ],
     "accent": "preview",
     "challenge": "Insurance payment posting was chaotic — documents came in every format, specialists jumped between screens comparing EOBs, and every posting required manual judgment calls. Slow, error-prone, and impossible to scale.",
@@ -54,11 +81,24 @@
     "coverVideo": "/Videos/case-studies/page-builder/cover.mp4",
     "ogImage": "/Images/case-studies/page-builder/cover.webp",
     "role": "Lead Product Designer & Architect",
-    "tags": ["CRM", "SaaS", "Design System"],
+    "tags": [
+      "CRM",
+      "SaaS",
+      "Design System"
+    ],
     "metrics": [
-      { "value": "9%", "label": "Sales increase" },
-      { "value": "2 mo.", "label": "Delivery speed" },
-      { "value": "4", "label": "Core capabilities shipped" }
+      {
+        "value": "9%",
+        "label": "Sales increase"
+      },
+      {
+        "value": "2 mo.",
+        "label": "Delivery speed"
+      },
+      {
+        "value": "4",
+        "label": "Core capabilities shipped"
+      }
     ],
     "accent": "ship",
     "challenge": "Users found Simplero's page builder so limiting they resorted to custom CSS and were threatening to migrate to competitors. The old builder prevented migration from other platforms and was driving churn.",
@@ -76,11 +116,25 @@
     "coverImage": "/Images/case-studies/connect-api/cover.webp",
     "ogImage": "/Images/case-studies/connect-api/cover.webp",
     "role": "Lead Product Designer",
-    "tags": ["Fintech", "API", "Developer Experience", "B2B"],
+    "tags": [
+      "Fintech",
+      "API",
+      "Developer Experience",
+      "B2B"
+    ],
     "metrics": [
-      { "value": "$20M+", "label": "Monthly volume in month 1" },
-      { "value": "3", "label": "Pre-launch partnerships" },
-      { "value": "8 wks", "label": "Client onboarding time" }
+      {
+        "value": "$20M+",
+        "label": "Monthly volume in month 1"
+      },
+      {
+        "value": "3",
+        "label": "Pre-launch partnerships"
+      },
+      {
+        "value": "8 wks",
+        "label": "Client onboarding time"
+      }
     ],
     "accent": "develop",
     "challenge": "Build a PCI-compliant embedded payments widget that would let enterprise clients integrate card and ACH payments into their own platforms — while eliminating merchant fees, expanding working capital, and onboarding partners in weeks.",
@@ -98,16 +152,34 @@
     "coverImage": "/Images/case-studies/athena-ds/cover.webp",
     "ogImage": "/Images/case-studies/athena-ds/cover.webp",
     "role": "Lead Product Designer — Visual, UX & Interaction Design",
-    "tags": ["Design System", "Enterprise", "Cross-functional"],
+    "tags": [
+      "Design System",
+      "Enterprise",
+      "Cross-functional"
+    ],
     "metrics": [
-      { "value": "3+", "label": "Products standardized" },
-      { "value": "1", "label": "Cross-org process built" },
-      { "value": "IPO", "label": "Foundation for readiness" }
+      {
+        "value": "3+",
+        "label": "Products standardized"
+      },
+      {
+        "value": "1",
+        "label": "Cross-org process built"
+      },
+      {
+        "value": "IPO",
+        "label": "Foundation for readiness"
+      }
     ],
     "accent": "preview",
     "challenge": "Siloed teams creating inconsistent patterns, duplicate work, and a confusing product experience. Design had no process. Engineering couldn't pick up components. Product was shipping features faster than the system could absorb them.",
     "approach": "Co-led workshops to establish design system principles and KPIs. Audited all products holistically. Built documentation around layout grid, dashboard components, payment widget, and feedback indicators. Collaborated with Engineering to build a Storybook equivalent. Created foundational elements: Type, Color, Brand, Spacing — all scoped to scale across multiple products and marketing channels.",
-    "outcome": "Engineering pickup time for global components dropped significantly. Design and product teams aligned on goals. Consistent brand language across all DS-adopted surfaces. The DS became Plastiq's foundation for its IPO-era brand evolution."
+    "outcome": "Engineering pickup time for global components dropped significantly. Design and product teams aligned on goals. Consistent brand language across all DS-adopted surfaces. The DS became Plastiq's foundation for its IPO-era brand evolution.",
+    "relatedLink": {
+      "href": "/design-system",
+      "label": "See the design system this site runs on",
+      "note": "The current version of this thinking, documented end to end: tokens, components, patterns, motion, and accessibility."
+    }
   },
   {
     "id": "plastiq-mktg",
@@ -120,11 +192,25 @@
     "coverImage": "/Images/case-studies/plastiq-mktg/cover.webp",
     "ogImage": "/Images/case-studies/plastiq-mktg/cover.webp",
     "role": "Lead Product Designer — IA, Interaction, Creative Strategy, Brand",
-    "tags": ["Brand", "Website", "Cross-functional", "WCAG"],
+    "tags": [
+      "Brand",
+      "Website",
+      "Cross-functional",
+      "WCAG"
+    ],
     "metrics": [
-      { "value": "3–4 wks", "label": "Full delivery timeline" },
-      { "value": "8", "label": "Cross-functional team" },
-      { "value": "WCAG", "label": "Compliant at launch" }
+      {
+        "value": "3–4 wks",
+        "label": "Full delivery timeline"
+      },
+      {
+        "value": "8",
+        "label": "Cross-functional team"
+      },
+      {
+        "value": "WCAG",
+        "label": "Compliant at launch"
+      }
     ],
     "accent": "ship",
     "challenge": "Plastiq needed a complete site overhaul in 3–4 weeks ahead of going public. The old site lacked polish, buried products in navigation, and failed to communicate value to investors or ideal customers.",
@@ -142,11 +228,25 @@
     "coverImage": "/Images/case-studies/disney-cct/cover.webp",
     "ogImage": "/Images/case-studies/disney-cct/cover.webp",
     "role": "Lead Senior UX Designer",
-    "tags": ["Enterprise", "Accessibility", "Mobile-first", "Scalable"],
+    "tags": [
+      "Enterprise",
+      "Accessibility",
+      "Mobile-first",
+      "Scalable"
+    ],
     "metrics": [
-      { "value": "1,600+", "label": "Users signed up" },
-      { "value": "200K+", "label": "Emails sent" },
-      { "value": "250", "label": "Critical incidents covered" }
+      {
+        "value": "1,600+",
+        "label": "Users signed up"
+      },
+      {
+        "value": "200K+",
+        "label": "Emails sent"
+      },
+      {
+        "value": "250",
+        "label": "Critical incidents covered"
+      }
     ],
     "accent": "develop",
     "challenge": "A 2019 fire in Italy disrupted Disney network coverage — and the right people were never notified. The support tool was broken: key stakeholders either missed notifications entirely or were flooded with irrelevant ones. With Disney+ launching in months and the Fox acquisition underway, the stakes for fixing this were enormous.",
@@ -164,11 +264,25 @@
     "coverVideo": "/Videos/case-studies/disney-uap/cover.mp4",
     "ogImage": "/Images/case-studies/disney-uap/cover.webp",
     "role": "Senior UX Designer",
-    "tags": ["Enterprise", "Design System", "Multi-brand", "React"],
+    "tags": [
+      "Enterprise",
+      "Design System",
+      "Multi-brand",
+      "React"
+    ],
     "metrics": [
-      { "value": "1→4", "label": "Brands consolidated" },
-      { "value": "$M+", "label": "Booking impact" },
-      { "value": "2", "label": "Designers led" }
+      {
+        "value": "1→4",
+        "label": "Brands consolidated"
+      },
+      {
+        "value": "$M+",
+        "label": "Booking impact"
+      },
+      {
+        "value": "2",
+        "label": "Designers led"
+      }
     ],
     "accent": "ship",
     "challenge": "ESPN, Freeform, FX Networks, and National Geographic each had their own ad sales platform. No standardization, no cross-brand collaboration, no efficiency. Booking ads across Disney's portfolio required navigating completely different systems.",
