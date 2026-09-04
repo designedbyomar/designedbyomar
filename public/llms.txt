@@ -1,6 +1,6 @@
 # designedbyomar
 
-> Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
+> Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
 
 Site: [https://www.designedbyomar.com/](https://www.designedbyomar.com/)
 Contact: [omar@designedbyomar.com](mailto:omar@designedbyomar.com)

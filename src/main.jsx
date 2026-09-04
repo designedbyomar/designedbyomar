@@ -2424,7 +2424,7 @@ const personSchema = {
   '@type': 'Person',
   name: 'Omar Tavarez',
   url: `${SITE_ORIGIN}/`,
-  jobTitle: 'Product Designer',
+  jobTitle: 'Principal Product Designer',
   email: 'omar@designedbyomar.com',
   sameAs: [
     LINKEDIN_URL,
@@ -2449,7 +2449,7 @@ const buildHomeStructuredData = () => ({
       '@type': 'WebSite',
       name: 'designedbyomar',
       url: `${SITE_ORIGIN}/`,
-      description: 'Portfolio site for Omar Tavarez, a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
+      description: 'Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
     },
     personSchema,
     {
@@ -2589,7 +2589,7 @@ const getRouteMeta = (route, currentCase) => {
 
   return {
     title: 'designedbyomar — Omar Tavarez',
-    description: 'Omar Tavarez is a product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.',
+    description: 'Omar Tavarez is a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.',
     url: `${SITE_ORIGIN}/`,
     robots: 'index,follow,max-image-preview:large',
     image: DEFAULT_OG_IMAGE,
