@@ -12,7 +12,7 @@ const personSchema = {
   '@type': 'Person',
   name: 'Omar Tavarez',
   url: `${SITE_ORIGIN}/`,
-  jobTitle: 'Product Designer',
+  jobTitle: 'Principal Product Designer',
   email: 'omar@designedbyomar.com',
   sameAs: [
     'https://www.linkedin.com/in/omartavarez/',

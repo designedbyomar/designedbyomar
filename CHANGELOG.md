@@ -2,7 +2,7 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-09-01
+## [Unreleased] - 2026-09-04
 
 ### Added
 - Case studies: long-form body content restored from the Webflow archive, starting with Management Portal — 1,644 words, 8 screenshots with written alt text and captions, four Operations Leadership pull quotes with attribution, and the "Why LLM, not just rules" rationale promoted to a callout. Renders below the existing Challenge / Approach / Outcome summary, so the 15-second skim is unchanged
@@ -36,6 +36,7 @@ All notable changes to designedbyomar.com are documented here.
 - Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
 
 ### Changed
+- SEO/AEO: machine-readable identity now says `Principal Product Designer` instead of `Product Designer` — the hidden static H1, both `jobTitle` fields (runtime and build-time JSON-LD), the meta/OG/Twitter descriptions, and `llms.txt`. Every field a crawler, ATS, or AI assistant reads for seniority was a rung below the title About already states, and the homepage JSON-LD block in `index.html` was a separate copy that `postbuild.js` never touched
 - Case studies: metrics can carry a `qualifier`. All three Management Portal stats are now labelled `Projected` — the body states the portal is in development with Q1–Q2 2026 rollout, and its own impact lists frame all three as targets rather than achieved results
 - Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
 - Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
@@ -71,6 +72,8 @@ All notable changes to designedbyomar.com are documented here.
 - Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
 
 ### Fixed
+- Homepage Open Graph and Twitter descriptions now match the principal-product-designer identity in the canonical description.
+- Static SEO coverage now protects the principal title across homepage metadata, JSON-LD, static H1, runtime source, route generation, and `llms.txt`.
 - Static route generation now replaces the complete `#root` subtree when template markup contains nested divs, preventing stale or malformed generated HTML.
 - Static SEO coverage now verifies case-study subtitles, client/year/role metadata, tags, and metrics in generated HTML.
 - Privacy: GA4 on the 404 page is now gated behind analytics consent — `404.html` loaded `gtag.js` and configured two measurement IDs at parse time regardless of consent, so a visitor who declined analytics was still served Google's tag if they hit a 404. The page now mirrors the app's consent check inline before loading anything. No analytics data is lost: both configs already set `send_page_view: false` and nothing sent a manual page view, so the 404 page reported nothing to GA4 either way
