@@ -33,6 +33,7 @@ All notable changes to designedbyomar.com are documented here.
 - Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
 
 ### Changed
+- SEO/AEO: machine-readable identity now says `Principal Product Designer` instead of `Product Designer` — the hidden static H1, both `jobTitle` fields (runtime and build-time JSON-LD), the meta/OG/Twitter descriptions, and `llms.txt`. Every field a crawler, ATS, or AI assistant reads for seniority was a rung below the title About already states, and the homepage JSON-LD block in `index.html` was a separate copy that `postbuild.js` never touched
 - Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
 - Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
 - Key facts: design-systems stat raised from 2 to 3, matching the three case studies tagged `Design System` (Simplero Page Builder, Plastiq Athena, Disney Unified Ad Platform)
