@@ -36,6 +36,7 @@ All notable changes to designedbyomar.com are documented here.
 - Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
 
 ### Changed
+- Case studies: header text now spans the full section width — the subtitle was capped at 640 px while the title beside it ran full-bleed. The reading column keeps its 640 px measure but is centred in the container rather than pinned left, with images still spanning full width
 - SEO/AEO: machine-readable identity now says `Principal Product Designer` instead of `Product Designer` — the hidden static H1, both `jobTitle` fields (runtime and build-time JSON-LD), the meta/OG/Twitter descriptions, and `llms.txt`. Every field a crawler, ATS, or AI assistant reads for seniority was a rung below the title About already states, and the homepage JSON-LD block in `index.html` was a separate copy that `postbuild.js` never touched
 - Case studies: metrics can carry a `qualifier`. All three Management Portal stats are now labelled `Projected` — the body states the portal is in development with Q1–Q2 2026 rollout, and its own impact lists frame all three as targets rather than achieved results
 - Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay

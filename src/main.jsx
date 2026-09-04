@@ -1268,7 +1268,7 @@ const WorkIndexPage = () => {
 // ============================================================
 // Prose holds a 640px measure for readability; images span the full container,
 // which is what fills the empty right-hand column on these pages.
-const CS_TEXT_WIDTH = { maxWidth: 640 };
+const CS_TEXT_WIDTH = { maxWidth: 640, marginLeft: 'auto', marginRight: 'auto', width: '100%' };
 const csSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const csWordCount = (blocks) => blocks.reduce(
   (n, b) => n + `${b.text || ''} ${(b.items || []).join(' ')}`.trim().split(/\s+/).filter(Boolean).length,
@@ -1441,7 +1441,7 @@ const CaseStudyPage = ({ c, onBack }) => {
           lineHeight: 'var(--line-height-solid)', letterSpacing: '-0.04em',
           color: 'var(--fg-primary)', margin: '0 0 20px',
         }}>{c.title}</h1>
-        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px', maxWidth: 640 }}>{c.subtitle}</p>
+        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>{c.subtitle}</p>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {c.tags.map(t => (
@@ -1470,7 +1470,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 640 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 640, margin: '0 auto', width: '100%' }}>
         {[
           { label: 'Challenge', body: c.challenge },
           { label: 'Approach', body: c.approach },
@@ -1486,7 +1486,7 @@ const CaseStudyPage = ({ c, onBack }) => {
       <CaseStudyBody blocks={c.body} accent={accent} />
 
       {c.relatedLink && (
-        <div style={{ maxWidth: 640, marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', width: '100%', marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
           <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)' }}>{c.relatedLink.note}</p>
           <a href={c.relatedLink.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
             {c.relatedLink.label}
