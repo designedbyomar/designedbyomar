@@ -899,7 +899,7 @@ const ABOUT_SHORT = `I turn undefined product problems into shipped software acr
 const ABOUT_LONG = [
   { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
   { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.`, link: { href: '/design-system', label: 'See the design system this site runs on' } },
-  { heading: 'Currently', body: `I'm a Principal Product Designer at Wisdom, an early-stage healthcare SaaS platform focused on AI-powered dental operations. I lead design across products including Management Portal, Reporting, Insurance Verification, and Posting Assistant.\n\nRecent work includes replacing 200+ spreadsheets with centralized operational tooling and designing an AI-assisted payment posting workflow that reduced manual processing time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
+  { heading: 'Currently', body: `I run an independent product design practice. I work with Welcome Lend and a few other companies I keep private, and the engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production.\n\nAt Welcome Lend I rebuilt the design system and shipped work their brokers use daily. One project was a lender comparison tool: brokers weigh quotes to find the right fit for a borrower, and the existing matrix had turned into something you decoded rather than read. Another was sponsor expiration — designing how records lapse on a schedule instead of quietly going stale.\n\nBefore this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
   { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
   { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
 ];
@@ -1264,6 +1264,100 @@ const WorkIndexPage = () => {
 };
 
 // ============================================================
+// CaseStudyBody — migrated long-form content
+// ============================================================
+// Prose holds a 640px measure for readability; images span the full container,
+// which is what fills the empty right-hand column on these pages.
+const CS_TEXT_WIDTH = { maxWidth: 640 };
+const csSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const csWordCount = (blocks) => blocks.reduce(
+  (n, b) => n + `${b.text || ''} ${(b.items || []).join(' ')}`.trim().split(/\s+/).filter(Boolean).length,
+  0,
+);
+
+const CaseStudyBody = ({ blocks, accent }) => {
+  if (!blocks || !blocks.length) return null;
+
+  const sections = blocks.filter((b) => b.type === 'heading' && b.level === 2);
+  const showToc = csWordCount(blocks) > 1200 && sections.length > 2;
+
+  return (
+    <div style={{ marginTop: 'var(--layout-2)', paddingTop: 'var(--layout-1)', borderTop: '1px solid var(--color-gray-100)' }}>
+      {showToc && (
+        <nav aria-label="On this page" style={{ ...CS_TEXT_WIDTH, marginBottom: 'var(--layout-1)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>On this page</div>
+          <ol style={{ margin: 0, paddingLeft: '1.1em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {sections.map((h) => (
+              <li key={h.text}>
+                <a href={`#${csSlug(h.text)}`} className="text-link" style={{ fontSize: 'var(--font-size-body-md)', color: 'var(--fg-secondary)' }}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        {blocks.map((b, i) => {
+          if (b.type === 'heading') {
+            const Tag = `h${b.level}`;
+            const size = b.level === 2 ? 'clamp(26px, 2.6vw, 34px)' : b.level === 3 ? 'clamp(19px, 1.5vw, 22px)' : 'var(--font-size-body-xl)';
+            return (
+              <Tag key={i} id={b.level === 2 ? csSlug(b.text) : undefined} style={{
+                ...CS_TEXT_WIDTH, scrollMarginTop: 88, fontSize: size,
+                fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)',
+                letterSpacing: '-0.02em', color: 'var(--fg-primary)',
+                margin: b.level === 2 ? 'var(--space-6) 0 0' : 0,
+              }}>{b.text}</Tag>
+            );
+          }
+          if (b.type === 'paragraph') {
+            return <p key={i} style={{ ...CS_TEXT_WIDTH, fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{b.text}</p>;
+          }
+          if (b.type === 'list') {
+            return (
+              <ul key={i} style={{ ...CS_TEXT_WIDTH, margin: 0, paddingLeft: '1.2em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)' }}>
+                {b.items.map((it, j) => <li key={j}>{it}</li>)}
+              </ul>
+            );
+          }
+          if (b.type === 'quote') {
+            return (
+              <blockquote key={i} style={{ ...CS_TEXT_WIDTH, margin: 0, paddingLeft: 'var(--space-5)', borderLeft: `2px solid ${accent}` }}>
+                <p style={{ fontSize: 'clamp(18px, 1.5vw, 22px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-primary)', margin: 0 }}>{`“${b.text}”`}</p>
+                {b.attribution && (
+                  <cite style={{ display: 'block', marginTop: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', fontStyle: 'normal', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{b.attribution}</cite>
+                )}
+              </blockquote>
+            );
+          }
+          if (b.type === 'callout') {
+            return (
+              <aside key={i} style={{ ...CS_TEXT_WIDTH, padding: 'var(--space-5)', borderRadius: 'var(--radius-standard)', background: 'var(--bg-subtle)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{b.title}</div>
+                <ul style={{ margin: 0, paddingLeft: '1.2em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-primary)' }}>
+                  {b.items.map((it, j) => <li key={j}>{it}</li>)}
+                </ul>
+              </aside>
+            );
+          }
+          if (b.type === 'image') {
+            return (
+              <figure key={i} style={{ margin: 'var(--space-4) 0' }}>
+                <img src={b.src} alt={b.alt} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }} />
+                {b.caption && (
+                  <figcaption style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)' }}>{b.caption}</figcaption>
+                )}
+              </figure>
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
 // CaseStudyPage — individual case study page
 // ============================================================
 const CaseStudyPage = ({ c, onBack }) => {
@@ -1368,6 +1462,9 @@ const CaseStudyPage = ({ c, onBack }) => {
           }}>
             <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: accent, lineHeight: 1 }}>{m.value}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
+            {m.qualifier && (
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.72 }}>{m.qualifier}</div>
+            )}
           </div>
         ))}
       </div>
@@ -1385,6 +1482,8 @@ const CaseStudyPage = ({ c, onBack }) => {
           </div>
         ))}
       </div>
+
+      <CaseStudyBody blocks={c.body} accent={accent} />
 
       {c.relatedLink && (
         <div style={{ maxWidth: 640, marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
@@ -1586,7 +1685,7 @@ const KeyFacts = () => {
   const facts = [
     { label: 'Core Expertise', value: 'AI workflows, design systems, enterprise UX, fintech, healthcare SaaS.', icon: Sparkles },
     { label: 'Role Focus', value: 'Principal, Lead, and Design Manager roles across 0→1 product delivery.', icon: Target },
-    { label: 'Experience', value: 'Disney, Plastiq, Simplero, Wisdom — enterprise platforms to AI ops.', icon: Rocket },
+    { label: 'Experience', value: 'Welcome Lend, Wisdom, Plastiq, Disney — AI workflows to enterprise platforms.', icon: Rocket },
     { label: 'Writing', value: null, custom: true, icon: NotebookPen },
   ];
 

@@ -203,7 +203,9 @@ test('case-study routes ship their prose in the static HTML', () => {
 
     assert.ok(caseStudy.metrics.length > 0, `${caseStudy.id} has metrics in case-studies.json`);
     caseStudy.metrics.forEach((metric) => {
-      const serializedMetric = `${escapeHtml(metric.value)} — ${escapeHtml(metric.label)}`;
+      // A qualified metric (e.g. Projected) carries that label through to the static HTML.
+      const qualifier = metric.qualifier ? ` (${escapeHtml(metric.qualifier)})` : '';
+      const serializedMetric = `${escapeHtml(metric.value)} — ${escapeHtml(metric.label)}${qualifier}`;
       assert.ok(html.includes(`<li>${serializedMetric}</li>`), `${caseStudy.id} has static metric "${serializedMetric}"`);
     });
 
@@ -229,5 +231,56 @@ test('static prose is scoped to case-study routes only', () => {
       !readDist(...page.split('/')).includes('<h2>Challenge</h2>'),
       `${page} does not carry case-study prose`,
     );
+  });
+});
+
+test('migrated case-study bodies ship images and prose in the static HTML', () => {
+  const migrated = caseStudySource().filter((c) => Array.isArray(c.body) && c.body.length);
+  assert.ok(migrated.length > 0, 'at least one case study has migrated body content');
+
+  migrated.forEach((caseStudy) => {
+    const html = readDist('work', caseStudy.id, 'index.html');
+    const blocks = caseStudy.body;
+
+    // Images must be real <img> tags in the server response, not client-rendered only.
+    const images = blocks.filter((b) => b.type === 'image');
+    images.forEach((img) => {
+      assert.ok(html.includes(`src="${img.src}"`), `${caseStudy.id}: ${img.src} missing from static HTML`);
+      assert.ok(img.alt && img.alt.trim().length > 20, `${caseStudy.id}: ${img.src} needs descriptive alt text`);
+      assert.ok(html.includes(escapeHtml(img.alt)), `${caseStudy.id}: alt text for ${img.src} missing from static HTML`);
+    });
+
+    // Pull quotes keep their attribution.
+    blocks.filter((b) => b.type === 'quote').forEach((q) => {
+      assert.ok(html.includes(escapeHtml(q.text)), `${caseStudy.id}: quote missing from static HTML`);
+      if (q.attribution) {
+        assert.ok(html.includes(escapeHtml(q.attribution)), `${caseStudy.id}: quote attribution missing`);
+      }
+    });
+
+    // Prose survives the round trip.
+    blocks.filter((b) => b.type === 'paragraph').slice(0, 5).forEach((p) => {
+      assert.ok(html.includes(escapeHtml(p.text)), `${caseStudy.id}: body paragraph missing from static HTML`);
+    });
+
+    // Exactly one h1, and no heading level is skipped.
+    assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${caseStudy.id}: expected exactly one h1`);
+    const levels = [...html.matchAll(/<h([1-6])[ >]/g)].map((m) => Number(m[1]));
+    const present = [...new Set(levels)].sort();
+    present.forEach((lvl, i) => {
+      if (i > 0) assert.ok(lvl - present[i - 1] <= 1, `${caseStudy.id}: heading level jumps from h${present[i - 1]} to h${lvl}`);
+    });
+  });
+});
+
+test('projected metrics are labelled as projections', () => {
+  caseStudySource().forEach((caseStudy) => {
+    (caseStudy.metrics || []).filter((m) => m.qualifier).forEach((m) => {
+      const html = readDist('work', caseStudy.id, 'index.html');
+      assert.ok(
+        html.includes(escapeHtml(m.qualifier)),
+        `${caseStudy.id}: metric "${m.value}" is qualified as ${m.qualifier} but that never reaches the static HTML`,
+      );
+    });
   });
 });

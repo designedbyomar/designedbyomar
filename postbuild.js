@@ -250,11 +250,40 @@ function injectH1(html, text) {
 // The full case-study record as static HTML. The rendered React view labels these
 // sections with styled divs (src/main.jsx); real headings here give the static version
 // the cleaner document outline, which is what non-rendering consumers actually read.
+// Serializes the migrated long-form body. Consumers that never execute the bundle —
+// crawlers, AI assistants, ATS scrapers, link-preview bots — read this and nothing else,
+// so images belong here as real <img> tags, not just in the client-rendered DOM.
+function caseStudyBodyHtml(body) {
+  if (!Array.isArray(body) || !body.length) return '';
+  const esc = escapeAttr;
+  const li = (items) => (items || []).map((i) => `<li>${esc(i)}</li>`).join('');
+
+  return body.map((b) => {
+    switch (b.type) {
+      case 'heading': {
+        const level = [2, 3, 4].includes(b.level) ? b.level : 3;
+        return `<h${level}>${esc(b.text)}</h${level}>`;
+      }
+      case 'paragraph':
+        return `<p>${esc(b.text)}</p>`;
+      case 'list':
+        return `<ul>${li(b.items)}</ul>`;
+      case 'quote':
+        return `<blockquote><p>${esc(b.text)}</p>${b.attribution ? `<cite>${esc(b.attribution)}</cite>` : ''}</blockquote>`;
+      case 'callout':
+        return `<aside><h3>${esc(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
+      case 'image':
+        return `<figure><img src="${esc(b.src)}" alt="${esc(b.alt || '')}">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ''}</figure>`;
+      default:
+        return '';
+    }
+  }).join('');
+}
 function caseStudyContentHtml(c) {
   const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeAttr).join(' · ');
   const list = (items) => (items && items.length ? `<ul>${items.join('')}</ul>` : '');
   const tags = list((c.tags || []).map((t) => `<li>${escapeAttr(t)}</li>`));
-  const metrics = list((c.metrics || []).map((m) => `<li>${escapeAttr(m.value)} — ${escapeAttr(m.label)}</li>`));
+  const metrics = list((c.metrics || []).map((m) => `<li>${escapeAttr(m.value)} — ${escapeAttr(m.label)}${m.qualifier ? ` (${escapeAttr(m.qualifier)})` : ''}</li>`));
   const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeAttr(body)}</p>` : '');
 
   return [
@@ -267,6 +296,7 @@ function caseStudyContentHtml(c) {
     section('Challenge', c.challenge),
     section('Approach', c.approach),
     section('Outcome', c.outcome),
+    caseStudyBodyHtml(c.body),
     '</article>',
   ].join('');
 }
