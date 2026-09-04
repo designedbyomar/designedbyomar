@@ -19,21 +19,453 @@
     "metrics": [
       {
         "value": "200+",
-        "label": "Excel files replaced"
+        "label": "Excel files replaced",
+        "qualifier": "Projected"
       },
       {
         "value": "260→900",
-        "label": "Office scale supported"
+        "label": "Office scale supported",
+        "qualifier": "Projected"
       },
       {
         "value": "90%+",
-        "label": "Weekly active usage"
+        "label": "Weekly active usage",
+        "qualifier": "Projected"
       }
     ],
     "accent": "develop",
     "challenge": "Wisdom's ops team managed 260+ offices across 9 Team Leads using 200+ interconnected Google Sheets. Risk was invisible until it became a crisis — at-risk clients were caught too late, capacity was opaque, and manual reconciliation was creating payroll and billing errors.",
     "approach": "Designed a centralized Management Portal as an ops command center. Built an LLM-powered Office Watchlist that detects A/R aging signals and ranks offices by urgency before issues escalate. Added workforce capacity views, per-specialist performance tracking, centralized profiles, and executive portfolio dashboards — replacing manual PDFs and spreadsheets with in-app reporting.",
-    "outcome": "Platform in development for Q1–Q2 2026 rollout. Designed to support 260→900 office scale, achieve 90%+ WAU among Team Leads, reduce churn from 1.8% to below 1.0%, and decommission 200+ operational spreadsheets. Shifts the ops model from reactive firefighting to proactive risk management."
+    "outcome": "Platform in development for Q1–Q2 2026 rollout. Designed to support 260→900 office scale, achieve 90%+ WAU among Team Leads, reduce churn from 1.8% to below 1.0%, and decommission 200+ operational spreadsheets. Shifts the ops model from reactive firefighting to proactive risk management.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview"
+      },
+      {
+        "type": "paragraph",
+        "text": "Wisdom’s operations organization had outgrown its tooling. At 260+ managed offices, teams relied on 200+ interconnected Google Sheets to track performance, risk, and workforce activity — creating blind spots, delays, and operational risk."
+      },
+      {
+        "type": "paragraph",
+        "text": "This project focused on redefining how operations sees the business by designing a unified Management Portal that replaces fragmented reporting with real-time operational intelligence."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "My Role"
+      },
+      {
+        "type": "paragraph",
+        "text": "I led the strategy and experience design for Management Portal, working closely with Operations, Finance, and Engineering leadership. This wasn’t a UI refresh—it was a rethinking of how information flows through the organization."
+      },
+      {
+        "type": "paragraph",
+        "text": "My focus was on:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Defining the product vision and problem space",
+          "Mapping operational workflows and breakdowns",
+          "Designing systems for risk detection, capacity planning, and performance tracking",
+          "Creating experience flows and dashboards that support different roles",
+          "Aligning design decisions with real operational constraints"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "The result is a foundation for an internal platform designed to scale with the business."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "As Wisdom scaled, the operations model didn’t scale with it."
+      },
+      {
+        "type": "paragraph",
+        "text": "By the end of 2025, Operations was managing 260+ offices across 9 Team Leads, with plans to grow to 900+. But the systems supporting that work were built for a much smaller organization. Nearly everything depended on a fragile network of 200+ interconnected Google Sheets that were slow, hard to maintain, and increasingly unreliable."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/01-manual-report-assembly.webp",
+        "alt": "Diagram of a Team Lead at the centre of five disconnected sources — alerts, specialist activity, a communication board, profiles and reports — linked by manual search, data hunting, multiple clicks, tab switching and fragmented access",
+        "caption": "Leads spend hours daily assembling reports from multiple sources (Google sheets)"
+      },
+      {
+        "type": "paragraph",
+        "text": "This created a compounding set of problems across the organization:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "At-Risk Clients Were Identified Too Late"
+      },
+      {
+        "type": "paragraph",
+        "text": "The strongest churn signals—rising A/R aging and declining collections—were buried across spreadsheets. Team Leads often didn’t realize an office was in trouble until aging had already spiked or the client escalated. There was no true early-warning system, no trend visibility, and no shared prioritization model."
+      },
+      {
+        "type": "quote",
+        "text": "An increasing over-90 balance is a red flag. We need a proactive approach to client management, not something we discover after it’s already a problem.",
+        "attribution": "Operations Leadership"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "No Clear View of Team Load or Capacity"
+      },
+      {
+        "type": "paragraph",
+        "text": "Team Leads had no reliable way to see how work was distributed across Revenue Specialists. Assignments were assessed manually by scanning long lists in spreadsheets, making it difficult to spot burnout, over-assignment, or unused capacity. As a result, some specialists were stretched too thin while others were underutilized—without leadership having a clear view of either."
+      },
+      {
+        "type": "quote",
+        "text": "Information about biller performance and office assignments is scattered across too many places. It’s hard to understand capacity or bandwidth.",
+        "attribution": "Operations Leadership"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Revenue Specialist Performance Was Hard to Track"
+      },
+      {
+        "type": "paragraph",
+        "text": "Understanding how a Revenue Specialist was performing across multiple office assignments required jumping between tabs, sheets, and tools. Activity, output, and progress weren’t visible in one place, which meant issues surfaced weeks late and strong performance often went unrecognized."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Manual Data Entry Across Disconnected Systems"
+      },
+      {
+        "type": "paragraph",
+        "text": "Critical office and workforce data lived in multiple places. Information like Tax IDs, NPIs, logins, assignments, and onboarding details were copied and pasted across systems, increasing the risk of errors and slowing down onboarding. There was no single source of truth for office or workforce profiles."
+      },
+      {
+        "type": "quote",
+        "text": "We spend too much time manually entering and reconciling data. It introduces errors and slows everything down.",
+        "attribution": "Operations Leadership"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Sales & GTM Execution Was Largely Invisible"
+      },
+      {
+        "type": "paragraph",
+        "text": "Leadership lacked visibility into how services were being used, added, or upgraded over time. This made it difficult to validate pricing models, understand expansion opportunities, or connect operational performance to go-to-market decisions."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Reporting Was Manual, Fragmented, and Risky"
+      },
+      {
+        "type": "paragraph",
+        "text": "Reporting relied on manual exports and reconciliation, introducing errors and delays. Payroll, invoicing, and audits were harder than they needed to be, and leadership didn’t have real-time insight into cash flow or operational performance. In some cases, the volume of data caused tools to crash entirely, increasing financial risk."
+      },
+      {
+        "type": "quote",
+        "text": "The volume of data causes our tools to lag or crash, which puts us at risk of payroll and billing mistakes.",
+        "attribution": "Operations Leadership"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "The Core Problem"
+      },
+      {
+        "type": "paragraph",
+        "text": "Across all of these issues, the root cause was the same:"
+      },
+      {
+        "type": "paragraph",
+        "text": "Operations was forced to react to problems instead of anticipating them."
+      },
+      {
+        "type": "paragraph",
+        "text": "The challenge wasn’t just to centralize data—but to design a system that surfaces risk early, supports better decisions, and can scale with the business without adding operational overhead"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/02-portal-command-center.webp",
+        "alt": "Management Portal command centre: a team lead dashboard combining the Office Watchlist, company performance table, PAR scores and collections trends in one view",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution"
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal was designed as a centralized operations command center—a single place where teams could quickly understand what’s happening, where attention is needed, and what actions to take next."
+      },
+      {
+        "type": "paragraph",
+        "text": "Rather than building one-off dashboards, the system focuses on surfacing early signals and reducing the effort it takes to stay informed."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Early Risk Detection (Office Watchlist, LLM-powered early risk detection)"
+      },
+      {
+        "type": "paragraph",
+        "text": "I designed an Office Watchlist powered by an LLM that continuously evaluates aging signals and flags offices when A/R aging crosses defined thresholds (ex: over-60 / over-90 balances, rapid week-over-week changes, and sustained negative collection trends)."
+      },
+      {
+        "type": "paragraph",
+        "text": "Instead of Team Leads digging through spreadsheets to “find the fire,” the Watchlist:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Detects risk states automatically as thresholds are hit (and as trends accelerate)",
+          "Ranks offices by urgency so attention goes to the highest-impact issues first",
+          "Explains the “why” (what changed, which threshold triggered, what’s trending)",
+          "Keeps humans in control (Team Leads validate, take action, and add context)"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "The result: a true early-warning system that surfaces issues weeks earlier than manual monitoring—without turning the product into another noisy dashboard"
+      },
+      {
+        "type": "heading",
+        "level": 4,
+        "text": "How it worked:"
+      },
+      {
+        "type": "paragraph",
+        "text": "Data in → signal out:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Inputs: aging buckets, collections trend, office metadata, staffing/assignment context",
+          "Logic: LLM + rules-based thresholds (guardrails)",
+          "Output: risk state + explanation + recommended next step"
+        ]
+      },
+      {
+        "type": "callout",
+        "title": "Why LLM, not just rules",
+        "items": [
+          "Rules catch “threshold hit.”",
+          "The LLM adds the missing layer: pattern recognition + summarization (what changed, how fast, what’s anomalous, what to look at next), so Team Leads don’t waste time interpreting raw data."
+        ]
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/03-office-watchlist.webp",
+        "alt": "Office Watchlist flagging three critical offices with the reason for each — 90-day aging spiked 12% week over week, collection ratio at 65% — beside aging buckets, PAR score and the assigned team lead, poster and ager",
+        "caption": "Automated risk states surface issues weeks earlier the current manual monitoring and reporting."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Workforce & Capacity Visibility"
+      },
+      {
+        "type": "paragraph",
+        "text": "To address burnout and underutilization, I introduced clear views into Revenue Specialist workload and capacity. This makes it easier to balance assignments and understand where teams are stretched—or where there’s room to take on more."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/04-capacity-visibility.webp",
+        "alt": "Revenue specialist roster showing availability, start date, practice management system, PAR score and per-skill coverage across posting, aging, patient aging and insurance verification",
+        "caption": "Capacity-aware views reduce burnout and unlock underutilized output."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Performance Tracking"
+      },
+      {
+        "type": "paragraph",
+        "text": "Each Revenue Specialist has a dedicated view that shows how they’re performing across assignments. This gives Team Leads better context for coaching, feedback, and recognition without creating a culture of micromanagement."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/05-specialist-performance.webp",
+        "alt": "An individual revenue specialist's performance view: PAR score against benchmark, average days in A/R, recent activity, and collections broken down by aging category",
+        "caption": "Performance visibility without micromanagement."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Centralized Profiles & Data"
+      },
+      {
+        "type": "paragraph",
+        "text": "Office and Revenue Specialist information is now centralized. Data is entered once and reused across the system, reducing manual errors and making onboarding and day-to-day operations much smoother."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/06-centralized-profiles.webp",
+        "alt": "Centralized office profile for Sunrise Dental showing office information and linked provider records in a single editable record",
+        "caption": "Enter data once. Use it everywhere."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Executive Visibility"
+      },
+      {
+        "type": "paragraph",
+        "text": "Leadership gets portfolio-level and company-wide views that surface trends, risk, and usage without having to request reports or pull data from multiple tools."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "In-App Reporting"
+      },
+      {
+        "type": "paragraph",
+        "text": "Manual PDFs and spreadsheets were replaced with in-app reporting and production tracking. This improves accuracy for payroll and invoicing and gives Finance better real-time visibility."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/07-in-app-reporting.webp",
+        "alt": "In-app monthly reporting: office production and collections by month with gross production, write-offs, net production and collection rate, exportable to CSV",
+        "caption": "Manual reporting replaced with real-time visibility"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/mgmt-portal/08-office-roster-and-detail.webp",
+        "alt": "Offices roster showing onboarding, assignment and live status per office, beside an office detail view listing team lead, posting, aging and insurance verification assignments",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Results & Impact (Projected)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal is currently in development, with planned rollout across Q1–Q2 2026. The outcomes below reflect the intended impact of the platform based on defined goals, operational baselines, and leadership alignment."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Reducing Preventable Customer Churn"
+      },
+      {
+        "type": "paragraph",
+        "text": "One of the primary goals of Management Portal is to reduce customer churn driven by insufficient revenue collection. As of Q4 2025, Wisdom’s churn rate sits at 1.8%, with aging A/R and declining collections being the most common early indicators of churn."
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal is designed to surface these signals earlier—before they escalate into client complaints or cancellations—through automated office watchlists and risk states. By giving Team Leads clear, prioritized visibility into offices that are trending in the wrong direction, the platform enables earlier intervention and more proactive client management."
+      },
+      {
+        "type": "paragraph",
+        "text": "Projected impact:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Reduce churn from 1.8% to below 1.0%",
+          "Identify at-risk offices weeks earlier through aging and collections trends",
+          "Shift churn prevention from reactive to proactive"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Improving Data Transparency & Adoption"
+      },
+      {
+        "type": "paragraph",
+        "text": "Today, Team Leads and Managers rely heavily on layered Google Sheets to understand performance, workload, and risk. This slows decision-making and creates dependency on manual reporting."
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal centralizes this information into a single system designed for daily use. The goal is not just visibility, but adoption—making the portal the first place Team Leads go to understand what’s happening across their portfolio."
+      },
+      {
+        "type": "paragraph",
+        "text": "Projected impact:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Decommission or significantly reduce reliance on operational spreadsheets",
+          "Achieve 90%+ Weekly Active Usage (WAU) among Team Leads",
+          "Faster access to trusted data without manual reconciliation"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Increasing Team Lead Efficiency While Maintaining NPS"
+      },
+      {
+        "type": "paragraph",
+        "text": "As the business scales, operational efficiency must improve without sacrificing service quality. Wisdom’s NPS was 73.47 as of Q3, exceeding the target of 70+, but maintaining that score becomes harder as office count grows."
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal is designed to reduce the cognitive and manual load on Team Leads by eliminating hours of data hunting and replacing it with clear, prioritized views. This allows Team Leads to spend more time supporting offices and less time assembling reports."
+      },
+      {
+        "type": "paragraph",
+        "text": "Projected impact:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Improved Team Lead efficiency and sustainability",
+          "Maintain or exceed 70+ NPS as office count increases",
+          "Support higher office-to-Team Lead ratios without burnout"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Supporting Workload Balance & Team Satisfaction"
+      },
+      {
+        "type": "paragraph",
+        "text": "Another key goal is improving overall satisfaction for Team Leads and Revenue Specialists while preparing the organization to scale to 900 offices by EOY. Without visibility into workload and capacity, teams risk burnout on one end and underutilization on the other."
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal introduces clear workload and performance visibility across Revenue Specialists, helping leadership make better assignment decisions and spot issues before they compound."
+      },
+      {
+        "type": "paragraph",
+        "text": "Projected impact:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Better workload balance across Revenue Specialists",
+          "Increased Team Lead confidence in assignments and performance",
+          "Tooling designed to support growth from 260 → 900 offices without linear increases in operational overhead"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Summary"
+      },
+      {
+        "type": "paragraph",
+        "text": "Management Portal is not positioned as a quick fix—it is foundational infrastructure. The platform is being built to help Wisdom operate more proactively, reduce preventable churn, maintain service quality at scale, and give teams the clarity they need to make better decisions every day."
+      },
+      {
+        "type": "paragraph",
+        "text": "By the time it launches, success won’t be measured by dashboards alone—but by how effectively teams can anticipate problems, act earlier, and scale without losing control."
+      }
+    ]
   },
   {
     "id": "posting-asst",

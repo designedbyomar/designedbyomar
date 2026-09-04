@@ -5,6 +5,9 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-01
 
 ### Added
+- Case studies: long-form body content restored from the Webflow archive, starting with Management Portal — 1,644 words, 8 screenshots with written alt text and captions, four Operations Leadership pull quotes with attribution, and the "Why LLM, not just rules" rationale promoted to a callout. Renders below the existing Challenge / Approach / Outcome summary, so the 15-second skim is unchanged
+- Case studies: optional `body` block array rendered by React and serialized by `postbuild.js`, so images ship as real `<img>` tags in the server response rather than client-rendered only
+- Case studies: automatic table of contents on bodies over 1,200 words
 - Client carousel: WelcomeLend wordmark added, bringing the logo band to 10 companies. Alt text carries the company name, matching the existing pattern where marquee duplicates stay `aria-hidden` with empty alt
 - Work: `/work` is now a real case-study index listing all 8 studies in a grid, with its own H1 and intro. It previously rendered the homepage and scrolled to the Selected Work section, so the primary nav item produced a byte-for-byte duplicate of the page the visitor was already on — two URLs competing for the same content, and a nav click that appeared to do nothing
 - Navigation: `Design System` added to the desktop and mobile header nav. The documented system powering the site was linked only from the footer, while the site claims design-systems expertise in three separate places
@@ -33,6 +36,7 @@ All notable changes to designedbyomar.com are documented here.
 - Work: the all-case-studies drawer and its `work_drawer_open` GA4 event, made redundant by the `/work` index. Its focus trap, scroll lock, and overlay are gone with it
 
 ### Changed
+- Case studies: metrics can carry a `qualifier`. All three Management Portal stats are now labelled `Projected` — the body states the portal is in development with Q1–Q2 2026 rollout, and its own impact lists frame all three as targets rather than achieved results
 - Work: "See all 8 case studies" is now an `<a href="/work">` instead of a button that opened an overlay — it is keyboard reachable, middle-clickable, openable in a new tab, and followable by a crawler. Three case studies including both Disney credits were previously reachable only through that overlay
 - Navigation: the Work nav item and hero CTA now navigate to `/work` rather than scrolling to a homepage section
 - Key facts: design-systems stat raised from 2 to 3, matching the three case studies tagged `Design System` (Simplero Page Builder, Plastiq Athena, Disney Unified Ad Platform)
