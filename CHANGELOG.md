@@ -2,7 +2,7 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-09-01
+## [Unreleased] - 2026-09-04
 
 ### Added
 - Client carousel: WelcomeLend wordmark added, bringing the logo band to 10 companies. Alt text carries the company name, matching the existing pattern where marquee duplicates stay `aria-hidden` with empty alt
@@ -68,6 +68,8 @@ All notable changes to designedbyomar.com are documented here.
 - Homepage logo strip: animation speed normalized for mobile — `animation-duration: 28s` in the ≤820 px breakpoint (was 44 s regardless of viewport); added `transform: translateZ(0)` to `.logo-carousel` for iOS compositing stability
 
 ### Fixed
+- Homepage Open Graph and Twitter descriptions now match the principal-product-designer identity in the canonical description.
+- Static SEO coverage now protects the principal title across homepage metadata, JSON-LD, static H1, runtime source, route generation, and `llms.txt`.
 - Static route generation now replaces the complete `#root` subtree when template markup contains nested divs, preventing stale or malformed generated HTML.
 - Static SEO coverage now verifies case-study subtitles, client/year/role metadata, tags, and metrics in generated HTML.
 - Privacy: GA4 on the 404 page is now gated behind analytics consent — `404.html` loaded `gtag.js` and configured two measurement IDs at parse time regardless of consent, so a visitor who declined analytics was still served Google's tag if they hit a 404. The page now mirrors the app's consent check inline before loading anything. No analytics data is lost: both configs already set `send_page_view: false` and nothing sent a manual page view, so the 404 page reported nothing to GA4 either way

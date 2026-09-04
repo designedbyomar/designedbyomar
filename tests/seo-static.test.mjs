@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 const { injectRootContent } = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
+const PRINCIPAL_TITLE = 'Principal Product Designer';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
 
@@ -40,6 +41,32 @@ const hasGraphUrl = (structuredData, url) => {
   const graph = Array.isArray(structuredData['@graph']) ? structuredData['@graph'] : [];
   return graph.some((node) => node && node.url === url);
 };
+
+const getJsJobTitle = (source, label) => {
+  const match = source.match(/\bjobTitle:\s*'([^']+)'/);
+  assert.ok(match, `${label} defines a jobTitle`);
+  return match[1];
+};
+
+test('homepage identity stays consistent across machine-readable surfaces', () => {
+  const homepageHtml = readDist('index.html');
+  const description = getMetaByName(homepageHtml, 'description');
+  const structuredData = getStructuredData(homepageHtml);
+  const graph = Array.isArray(structuredData['@graph']) ? structuredData['@graph'] : [];
+  const person = graph.find((node) => node && node['@type'] === 'Person');
+
+  assert.match(description, /principal product designer/i, 'homepage description states the principal title');
+  assert.equal(getMetaByProperty(homepageHtml, 'og:description'), description, 'Open Graph description matches the homepage description');
+  assert.equal(getMetaByName(homepageHtml, 'twitter:description'), description, 'Twitter description matches the homepage description');
+  assert.equal(person?.jobTitle, PRINCIPAL_TITLE, 'homepage JSON-LD uses the principal title');
+  assert.ok(homepageHtml.includes(`Omar Tavarez — ${PRINCIPAL_TITLE}</h1>`), 'static homepage H1 uses the principal title');
+  assert.equal(getJsJobTitle(readText('postbuild.js'), 'postbuild.js'), PRINCIPAL_TITLE);
+  assert.equal(getJsJobTitle(readText('src', 'main.jsx'), 'src/main.jsx'), PRINCIPAL_TITLE);
+  assert.ok(
+    readDist('llms.txt').toLowerCase().includes(PRINCIPAL_TITLE.toLowerCase()),
+    'llms.txt uses the principal title',
+  );
+});
 
 test('sitemap uses canonical www URLs and avoids redirect sources', () => {
   const redirects = JSON.parse(readText('vercel.json')).redirects ?? [];
