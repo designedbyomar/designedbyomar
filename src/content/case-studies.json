@@ -561,12 +561,6 @@
         "text": "I also set up observational research using OBS Studio so we could watch revenue specialists work across multiple monitors in their real environment and understand where time and effort were being lost."
       },
       {
-        "type": "image",
-        "src": "/Images/case-studies/posting-asst/02-review-screen-imbalance.webp",
-        "alt": "Posting Assistant review screen comparing extracted check totals against the office’s own cover sheet — $6,570.10 against $6,670.00 — flagging a $100 imbalance, beside the source EOB document",
-        "caption": "Extracted values sit beside the source document so the specialist confirms rather than retypes. A $100 imbalance is surfaced rather than silently absorbed."
-      },
-      {
         "type": "heading",
         "level": 2,
         "text": "Approach"
