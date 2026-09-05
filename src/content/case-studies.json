@@ -1306,6 +1306,98 @@
     "accent": "ship",
     "challenge": "ESPN, Freeform, FX Networks, and National Geographic each had their own ad sales platform. No standardization, no cross-brand collaboration, no efficiency. Booking ads across Disney's portfolio required navigating completely different systems.",
     "approach": "Audited and analyzed complex data sets across all four brands: reporting, client relations, dashboards, internal communications. Unified nomenclature, process, and front-end UI aligned to backend architecture. Led a team of two designers. Built React components designed to plug into the Adapt design system — laying the foundation for a future-proof cross-brand system.",
-    "outcome": "All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library."
+    "outcome": "All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Background"
+      },
+      {
+        "type": "paragraph",
+        "text": "Disney had several brands under its umbrella, including ESPN, Freeform, FX Networks, National Geographic Networks, ABC, Hulu, and ABC News, each with its own ad sales platform. This created a lack of standardization and collaboration across the organization, making it difficult for users to perform tasks and book ads efficiently."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/01-fragmented-ad-platforms.webp",
+        "alt": "Disney's brands — ABC, Disney, Hulu, ABC News, Freeform, FX and National Geographic — annotated to show each was using a different platform for ad sales",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Goals"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Unify all Disney brands under one Ad Sales platform (AdVisor); previously only available to ESPN",
+          "Unify Freeform, FX Networks, and National Geographic Networks under AdVisor",
+          "Design with the intent to later use the React components to plug into Adapt design system"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Challenges: The main challenge was to unify all the brands under one platform while keeping in mind their individual needs and requirements. Additionally, the lack of resources made it difficult to conduct comprehensive research."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/02-icon-audit-findings.webp",
+        "alt": "Application audit pairing a grid of AdVisor icons with the findings: roughly 194 unique symbols, of which only 36 are custom and 158 are system icons",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Approach"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Conducted an audit and analysis of complex data sets, including reporting, client relations, dashboards/data visualization, and internal communications across all brands.",
+          "Unify the nomenclature, process, and front-end UI as it related to the backend architecture.",
+          "Worked with engineering to create React components that could be reused in future design systems.",
+          "Led a team of two designers on all these efforts while also mentoring them and other designers on the larger team."
+        ]
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/03-unified-under-advisor.webp",
+        "alt": "Funnel diagram showing all seven Disney brands consolidating onto AdVisor, noting that ESPN was already using it",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Solution"
+      },
+      {
+        "type": "paragraph",
+        "text": "Through my design efforts, we were able to unify all Disney brands under the AdVisor platform, including Freeform, FX Networks, and National Geographic Networks. We designed the platform with the intent to later use the React components to plug into the Adapt design system, making it easier for the company to standardize the process for ad sales throughout the organization, which created better visibility and collaboration across Disney brands."
+      },
+      {
+        "type": "paragraph",
+        "text": "The KPIs of the project were successfully met, as we gave users the ability to perform the tasks needed for their specific business segment while not sacrificing the old functionality for ESPN. We unified the brands not only under one platform but also one unified language, at least on the product side. As a bonus, UX and engineering started the Ad Sales design system, updated documentation, and React components. I laid the foundation for us to flip the switch on the design system when we are ready."
+      },
+      {
+        "type": "paragraph",
+        "text": "Before the release, even though we have yet to onboard some users for Freeform, all other users have already started using the application and maximizing their productivity compared to their old system. All feedback is being collected, and follow-up user interviews have also taken place, which have already been turned into user stories."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/04-advisor-proposal-view.webp",
+        "alt": "The AdVisor proposal view on desktop, showing a media plan with budget, placement and total tables",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Reflection"
+      },
+      {
+        "type": "paragraph",
+        "text": "Understanding my limitations as a researcher and knowing when to hand off a concept was very important for me. Resources were scarce in the beginning of the project, but once they came in, it became a cornucopia of ideas and perspectives. There is still lots of work that needs to be done to bring AdVisor into the 21st century, but with the strong foundation we have established, I am confident that Disney will continue to succeed in its ad sales efforts."
+      }
+    ]
   }
 ]

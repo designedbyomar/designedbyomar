@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Case studies: Unified Ad Platform body restored from the Webflow archive — 491 words and 4 images covering the fragmented per-brand ad platforms, the AdVisor icon audit, the consolidation funnel and the proposal view
 - Case studies: Athena Design System 2.0 body restored from the Webflow archive — 982 words and 9 images covering the device and resolution research, annotated inconsistencies, layout anatomy, the pitch deck, the governance model, the colour system, the Connect payment widget and feedback indicators. Five source captions preserved verbatim
 - Case studies: Page Builder 2.0 body restored from the Webflow archive — 693 words and 5 screenshots covering the style system, the previous builder's limits, real customer pages in the new editor, input field configuration and named colour styles, with the KPI section intact
 - Case studies: Connect API Payments body restored from the Webflow archive — 693 words, 7 screenshots with written alt text and captions, and the PayGround customer quote with attribution. Covers the Nearside white-label flows, card payment method, review and confirm, the Connect Teal token documentation, the partner portal, the V2 concept and the mobile portal
