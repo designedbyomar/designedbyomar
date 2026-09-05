@@ -1831,7 +1831,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices, with rollout planned for Q1–Q2 2026. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
+    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
     links: [
       { label: 'Posting Assistant', href: '/work/posting-asst/' },
       { label: 'Management Portal', href: '/work/mgmt-portal/' },
