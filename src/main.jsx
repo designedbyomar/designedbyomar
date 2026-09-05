@@ -23,6 +23,7 @@ const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
 const GITHUB_URL = 'https://github.com/designedbyomar';
 const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
 const BEHANCE_URL = 'https://www.behance.net/omartavarez';
+const BOOKING_URL = 'https://calendar.app.google/4NcXLDoniazZ5VT78';
 
 let sentryInitialized = false;
 const initSentryIfEnabled = () => {
@@ -2106,6 +2107,7 @@ const Contact = () => {
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
+            <ContactCard label="Book a call" value="20 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
             <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
             <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
             <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />

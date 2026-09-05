@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Contact: a booking card now leads the contact grid, linking to a 20-minute intro call. Closes audit finding F-14 without adding a form — the site is static with an enforcing CSP, so a hosted form service would be blocked and would need a new processor named in the privacy policy, while a scheduler is a plain outbound link. Also listed in `llms.txt` so an assistant asked how to reach Omar can offer both routes
 - Case studies: `gallery` block type renders a run of related images as a responsive row — three columns on desktop, two on tablet, stacked on mobile. Used for the three live-broadcast photos closing Critical Communication Tool, which illustrate the sentence naming the NBA Finals, Presidential Debate and Emmys rather than sitting stacked below it
 - Case studies: Critical Communication Tool body restored from the Webflow archive — 3,793 words and 27 images, the deepest case study on the site. Covers the interviews and affinity mapping, journey maps, MoSCoW prioritisation, two scrapped and rebuilt versions of the subscription manager, the responsive breakpoint specifications, skeleton loading states and usability findings, with all three user quotes attributed
 - Case studies: Plastiq Marketing Site body restored from the Webflow archive — 1,540 words and 11 images spanning the wireframes and module library, creative strategy, the colour and type systems, brand logo lockups, competitive analysis and the launched site
