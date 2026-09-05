@@ -674,7 +674,146 @@
     "accent": "ship",
     "challenge": "Users found Simplero's page builder so limiting they resorted to custom CSS and were threatening to migrate to competitors. The old builder prevented migration from other platforms and was driving churn.",
     "approach": "Led the full redesign from scratch: user and expert interviews, competitive analysis, product requirements (no PM — I owned that role), and close collaboration with the Lead Engineer to ship fast. Delivered a WYSIWYG editor, style guide, color picker, and competitor page import — all in 2 months.",
-    "outcome": "9% increase in sales post-launch. Customer migration increased. Engineers shipped with minimal friction. Users who previously exported to external developers stayed on platform. Positioned Simplero as a credible CRM platform, not just a tool."
+    "outcome": "9% increase in sales post-launch. Customer migration increased. Engineers shipped with minimal friction. Users who previously exported to external developers stayed on platform. Positioned Simplero as a credible CRM platform, not just a tool.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview"
+      },
+      {
+        "type": "paragraph",
+        "text": "In response to mounting user dissatisfaction with Simplero's outdated page builder, I led the redesign and implementation of a revolutionary solution within Simplero's CRM system. The primary goal was to overcome the limitations of the existing builder, which users found clunky and restrictive, leading some to resort to custom CSS and even contemplate leaving the platform. My role involved conducting extensive user and expert interviews, creating product requirements, and collaborating closely with the Lead Engineer to bring about a transformative change. The result was a feature-rich page builder with innovative elements such as a WYSIWYG editor, style guide, color picker, and more."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My role"
+      },
+      {
+        "type": "paragraph",
+        "text": "As the lead product designer, I spearheaded the entire redesign process, from conducting user and expert interviews to creating comprehensive product requirements. In the absence of a product manager, I took charge of outlining the project's goals and collaborated closely with the Lead Engineer to ensure seamless integration of design and functionality. My responsibilities included a comprehensive competitive analysis, design and architecture of innovative features, and the production of various design artifacts such as personas, sketches, wireframes, UI designs, and prototypes. Throughout the process, I played a pivotal role in enhancing the overall user experience and addressing critical pain points within Simplero's CRM system."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/01-style-guide-system.webp",
+        "alt": "Style guide artboard for the page builder covering colour palettes and pickers, font pairing selection, buttons, form fields and borders, with a rendered style-guide preview",
+        "caption": "The style system behind the builder: colour, type, buttons and form fields defined once so every page inherits them."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/02-previous-builder-limits.webp",
+        "alt": "The previous page builder: a text panel offering only style, width, padding and background controls, beside the landing page it renders",
+        "caption": "The old page builder was limited in customization"
+      },
+      {
+        "type": "paragraph",
+        "text": "The project aimed to address critical issues with Simplero's existing page builder. Users faced challenges in achieving their desired designs, resorting to external developers and custom CSS. Migration from other platforms was hindered, and the threat of user exodus loomed. The primary target was to enhance user satisfaction and retention. The challenge involved understanding user needs, conducting a comprehensive competitive analysis, and formulating product requirements. Technical constraints and the need for efficient design were crucial considerations to ensure a streamlined development process."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/03-pages-built-in-the-editor.webp",
+        "alt": "Landing pages being edited in the new builder — a funnel marketing page, a post-purchase thank-you page, a popup editor and an appointment booking page",
+        "caption": "Real customer pages in the new editor, including popups and booking flows rather than only marketing pages."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution: Empowering CRM Excellence through Simplero’s Page Builder Revolution"
+      },
+      {
+        "type": "paragraph",
+        "text": "The redesign journey commenced with in-depth user and expert interviews, unraveling frustrations with Simplero's existing page builder. This insight shaped detailed product requirements, where, in the absence of a dedicated product manager, I assumed a lead role in defining project goals. A comprehensive competitive analysis not only spotlighted the flaws in Simplero's builder but also drew inspiration from industry-leading features, setting the redesign's trajectory."
+      },
+      {
+        "type": "paragraph",
+        "text": "Collaboration with the Lead Engineer ensured a seamless fusion of design and functionality, resulting in a swift and efficient development process. The innovative features, including a WYSIWYG editor, style guide, color picker, and more, were meticulously crafted to empower users, addressing customization needs and enhancing the overall design flexibility. Crucially, the redesign underscored the symbiotic relationship between a robust page builder and CRM users."
+      },
+      {
+        "type": "paragraph",
+        "text": "Recognizing the pivotal role of CRM integration, the new design seamlessly incorporated the page builder into Simplero's CRM system. This strategic move aimed not only to rectify clunkiness but to position Simplero as a CRM platform leader. The redesign was more than a fix; it was a statement of empowerment, customer loyalty, and an elevated market standing. In essence, the project highlighted the vital role a sophisticated page builder plays in enhancing the broader CRM user experience."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/04-input-field-settings.webp",
+        "alt": "Input field configuration showing format and advanced tabs, selection from existing CRM fields such as birth date and contact email, and the list of new field types that can be added",
+        "caption": "Settings for inputs"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/05-color-styles.webp",
+        "alt": "Colour management in the builder: the palette, custom colours, and four named colour styles previewed against sample page content",
+        "caption": "Named colour styles let a customer restyle a whole page without editing each block."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Results"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key Performance Indicators (KPIs):"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Enhanced Customer Satisfaction:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Customer satisfaction witnessed a significant improvement post-implementation of the new page builder."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Increased Customer Migration:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Users are now eager to migrate their entire websites to Simplero, predicting a subsequent increase in the lifetime value of customers."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Efficient Development Process:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Engineers encountered minimal barriers during the building phase, leading to the quick deployment of the new page builder within months."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Competitor Page Imports:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Users can now seamlessly import pages from competitors' builders, expanding Simplero's ecosystem and attracting users from other platforms."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Conclusion"
+      },
+      {
+        "type": "paragraph",
+        "text": "Post-implementation, the project yielded remarkable results. Customer satisfaction soared, leading to increased customer migration and a predicted rise in the lifetime value of customers. The efficient design process allowed engineers to swiftly bring the new page builder to fruition, and users can now seamlessly import pages from competitors' builders. The success of this project not only addressed critical user pain points but also showcased the power of user-centric design and collaborative innovation. As a lead product designer, the experience reinforced the importance of investing in the entire project lifecycle and continually seeking opportunities for career development."
+      }
+    ]
   },
   {
     "id": "connect-api",
