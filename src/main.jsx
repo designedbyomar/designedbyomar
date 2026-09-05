@@ -1268,7 +1268,7 @@ const WorkIndexPage = () => {
 // ============================================================
 // Prose holds a 640px measure for readability; images span the full container,
 // which is what fills the empty right-hand column on these pages.
-const CS_TEXT_WIDTH = { maxWidth: 640, marginLeft: 'auto', marginRight: 'auto', width: '100%' };
+const CS_TEXT_WIDTH = { maxWidth: 640, width: '100%' };
 const csSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const csWordCount = (blocks) => blocks.reduce(
   (n, b) => n + `${b.text || ''} ${(b.items || []).join(' ')}`.trim().split(/\s+/).filter(Boolean).length,
@@ -1284,7 +1284,7 @@ const CaseStudyBody = ({ blocks, accent }) => {
   return (
     <div style={{ marginTop: 'var(--layout-2)', paddingTop: 'var(--layout-1)', borderTop: '1px solid var(--color-gray-100)' }}>
       {showToc && (
-        <nav aria-label="On this page" style={{ ...CS_TEXT_WIDTH, marginBottom: 'var(--layout-1)' }}>
+        <nav aria-label="On this page" style={{ ...CS_TEXT_WIDTH, margin: '0 auto var(--layout-1)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>On this page</div>
           <ol style={{ margin: 0, paddingLeft: '1.1em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {sections.map((h) => (
@@ -1296,7 +1296,7 @@ const CaseStudyBody = ({ blocks, accent }) => {
         </nav>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
         {blocks.map((b, i) => {
           if (b.type === 'heading') {
             const Tag = `h${b.level}`;
@@ -1342,7 +1342,7 @@ const CaseStudyBody = ({ blocks, accent }) => {
           }
           if (b.type === 'image') {
             return (
-              <figure key={i} style={{ margin: 'var(--space-4) 0' }}>
+              <figure key={i} style={{ width: '100%', margin: 'var(--space-4) 0' }}>
                 <img src={b.src} alt={b.alt} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }} />
                 {b.caption && (
                   <figcaption style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)' }}>{b.caption}</figcaption>
