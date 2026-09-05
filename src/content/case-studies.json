@@ -645,28 +645,6 @@
         "type": "paragraph",
         "text": "The first version helped prove the value and establish trust. That made it possible to keep improving the experience and automate more over time."
       }
-    ],
-    "todos": [
-      {
-        "anchor": "My role — after the OBS Studio paragraph",
-        "note": "The OBS observational research is described as a method but the FINDING is missing. What did you actually see specialists doing across monitors? What changed in the design because of it? This is the highest-value missing paragraph on the site."
-      },
-      {
-        "anchor": "Approach — heading",
-        "note": "This section is written entirely in \"we\" while My role is in \"I\". A reviewer cannot isolate your contribution here. Rewrite in first person."
-      },
-      {
-        "anchor": "Approach — after the assistive-workflow paragraph",
-        "note": "Alternatives rejected. Who wanted full automation? What would it have cost in specialist trust? How did you win that argument? Currently this is one clause (\"Instead of jumping straight to full automation\") and it is the Principal-level moment of the project."
-      },
-      {
-        "anchor": "Impact — section",
-        "note": "Four subsections restate the same 40% figure. Consolidate to one, or add distinct outcomes."
-      },
-      {
-        "anchor": "Image 02 — review screen",
-        "note": "LOREM IPSUM. The Notes field of the review screen still reads \"Lorem ipsum dolor sit amet consectetur...\". This is audit finding F-05 and the image is now used twice: as the case-study cover and in the body. Replace with plausible posting notes, e.g. \"Secondary claim, EOB page 2 missing. Held pending payer callback.\" Needs a re-export from you."
-      }
     ]
   },
   {

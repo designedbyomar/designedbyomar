@@ -311,3 +311,39 @@ test('projected metrics are labelled as projections', () => {
     });
   });
 });
+
+test('case-study content ships no internal editorial metadata', () => {
+  // src/content/case-studies.json is bundled into the client JS, and this repository is
+  // public, so anything added to that file is published twice over. Editorial notes
+  // belong in the gitignored roadmap instead.
+  const INTERNAL_KEYS = ['todos', 'todo', 'notes', 'note', 'internal', 'draft', 'review'];
+  caseStudySource().forEach((caseStudy) => {
+    INTERNAL_KEYS.forEach((key) => {
+      assert.equal(
+        caseStudy[key], undefined,
+        `${caseStudy.id}: "${key}" is internal metadata and would ship in the public JS bundle`,
+      );
+    });
+  });
+
+  // And nothing note-shaped reached the built bundle by another route.
+  const assetsDir = path.join(DIST, 'assets');
+  const bundles = fs.readdirSync(assetsDir).filter((f) => f.endsWith('.js'));
+  assert.ok(bundles.length > 0, 'built JS bundles exist to scan');
+  const MARKERS = ['TODO(omar)', 'Principal-level moment', 'Lorem ipsum dolor'];
+  bundles.forEach((file) => {
+    const code = fs.readFileSync(path.join(assetsDir, file), 'utf8');
+    MARKERS.forEach((marker) => {
+      assert.ok(!code.includes(marker), `${file} contains internal marker "${marker}"`);
+    });
+  });
+});
+
+test('the client case-study module publishes only allowlisted fields', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src', 'case-studies.js'), 'utf8');
+  assert.match(source, /PUBLIC_FIELDS/, 'client module filters fields through an allowlist');
+  assert.ok(
+    !/\.\.\.caseStudy\b/.test(source),
+    'client module must not spread the raw record — that republishes every future field',
+  );
+});

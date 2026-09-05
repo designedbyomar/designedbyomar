@@ -6,7 +6,6 @@ All notable changes to designedbyomar.com are documented here.
 
 ### Added
 - Case studies: Posting Assistant body restored from the Webflow archive — 563 words, the posting-journey blueprint, the assistive review screen, file intake with Open Dental posting, and claim-level check detail, each with written alt text and a caption tying it to the argument (the source had no captions)
-- Case studies: non-rendered `todos` field for editorial notes, kept out of the published HTML rather than shipped as source comments
 - Case studies: long-form body content restored from the Webflow archive, starting with Management Portal — 1,644 words, 8 screenshots with written alt text and captions, four Operations Leadership pull quotes with attribution, and the "Why LLM, not just rules" rationale promoted to a callout. Renders below the existing Challenge / Approach / Outcome summary, so the 15-second skim is unchanged
 - Case studies: optional `body` block array rendered by React and serialized by `postbuild.js`, so images ship as real `<img>` tags in the server response rather than client-rendered only
 - Case studies: automatic table of contents on bodies over 1,200 words
@@ -25,6 +24,7 @@ All notable changes to designedbyomar.com are documented here.
 - SEO/AEO: Case-study routes now ship their full prose in the static HTML — title, subtitle, client/year/role, tags, metrics, and the Challenge / Approach / Outcome sections are injected into `<div id="root">` by `postbuild.js` from `case-studies.json`. Previously every `/work/[id]/` URL returned a document containing no case-study writing at all, so AI assistants, ATS scrapers, link-preview bots, reader mode, and non-rendering crawlers saw an empty page. React replaces root content on mount, so the rendered site is unchanged
 
 ### Fixed
+- Privacy: case-study editorial notes no longer ship to the public. `src/content/case-studies.json` is bundled into the client JS, and `src/case-studies.js` spread every field into the published objects, so internal notes were downloadable in `dist/assets/main-*.js`. Notes moved to the gitignored roadmap, and the client module now filters through an explicit `PUBLIC_FIELDS` allowlist so a future internal field cannot leak by default
 - Performance: hero portrait preload is now scoped to the homepage only. It previously also ran on `/work`, which was correct while `/work` rendered the homepage hero — now that `/work` is its own case-study index, preloading there fetched a 50 KB image at `fetchpriority="high"` that the page never paints
 - Security: CSP `report-uri` directive removed — the value was single-quoted (`'/csp-report'`), which CSP reserves for keywords like `'self'`, so browsers POSTed violation reports to a literal quoted path that 404ed and no reports were ever collected
 - Security: CSP `connect-src` Sentry host corrected from `https://*.ingest.sentry.io` to `https://*.ingest.us.sentry.io` — the wildcard did not match the regional DSN host `o4511277976649728.ingest.us.sentry.io`, so enforcing the policy would have silently blocked all Sentry error reporting
