@@ -400,3 +400,19 @@ test('both renderers share the block normalizer rather than guarding separately'
     'static renderer should defer heading validation to the shared module, not re-implement it',
   );
 });
+
+test('case-study bodies contain no empty heading sections', () => {
+  // A heading followed directly by a heading at the same or shallower level leaves a
+  // section with no content in it, which reads as a dead entry to anyone navigating by
+  // headings. A heading followed by a deeper one is ordinary section/subsection nesting.
+  caseStudySource().filter((c) => Array.isArray(c.body)).forEach((caseStudy) => {
+    caseStudy.body.forEach((block, i) => {
+      const next = caseStudy.body[i + 1];
+      if (block.type !== 'heading' || !next || next.type !== 'heading') return;
+      assert.ok(
+        next.level > block.level,
+        `${caseStudy.id}: "${block.text}" (h${block.level}) is followed straight by "${next.text}" (h${next.level}) with no content between them`,
+      );
+    });
+  });
+});

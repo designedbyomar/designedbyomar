@@ -674,7 +674,146 @@
     "accent": "ship",
     "challenge": "Users found Simplero's page builder so limiting they resorted to custom CSS and were threatening to migrate to competitors. The old builder prevented migration from other platforms and was driving churn.",
     "approach": "Led the full redesign from scratch: user and expert interviews, competitive analysis, product requirements (no PM — I owned that role), and close collaboration with the Lead Engineer to ship fast. Delivered a WYSIWYG editor, style guide, color picker, and competitor page import — all in 2 months.",
-    "outcome": "9% increase in sales post-launch. Customer migration increased. Engineers shipped with minimal friction. Users who previously exported to external developers stayed on platform. Positioned Simplero as a credible CRM platform, not just a tool."
+    "outcome": "9% increase in sales post-launch. Customer migration increased. Engineers shipped with minimal friction. Users who previously exported to external developers stayed on platform. Positioned Simplero as a credible CRM platform, not just a tool.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview"
+      },
+      {
+        "type": "paragraph",
+        "text": "In response to mounting user dissatisfaction with Simplero's outdated page builder, I led the redesign and implementation of a revolutionary solution within Simplero's CRM system. The primary goal was to overcome the limitations of the existing builder, which users found clunky and restrictive, leading some to resort to custom CSS and even contemplate leaving the platform. My role involved conducting extensive user and expert interviews, creating product requirements, and collaborating closely with the Lead Engineer to bring about a transformative change. The result was a feature-rich page builder with innovative elements such as a WYSIWYG editor, style guide, color picker, and more."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My role"
+      },
+      {
+        "type": "paragraph",
+        "text": "As the lead product designer, I spearheaded the entire redesign process, from conducting user and expert interviews to creating comprehensive product requirements. In the absence of a product manager, I took charge of outlining the project's goals and collaborated closely with the Lead Engineer to ensure seamless integration of design and functionality. My responsibilities included a comprehensive competitive analysis, design and architecture of innovative features, and the production of various design artifacts such as personas, sketches, wireframes, UI designs, and prototypes. Throughout the process, I played a pivotal role in enhancing the overall user experience and addressing critical pain points within Simplero's CRM system."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/01-style-guide-system.webp",
+        "alt": "Style guide artboard for the page builder covering colour palettes and pickers, font pairing selection, buttons, form fields and borders, with a rendered style-guide preview",
+        "caption": "The style system behind the builder: colour, type, buttons and form fields defined once so every page inherits them."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/02-previous-builder-limits.webp",
+        "alt": "The previous page builder: a text panel offering only style, width, padding and background controls, beside the landing page it renders",
+        "caption": "The old page builder was limited in customization"
+      },
+      {
+        "type": "paragraph",
+        "text": "The project aimed to address critical issues with Simplero's existing page builder. Users faced challenges in achieving their desired designs, resorting to external developers and custom CSS. Migration from other platforms was hindered, and the threat of user exodus loomed. The primary target was to enhance user satisfaction and retention. The challenge involved understanding user needs, conducting a comprehensive competitive analysis, and formulating product requirements. Technical constraints and the need for efficient design were crucial considerations to ensure a streamlined development process."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/03-pages-built-in-the-editor.webp",
+        "alt": "Landing pages being edited in the new builder — a funnel marketing page, a post-purchase thank-you page, a popup editor and an appointment booking page",
+        "caption": "Real customer pages in the new editor, including popups and booking flows rather than only marketing pages."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution: Empowering CRM Excellence through Simplero’s Page Builder Revolution"
+      },
+      {
+        "type": "paragraph",
+        "text": "The redesign journey commenced with in-depth user and expert interviews, unraveling frustrations with Simplero's existing page builder. This insight shaped detailed product requirements, where, in the absence of a dedicated product manager, I assumed a lead role in defining project goals. A comprehensive competitive analysis not only spotlighted the flaws in Simplero's builder but also drew inspiration from industry-leading features, setting the redesign's trajectory."
+      },
+      {
+        "type": "paragraph",
+        "text": "Collaboration with the Lead Engineer ensured a seamless fusion of design and functionality, resulting in a swift and efficient development process. The innovative features, including a WYSIWYG editor, style guide, color picker, and more, were meticulously crafted to empower users, addressing customization needs and enhancing the overall design flexibility. Crucially, the redesign underscored the symbiotic relationship between a robust page builder and CRM users."
+      },
+      {
+        "type": "paragraph",
+        "text": "Recognizing the pivotal role of CRM integration, the new design seamlessly incorporated the page builder into Simplero's CRM system. This strategic move aimed not only to rectify clunkiness but to position Simplero as a CRM platform leader. The redesign was more than a fix; it was a statement of empowerment, customer loyalty, and an elevated market standing. In essence, the project highlighted the vital role a sophisticated page builder plays in enhancing the broader CRM user experience."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/04-input-field-settings.webp",
+        "alt": "Input field configuration showing format and advanced tabs, selection from existing CRM fields such as birth date and contact email, and the list of new field types that can be added",
+        "caption": "Settings for inputs"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/page-builder/05-color-styles.webp",
+        "alt": "Colour management in the builder: the palette, custom colours, and four named colour styles previewed against sample page content",
+        "caption": "Named colour styles let a customer restyle a whole page without editing each block."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Results"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Key Performance Indicators (KPIs):"
+      },
+      {
+        "type": "heading",
+        "level": 4,
+        "text": "Enhanced Customer Satisfaction:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Customer satisfaction witnessed a significant improvement post-implementation of the new page builder."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 4,
+        "text": "Increased Customer Migration:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Users are now eager to migrate their entire websites to Simplero, predicting a subsequent increase in the lifetime value of customers."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 4,
+        "text": "Efficient Development Process:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Engineers encountered minimal barriers during the building phase, leading to the quick deployment of the new page builder within months."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 4,
+        "text": "Competitor Page Imports:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Users can now seamlessly import pages from competitors' builders, expanding Simplero's ecosystem and attracting users from other platforms."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Conclusion"
+      },
+      {
+        "type": "paragraph",
+        "text": "Post-implementation, the project yielded remarkable results. Customer satisfaction soared, leading to increased customer migration and a predicted rise in the lifetime value of customers. The efficient design process allowed engineers to swiftly bring the new page builder to fruition, and users can now seamlessly import pages from competitors' builders. The success of this project not only addressed critical user pain points but also showcased the power of user-centric design and collaborative innovation. As a lead product designer, the experience reinforced the importance of investing in the entire project lifecycle and continually seeking opportunities for career development."
+      }
+    ]
   },
   {
     "id": "connect-api",
@@ -920,7 +1059,146 @@
       "href": "/design-system",
       "label": "See the design system this site runs on",
       "note": "The current version of this thinking, documented end to end: tokens, components, patterns, motion, and accessibility."
-    }
+    },
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Project Summary"
+      },
+      {
+        "type": "paragraph",
+        "text": "I am leading the design system (DS) effort (along with co-lead Danny Lopez) to create consistency, increase development efficiency, and decrease time to implementation throughout Plastiq’s suite of products. I work on transforming Athena, previously only a component library, to an enterprise level design system that can solve for a host of products and marketing channels. I did this by guiding our team through workshops to gain a purpose and principles for our DS and also identify issues affecting our products. Additionally, I worked on revamping our components by adding usage documentation and encouraging the Engineering team into creating a Storybook equivalent to our effort."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "After observing the poor user experience from a portion of our products features and hearing the same feedback from stakeholders and users I decided to begin taking steps towards fixing it. The reasons for that were evident from the moment I joined the organization. I spent a considerable amount focusing on the issues Plastiq faced from a Product, Design and Engineering perspective as well as the concerns of the many different users of our products."
+      },
+      {
+        "type": "paragraph",
+        "text": "What I found was that there was a lack of consistency in the way we built products. Simply put, there was a lack of process. Development had too many dependencies and could not pick up code already built in many cases; designers were creating too many variants to already existing patterns and product was building too many features too quickly which lead to too much duplicate work that was inconsistent. All these things contributed to a product that confused the user and failed to deliver on the KPI’s set forth by the organization."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/01-device-and-resolution-analytics.webp",
+        "alt": "Analytics dashboards breaking down device, browser and screen resolution, annotated with the specific handsets behind each resolution and callouts noting the top five devices cover 56% of users",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/02-audience-analytics-annotated.webp",
+        "alt": "Audience analytics annotated to show secondary monitors accounting for 34% of users, 1920 width as the largest single segment, and the top twenty resolutions being mobile sizes above 375 width",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/03-inconsistency-annotations.webp",
+        "alt": "Product screenshots annotated with a numbered list of layout failures: inconsistent components in list view, a hybrid mobile and desktop navigation, the account component pushed out of its container, and an unusable back button",
+        "caption": "Some screenshot annotations displaying some of the issues with the current layout grid"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/04-layout-grid-anatomy.webp",
+        "alt": "Layout anatomy documentation covering the column grid, defined product regions, breakpoints, and the named sizes from small through max",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Getting the team aligned"
+      },
+      {
+        "type": "paragraph",
+        "text": "To begin the DS team and I began taking a look at all of our products and features holistically. We started by auditing the core Pay product and branched out from there. I began to notice inconsistent nomenclature, messaging and UI patterns amongst other things that have an impact on user experience. I noted some of the issues and how they could be impacting the organization and product streams. This gave us a broad understanding the steps we needed to take to remedy the issues."
+      },
+      {
+        "type": "paragraph",
+        "text": "Before I produced any assets I wanted to make sure that the organization as whole and the Product, Design and Engineering teams were aligned. To do that, the co-lead and I developed a series of workshops that assisted us in establishing our KPI’s which included fewer development hours, a more streamlined process bringing features to market and several others."
+      },
+      {
+        "type": "paragraph",
+        "text": "I then moved on to gathering case studies and research regarding the impact of design systems. I needed to now “evangelize” the DS throughout the organization. I knew that this would help align teams as well as bring awareness to some of the issues we have all been facing. I then, along with my co-lead, began synthesizing this information to present to the company and key stake holders."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/05-ds-presentation-slides.webp",
+        "alt": "Slides from the design system pitch deck covering what a design system is, ROI and case studies, what peers were saying, a non-technical analogy, and where Plastiq was heading",
+        "caption": "DS Presentation slides"
+      },
+      {
+        "type": "paragraph",
+        "text": "This resulted in several stakeholders showing full support of our efforts as well as a small team of dedicated developers who volunteered to work with us to build Plastiq’s first fully-fledged Design System."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Establishing a process"
+      },
+      {
+        "type": "paragraph",
+        "text": "For the DS to work as intended teams throughout the organization needed to be able to consume and contribute to the DS. After spending a considerable amount of time brainstorming and researching the best methods we landed on a process that referenced Brad Frost’s Design System Governance Process but incorporated Plastiq’s way of work. Once this was solidified and the administrators of the DS were in agreement, we documented the process for all to refer to."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/06-governance-model.webp",
+        "alt": "The design system governance model as a flow across discovery, design-system work and delivery phases, with the research citations it was built on",
+        "caption": "Design System Governance model"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Systemizing design and code"
+      },
+      {
+        "type": "paragraph",
+        "text": "To ensure that consistent design patterns, components and reusable code were being created my co-lead and I began to work on the documentation of usage for the existing component library. We divided the work based on the product needs at the moment. I began creating documentation around layout grid, dashboard components, payment widget and feedback indicators. Those items could be used immediately to remedy some of the issues we discovered during our audit. The payment widget was by far our most used as it was the core of our product. Layout grid alone could fix a major issue in the way we accommodate UI elements at multiple breakpoints."
+      },
+      {
+        "type": "paragraph",
+        "text": "Next, the co-lead and I worked on revamping our brand and creating new foundational elements for Athena DS. We did this by referring back to our product needs that were discovered during our audits. We knew that we needed to create a system that was scalable across multiple products and marketing channels as well. These foundational elements included Type, Color, Brand and Spacing. Once completed this same foundation would go on to be used across our marketing site too. (See Case Study ↗)"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/07-color-system.webp",
+        "alt": "The colour system: eighteen named ramps including Sky for Plastiq Pay, Teal for Connect and Stone for the core brand, each with full tonal steps",
+        "caption": "Color system"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Results"
+      },
+      {
+        "type": "paragraph",
+        "text": "Even though certain components and foundational elements are still in production; we have seen the results of creating the process, documentation and components. The it is more efficient than ever for the Engineering teams to pick up global components, layouts and templates to create new products, pages, and features. The design and product teams have better alignment on the goals of the company and future of the product. This has lead to more consistent work from everyone that builds anything for the product. In the areas of the product and marketing site that are using the DS you can see a noticeable improvement in consistency of user experience and brand language."
+      },
+      {
+        "type": "paragraph",
+        "text": "All the work thus far and future work culminate into a long-term effort that will catapult this company’s image from a mature start-up to an industry leader in the public space. At the moment, we are working as an org to expand our efforts towards the DS. We continue to improve current DS elements and elaborate on future additions to the DS which will help previous stated goals."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/08-connect-payment-widget.webp",
+        "alt": "The Plastiq Connect payment widget as a full set of mobile screens covering the end-to-end payment flow",
+        "caption": "Payment Widget for Plastiq Connect"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/athena-ds/09-feedback-indicators.webp",
+        "alt": "Feedback indicator documentation covering indicator types, the blue dot, spinners, progress and loading indicators, and the accessibility rules for each",
+        "caption": ""
+      }
+    ]
   },
   {
     "id": "plastiq-mktg",
@@ -956,7 +1234,240 @@
     "accent": "ship",
     "challenge": "Plastiq needed a complete site overhaul in 3–4 weeks ahead of going public. The old site lacked polish, buried products in navigation, and failed to communicate value to investors or ideal customers.",
     "approach": "Took initiative as creative lead despite no formal assignment. Created the visual language, brand direction, and content strategy. Led workshops to align an 8-person cross-functional team (design, copy, marketing, engineering). Built the design system from scratch using my proprietary color system, then directed atomic-scale production across all pages.",
-    "outcome": "Delivered on time. WCAG compliant. Drove growth in PayPro (paid tier). Fulfilled the \"One Plastiq\" unified brand vision. Early analytics and investor feedback overwhelmingly positive."
+    "outcome": "Delivered on time. WCAG compliant. Drove growth in PayPro (paid tier). Fulfilled the \"One Plastiq\" unified brand vision. Early analytics and investor feedback overwhelmingly positive.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Role"
+      },
+      {
+        "type": "paragraph",
+        "text": "Team: Lead Designer: Omar Tavarez, Principal designers: Danny Lopez, Craig Cockerill, Marketing Team: Angela Luna-Chavez (Designer), Noah Sanders (Copywriter), Developers: Rony, Mark, Product Manager: Caleb"
+      },
+      {
+        "type": "paragraph",
+        "text": "Even though there wasn’t an assigned lead I took the initiative on this project. I created the visual language and brand direction. Furthermore, I led the brainstorms and workshops that brought us together as a team to create this project. Every team member brought their strengths to this project."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Project Summary"
+      },
+      {
+        "type": "paragraph",
+        "text": "Plastiq needed a new and improved website ahead of going IPO. The COO came directly to the design team with this ask based on the importance of the project and short timeline. The goal of the project was to display the benefits our suite of products to our users while revamping the brand and attracting investors. We also wanted to evolve our brand and drive growth in key areas of our products."
+      },
+      {
+        "type": "paragraph",
+        "text": "We delivered on these goals by creating a new experience for users visiting our site. The site now shows our suite of products with great clarity; as well as our pricing tiers. Investors and stakeholders are confident with the liberties we took in revamping the brand. It’s still early but, the feedback and analytics have been great."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/01-mobile-site-compositions.webp",
+        "alt": "Mobile compositions of the new marketing site covering the financial-control pitch, the growth message, pricing at $59 monthly and the risk-reduction panel",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "When first being alerted about this project my first concern was the short timeline. We only had about 3-4 weeks to put together a site which was a short timeline for the scale of the project. Since our Head of Design was busy with other priorities and would not be available for most of the project I was assigned to lead this effort. Based on conversations with him and the COO I knew that this updated site needed to:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Meet all of the KPI’s set by stakeholders",
+          "Provide clarity around what Plastiq does and really hone in on our value props and benefits",
+          "Be WCAG compliant",
+          "Be visually stunning and engaging (There will be lots of eyes on this once we go IPO)",
+          "Evolve our image as a public company",
+          "Drive the growth of PayPro (our professional paid tier product offering)",
+          "We also wanted to take a “One Plastiq” unified approach when it comes to how we present our products"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Accomplishing this ended up being more difficult of a task than originally expected due to changes that needed to be made to our brand and also because we were starting completely from scratch. Furthermore, the previous site lacked polish and was very scattered on the ideal customer profile we were trying to attract. This led to confusion for the majority of customers we were trying to target. Some of our products were also hidden in the navigation and not featured on the home page. I rolled up my sleeves and set out to fix all these issues."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/02-desktop-page-compositions.webp",
+        "alt": "Desktop page compositions for the launched site, including the embedded payments pitch, pricing tiers and a customer testimonial",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution"
+      },
+      {
+        "type": "paragraph",
+        "text": "To begin, I had to align with the team on the project. Once the team was assembled, we all began meeting regularly so we could share updates and stay aligned. I began to create a list of tasks that needed to be done for us to accomplish our goals. First order of business was to start structuring the approach for the project. I started planning the strategy for producing the hard assets for website as well as the content that would go on it."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Planning the creative strategy"
+      },
+      {
+        "type": "paragraph",
+        "text": "I needed to get a feel for what the structure of the site would be and what the content would showcase; so I (along with another principal designer) began explorations around styling, theming, content and components for the project. We went through several design iterations (using the agile design methodology) to find what worked. Once we had a basis for what we were building and what needed to be included on the homepage, products pages and subpages we could finally start working on the global items that were needed across the project."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/03-wireframes-and-module-library.webp",
+        "alt": "Annotated wireframes for the homepage and Pay page, marked up with sticky notes and linked to the shared Figma module library",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/04-creative-strategy-explorations.webp",
+        "alt": "Creative strategy board pairing a to-do list with look-and-feel explorations at two slide ratios and a set of candidate icon styles",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Creating the framework"
+      },
+      {
+        "type": "paragraph",
+        "text": "To start building effectively we needed to create global foundations that would reused across all of the design assets. I started by bringing my own proprietary color system (with some tweaks) that I have been developing over the last couple of years to use as a basis. I also collaborated with our two principal designers to develop our spacing and typography scales from which we created all the necessary styles to create the website from an atomic scale."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/05-color-system.webp",
+        "alt": "The Plastiq colour system: eighteen named ramps including Sky for Pay, Teal for Connect and Stone for the core brand",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/06-type-ramps.webp",
+        "alt": "Global and marketing type ramps side by side, with the token tables behind each heading level and the rules for when to use which",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "We still had the question of how to tackle was the question of what to do with our brand in regards to our product suite and tiered pricing packages. The lack of cohesion and consistency throughout brand experiences was preventing us from evolving our brand and scaling. I proposed a few different ways we could execute some enhancements without creating any drastic changes to the brand. The results created a brand strategy that made sense for what we needed at the moment but, could also scale to any future needs. We ultimately decided as a team that what I proposed would be the future of the Plastiq brand."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/07-brand-logo-lockups.webp",
+        "alt": "Brand logo lockups for Plastiq, Pay, Accept and Connect on both dark and light backgrounds, each paired with the colour tokens it uses",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/08-brand-architecture-and-partners.webp",
+        "alt": "Brand architecture exploration alongside partner and customer logo lockups and pricing-tier branding",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Setting the creative tone"
+      },
+      {
+        "type": "paragraph",
+        "text": "I then started to create multiple versions and explorations around what could be the final style that we would run with. The team and I explored multiple conceptual styles for modules, templates and general things for the site. I asked the team to present all of their best work and we decided on a visual style from there. We wanted to use clear visual styles to convey what the company does clearly to potential customers and investors alike. I also brought in a previous exploration I had done for the connect product’s subpage and created new conceptual styles for the project. Over the course of a productive workshop we decided on the visual style we were going forward with."
+      },
+      {
+        "type": "paragraph",
+        "text": "The content still needed to be decided on since there was no definition around this aspect of the project. We had a general idea of what the stakeholders wanted to see and what was valuable to the user. Using that and our KPI’s we started brainstorming what should be on the homepage and other critical subpages. I again brought in previous explorations and work I had done in anticipation of the Connect page being updated. I compiled a list of general key marketing points that should be on a homepage based on a market analysis of competitors and others in the same industry. This helped the team understand what content needed to be part of this project and how we should structure ours."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/09-competitive-analysis.webp",
+        "alt": "Comparative teardown of Shopify, Stripe, Melio, PayPal, Apple Pay, Google Pay, Amazon Pay, Square and Bolt, annotated against the criteria used to judge each",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/10-connect-page-layout.webp",
+        "alt": "Page layout for Plastiq Connect covering embedded B2B payment options, enterprise APIs, developer resources and the case for platforms and marketplaces",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "After brainstorming key points with the design team we strategized on how to create and incorporate our brand tone and voice. Once we answered the questions of who we were speaking to and what we the message should be we wrapped up our content strategy session and let our Marketing/Brand Designer and Copywriter take over the writing and placement of the content."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Execution of strategy as a team"
+      },
+      {
+        "type": "paragraph",
+        "text": "I created a task list/kanban board to begin dividing work from. It was very rudimentary but effective and agile based on the timeline we were working with. We generally divided tasks based on our strengths and areas of expertise throughout the product and marketing segments. Collaboration was key for our success and the reason we worked so efficiently individually and as a team."
+      },
+      {
+        "type": "paragraph",
+        "text": "Now that all of the key pieces to build the site were in place, the team was aligned and we had a clear understanding of what we were building we began to work on the final site. I decided to take on the task of compiling all of our the work the team had done to and created the final mockup with all of the foundational elements, content and visual explorations. I made to create mockups that were pixel perfect and gave Engineering all the documentation needed to build the site."
+      },
+      {
+        "type": "paragraph",
+        "text": "Once all of the final assets were in place we began talks with Engineering and Product to make this site a reality. While there were some sacrifices that we had to make based on the timeline the Engineering team was able to deliver on time. The things that we couldn't accomplish in the first few sprints before launch we added to the backlog."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Site Launch"
+      },
+      {
+        "type": "paragraph",
+        "text": "The website was first showcased to everyone at our show and tell meeting for the entire company. Feedback was great from C-level down to IC’s. The new site provided clarity around our products and had a cohesive message and consistent brand. This brought us a step closer to fulfilling the “One Plastiq” vision. We were finally ready for launch 🙌."
+      },
+      {
+        "type": "paragraph",
+        "text": "Pre and post-launch we noticed a few small bugs and improvements that also went into the backlog, but none that were showstoppers."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/11-launched-site.webp",
+        "alt": "The launched site: the low-code embedded payments message, pricing plans, the accelerate-your-business page and the customer logo band",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Impact and Outcome"
+      },
+      {
+        "type": "paragraph",
+        "text": "The early data and feedback from customers is overwhelmingly positive. We are meeting all of our KPI’s and are continuing to improve the experience based on new data."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Customers"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Provided clear benefits of our suite of products",
+          "Created a more delightful and cohesive experience",
+          "They now have more robust optionality when choosing the correct product",
+          "Site is fully WCAG compliant"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Business"
+      },
+      {
+        "type": "list",
+        "items": [
+          "We evolved out public image as a company significantly",
+          "Drove the growth of PayPro (our professional paid tier product offering)",
+          "Fulfilled he “One Plastiq” vision"
+        ]
+      }
+    ]
   },
   {
     "id": "disney-cct",
@@ -1028,6 +1539,98 @@
     "accent": "ship",
     "challenge": "ESPN, Freeform, FX Networks, and National Geographic each had their own ad sales platform. No standardization, no cross-brand collaboration, no efficiency. Booking ads across Disney's portfolio required navigating completely different systems.",
     "approach": "Audited and analyzed complex data sets across all four brands: reporting, client relations, dashboards, internal communications. Unified nomenclature, process, and front-end UI aligned to backend architecture. Led a team of two designers. Built React components designed to plug into the Adapt design system — laying the foundation for a future-proof cross-brand system.",
-    "outcome": "All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library."
+    "outcome": "All four brands unified under the AdVisor platform. Users across Freeform, FX, and NatGeo immediately started using it and reported improved productivity over their previous systems. Laid the foundation for Disney's cross-brand Adapt design system and in-house React component library.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Background"
+      },
+      {
+        "type": "paragraph",
+        "text": "Disney had several brands under its umbrella, including ESPN, Freeform, FX Networks, National Geographic Networks, ABC, Hulu, and ABC News, each with its own ad sales platform. This created a lack of standardization and collaboration across the organization, making it difficult for users to perform tasks and book ads efficiently."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/01-fragmented-ad-platforms.webp",
+        "alt": "Disney's brands — ABC, Disney, Hulu, ABC News, Freeform, FX and National Geographic — annotated to show each was using a different platform for ad sales",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Goals"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Unify all Disney brands under one Ad Sales platform (AdVisor); previously only available to ESPN",
+          "Unify Freeform, FX Networks, and National Geographic Networks under AdVisor",
+          "Design with the intent to later use the React components to plug into Adapt design system"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Challenges: The main challenge was to unify all the brands under one platform while keeping in mind their individual needs and requirements. Additionally, the lack of resources made it difficult to conduct comprehensive research."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/02-icon-audit-findings.webp",
+        "alt": "Application audit pairing a grid of AdVisor icons with the findings: roughly 194 unique symbols, of which only 36 are custom and 158 are system icons",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Approach"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Conducted an audit and analysis of complex data sets, including reporting, client relations, dashboards/data visualization, and internal communications across all brands.",
+          "Unify the nomenclature, process, and front-end UI as it related to the backend architecture.",
+          "Worked with engineering to create React components that could be reused in future design systems.",
+          "Led a team of two designers on all these efforts while also mentoring them and other designers on the larger team."
+        ]
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/03-unified-under-advisor.webp",
+        "alt": "Funnel diagram showing all seven Disney brands consolidating onto AdVisor, noting that ESPN was already using it",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Solution"
+      },
+      {
+        "type": "paragraph",
+        "text": "Through my design efforts, we were able to unify all Disney brands under the AdVisor platform, including Freeform, FX Networks, and National Geographic Networks. We designed the platform with the intent to later use the React components to plug into the Adapt design system, making it easier for the company to standardize the process for ad sales throughout the organization, which created better visibility and collaboration across Disney brands."
+      },
+      {
+        "type": "paragraph",
+        "text": "The KPIs of the project were successfully met, as we gave users the ability to perform the tasks needed for their specific business segment while not sacrificing the old functionality for ESPN. We unified the brands not only under one platform but also one unified language, at least on the product side. As a bonus, UX and engineering started the Ad Sales design system, updated documentation, and React components. I laid the foundation for us to flip the switch on the design system when we are ready."
+      },
+      {
+        "type": "paragraph",
+        "text": "Before the release, even though we have yet to onboard some users for Freeform, all other users have already started using the application and maximizing their productivity compared to their old system. All feedback is being collected, and follow-up user interviews have also taken place, which have already been turned into user stories."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/04-advisor-proposal-view.webp",
+        "alt": "The AdVisor proposal view on desktop, showing a media plan with budget, placement and total tables",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Reflection"
+      },
+      {
+        "type": "paragraph",
+        "text": "Understanding my limitations as a researcher and knowing when to hand off a concept was very important for me. Resources were scarce in the beginning of the project, but once they came in, it became a cornucopia of ideas and perspectives. There is still lots of work that needs to be done to bring AdVisor into the 21st century, but with the strong foundation we have established, I am confident that Disney will continue to succeed in its ad sales efforts."
+      }
+    ]
   }
 ]
