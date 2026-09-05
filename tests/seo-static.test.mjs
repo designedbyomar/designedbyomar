@@ -416,3 +416,20 @@ test('case-study bodies contain no empty heading sections', () => {
     });
   });
 });
+
+test('gallery blocks ship every image in the static HTML', () => {
+  caseStudySource().filter((c) => Array.isArray(c.body)).forEach((caseStudy) => {
+    const galleries = caseStudy.body.filter((b) => b.type === 'gallery');
+    if (!galleries.length) return;
+    const html = readDist('work', caseStudy.id, 'index.html');
+
+    galleries.forEach((gallery) => {
+      assert.ok(Array.isArray(gallery.images) && gallery.images.length, `${caseStudy.id}: gallery has images`);
+      gallery.images.forEach((img) => {
+        // A grouped image is still a real <img> for consumers that never run the bundle.
+        assert.ok(html.includes(`src="${img.src}"`), `${caseStudy.id}: ${img.src} missing from static HTML`);
+        assert.ok(img.alt && img.alt.trim().length > 20, `${caseStudy.id}: ${img.src} needs descriptive alt text`);
+      });
+    });
+  });
+});

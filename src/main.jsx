@@ -1351,6 +1351,25 @@ const CaseStudyBody = ({ blocks: rawBlocks, accent }) => {
               </aside>
             );
           }
+          if (b.type === 'gallery') {
+            return (
+              <div key={i} style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: 'var(--space-4)',
+                margin: 'var(--space-4) 0',
+              }}>
+                {b.images.map((img, j) => (
+                  <figure key={j} style={{ margin: 0 }}>
+                    <img src={img.src} alt={img.alt} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', aspectRatio: '4 / 3', display: 'block', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }} />
+                    {img.caption && (
+                      <figcaption style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)' }}>{img.caption}</figcaption>
+                    )}
+                  </figure>
+                ))}
+              </div>
+            );
+          }
           if (b.type === 'image') {
             return (
               <figure key={i} style={{ width: '100%', margin: 'var(--space-4) 0' }}>

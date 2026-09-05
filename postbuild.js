@@ -272,6 +272,8 @@ function caseStudyBodyHtml(rawBody) {
         return `<blockquote><p>${esc(b.text)}</p>${b.attribution ? `<cite>${esc(b.attribution)}</cite>` : ''}</blockquote>`;
       case 'callout':
         return `<aside><h3>${esc(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
+      case 'gallery':
+        return `<div class="cs-gallery">${(b.images || []).map((img) => `<figure><img src="${esc(img.src)}" alt="${esc(img.alt || '')}">${img.caption ? `<figcaption>${esc(img.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`;
       case 'image':
         return `<figure><img src="${esc(b.src)}" alt="${esc(b.alt || '')}">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ''}</figure>`;
       default:

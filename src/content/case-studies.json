@@ -1989,22 +1989,24 @@
         "text": "CCT now has 1,600+ users that have signed up with about 150 daily users. 200,000 emails have been sent to these users since March of 2020, which includes communications for 250 critical incidents (as of October 2020). CCT has reported issues such as power outages, network losses, and alerts to relay active monitoring of pivotal events like NBA Finals, Presidential Debate, NFL Draft, Emmys and more."
       },
       {
-        "type": "image",
-        "src": "/Images/case-studies/disney-cct/25-live-sports-broadcast.webp",
-        "alt": "A live sports broadcast, one of the events an unreported network outage would disrupt",
-        "caption": ""
-      },
-      {
-        "type": "image",
-        "src": "/Images/case-studies/disney-cct/26-live-debate-broadcast.webp",
-        "alt": "A live debate broadcast, another event dependent on the networks CCT monitors",
-        "caption": ""
-      },
-      {
-        "type": "image",
-        "src": "/Images/case-studies/disney-cct/27-live-awards-broadcast.webp",
-        "alt": "A live awards broadcast, the third kind of event where an outage carries immediate cost",
-        "caption": ""
+        "type": "gallery",
+        "images": [
+          {
+            "src": "/Images/case-studies/disney-cct/25-live-sports-broadcast.webp",
+            "alt": "A live sports broadcast, one of the events an unreported network outage would disrupt",
+            "caption": ""
+          },
+          {
+            "src": "/Images/case-studies/disney-cct/26-live-debate-broadcast.webp",
+            "alt": "A live debate broadcast, another event dependent on the networks CCT monitors",
+            "caption": ""
+          },
+          {
+            "src": "/Images/case-studies/disney-cct/27-live-awards-broadcast.webp",
+            "alt": "A live awards broadcast, the third kind of event where an outage carries immediate cost",
+            "caption": ""
+          }
+        ]
       }
     ]
   },
