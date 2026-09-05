@@ -710,7 +710,177 @@
     "accent": "develop",
     "challenge": "Build a PCI-compliant embedded payments widget that would let enterprise clients integrate card and ACH payments into their own platforms — while eliminating merchant fees, expanding working capital, and onboarding partners in weeks.",
     "approach": "Worked closely with the PM to define the product vision from zero. Designed an end-to-end payment widget and developer portal through iterative wireframing and expert interviews. Baked PCI Level 1 certification into the design process from day one — not as an afterthought. Partnered with Billfire, Brex, and PayGround before launch.",
-    "outcome": "$20M+ monthly payment volume exceeded in the first month. Three strategic partnerships secured pre-launch. Clients consistently commented on the solidity and intuitiveness of the partner portal. Clients can get up and running in 8 weeks."
+    "outcome": "$20M+ monthly payment volume exceeded in the first month. Three strategic partnerships secured pre-launch. Clients consistently commented on the solidity and intuitiveness of the partner portal. Clients can get up and running in 8 weeks.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview"
+      },
+      {
+        "type": "paragraph",
+        "text": "Plastiq Connect transformed API payments, crafting an end-to-end payment widget and a developer portal. Through iterative wireframing and expert interviews, the solution achieved client recognition for its solidity and intuitive design. This project sets a new standard, emphasizing security, usability, and collaborative design in shaping the future of financial transactions."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/01-nearside-white-label-flows.webp",
+        "alt": "Nearside-branded payment screens showing account balance, transfer funds, add a contact and account menu, demonstrating the widget carrying a partner’s own branding",
+        "caption": "The widget white-labelled for Nearside: the partner’s brand, not Plastiq’s, in front of their customers."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Navigating Complexity: Designing Plastiq Connect to Tackle the Challenges of API Payments"
+      },
+      {
+        "type": "paragraph",
+        "text": "The challenge was to create a solution that provided flexibility to payers and vendors, ensuring seamless transactions across various payment methods. Plastiq Connect aimed to eliminate merchant fees, enhance security, expedite payment processes for sellers, and allow buyers to pay vendors by card regardless of acceptance. Additionally, the project focused on expanding working capital for sellers and providing a robust framework for capturing additional revenue and insights from in-product customer payments."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/02-add-payment-method-card.webp",
+        "alt": "Add payment method flow: selecting from saved cards and bank accounts, then entering cardholder name, card number, expiry, CVV, country and billing address",
+        "caption": "Adding a card, with saved cards and bank accounts selectable from the same list."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The solution: Crafting a Seamless Financial Ecosystem"
+      },
+      {
+        "type": "paragraph",
+        "text": "At the epicenter of Plastiq Connect's success was a meticulous design solution, where my daily collaboration with the product manager played a pivotal role in shaping the product's vision."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/03-review-and-confirm-payment.webp",
+        "alt": "Review payment screen showing amount, fees, total, the card being charged, delivery method by wire transfer, recipient details, invoice number and memo before submitting",
+        "caption": "Every number the payer is committing to — amount, fee, total, delivery method and recipient — on one screen before submit."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "End-to-End Payment Widget and Developer Portal: A Gateway to Innovation"
+      },
+      {
+        "type": "paragraph",
+        "text": "In close collaboration with the product manager, we set a clear vision for the product. Iterating tirelessly on wireframes, we crafted a solution that not only satisfied business needs but also ensured a seamless onboarding experience for potential clients. The design process involved countless hours of expert interviews and iteration of initial ideas and strategies. By remaining agile and respecting the collective vision of the company and potential clients, we produced a solution that stood at the intersection of innovation and usability."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Security Beyond Standards: PCI Level 1 Certification and Bank-Grade Protection"
+      },
+      {
+        "type": "paragraph",
+        "text": "The commitment to security was not just a checkbox but an integral part of the design process. The implementation of PCI Level 1 certification and bank-grade security measures was a result of continuous iteration and expert interviews. This rigorous approach reassured our partners and users, garnering frequent comments on the solidity of the product's design."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/04-connect-teal-design-tokens.webp",
+        "alt": "Design token documentation for Connect Teal: the raw hex value, the connect-teal-400 token, alias tokens for navigation states, and contrast results marked 1.81 FAIL on white text and 11.63 AAA on black",
+        "caption": "Colour documented as a chain: raw value to token to alias, with contrast results recorded against each usage."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Seamless Integration with Freedom of Choice: UI Design Excellence"
+      },
+      {
+        "type": "paragraph",
+        "text": "The UI design was a labor of love, guided by the principles of usability and clarity. Clients frequently commented on the solid design of the product, particularly highlighting the intuitiveness of the partner portal. The portal, developed through countless iterations, provided an easy way for developers to integrate Connect into their systems, ensuring a smooth and intuitive experience."
+      },
+      {
+        "type": "paragraph",
+        "text": "In essence, our design solution was not just about creating a product; it was about fostering a collaborative vision, iterating tirelessly, and respecting the diverse needs of clients. Plastiq Connect's end-to-end payment widget and developer portal, coupled with stringent security measures and an intuitive UI, emerged as a testament to the success that can be achieved through a harmonious blend of collaboration, innovation, and user-centric design."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/05-partner-portal-developer-tools.webp",
+        "alt": "Partner portal screens covering a payment volume dashboard, API key management, IP whitelisting, reporting, and per-user permission editing",
+        "caption": "The partner portal: keys, whitelisting, reporting and permissions in one place for the developer integrating the widget."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/06-v2-dashboard-concept.webp",
+        "alt": "V2 concept for the partner dashboard with payment volume charts by currency, an onboarding checklist, implementation guide and link to Connect documentation",
+        "caption": "V2 and beyond: pairing the volume data with an onboarding checklist and route into the docs."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Shaping Future Transactions"
+      },
+      {
+        "type": "paragraph",
+        "text": "Even though I was the sole (lead) product designer and architect, the journey with Plastiq Connect was a collaborative triumph. Working tirelessly alongside the product manager and business analyst, we collectively crafted a PCI-compliant end-to-end payment widget that not only met but exceeded industry standards, redefining the landscape of secure and seamless financial transactions. This was done through countless hours of expert interview and iteration of initial ideas and strategies for the product. By remaining agile and respecting and incorporating the collective vision of the company and potential clients I was able to produce"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key KPI's"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Strategic Partnerships (Pre-Launch)"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Successfully collaborated with Billfire, Brex, and PayGround",
+          "Resulted in partnerships secured before the official launch"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Monthly Payment Volume (Post-Launch)"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Exceeded $20 million monthly payment volume in the first month of launch",
+          "Demonstrated the success of teamwork, strategic design, and valuable partnerships"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Client Satisfaction"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Frequent client comments on the solidity and intuitive design",
+          "Particularly noted the intuitiveness of the partner portal"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Developer Integration Ease"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Partner portal offered an easy integration path for developers",
+          "Contributed to the overall success of Plastiq Connect in the API payments landscape",
+          "Clients can get up and running in as little as 8 weeks"
+        ]
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/07-mobile-partner-portal.webp",
+        "alt": "Partner portal rendered on mobile devices showing the payment volume dashboard, webhooks configuration, API keys and a partner invitation screen",
+        "caption": "The same portal on mobile, including webhooks, keys and the partner invitation flow."
+      },
+      {
+        "type": "quote",
+        "text": "Plastiq’s APIs enabled us to seamlessly integrate our mobile app and payments capabilities. From day one, we received a ton of support from the team at Plastiq, helping with engagement and fueling the project.",
+        "attribution": "Adam Younger, COO of Payground"
+      }
+    ]
   },
   {
     "id": "athena-ds",
