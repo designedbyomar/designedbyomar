@@ -5,6 +5,8 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Case studies: Posting Assistant body restored from the Webflow archive — 563 words, the posting-journey blueprint, the assistive review screen, file intake with Open Dental posting, and claim-level check detail, each with written alt text and a caption tying it to the argument (the source had no captions)
+- Case studies: non-rendered `todos` field for editorial notes, kept out of the published HTML rather than shipped as source comments
 - Case studies: long-form body content restored from the Webflow archive, starting with Management Portal — 1,644 words, 8 screenshots with written alt text and captions, four Operations Leadership pull quotes with attribution, and the "Why LLM, not just rules" rationale promoted to a callout. Renders below the existing Challenge / Approach / Outcome summary, so the 15-second skim is unchanged
 - Case studies: optional `body` block array rendered by React and serialized by `postbuild.js`, so images ship as real `<img>` tags in the server response rather than client-rendered only
 - Case studies: automatic table of contents on bodies over 1,200 words

@@ -500,7 +500,174 @@
     "accent": "preview",
     "challenge": "Insurance payment posting was chaotic — documents came in every format, specialists jumped between screens comparing EOBs, and every posting required manual judgment calls. Slow, error-prone, and impossible to scale.",
     "approach": "Instead of jumping to full automation, started with an assistive workflow: OCR + LLMs extracted key data from scanned insurance documents and surfaced it in a structured review interface. Preserved specialist control while reducing cognitive load. Used OBS Studio to run observational research across multiple monitors. Once trust was established, integrated with Open Dental for deeper automation.",
-    "outcome": "40% reduction in manual posting time. Transformed a messy multi-screen workflow into a structured AI-assisted tool. Created a path to scale without adding headcount, and a strong foundation for full automation in the next phase."
+    "outcome": "40% reduction in manual posting time. Transformed a messy multi-screen workflow into a structured AI-assisted tool. Created a path to scale without adding headcount, and a strong foundation for full automation in the next phase.",
+    "body": [
+      {
+        "type": "paragraph",
+        "text": "Posting Assistant was built to help Wisdom’s revenue specialists process insurance payments faster and with less manual work. We used OCR and LLMs to parse scanned EOBs, payment docs, and denial details, then surfaced that information in a structured workflow that made posting easier and faster. Later, we integrated with Open Dental, which helped reduce manual posting time by 40%."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Key impact"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Reduced manual posting time by 40%",
+          "Conducted 40+ user interviews",
+          "Turned a messy multi-screen workflow into a structured AI-assisted tool",
+          "Helped create a path from manual assistive tooling to deeper automation"
+        ]
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/posting-asst/01-posting-journey-blueprint.webp",
+        "alt": "Service blueprint of the payment posting journey, mapping the dental office's document upload against the biller's steps inside Wisdom, ending at the office's practice management system",
+        "caption": "The posting journey mapped end to end, from the office uploading documents to the biller working them inside Wisdom."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "Payment posting was one of those workflows that looked simple from the outside, but once you really got into it, it was messy and time-consuming."
+      },
+      {
+        "type": "paragraph",
+        "text": "Insurance documents came in all kinds of formats. Some were clean, some were hard to read, some had missing context, and a lot of them required interpretation. Revenue specialists had to look through the document, figure out what happened, understand why something was or wasn’t paid, and then manually enter that information into another system."
+      },
+      {
+        "type": "paragraph",
+        "text": "It was a very manual process, and it also required a lot of attention to detail. People were constantly switching between screens, comparing information, and making judgment calls. That made the work slower, harder to scale, and more mentally draining than it needed to be."
+      },
+      {
+        "type": "paragraph",
+        "text": "We saw an opportunity to make that whole process better by extracting the important information up front and giving specialists a workflow that supported the way they already worked."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My role"
+      },
+      {
+        "type": "paragraph",
+        "text": "I led the design of Posting Assistant end to end, from discovery and workflow definition through prototyping, interface design, and iteration. I worked closely with product and engineering, conducted user research, and helped define how we would measure the workflow before and after launch."
+      },
+      {
+        "type": "paragraph",
+        "text": "I also set up observational research using OBS Studio so we could watch revenue specialists work across multiple monitors in their real environment and understand where time and effort were being lost."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/posting-asst/02-review-screen-imbalance.webp",
+        "alt": "Posting Assistant review screen comparing extracted check totals against the office’s own cover sheet — $6,570.10 against $6,670.00 — flagging a $100 imbalance, beside the source EOB document",
+        "caption": "Extracted values sit beside the source document so the specialist confirms rather than retypes. A $100 imbalance is surfaced rather than silently absorbed."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Approach"
+      },
+      {
+        "type": "paragraph",
+        "text": "Instead of jumping straight to full automation, we started with an assistive workflow. OCR and LLMs extracted key information from scanned insurance documents, and the product surfaced that information in a way revenue specialists could quickly review and act on."
+      },
+      {
+        "type": "paragraph",
+        "text": "This approach helped us:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "reduce cognitive load",
+          "support trust in AI-generated output",
+          "preserve specialist control in a complex workflow",
+          "create a foundation for deeper automation later"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Once the workflow proved value, we extended it through Open Dental integration, which removed more manual work and drove a meaningful time savings."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/posting-asst/03-file-intake-and-open-dental.webp",
+        "alt": "File intake form capturing deposit totals and scan counts, alongside the Post to Open Dental patient search used to match a payment to the correct record",
+        "caption": "Intake captures the deposit once; posting to Open Dental matches the payment to a patient record without leaving the workflow."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/posting-asst/04-check-claim-detail.webp",
+        "alt": "Check detail for a $50,000 Delta Dental payment showing nine paid claims and nine still waiting to post, with submitted amount, patient responsibility and plan payment per patient",
+        "caption": "Claim-level detail for a single check, showing what has posted and what still needs attention."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Impact"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Reduced manual posting time by around 40%"
+      },
+      {
+        "type": "paragraph",
+        "text": "The biggest outcome was the reduction in manual posting time. Once we introduced the product and later integrated with Open Dental, we were able to cut manual posting time by about 40%."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Made the workflow easier on the team"
+      },
+      {
+        "type": "paragraph",
+        "text": "The product reduced how much specialists had to manually read, interpret, and re-enter on every task. Instead of starting from a blank slate every time, they were working from structured information that was already surfaced for them."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Created a path to scale without adding headcount"
+      },
+      {
+        "type": "paragraph",
+        "text": "By making the workflow more efficient, Posting Assistant helped the team handle more volume without relying on more manual effort to get there."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Built a stronger foundation for future automation"
+      },
+      {
+        "type": "paragraph",
+        "text": "The first version helped prove the value and establish trust. That made it possible to keep improving the experience and automate more over time."
+      }
+    ],
+    "todos": [
+      {
+        "anchor": "My role — after the OBS Studio paragraph",
+        "note": "The OBS observational research is described as a method but the FINDING is missing. What did you actually see specialists doing across monitors? What changed in the design because of it? This is the highest-value missing paragraph on the site."
+      },
+      {
+        "anchor": "Approach — heading",
+        "note": "This section is written entirely in \"we\" while My role is in \"I\". A reviewer cannot isolate your contribution here. Rewrite in first person."
+      },
+      {
+        "anchor": "Approach — after the assistive-workflow paragraph",
+        "note": "Alternatives rejected. Who wanted full automation? What would it have cost in specialist trust? How did you win that argument? Currently this is one clause (\"Instead of jumping straight to full automation\") and it is the Principal-level moment of the project."
+      },
+      {
+        "anchor": "Impact — section",
+        "note": "Four subsections restate the same 40% figure. Consolidate to one, or add distinct outcomes."
+      },
+      {
+        "anchor": "Image 02 — review screen",
+        "note": "LOREM IPSUM. The Notes field of the review screen still reads \"Lorem ipsum dolor sit amet consectetur...\". This is audit finding F-05 and the image is now used twice: as the case-study cover and in the body. Replace with plausible posting notes, e.g. \"Secondary claim, EOB page 2 missing. Held pending payer callback.\" Needs a re-export from you."
+      }
+    ]
   },
   {
     "id": "page-builder",
