@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Case studies: Athena Design System 2.0 body restored from the Webflow archive — 982 words and 9 images covering the device and resolution research, annotated inconsistencies, layout anatomy, the pitch deck, the governance model, the colour system, the Connect payment widget and feedback indicators. Five source captions preserved verbatim
 - Case studies: Page Builder 2.0 body restored from the Webflow archive — 693 words and 5 screenshots covering the style system, the previous builder's limits, real customer pages in the new editor, input field configuration and named colour styles, with the KPI section intact
 - Case studies: Connect API Payments body restored from the Webflow archive — 693 words, 7 screenshots with written alt text and captions, and the PayGround customer quote with attribution. Covers the Nearside white-label flows, card payment method, review and confirm, the Connect Teal token documentation, the partner portal, the V2 concept and the mobile portal
 - Case studies: Posting Assistant body restored from the Webflow archive — 563 words, the posting-journey blueprint, the assistive review screen, file intake with Open Dental posting, and claim-level check detail, each with written alt text and a caption tying it to the argument (the source had no captions)
