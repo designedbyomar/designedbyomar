@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Case studies: Critical Communication Tool body restored from the Webflow archive — 3,793 words and 27 images, the deepest case study on the site. Covers the interviews and affinity mapping, journey maps, MoSCoW prioritisation, two scrapped and rebuilt versions of the subscription manager, the responsive breakpoint specifications, skeleton loading states and usability findings, with all three user quotes attributed
 - Case studies: Plastiq Marketing Site body restored from the Webflow archive — 1,540 words and 11 images spanning the wireframes and module library, creative strategy, the colour and type systems, brand logo lockups, competitive analysis and the launched site
 - Case studies: Unified Ad Platform body restored from the Webflow archive — 491 words and 4 images covering the fragmented per-brand ad platforms, the AdVisor icon audit, the consolidation funnel and the proposal view
 - Case studies: Athena Design System 2.0 body restored from the Webflow archive — 982 words and 9 images covering the device and resolution research, annotated inconsistencies, layout anatomy, the pitch deck, the governance model, the colour system, the Connect payment widget and feedback indicators. Five source captions preserved verbatim

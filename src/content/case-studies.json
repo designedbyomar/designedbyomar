@@ -1503,7 +1503,514 @@
     "accent": "develop",
     "challenge": "A 2019 fire in Italy disrupted Disney network coverage — and the right people were never notified. The support tool was broken: key stakeholders either missed notifications entirely or were flooded with irrelevant ones. With Disney+ launching in months and the Fox acquisition underway, the stakes for fixing this were enormous.",
     "approach": "Led all UX activities solo across a large cross-functional team. Designed a self-service subscription manager that was scalable (infinitely addable brands/tags), flexible (no architecture changes for new assignments), responsive (mobile-first for commuting execs), and intuitive (correct on first login). Used hierarchical toggles, progressive disclosure, and modals to manage cognitive load. Ran usability testing and a full WCAG 2.0 compliance audit before launch.",
-    "outcome": "1,600+ users signed up. 200,000+ emails sent. 250 critical incidents communicated — covering NBA Finals, Presidential Debate, NFL Draft, Emmys, and more. SVP of Software Engineering and SVP of Technology Business Operations Strategy both praised the design publicly. Zero major bugs post-launch."
+    "outcome": "1,600+ users signed up. 200,000+ emails sent. 250 critical incidents communicated — covering NBA Finals, Presidential Debate, NFL Draft, Emmys, and more. SVP of Software Engineering and SVP of Technology Business Operations Strategy both praised the design publicly. Zero major bugs post-launch.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Role"
+      },
+      {
+        "type": "paragraph",
+        "text": "As part of this project, I was assigned to conduct all UX activities with the help of one designer during the first half of the discovery phase. Being that I was the only UX designer on the team, I led all UX initiatives for the project and worked with minimal supervision and direction to create all project deliverables. The team consisted of 2 Front-End Engineers, 2 Back-End Engineers, 2 QA Analysts, 1 Product Manager, 1 Scrum Master-Project Manager, and several other team members that moved in and out of the project as needed."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview"
+      },
+      {
+        "type": "paragraph",
+        "text": "Critical Communication Tool is an application that was built for key individuals within Disney to be notified when network outages occur. The current platform and tools at the time were insufficient. The goal was to provide users with a \"self-service subscription manager,\" and to fix the existing communications process. Throughout my discovery, I identified key pain points that were causing friction. I set out to solve these issues by paying special attention to user needs, while trying to balance business requirements as well as technical and time constraints. I audited and fixed the present support tool and designed the UI for the new subscription manager, which I throughly vetted through usability testing."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "At Disney, like most medium to large companies, there is a process in place for reporting issues as they occur. Tickets are created by the staff experiencing those issues and they are sent to the Support Center located in Bristol, CT. The Support Center serves as 'traffic control' by directing email communications for network outages, as well as monitoring live broadcasts and support for digital products (i.e. Disney+, Hulu, and more). Additionally, informational communications with less urgency are sent out as needed."
+      },
+      {
+        "type": "paragraph",
+        "text": "The suite of applications along with the process for getting these communications out to the correct people were simply not working as intended. The two biggest indicators were:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "The appropriate individuals, such as managers, technical support staff and key executives who like to stay informed, were not being notified in a timely manner or at all",
+          "These same individuals were also sometimes bombarded with notifications that did not pertain to them"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "This came to be an issue when, in July of 2019, a small fire in an Italy location disrupted network coverage. What transpired after support was requested from all accounts was utter confusion. The parties who should have been contacted were not, therefore delaying the support that the technical crews needed to pinpoint the problem."
+      },
+      {
+        "type": "paragraph",
+        "text": "It was clear that things needed to change in order to provide support efficiently and effectively. Disney+ was set to launch in a few months (November 12, 2019). Additionally, the target dates for onboarding the new brands, as a result of the FOX acquisition, were looming. Executives, Managers, and Support Center wanted to develop a system of communication that tightened the feedback loop between all parties involved."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Understanding the Users; Building Empathy"
+      },
+      {
+        "type": "paragraph",
+        "text": "To begin, I was briefed by my Director of UX on the project and introduced to the Support Center, Managers, and others from the business in charge of operations. This kicked off the Discovery phase in which I conducted a series of interviews to gain insight into the reasons the process was not working as it should."
+      },
+      {
+        "type": "paragraph",
+        "text": "During my interviews with Support Center, I learned that in the months leading up to the project they took an average of 1600 calls resulting in 1300 tickets that had to be addressed. About 150 tickets per month were 'initial criticals' meaning that these were issues that had to be taken care of immediately. These tickets were from ESPN alone, and with the Disney-FOX merger these numbers would increase exponentially. The volume was shocking, as it gave me a clearer picture behind some of the issues plaguing the Support Center. The sheer number of tickets that had to resolved, in addition to the confusion around who should be involved, were two major pain points for them."
+      },
+      {
+        "type": "quote",
+        "text": "You’re either fast or correct but, you can’t be both",
+        "attribution": "Support Center"
+      },
+      {
+        "type": "quote",
+        "text": "Sometimes we get told that its a DATG application, we’ll send the DATG notification, only to be told the wrong people got this",
+        "attribution": "Support Center"
+      },
+      {
+        "type": "paragraph",
+        "text": "I knew that the volume of tickets was not going to change. It was going to increase. But, I knew that I could make the tool for completing forms easier to fill so that notifications could be sent out quicker. I had to dig deeper into what was causing confusion when determining which parties to involve. Support Center stated the DL's (Distribution Lists) and time constraints were problematic, but I needed to learn more."
+      },
+      {
+        "type": "paragraph",
+        "text": "I set out to speak to the managers who were the users receiving the notifications. Managers are responsible for overseeing network operations and managing staff working on fixing any linear network or digital product issues. Mangers are also responsible for reaching out to Support Center to re-direct the communication if it did not pertain to them. After having a series of interviews with several managers, I started to see more of the bigger picture. The relevance of the notification to the user was hit or miss and the volume of emails made the issue even worse. One example of this volume was 115 emails in one month sent to just one manager."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/01-interview-notes.webp",
+        "alt": "Interview notes recording how notification templates were sending alerts to the wrong people, how often updates went out, and what managers said they needed control over",
+        "caption": "Notes from my interviews with the Managers"
+      },
+      {
+        "type": "paragraph",
+        "text": "I set out to speak to the managers who were the users receiving the notifications. Managers are responsible for overseeing network operations and managing staff working on fixing any linear network or digital product issues. Mangers are also responsible for reaching out to Support Center to re-direct the communication if it did not pertain to them. After having a series of interviews with several managers, I started to see more of the bigger picture. The relevance of the notification to the user was hit or miss and the volume of emails made the issue even worse. One example of this volume was 115 emails in one month sent to just one manager."
+      },
+      {
+        "type": "quote",
+        "text": "I assume Support Center manages DL's (Distribution Lists)",
+        "attribution": "Managers"
+      },
+      {
+        "type": "paragraph",
+        "text": "This same manager filled me in a bit more on how DL's function. From what I gathered, DL's had copious maintenance associated with them."
+      },
+      {
+        "type": "paragraph",
+        "text": "For example, the lists had to be updated to reflect the most current leadership and technical staff in the business segment. In an organization as large as Disney, this can be a difficult task. Because of the amount of staff and the nature of the business, the organization is in constant flux in regards to assignments. Still, it was still unclear who managed what."
+      },
+      {
+        "type": "paragraph",
+        "text": "A few things became transparent to me:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Sometimes it was not clear who should be involved to fix an issue because there isn't a clear system on who should be involved in the first place",
+          "The DLs were specific to one area (eg. Cameras) and did not account for compounded issues or related issues.",
+          "There was no clarity on who managed the DLs. Some assumed that Support Center managed them.",
+          "These DLs are not always correct and maintaining them leaves room for error."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "I put together a Journey Map to chart all of the activities that were happening concurrently when an issue was reported, in order to paint a better picture and the pain points throughout the process. I presented this and the rest of my findings during discovery to the Associate Director of UX along with the Senior Director of Technology and Operations. They then relayed this information to other stakeholders with the intent of securing a budget for the project and charting a path forward."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/02-affinity-mapping.webp",
+        "alt": "Interview findings clustered on sticky notes across a wall during affinity mapping",
+        "caption": "Initial journey map, created while interviewing users"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/03-journey-maps-synthesized.webp",
+        "alt": "Synthesized journey maps for Support Center and for Managers, set above a band showing where the two groups agreed",
+        "caption": "Synthesized journey map"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Merging User and Business Needs"
+      },
+      {
+        "type": "paragraph",
+        "text": "After more deliberation by the business, the Director of UX came back with a briefing on how to proceed explaining how the business would like their incident reporting to operate from now on. This included improving the Support Center's application and creating a new self-service subscription manager. The new subscription manager application would be called the Critical Communication Tool (CCT)."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/04-early-user-flow.webp",
+        "alt": "An early user flow connecting four screens, tracing how a manager would move from notification to managing their own subscription preferences",
+        "caption": "Figuring out the user flow"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Scalable"
+      },
+      {
+        "type": "paragraph",
+        "text": "I knew that the organization was going through a period of change, being that there were new products and newly acquired brands that might need to be added or removed from this application as needed. Therefore, I had to make CCT infinitely scalable to ensure that future changes to the app wouldn't need constant maintenance from UX and Engineering."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Flexible"
+      },
+      {
+        "type": "paragraph",
+        "text": "Based on initial discussions over the structure of the organization, I needed to figure out how to best group and align the various Disney brands and how they reported up. CCT needed to be flexible enough to easily assign new tags to the brand, without changing the architecture and placement. This allowed the service to be extended to all brands: Disney+, Freeform, Star Wars, FX, FOX, Hulu, and more."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Responsive"
+      },
+      {
+        "type": "paragraph",
+        "text": "A sentiment that was repeated by several stakeholders was that key executives in the organization would be using CCT as a resource for tracking specific issues. Additionally, they stated that the application would have to be responsive because most perform these activities while commuting. The project scope did not allow for a Progressive Web App or Bootstrap, so I had to be mindful of how we were going to handle breakpoints with a \"mobile-first\" mentality further in the project."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Intuitive"
+      },
+      {
+        "type": "paragraph",
+        "text": "All users of this application would be logging into it for the first time which meant that I had to take extra steps to ensure CCT’s simplicity, efficiency, and effectivity of use. Some users might log on once and never think to visit again, making it crucial to assure a correct subscription configuration the first time. Moreover, most users were under time constraints from their daily tasks and did not have the time to decipher an over-complicated UI."
+      },
+      {
+        "type": "paragraph",
+        "text": "I got to work wire-framing how this subscription manager could work. I created several different versions and settled on a small group that I thought satisfied the key tenets that CCT would have to exhibit. Through expert review and some deliberation, I chose the wireframe that made the most sense for the project. I set out to enlist some of the managers I previously interviewed to help me test this wireframe and validate (or refute) my assumptions."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/05-subscription-manager-v1.webp",
+        "alt": "Version one of the subscription manager, with notification types as rows and regions as columns in a single wide table",
+        "caption": "Version 1 (Scrapped after testing)"
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/06-subscription-manager-v2.webp",
+        "alt": "Version two, with each region broken into its own card so a user reads one region at a time",
+        "caption": "Version 2"
+      },
+      {
+        "type": "paragraph",
+        "text": "I started conducting usability testing around the comprehension of the structure and layout of the wireframe. Next, I had them use a basic prototype to better understand their behaviors and what interactions I would need to pay more attention to while designing the app. The results gave me the insights I needed to define a direction for the UI, interactions, and information architecture among others. I produced a new iteration of the wireframe based on my findings. This finally gave the team a visual of what we were building."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Defining the \"End State\""
+      },
+      {
+        "type": "paragraph",
+        "text": "At this time, I learned what platform and design system we would be using to craft the final interface. The design system was called Spellbook. I received a link to it and found out that it was still in its beginning stages. But, the foundation for the component library was filled out well enough to begin applying this to my current wireframes to develop the styling, in conjunction with using the DTCI branding guidelines."
+      },
+      {
+        "type": "paragraph",
+        "text": "I began having discussions with the engineers and product manager on my team to determine what our technical capabilities and time constraints were. The budget was conservative. Therefore, I had to consider creating an interface that minimized the effort for engineering, while still containing all of the functionality that would make it usable. I received more information of the project scope from the Director of UX that showed me a MoSCoW analysis. With this, we could further define the MVP (Minimum Viable Product)."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/07-mscow-prioritization.webp",
+        "alt": "Whiteboard prioritisation using MoSCoW, mapping goals to activities to tasks and sorting them across sprints",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "Taking all of these constraints into consideration, I began working on turning the wireframe that I had tested into a mockup that would factor in all of the aforementioned key tenets. Once I had something that was more defined, I took it to my UX teammates (at the time working on separate projects) for expert review and the users for more testing."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/08-regional-notification-toggles.webp",
+        "alt": "Regional notification toggles for ABC and ESPN, each offering critical alerts, non-critical alerts, remote site issues and informational updates",
+        "caption": "Early mockup"
+      },
+      {
+        "type": "paragraph",
+        "text": "This set off a series of iterations that took the interface closer to our defined end state. It also afforded the engineering team the opportunity to start working on the basic structure of the application and get a head start on development. I felt we were in a good place, as far as project deadlines went, so I started considering how to improve on the Support Center tool for sending out notifications."
+      },
+      {
+        "type": "paragraph",
+        "text": "Due to the limited scope of the project, I was only going to revamp the current Support Center tool. I started by auditing the existing UI and determining where I could make improvements. Based on key pain points that I observed with my time with them I determined that they needed to fill the form to send notifications quicker. By using the principles of Keystroke Level Modeling, I was able to determine a path forward. I made touch target sizes bigger on key selections and grouped them in a way that made sense to the user. I worked closely with users from the Support Center to ensure that the changes improved their workflow."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/09-leadership-details-and-brands.webp",
+        "alt": "Leadership details panel with brands grouped under News and Sports and under Entertainment, each independently selectable",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "The next piece was the actual notification email themselves. Even though this was not part of MVP, I worked on a few ideas that could help improve what we currently had. This included creating a string at the footer of the email containing the properties that were notified and a link to the subscription manager. That would allow the user to understand why an email was received and to be able to unsubscribe from the property if the communication did not apply to the them."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/10-notification-email.webp",
+        "alt": "The notification email itself, listing the properties a recipient is subscribed to, the incident level, and a direct link to manage their notifications",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "Once I felt that sufficient progress had been made on the project as a whole, I went back to refining the CCT subscription manager. I now shifted my focus to the Information Architecture (IA). More discussions still needed to be had behind the scenes by the product experts and stakeholders, but I started to conceptualize ways to organize the information and properties. The Director of UX and I had several whiteboarding sessions to try to align the different Disney brands to the correct business segment. Ultimately, this information was passed up the chain and the organization had the final say on what made sense."
+      },
+      {
+        "type": "paragraph",
+        "text": "Once the business came back with the grouping of brands and segments in a way that prioritized the user, it was easier to start preparing for the final stages of my creative strategy."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/11-information-architecture-map.webp",
+        "alt": "Information architecture mapped as a branching tree of every brand, region and property in the system",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/12-hierarchy-sketches.webp",
+        "alt": "Whiteboard sketches working out the top-level hierarchy across FOX, US, LATAM, PACRIM and EMEA, with rough interface layouts beside them",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Simplicity Conquers Complexity"
+      },
+      {
+        "type": "paragraph",
+        "text": "I pivoted once again to start refining what I deemed the \"make or break\" portion of the CCT subscription manager - the interactions. The reason I believed these were so important was that the content would be new to the user. The content was complicated. Besides simplifying the language, I had to display the content in an intuitive way. I accomplished this by scaffolding the information so that the user would not be overloaded."
+      },
+      {
+        "type": "paragraph",
+        "text": "The toggle selections needed to be simple to understand. By presenting the user with additional hierarchical toggles only when the user needed to see them this made it easier to consume. This technique was used by Massimo Vignelli in his design of the way-finding portion of the NYC subway system and outlined in the NYCTA Graphic Standards Manual."
+      },
+      {
+        "type": "paragraph",
+        "text": "Cognitive overload was a major concern. By only showing the information needed at the moment, the user was able to focus more on the task at hand. This also applied to the user when trying to understand what brands, business segment and/or world regions were appropriate to select. For two reasons, I chose to intentionally disrupt the user with a modal when clicking the more info icons:"
+      },
+      {
+        "type": "paragraph",
+        "text": "1. Engineering informed me that adding a popover would add scope to the project and some of the descriptions were too long to put in a smaller form of messaging."
+      },
+      {
+        "type": "paragraph",
+        "text": "2. As stated earlier, all users would be seeing the UI for the first time. Thus, there was a good chance the user needed to take a moment to understand the selection more thoroughly."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/13-property-card-popover.webp",
+        "alt": "A property card in the built application with a popover explaining what DTCI International Networks covers, so a user does not have to know the acronym",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "All of these interactions, including some smaller ones, like auto-save, were built out as prototypes for usability testing and expert review to validate the solutions. The testing helped reach the best solution for the user, while discussions with engineering helped me work within our technical constraints."
+      },
+      {
+        "type": "paragraph",
+        "text": "Now that all of the major components were fully fleshed out, it was easy to move on to the embellishing of the UI. In addition to staying true to form as a 1:1 representation of the mockup I had been testing, I worked diligently on fine-tuning the UI to stay consistent within the key tenets I laid out for the application. As recognizable as the Disney brands are, I took this as an opportunity to add a level of recognition to the tiles that I selected to represent each brand. Once I unveiled the result to the team, members became excited to work on the project."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/14-subscription-configuration.webp",
+        "alt": "The subscription configuration screen grouping media networks, ESPN networks and international networks",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "At this stage, the engineering team began their sprints; hence, it was significant to shift my focus on supporting their efforts by preparing the designs, interactions, and all other artifacts for handoff."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/15-color-annotations.webp",
+        "alt": "The interface annotated with the colour decisions applied to each element",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/16-open-closed-states.webp",
+        "alt": "Open and closed card states marked up across desktop and mobile to define the interaction",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/17-default-and-target-areas.webp",
+        "alt": "Default view and target area documented side by side, showing exactly where a user can click",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Working alongside engineering"
+      },
+      {
+        "type": "paragraph",
+        "text": "Because I had been working very closely with all team members, including engineering, they were already well aware of what we were building and how they would accomplish the task. When issues came up, we solved them as a team. We trusted in each other's expertise and pivoted to adjust our solutions slightly when needed, while not altering the current UI or sacrificing key functionality for the user."
+      },
+      {
+        "type": "paragraph",
+        "text": "The last obstacle to overcome during this project was to work with engineering in order to solve responsive breakpoints. Because I had kept this in mind from the beginning, I made the UI design modular. Since our design system had very basic functionality and documentation as far as breakpoints (and bootstrap was not available to us) I knew I had to come up with a unique solution that was simple for engineering to build. After several discussions in which engineering addressed concerns, I paved a path forward for us by creating some documentation and mockups for engineering to use a guideline."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/18-mobile-width-threshold.webp",
+        "alt": "Responsive annotation showing property cards reaching their optimal mobile width of 320 pixels at a 368 pixel viewport",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/19-full-property-grid.webp",
+        "alt": "The full property grid at 1520 pixels and above, where fixed widths and padding reach their limit",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/20-responsive-configuration-specs.webp",
+        "alt": "Responsive configuration specifications across five breakpoint bands, from 1520 and above down to 326 and below",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "We were ahead of schedule at this point. The team's constant communication gave us the ability to comprehend what we were building and to build it fast. This afforded us the time to work on refining and the adding components that were not originally a part of MVP."
+      },
+      {
+        "type": "paragraph",
+        "text": "We now shifted to the new issue of loading the components on the screen, since the system took a few seconds to display the previous selections of the user. I worked on adjusting the skeleton loading component that we had in the design system to fit our needs. I passed along the CSS to the engineers detailing the motion easing and styling."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/21-skeleton-loading-css.webp",
+        "alt": "The CSS behind the skeleton loading state, using a repeating gradient animation while previous selections load",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Last Minute Concerns"
+      },
+      {
+        "type": "paragraph",
+        "text": "The project was getting close to wrapping up. As a team, we succeeded in finishing ahead of deadlines, so we could focus on helping engineering implement things that were not originally a part of MVP, such as the string of subscription selections located at the bottom of the notification email. This helped us tighten the feedback loop for the user, understand why notifications were received, and how to change selections."
+      },
+      {
+        "type": "paragraph",
+        "text": "Stakeholders had last minute concerns about the user comprehension of verbiage in the notification labels, as well as assuring the following of accessibility guidelines. To alleviate the verbiage concerns, I formulated a preference test with elements to assess the comprehension of the labels in question. At this point, the users were seeing the final copy for the first time, since the draft had changed a few times throughout the process. The results helped to determine the path that we should take, as the qualitative data was enough to help me see exactly what the correct verbiage should be. In terms of adhering to accessibility guidelines, I performed a full audit of the application in order to find areas where accessibility may have lacked (e.g. WCAG 2.0 color contrast audit). Despite there being some small tweaks to make, the results also showed that we had done our due diligence because there were no major changes that needed to be made. We could now go into product launch with confidence."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/22-usability-test-findings.webp",
+        "alt": "Usability test findings on whether users understood interruptions under fifteen seconds, with the resulting action items",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Preparing for Product Launch"
+      },
+      {
+        "type": "paragraph",
+        "text": "All of the UX and development work was completed. The last step before launch consisted of performing final regression testing and reporting any UX bugs that came up. Additionally, I had some time to help write some stories to tackle for future releases such as adding a filtering function (which was not a part of MVP). Even though I knew I had done my due diligence in assuring that CCT would be successful, I still had that moment of nervousness before launch. The success of this app was paramount because there were lots of eyes on the project outside of just stakeholders."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/23-program-review-feedback.webp",
+        "alt": "A program review message reporting that CCT was first on the agenda and that the project update and completion were well received",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "Email blasts were sent out prior to release encouraging users to sign up. The release date came and went without a hitch. The feedback was instant, yet extremely positive. The Senior VPs overseeing the project commented on how well the application was designed and built. The team received many praises from our scrum master, to directors, and more. Weeks went by and there were no major bugs to report or complaints about the process as a whole. We commended ourselves as a team for a job well done."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/24-product-marketing-image.webp",
+        "alt": "Product marketing image showing the Critical Communication Tool across desktop, tablet and mobile",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "A Moment to Reflect"
+      },
+      {
+        "type": "paragraph",
+        "text": "It has been some time now since the project was completed. CCT was now providing the service it was built for. Support Center was more confident in sending out notifications and users felt empowered by being able to control what notifications they wanted to receive. Sticking to the key tenets I set forth for the application and working through all the iterations until I found what worked had paid dividends."
+      },
+      {
+        "type": "paragraph",
+        "text": "There were some other key team tenets that contributed to the project’s success as a whole:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Clarity"
+      },
+      {
+        "type": "paragraph",
+        "text": "Understanding what we were building from the beginning"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Efficiency"
+      },
+      {
+        "type": "paragraph",
+        "text": "Establishing a workflow that created the least amount of churn for engineering while staying agile"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Engagement"
+      },
+      {
+        "type": "paragraph",
+        "text": "The organization and leadership's involvement helped establish clear goals and intended outcomes"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Communication"
+      },
+      {
+        "type": "paragraph",
+        "text": "This helped us catch issues early and building the product as designed to even include items that were not a part of MVP"
+      },
+      {
+        "type": "paragraph",
+        "text": "CCT now has 1,600+ users that have signed up with about 150 daily users. 200,000 emails have been sent to these users since March of 2020, which includes communications for 250 critical incidents (as of October 2020). CCT has reported issues such as power outages, network losses, and alerts to relay active monitoring of pivotal events like NBA Finals, Presidential Debate, NFL Draft, Emmys and more."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/25-live-sports-broadcast.webp",
+        "alt": "A live sports broadcast, one of the events an unreported network outage would disrupt",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/26-live-debate-broadcast.webp",
+        "alt": "A live debate broadcast, another event dependent on the networks CCT monitors",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-cct/27-live-awards-broadcast.webp",
+        "alt": "A live awards broadcast, the third kind of event where an outage carries immediate cost",
+        "caption": ""
+      }
+    ]
   },
   {
     "id": "disney-uap",
