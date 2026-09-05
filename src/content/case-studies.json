@@ -490,7 +490,7 @@
       },
       {
         "value": "40+",
-        "label": "User interviews"
+        "label": "User interviews, this product"
       },
       {
         "value": "3",
@@ -515,7 +515,7 @@
         "type": "list",
         "items": [
           "Reduced manual posting time by 40%",
-          "Conducted 40+ user interviews",
+          "Conducted 40+ user interviews for Posting Assistant",
           "Turned a messy multi-screen workflow into a structured AI-assisted tool",
           "Helped create a path from manual assistive tooling to deeper automation"
         ]

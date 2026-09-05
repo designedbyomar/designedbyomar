@@ -1865,7 +1865,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What business outcomes has Omar influenced?',
-    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions, 200+ spreadsheets replaced, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
+    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, 200+ spreadsheets replaced, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
   },
 ];
 
