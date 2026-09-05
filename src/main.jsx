@@ -1238,6 +1238,7 @@ const Work = () => {
 const WorkIndexPage = () => {
   const viewportWidth = useViewportWidth();
   const headColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP;
+  const featuredColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
 
   return (
     <section style={{ padding: '40px 24px 96px' }}>
@@ -1256,8 +1257,15 @@ const WorkIndexPage = () => {
           </div>
         </Reveal>
 
-        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-8)', alignItems: 'stretch' }}>
-          {CASE_STUDIES.map((c) => <CaseCard key={c.id} c={c} />)}
+        {/* The two leading case studies keep a featured tier here, as they do on the
+            homepage — a uniform grid flattened the flagship to the same weight as
+            everything else on the page most likely to be sent to a hiring manager. */}
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: featuredColumns, gap: 'var(--space-8)', alignItems: 'stretch', marginBottom: 'var(--space-8)' }}>
+          {CASE_STUDIES.slice(0, 2).map((c) => <CaseCard key={c.id} c={c} featured />)}
+        </Reveal>
+
+        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-8)', alignItems: 'stretch' }}>
+          {CASE_STUDIES.slice(2).map((c) => <CaseCard key={c.id} c={c} />)}
         </Reveal>
       </div>
     </section>
