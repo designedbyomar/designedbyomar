@@ -167,7 +167,8 @@ test('contact section exposes the primary conversion links', async ({ page }) =>
 
   const contact = page.locator('#contact');
   await contact.scrollIntoViewIfNeeded();
-  await expect(contact.locator('.contact-card')).toHaveCount(6);
+  await expect(contact.locator('.contact-card')).toHaveCount(7);
+  await expect(contact.getByText('Book a call', { exact: true })).toBeVisible();
   await expect(contact.getByText('Email', { exact: true })).toBeVisible();
   await expect(contact.getByText('Resume / CV', { exact: true })).toBeVisible();
   await expect(contact.getByText('LinkedIn', { exact: true })).toBeVisible();
@@ -176,6 +177,10 @@ test('contact section exposes the primary conversion links', async ({ page }) =>
   await expect(contact.getByText('Behance', { exact: true })).toBeVisible();
   await expect(contact.getByRole('link', { name: /Email\s+omar@designedbyomar\.com/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
   await expect(contact.getByRole('link', { name: /Resume \/ CV\s+Open PDF/i })).toHaveAttribute('href', '/Omar%20Tavarez%20Resume.pdf');
+  // Booking is the highest-intent action, so it leads the grid.
+  const booking = contact.getByRole('link', { name: /Book a call\s+20 minutes/i });
+  await expect(booking).toHaveAttribute('href', 'https://calendar.app.google/4NcXLDoniazZ5VT78');
+  await expect(contact.locator('.contact-card').first()).toContainText('Book a call');
 });
 
 test('tracks deeper portfolio interaction analytics after consent', async ({ page }) => {
@@ -230,6 +235,18 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
     const event = events.find((entry) => entry.eventName === 'copy_email_click');
     return JSON.stringify(event?.params || {});
   })).not.toContain('omar@designedbyomar.com');
+
+  // Booking is the highest-intent contact action. Its destination and grid position are
+  // asserted in the contact-links test; only a real click proves the event name and its
+  // metadata are wired, which is what would silently break if the props were mistyped.
+  await page.context().route('https://calendar.app.google/**', (route) => route.abort());
+  const bookingPopup = page.waitForEvent('popup');
+  await page.locator('#contact').getByRole('link', { name: /Book a call\s+20 minutes/i }).click();
+  await expectLatestAnalyticsEvent(page, 'contact_click_booking', {
+    section: 'contact',
+    link_url: 'https://calendar.app.google/4NcXLDoniazZ5VT78',
+  });
+  await (await bookingPopup).close();
 
   await page.goto('/work/posting-asst/');
   await page.evaluate(() => {
