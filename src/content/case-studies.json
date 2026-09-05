@@ -1594,10 +1594,6 @@
         "caption": "Notes from my interviews with the Managers"
       },
       {
-        "type": "paragraph",
-        "text": "I set out to speak to the managers who were the users receiving the notifications. Managers are responsible for overseeing network operations and managing staff working on fixing any linear network or digital product issues. Mangers are also responsible for reaching out to Support Center to re-direct the communication if it did not pertain to them. After having a series of interviews with several managers, I started to see more of the bigger picture. The relevance of the notification to the user was hit or miss and the volume of emails made the issue even worse. One example of this volume was 115 emails in one month sent to just one manager."
-      },
-      {
         "type": "quote",
         "text": "I assume Support Center manages DL's (Distribution Lists)",
         "attribution": "Managers"
@@ -1629,8 +1625,8 @@
       },
       {
         "type": "image",
-        "src": "/Images/case-studies/disney-cct/02-affinity-mapping.webp",
-        "alt": "Interview findings clustered on sticky notes across a wall during affinity mapping",
+        "src": "/Images/case-studies/disney-cct/02-initial-journey-map.webp",
+        "alt": "The initial journey map, built from sticky notes on a wall while interviewing users, before it was synthesized",
         "caption": "Initial journey map, created while interviewing users"
       },
       {
@@ -1810,8 +1806,8 @@
       },
       {
         "type": "image",
-        "src": "/Images/case-studies/disney-cct/13-property-card-popover.webp",
-        "alt": "A property card in the built application with a popover explaining what DTCI International Networks covers, so a user does not have to know the acronym",
+        "src": "/Images/case-studies/disney-cct/13-property-card-modal.webp",
+        "alt": "The built application showing a modal that explains what DTCI International Networks covers, listing the FOX and National Geographic channels within it",
         "caption": ""
       },
       {
