@@ -5,8 +5,8 @@
     "year": "2025",
     "client": "Wisdom",
     "title": "Management Portal",
-    "subtitle": "Ops command center replacing 200+ spreadsheets with real-time intelligence.",
-    "metaDescription": "LLM-powered ops command center for Wisdom — replaced 200+ spreadsheets with real-time A/R intelligence, designed to support a 260→900 office scale.",
+    "subtitle": "Ops command center built to retire 200+ spreadsheets with real-time intelligence.",
+    "metaDescription": "LLM-powered ops command center for Wisdom — built to retire 200+ spreadsheets with real-time A/R intelligence, designed to support a 260–900 office scale.",
     "coverImage": "/Images/case-studies/management-portal/team-lead-dashboard.webp",
     "ogImage": "/Images/case-studies/management-portal/team-lead-dashboard.webp",
     "role": "Lead Product Designer — Strategy & UX Architecture",
@@ -19,12 +19,12 @@
     "metrics": [
       {
         "value": "200+",
-        "label": "Excel files replaced",
+        "label": "Excel files to retire",
         "qualifier": "Projected"
       },
       {
         "value": "260→900",
-        "label": "Office scale supported",
+        "label": "Office scale designed for",
         "qualifier": "Projected"
       },
       {

@@ -141,7 +141,7 @@ const HERO_STATS = [
   },
   {
     value: '500+ interviews',
-    label: 'Customers · operators · teams',
+    label: 'Career-wide · customers, operators, teams',
     desktop: { top: '72%', left: '-10%', maxWidth: 180 },
     mobile: { top: '63%', left: '-2%', maxWidth: 150 },
     motion: { phase: 1.8, radiusX: 7, radiusY: 5, boostX: 8, boostY: 6, parallaxX: -0.36, parallaxY: 0.10, rotate: 1.3, rotateBoost: 0.85, rotateDir: -1 },
@@ -883,7 +883,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         </a>
       </div>
       <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 3x growth • $20M+ revenue-driving workflows</span>
+        Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 1,600+ enterprise users • $20M+ revenue-driving workflows</span>
       </div>
     </div>
     <Portrait galaxy={galaxy} theme={theme} />
@@ -1831,7 +1831,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. The work helped reduce manual posting time by about 40%, replace 200+ spreadsheets, and support growth from 260 to 900+ offices.',
+    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices, and entered staged rollout in 2026. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
     links: [
       { label: 'Posting Assistant', href: '/work/posting-asst/' },
       { label: 'Management Portal', href: '/work/mgmt-portal/' },
@@ -1865,7 +1865,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What business outcomes has Omar influenced?',
-    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, 200+ spreadsheets replaced, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
+    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
   },
 ];
 
