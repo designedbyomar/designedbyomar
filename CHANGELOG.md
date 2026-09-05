@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased] - 2026-09-04
 
 ### Added
+- Case studies: Plastiq Marketing Site body restored from the Webflow archive — 1,540 words and 11 images spanning the wireframes and module library, creative strategy, the colour and type systems, brand logo lockups, competitive analysis and the launched site
 - Case studies: Unified Ad Platform body restored from the Webflow archive — 491 words and 4 images covering the fragmented per-brand ad platforms, the AdVisor icon audit, the consolidation funnel and the proposal view
 - Case studies: Athena Design System 2.0 body restored from the Webflow archive — 982 words and 9 images covering the device and resolution research, annotated inconsistencies, layout anatomy, the pitch deck, the governance model, the colour system, the Connect payment widget and feedback indicators. Five source captions preserved verbatim
 - Case studies: Page Builder 2.0 body restored from the Webflow archive — 693 words and 5 screenshots covering the style system, the previous builder's limits, real customer pages in the new editor, input field configuration and named colour styles, with the KPI section intact

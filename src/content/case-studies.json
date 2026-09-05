@@ -1234,7 +1234,240 @@
     "accent": "ship",
     "challenge": "Plastiq needed a complete site overhaul in 3–4 weeks ahead of going public. The old site lacked polish, buried products in navigation, and failed to communicate value to investors or ideal customers.",
     "approach": "Took initiative as creative lead despite no formal assignment. Created the visual language, brand direction, and content strategy. Led workshops to align an 8-person cross-functional team (design, copy, marketing, engineering). Built the design system from scratch using my proprietary color system, then directed atomic-scale production across all pages.",
-    "outcome": "Delivered on time. WCAG compliant. Drove growth in PayPro (paid tier). Fulfilled the \"One Plastiq\" unified brand vision. Early analytics and investor feedback overwhelmingly positive."
+    "outcome": "Delivered on time. WCAG compliant. Drove growth in PayPro (paid tier). Fulfilled the \"One Plastiq\" unified brand vision. Early analytics and investor feedback overwhelmingly positive.",
+    "body": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Role"
+      },
+      {
+        "type": "paragraph",
+        "text": "Team: Lead Designer: Omar Tavarez, Principal designers: Danny Lopez, Craig Cockerill, Marketing Team: Angela Luna-Chavez (Designer), Noah Sanders (Copywriter), Developers: Rony, Mark, Product Manager: Caleb"
+      },
+      {
+        "type": "paragraph",
+        "text": "Even though there wasn’t an assigned lead I took the initiative on this project. I created the visual language and brand direction. Furthermore, I led the brainstorms and workshops that brought us together as a team to create this project. Every team member brought their strengths to this project."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Project Summary"
+      },
+      {
+        "type": "paragraph",
+        "text": "Plastiq needed a new and improved website ahead of going IPO. The COO came directly to the design team with this ask based on the importance of the project and short timeline. The goal of the project was to display the benefits our suite of products to our users while revamping the brand and attracting investors. We also wanted to evolve our brand and drive growth in key areas of our products."
+      },
+      {
+        "type": "paragraph",
+        "text": "We delivered on these goals by creating a new experience for users visiting our site. The site now shows our suite of products with great clarity; as well as our pricing tiers. Investors and stakeholders are confident with the liberties we took in revamping the brand. It’s still early but, the feedback and analytics have been great."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/01-mobile-site-compositions.webp",
+        "alt": "Mobile compositions of the new marketing site covering the financial-control pitch, the growth message, pricing at $59 monthly and the risk-reduction panel",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Challenge"
+      },
+      {
+        "type": "paragraph",
+        "text": "When first being alerted about this project my first concern was the short timeline. We only had about 3-4 weeks to put together a site which was a short timeline for the scale of the project. Since our Head of Design was busy with other priorities and would not be available for most of the project I was assigned to lead this effort. Based on conversations with him and the COO I knew that this updated site needed to:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Meet all of the KPI’s set by stakeholders",
+          "Provide clarity around what Plastiq does and really hone in on our value props and benefits",
+          "Be WCAG compliant",
+          "Be visually stunning and engaging (There will be lots of eyes on this once we go IPO)",
+          "Evolve our image as a public company",
+          "Drive the growth of PayPro (our professional paid tier product offering)",
+          "We also wanted to take a “One Plastiq” unified approach when it comes to how we present our products"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Accomplishing this ended up being more difficult of a task than originally expected due to changes that needed to be made to our brand and also because we were starting completely from scratch. Furthermore, the previous site lacked polish and was very scattered on the ideal customer profile we were trying to attract. This led to confusion for the majority of customers we were trying to target. Some of our products were also hidden in the navigation and not featured on the home page. I rolled up my sleeves and set out to fix all these issues."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/02-desktop-page-compositions.webp",
+        "alt": "Desktop page compositions for the launched site, including the embedded payments pitch, pricing tiers and a customer testimonial",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Solution"
+      },
+      {
+        "type": "paragraph",
+        "text": "To begin, I had to align with the team on the project. Once the team was assembled, we all began meeting regularly so we could share updates and stay aligned. I began to create a list of tasks that needed to be done for us to accomplish our goals. First order of business was to start structuring the approach for the project. I started planning the strategy for producing the hard assets for website as well as the content that would go on it."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Planning the creative strategy"
+      },
+      {
+        "type": "paragraph",
+        "text": "I needed to get a feel for what the structure of the site would be and what the content would showcase; so I (along with another principal designer) began explorations around styling, theming, content and components for the project. We went through several design iterations (using the agile design methodology) to find what worked. Once we had a basis for what we were building and what needed to be included on the homepage, products pages and subpages we could finally start working on the global items that were needed across the project."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/03-wireframes-and-module-library.webp",
+        "alt": "Annotated wireframes for the homepage and Pay page, marked up with sticky notes and linked to the shared Figma module library",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/04-creative-strategy-explorations.webp",
+        "alt": "Creative strategy board pairing a to-do list with look-and-feel explorations at two slide ratios and a set of candidate icon styles",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Creating the framework"
+      },
+      {
+        "type": "paragraph",
+        "text": "To start building effectively we needed to create global foundations that would reused across all of the design assets. I started by bringing my own proprietary color system (with some tweaks) that I have been developing over the last couple of years to use as a basis. I also collaborated with our two principal designers to develop our spacing and typography scales from which we created all the necessary styles to create the website from an atomic scale."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/05-color-system.webp",
+        "alt": "The Plastiq colour system: eighteen named ramps including Sky for Pay, Teal for Connect and Stone for the core brand",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/06-type-ramps.webp",
+        "alt": "Global and marketing type ramps side by side, with the token tables behind each heading level and the rules for when to use which",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "We still had the question of how to tackle was the question of what to do with our brand in regards to our product suite and tiered pricing packages. The lack of cohesion and consistency throughout brand experiences was preventing us from evolving our brand and scaling. I proposed a few different ways we could execute some enhancements without creating any drastic changes to the brand. The results created a brand strategy that made sense for what we needed at the moment but, could also scale to any future needs. We ultimately decided as a team that what I proposed would be the future of the Plastiq brand."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/07-brand-logo-lockups.webp",
+        "alt": "Brand logo lockups for Plastiq, Pay, Accept and Connect on both dark and light backgrounds, each paired with the colour tokens it uses",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/08-brand-architecture-and-partners.webp",
+        "alt": "Brand architecture exploration alongside partner and customer logo lockups and pricing-tier branding",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Setting the creative tone"
+      },
+      {
+        "type": "paragraph",
+        "text": "I then started to create multiple versions and explorations around what could be the final style that we would run with. The team and I explored multiple conceptual styles for modules, templates and general things for the site. I asked the team to present all of their best work and we decided on a visual style from there. We wanted to use clear visual styles to convey what the company does clearly to potential customers and investors alike. I also brought in a previous exploration I had done for the connect product’s subpage and created new conceptual styles for the project. Over the course of a productive workshop we decided on the visual style we were going forward with."
+      },
+      {
+        "type": "paragraph",
+        "text": "The content still needed to be decided on since there was no definition around this aspect of the project. We had a general idea of what the stakeholders wanted to see and what was valuable to the user. Using that and our KPI’s we started brainstorming what should be on the homepage and other critical subpages. I again brought in previous explorations and work I had done in anticipation of the Connect page being updated. I compiled a list of general key marketing points that should be on a homepage based on a market analysis of competitors and others in the same industry. This helped the team understand what content needed to be part of this project and how we should structure ours."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/09-competitive-analysis.webp",
+        "alt": "Comparative teardown of Shopify, Stripe, Melio, PayPal, Apple Pay, Google Pay, Amazon Pay, Square and Bolt, annotated against the criteria used to judge each",
+        "caption": ""
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/10-connect-page-layout.webp",
+        "alt": "Page layout for Plastiq Connect covering embedded B2B payment options, enterprise APIs, developer resources and the case for platforms and marketplaces",
+        "caption": ""
+      },
+      {
+        "type": "paragraph",
+        "text": "After brainstorming key points with the design team we strategized on how to create and incorporate our brand tone and voice. Once we answered the questions of who we were speaking to and what we the message should be we wrapped up our content strategy session and let our Marketing/Brand Designer and Copywriter take over the writing and placement of the content."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Execution of strategy as a team"
+      },
+      {
+        "type": "paragraph",
+        "text": "I created a task list/kanban board to begin dividing work from. It was very rudimentary but effective and agile based on the timeline we were working with. We generally divided tasks based on our strengths and areas of expertise throughout the product and marketing segments. Collaboration was key for our success and the reason we worked so efficiently individually and as a team."
+      },
+      {
+        "type": "paragraph",
+        "text": "Now that all of the key pieces to build the site were in place, the team was aligned and we had a clear understanding of what we were building we began to work on the final site. I decided to take on the task of compiling all of our the work the team had done to and created the final mockup with all of the foundational elements, content and visual explorations. I made to create mockups that were pixel perfect and gave Engineering all the documentation needed to build the site."
+      },
+      {
+        "type": "paragraph",
+        "text": "Once all of the final assets were in place we began talks with Engineering and Product to make this site a reality. While there were some sacrifices that we had to make based on the timeline the Engineering team was able to deliver on time. The things that we couldn't accomplish in the first few sprints before launch we added to the backlog."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Site Launch"
+      },
+      {
+        "type": "paragraph",
+        "text": "The website was first showcased to everyone at our show and tell meeting for the entire company. Feedback was great from C-level down to IC’s. The new site provided clarity around our products and had a cohesive message and consistent brand. This brought us a step closer to fulfilling the “One Plastiq” vision. We were finally ready for launch 🙌."
+      },
+      {
+        "type": "paragraph",
+        "text": "Pre and post-launch we noticed a few small bugs and improvements that also went into the backlog, but none that were showstoppers."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/plastiq-mktg/11-launched-site.webp",
+        "alt": "The launched site: the low-code embedded payments message, pricing plans, the accelerate-your-business page and the customer logo band",
+        "caption": ""
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Impact and Outcome"
+      },
+      {
+        "type": "paragraph",
+        "text": "The early data and feedback from customers is overwhelmingly positive. We are meeting all of our KPI’s and are continuing to improve the experience based on new data."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Customers"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Provided clear benefits of our suite of products",
+          "Created a more delightful and cohesive experience",
+          "They now have more robust optionality when choosing the correct product",
+          "Site is fully WCAG compliant"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Business"
+      },
+      {
+        "type": "list",
+        "items": [
+          "We evolved out public image as a company significantly",
+          "Drove the growth of PayPro (our professional paid tier product offering)",
+          "Fulfilled he “One Plastiq” vision"
+        ]
+      }
+    ]
   },
   {
     "id": "disney-cct",
