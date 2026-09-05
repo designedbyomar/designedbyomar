@@ -230,7 +230,9 @@ test('case-study routes ship their prose in the static HTML', () => {
 
     assert.ok(caseStudy.metrics.length > 0, `${caseStudy.id} has metrics in case-studies.json`);
     caseStudy.metrics.forEach((metric) => {
-      const serializedMetric = `${escapeHtml(metric.value)} — ${escapeHtml(metric.label)}`;
+      // A qualified metric (e.g. Projected) carries that label through to the static HTML.
+      const qualifier = metric.qualifier ? ` (${escapeHtml(metric.qualifier)})` : '';
+      const serializedMetric = `${escapeHtml(metric.value)} — ${escapeHtml(metric.label)}${qualifier}`;
       assert.ok(html.includes(`<li>${serializedMetric}</li>`), `${caseStudy.id} has static metric "${serializedMetric}"`);
     });
 
@@ -257,4 +259,144 @@ test('static prose is scoped to case-study routes only', () => {
       `${page} does not carry case-study prose`,
     );
   });
+});
+
+test('migrated case-study bodies ship images and prose in the static HTML', () => {
+  const migrated = caseStudySource().filter((c) => Array.isArray(c.body) && c.body.length);
+  assert.ok(migrated.length > 0, 'at least one case study has migrated body content');
+
+  migrated.forEach((caseStudy) => {
+    const html = readDist('work', caseStudy.id, 'index.html');
+    const blocks = caseStudy.body;
+
+    // Images must be real <img> tags in the server response, not client-rendered only.
+    const images = blocks.filter((b) => b.type === 'image');
+    images.forEach((img) => {
+      assert.ok(html.includes(`src="${img.src}"`), `${caseStudy.id}: ${img.src} missing from static HTML`);
+      assert.ok(img.alt && img.alt.trim().length > 20, `${caseStudy.id}: ${img.src} needs descriptive alt text`);
+      assert.ok(html.includes(escapeHtml(img.alt)), `${caseStudy.id}: alt text for ${img.src} missing from static HTML`);
+    });
+
+    // Pull quotes keep their attribution.
+    blocks.filter((b) => b.type === 'quote').forEach((q) => {
+      assert.ok(html.includes(escapeHtml(q.text)), `${caseStudy.id}: quote missing from static HTML`);
+      if (q.attribution) {
+        assert.ok(html.includes(escapeHtml(q.attribution)), `${caseStudy.id}: quote attribution missing`);
+      }
+    });
+
+    // Prose survives the round trip.
+    blocks.filter((b) => b.type === 'paragraph').slice(0, 5).forEach((p) => {
+      assert.ok(html.includes(escapeHtml(p.text)), `${caseStudy.id}: body paragraph missing from static HTML`);
+    });
+
+    // Exactly one h1, and no heading level is skipped.
+    assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${caseStudy.id}: expected exactly one h1`);
+    const levels = [...html.matchAll(/<h([1-6])[ >]/g)].map((m) => Number(m[1]));
+    const present = [...new Set(levels)].sort();
+    present.forEach((lvl, i) => {
+      if (i > 0) assert.ok(lvl - present[i - 1] <= 1, `${caseStudy.id}: heading level jumps from h${present[i - 1]} to h${lvl}`);
+    });
+  });
+});
+
+test('projected metrics are labelled as projections', () => {
+  caseStudySource().forEach((caseStudy) => {
+    (caseStudy.metrics || []).filter((m) => m.qualifier).forEach((m) => {
+      const html = readDist('work', caseStudy.id, 'index.html');
+      assert.ok(
+        html.includes(escapeHtml(m.qualifier)),
+        `${caseStudy.id}: metric "${m.value}" is qualified as ${m.qualifier} but that never reaches the static HTML`,
+      );
+    });
+  });
+});
+
+test('case-study content ships no internal editorial metadata', () => {
+  // src/content/case-studies.json is bundled into the client JS, and this repository is
+  // public, so anything added to that file is published twice over. Editorial notes
+  // belong in the gitignored roadmap instead.
+  const INTERNAL_KEYS = ['todos', 'todo', 'notes', 'note', 'internal', 'draft', 'review'];
+  caseStudySource().forEach((caseStudy) => {
+    INTERNAL_KEYS.forEach((key) => {
+      assert.equal(
+        caseStudy[key], undefined,
+        `${caseStudy.id}: "${key}" is internal metadata and would ship in the public JS bundle`,
+      );
+    });
+  });
+
+  // And nothing note-shaped reached the built bundle by another route.
+  const assetsDir = path.join(DIST, 'assets');
+  const bundles = fs.readdirSync(assetsDir).filter((f) => f.endsWith('.js'));
+  assert.ok(bundles.length > 0, 'built JS bundles exist to scan');
+  const MARKERS = ['TODO(omar)', 'Principal-level moment', 'Lorem ipsum dolor'];
+  bundles.forEach((file) => {
+    const code = fs.readFileSync(path.join(assetsDir, file), 'utf8');
+    MARKERS.forEach((marker) => {
+      assert.ok(!code.includes(marker), `${file} contains internal marker "${marker}"`);
+    });
+  });
+});
+
+test('the client case-study module publishes only allowlisted fields', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'src', 'case-studies.js'), 'utf8');
+  assert.match(source, /PUBLIC_FIELDS/, 'client module filters fields through an allowlist');
+  assert.ok(
+    !/\.\.\.caseStudy\b/.test(source),
+    'client module must not spread the raw record — that republishes every future field',
+  );
+});
+
+test('the block model is normalized identically for both renderers', async () => {
+  const { normalizeBlocks, HEADING_LEVELS } = await import('../src/content/case-study-blocks.mjs');
+
+  // Shapes that used to render as an empty list in the static HTML while crashing the
+  // client on `b.items.map(...)` — the static build and its tests stayed green.
+  const malformed = [
+    { type: 'list' },
+    { type: 'list', items: null },
+    { type: 'callout', title: 'Kept for its title' },
+    { type: 'heading', level: 9, text: 'Out of range' },
+    { type: 'heading', text: 'No level at all' },
+    { type: 'image' },
+    { type: 'unknown-type', text: 'dropped' },
+    { type: 'paragraph', text: '   ' },
+    null,
+  ];
+
+  normalizeBlocks(malformed).forEach((block) => {
+    if (block.type === 'list' || block.type === 'callout') {
+      assert.ok(Array.isArray(block.items), `${block.type}: items must always be an array`);
+    }
+    if (block.type === 'heading') {
+      assert.ok(HEADING_LEVELS.includes(block.level), `heading level ${block.level} is not renderable`);
+    }
+    if (block.type === 'image') {
+      assert.ok(block.src, 'an image block without a src must not survive');
+    }
+  });
+
+  assert.equal(normalizeBlocks(null).length, 0, 'a missing body normalizes to an empty list');
+  assert.equal(normalizeBlocks(undefined).length, 0, 'an undefined body normalizes to an empty list');
+
+  // Real content must survive the same pass untouched in count.
+  caseStudySource().filter((c) => Array.isArray(c.body)).forEach((c) => {
+    assert.equal(
+      normalizeBlocks(c.body).length, c.body.length,
+      `${c.id}: authored content should not be dropped by normalization`,
+    );
+  });
+});
+
+test('both renderers share the block normalizer rather than guarding separately', () => {
+  const react = fs.readFileSync(path.join(ROOT, 'src', 'main.jsx'), 'utf8');
+  const staticRenderer = fs.readFileSync(path.join(ROOT, 'postbuild.js'), 'utf8');
+
+  assert.match(react, /normalizeBlocks/, 'React renderer normalizes blocks');
+  assert.match(staticRenderer, /normalizeBlocks/, 'static renderer normalizes blocks');
+  assert.ok(
+    !/\[2, 3, 4\]\.includes/.test(staticRenderer),
+    'static renderer should defer heading validation to the shared module, not re-implement it',
+  );
 });

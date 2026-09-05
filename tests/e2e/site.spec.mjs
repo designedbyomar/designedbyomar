@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const expectWorkIndex = async (page) => {
-  await expect(page).toHaveURL(/\/work$/);
+  await expect(page).toHaveURL(/\/work\/?$/);
   await expect(page.getByRole('heading', { level: 1, name: /Selected work\./i })).toBeVisible();
   await expect(page.locator('.case-card')).toHaveCount(8);
 };
@@ -70,7 +70,7 @@ test('case-study routes load directly and return to /work', async ({ page }) => 
 test('/privacy loads the privacy policy route', async ({ page }) => {
   await page.goto('/privacy');
 
-  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(page).toHaveURL(/\/privacy\/?$/);
   await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible();
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
 });
@@ -246,7 +246,7 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
 test('design system route exposes the public header and intro content', async ({ page }) => {
   await page.goto('/design-system');
 
-  await expect(page).toHaveURL(/\/design-system$/);
+  await expect(page).toHaveURL(/\/design-system\/?$/);
   await expect(page.getByRole('heading', { level: 1, name: /designedbyomar Design System/i })).toBeVisible();
   await expect(page.getByText(/powers Omar Tavarez's portfolio/i)).toBeVisible();
   await expect(page.getByText('Public design-system artifact')).toHaveCount(0);
