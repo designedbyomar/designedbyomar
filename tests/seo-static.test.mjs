@@ -347,3 +347,56 @@ test('the client case-study module publishes only allowlisted fields', () => {
     'client module must not spread the raw record — that republishes every future field',
   );
 });
+
+test('the block model is normalized identically for both renderers', async () => {
+  const { normalizeBlocks, HEADING_LEVELS } = await import('../src/content/case-study-blocks.mjs');
+
+  // Shapes that used to render as an empty list in the static HTML while crashing the
+  // client on `b.items.map(...)` — the static build and its tests stayed green.
+  const malformed = [
+    { type: 'list' },
+    { type: 'list', items: null },
+    { type: 'callout', title: 'Kept for its title' },
+    { type: 'heading', level: 9, text: 'Out of range' },
+    { type: 'heading', text: 'No level at all' },
+    { type: 'image' },
+    { type: 'unknown-type', text: 'dropped' },
+    { type: 'paragraph', text: '   ' },
+    null,
+  ];
+
+  normalizeBlocks(malformed).forEach((block) => {
+    if (block.type === 'list' || block.type === 'callout') {
+      assert.ok(Array.isArray(block.items), `${block.type}: items must always be an array`);
+    }
+    if (block.type === 'heading') {
+      assert.ok(HEADING_LEVELS.includes(block.level), `heading level ${block.level} is not renderable`);
+    }
+    if (block.type === 'image') {
+      assert.ok(block.src, 'an image block without a src must not survive');
+    }
+  });
+
+  assert.equal(normalizeBlocks(null).length, 0, 'a missing body normalizes to an empty list');
+  assert.equal(normalizeBlocks(undefined).length, 0, 'an undefined body normalizes to an empty list');
+
+  // Real content must survive the same pass untouched in count.
+  caseStudySource().filter((c) => Array.isArray(c.body)).forEach((c) => {
+    assert.equal(
+      normalizeBlocks(c.body).length, c.body.length,
+      `${c.id}: authored content should not be dropped by normalization`,
+    );
+  });
+});
+
+test('both renderers share the block normalizer rather than guarding separately', () => {
+  const react = fs.readFileSync(path.join(ROOT, 'src', 'main.jsx'), 'utf8');
+  const staticRenderer = fs.readFileSync(path.join(ROOT, 'postbuild.js'), 'utf8');
+
+  assert.match(react, /normalizeBlocks/, 'React renderer normalizes blocks');
+  assert.match(staticRenderer, /normalizeBlocks/, 'static renderer normalizes blocks');
+  assert.ok(
+    !/\[2, 3, 4\]\.includes/.test(staticRenderer),
+    'static renderer should defer heading validation to the shared module, not re-implement it',
+  );
+});

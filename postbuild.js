@@ -1,4 +1,5 @@
 const fs = require('fs');
+let normalizeBlocks = (body) => (Array.isArray(body) ? body : []); // replaced below by the shared module
 const CASE_STUDIES = require('./src/content/case-studies.json');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
@@ -253,17 +254,16 @@ function injectH1(html, text) {
 // Serializes the migrated long-form body. Consumers that never execute the bundle —
 // crawlers, AI assistants, ATS scrapers, link-preview bots — read this and nothing else,
 // so images belong here as real <img> tags, not just in the client-rendered DOM.
-function caseStudyBodyHtml(body) {
-  if (!Array.isArray(body) || !body.length) return '';
+function caseStudyBodyHtml(rawBody) {
+  const body = normalizeBlocks(rawBody);
+  if (!body.length) return '';
   const esc = escapeAttr;
-  const li = (items) => (items || []).map((i) => `<li>${esc(i)}</li>`).join('');
+  const li = (items) => items.map((i) => `<li>${esc(i)}</li>`).join('');
 
   return body.map((b) => {
     switch (b.type) {
-      case 'heading': {
-        const level = [2, 3, 4].includes(b.level) ? b.level : 3;
-        return `<h${level}>${esc(b.text)}</h${level}>`;
-      }
+      case 'heading':
+        return `<h${b.level}>${esc(b.text)}</h${b.level}>`;
       case 'paragraph':
         return `<p>${esc(b.text)}</p>`;
       case 'list':
@@ -378,6 +378,9 @@ function generateRoutes() {
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
 
-if (require.main === module) generateRoutes();
+if (require.main === module) (async () => {
+  ({ normalizeBlocks } = await import('./src/content/case-study-blocks.mjs'));
+  generateRoutes();
+})();
 
 module.exports = { injectRootContent };

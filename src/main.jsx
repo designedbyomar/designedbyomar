@@ -8,6 +8,7 @@ import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
+import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -1275,8 +1276,10 @@ const csWordCount = (blocks) => blocks.reduce(
   0,
 );
 
-const CaseStudyBody = ({ blocks, accent }) => {
-  if (!blocks || !blocks.length) return null;
+const CaseStudyBody = ({ blocks: rawBlocks, accent }) => {
+  // Normalized so this renderer and postbuild.js agree on what a block is.
+  const blocks = normalizeBlocks(rawBlocks);
+  if (!blocks.length) return null;
 
   const sections = blocks.filter((b) => b.type === 'heading' && b.level === 2);
   const showToc = csWordCount(blocks) > 1200 && sections.length > 2;
@@ -1299,7 +1302,7 @@ const CaseStudyBody = ({ blocks, accent }) => {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
         {blocks.map((b, i) => {
           if (b.type === 'heading') {
-            const Tag = `h${b.level}`;
+            const Tag = `h${b.level}`; // level is normalized to 2, 3 or 4
             const size = b.level === 2 ? 'clamp(26px, 2.6vw, 34px)' : b.level === 3 ? 'clamp(19px, 1.5vw, 22px)' : 'var(--font-size-body-xl)';
             return (
               <Tag key={i} id={b.level === 2 ? csSlug(b.text) : undefined} style={{
