@@ -236,6 +236,18 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
     return JSON.stringify(event?.params || {});
   })).not.toContain('omar@designedbyomar.com');
 
+  // Booking is the highest-intent contact action. Its destination and grid position are
+  // asserted in the contact-links test; only a real click proves the event name and its
+  // metadata are wired, which is what would silently break if the props were mistyped.
+  await page.context().route('https://calendar.app.google/**', (route) => route.abort());
+  const bookingPopup = page.waitForEvent('popup');
+  await page.locator('#contact').getByRole('link', { name: /Book a call\s+20 minutes/i }).click();
+  await expectLatestAnalyticsEvent(page, 'contact_click_booking', {
+    section: 'contact',
+    link_url: 'https://calendar.app.google/4NcXLDoniazZ5VT78',
+  });
+  await (await bookingPopup).close();
+
   await page.goto('/work/posting-asst/');
   await page.evaluate(() => {
     window.__omarAnalyticsEvents = [];
