@@ -69,6 +69,15 @@ export const normalizeBlock = (block) => {
       };
     }
 
+    // A run of related images shown side by side rather than stacked. Each entry is
+    // normalized as an image, so a malformed one is dropped rather than breaking the row.
+    case 'gallery': {
+      const images = Array.isArray(block.images)
+        ? block.images.map((image) => normalizeBlock({ ...image, type: 'image' })).filter(Boolean)
+        : [];
+      return images.length ? { type: 'gallery', images } : null;
+    }
+
     default:
       return null;
   }
