@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './design-system-page.css';
 import {
   AppIcon,
-  ArrowLeft,
   ArrowUp,
   ArrowUpRight,
   BookOpen,
@@ -709,13 +708,19 @@ const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
             <AppIcon icon={navOpen ? X : Menu} size={17} />
           </button>
           <NavLogo />
-          <a href="/" className="ds-back-link">
-            <AppIcon icon={ArrowLeft} size={13} />
-            Back to site
-          </a>
         </div>
+        {/* Mirrors the site header. Plain hrefs rather than in-app scrolling: this page is a
+            separate entry, and src/main.jsx already scrolls to a hash on arrival. */}
+        <nav className="ds-site-header__nav" aria-label="Site">
+          <a href="/work">Work</a>
+          <a href="/design-system" aria-current="page">Design System</a>
+          <a href="/#about">About</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/#contact">Contact</a>
+        </nav>
         <div className="ds-site-header__actions">
           <ThemeToggle theme={theme} setTheme={setTheme} />
+          <a className="ds-header-cta" href="/#contact">Get in touch</a>
         </div>
       </div>
     </header>
@@ -1424,6 +1429,14 @@ const DesignSystem = () => {
           activeId={activeId}
           onNavigate={handleNavigate}
         />
+        <nav className="ds-site-header__nav ds-mobile-site-nav" aria-label="Site">
+          <a href="/work">Work</a>
+          <a href="/design-system" aria-current="page">Design System</a>
+          <a href="/#about">About</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/#contact">Contact</a>
+          <a className="ds-header-cta" href="/#contact">Get in touch</a>
+        </nav>
       </div>
       <div className={`ds-layout${!navOpen ? ' sidebar-collapsed' : ''}`}>
         <aside className="ds-sidebar" hidden={!navOpen}>

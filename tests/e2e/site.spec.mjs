@@ -268,11 +268,17 @@ test('design system route exposes the public header and intro content', async ({
   await expect(page.getByText(/powers Omar Tavarez's portfolio/i)).toBeVisible();
   await expect(page.getByText('Public design-system artifact')).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('link', { name: 'designedbyomar' })).toBeVisible();
-  await expect(page.getByRole('banner').getByRole('link', { name: /Back to site/i })).toBeVisible();
-  await expect(page.getByRole('banner').getByRole('link', { name: /^Work$/ })).toHaveCount(0);
-  await expect(page.getByRole('banner').getByRole('link', { name: /^About$/ })).toHaveCount(0);
-  await expect(page.getByRole('banner').getByRole('link', { name: /^FAQ$/ })).toHaveCount(0);
-  await expect(page.getByRole('banner').getByRole('link', { name: /^Contact$/ })).toHaveCount(0);
+  // The header mirrors the site header, so the design system reads as part of the site
+  // rather than a separate microsite. "Back to site" is gone: every link returns home.
+  const banner = page.getByRole('banner');
+  await expect(banner.getByRole('link', { name: /Back to site/i })).toHaveCount(0);
+  await expect(banner.getByRole('link', { name: /^Work$/ })).toHaveAttribute('href', '/work');
+  await expect(banner.getByRole('link', { name: /^About$/ })).toHaveAttribute('href', '/#about');
+  await expect(banner.getByRole('link', { name: /^FAQ$/ })).toHaveAttribute('href', '/#faq');
+  await expect(banner.getByRole('link', { name: /^Contact$/ })).toHaveAttribute('href', '/#contact');
+  await expect(banner.getByRole('link', { name: /^Get in touch$/ })).toHaveAttribute('href', '/#contact');
+  // Marks the current section for assistive tech.
+  await expect(banner.getByRole('link', { name: /^Design System$/ })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByRole('banner').getByRole('button', { name: /design system navigation/i })).toBeVisible();
 });
 
@@ -520,6 +526,14 @@ test.describe('mobile navigation', () => {
 
     await expect(page).toHaveURL(/#buttons$/);
     await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons$/ })).toBeVisible();
+
+    // The header nav is hidden below 1054px, so the panel is the only route back to the
+    // site at this width. Without these the mobile page would offer less than every other.
+    await page.getByRole('button', { name: /Open design system navigation/i }).click();
+    const panelNav = page.locator('.ds-mobile-panel .ds-mobile-site-nav');
+    await expect(panelNav.getByRole('link', { name: /^Work$/ })).toHaveAttribute('href', '/work');
+    await expect(panelNav.getByRole('link', { name: /^Contact$/ })).toHaveAttribute('href', '/#contact');
+    await expect(panelNav.getByRole('link', { name: /^Get in touch$/ })).toBeVisible();
   });
 });
 
