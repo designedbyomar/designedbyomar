@@ -734,7 +734,28 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
     }}>
       <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-        <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
+        {/* Menu trigger sits left of the logo, matching the design-system header. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          {isMobile && (
+            <button
+              type="button"
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(open => !open)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
+                color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                cursor: 'pointer', transition: 'background var(--duration-fast)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
+            </button>
+          )}
+          <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
+        </div>
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
             <a href="/work" onClick={goSection('work')} style={navLink}
@@ -764,24 +785,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             setTheme(t);
             if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('theme_toggle', { new_theme: t });
           }} />
-          {isMobile ? (
-            <button
-              type="button"
-              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(open => !open)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
-                color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                cursor: 'pointer', transition: 'background var(--duration-fast)',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
-            </button>
-          ) : (
+          {!isMobile && (
             <a href="#contact" onClick={goSection('contact')} style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 44,
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
