@@ -76,7 +76,7 @@ npm run test:e2e    # build, preview, and Playwright browser checks
 npm run test:e2e:ui # optional interactive Playwright UI
 ```
 
-GitHub Actions runs the full suite automatically on every pull request and every push to `main`. Playwright's UI mode is local-only and requires user interaction.
+GitHub Actions runs the full suite automatically on every pull request and every push to `main`, alongside `npm audit --audit-level=high` and `npm run lint` — a high-severity advisory or a single lint warning fails the build. Playwright's UI mode is local-only and requires user interaction.
 
 Future unit tests should be added when route parsing, metadata generation, or analytics helpers are extracted from `src/main.jsx` / `postbuild.js`.
 
