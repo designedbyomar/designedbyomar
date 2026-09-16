@@ -2,7 +2,11 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-09-04
+## [Unreleased] - 2026-09-16
+
+### Fixed
+- `package.json` version synced to `1.1.5`, matching the `VERSION` file. It had been left at `1.1.1` since the 1.1.2 release, so the published package metadata understated the shipped version by four patches
+- Docs: CI description corrected in `README.md`, `docs/ai-workflow.md`, and `DEPLOYMENT_RUNBOOK.md`. All three described CI as `npm ci` → Chromium → `npm test`, omitting the `npm audit --audit-level=high` and `npm run lint` steps that have gated every build since the ESLint flat config landed. The pipeline was stronger than its own documentation claimed
 
 ### Added
 - Contact: a booking card now leads the contact grid, linking to a 20-minute intro call. Closes audit finding F-14 without adding a form — the site is static with an enforcing CSP, so a hosted form service would be blocked and would need a new processor named in the privacy policy, while a scheduler is a plain outbound link. Also listed in `llms.txt` so an assistant asked how to reach Omar can offer both routes

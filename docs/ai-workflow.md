@@ -60,7 +60,7 @@ The requester can explicitly opt out when they want changes left uncommitted or 
 ## What I deliberately did not do
 
 - **No broad unit suite yet.** A portfolio site with static case studies and route-specific metadata earns more from regression checks than component-level unit tests right now. `npm test` runs the production build, generated SEO/static assertions, and Chromium Playwright checks over the built preview.
-- **Focused CI.** `.github/workflows/ci.yml` runs `npm ci`, installs Chromium for Playwright, and runs `npm test` on every PR and push to main. Lighthouse CI is the obvious next add.
+- **Focused CI.** `.github/workflows/ci.yml` runs `npm ci`, audits dependencies (`npm audit --audit-level=high`), lints with zero tolerance for warnings (`npm run lint`), installs Chromium for Playwright, and runs `npm test` on every PR and push to main. Lighthouse CI is the obvious next add.
 - **Incremental extraction only where it removes drift.** The app is still a content-heavy SPA, but shared case-study content, route helpers/constants, and design-system documentation primitives have been pulled into focused modules where that makes metadata, tests, and future edits easier to reason about.
 
 ---
