@@ -2,7 +2,7 @@
 
 All notable changes to designedbyomar.com are documented here.
 
-## [Unreleased] - 2026-09-16
+## [1.2.0] - 2026-09-16
 
 ### Fixed
 - `package.json` version synced to `1.1.5`, matching the `VERSION` file. It had been left at `1.1.1` since the 1.1.2 release, so the published package metadata understated the shipped version by four patches
