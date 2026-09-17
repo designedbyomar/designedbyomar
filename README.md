@@ -125,6 +125,27 @@ git push -u origin fix/canonical-host
 # open PR → merge → branch auto-deleted
 ```
 
+## Releases
+
+Versions follow [semver](https://semver.org/) and are recorded in three places that must agree: the [`VERSION`](./VERSION) file, the `version` field in [`package.json`](./package.json), and the heading in [`CHANGELOG.md`](./CHANGELOG.md). Every release is tagged and published as a GitHub release.
+
+Work accumulates under `## [Unreleased]` in the changelog as it merges. Cutting a release closes that block out:
+
+```bash
+git switch main && git pull
+# bump VERSION and package.json to the same number
+# rename the CHANGELOG [Unreleased] heading to [X.Y.Z] - YYYY-MM-DD
+npm run build && npm run lint && npm test   # all must pass
+git switch -c chore/release-X.Y.Z
+# commit, push, open a PR, merge
+git switch main && git pull
+git tag -a vX.Y.Z -m "designedbyomar X.Y.Z"
+git push origin vX.Y.Z
+gh release create vX.Y.Z --title "..." --notes "..."
+```
+
+Bump **minor** when the release adds capability or changes how something is rendered or served; **patch** for fixes, copy, and maintenance. Keeping `VERSION` and `package.json` in the same commit is what stops them drifting apart.
+
 ## Quality checklist
 
 - [x] Production build passes
