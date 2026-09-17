@@ -2,6 +2,11 @@
 
 All notable changes to designedbyomar.com are documented here.
 
+## [Unreleased]
+
+### Added
+- Docs: a `Releases` section in `README.md` and a `Cutting A Release` procedure in the deployment runbook. Versions are recorded in `VERSION`, `package.json`, and the changelog heading, and all three have to agree — they drifted four patches apart between May and September 2026 because nothing read `VERSION` and no procedure existed. Covers semver choice, the verify-before-commit gate, tagging, and publishing a GitHub release
+
 ## [1.2.0] - 2026-09-16
 
 ### Fixed
