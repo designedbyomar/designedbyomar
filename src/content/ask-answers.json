@@ -183,6 +183,564 @@
       "answer": "Not something the site covers — and not something worth relaying second-hand through a bot on his own portfolio.\n\nThe history itself is public: five roles with dates, on the resume and in the work-history answer here. The reasoning behind any particular move is a conversation, not a FAQ entry.\n\nIf you're doing reference work or weighing fit, ask him directly — booking link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
       "status": "draft"
+    },
+    {
+      "id": "cs-mgmt-portal",
+      "topic": "case-study",
+      "question": "Tell me about the Wisdom Management Portal",
+      "aliases": [
+        "management portal",
+        "wisdom ops portal",
+        "office watchlist",
+        "spreadsheet replacement",
+        "ops command center"
+      ],
+      "answer": "Wisdom's ops team was running 260+ dental offices across 9 Team Leads on 200+ interconnected Google Sheets. Risk stayed invisible until it became a crisis — at-risk clients surfaced too late and capacity was opaque.\n\nHe designed a centralised command centre around an LLM-powered Office Watchlist that evaluates A/R aging signals and ranks offices by urgency, plus workforce and capacity views. The watchlist explains what changed and why it tripped, rather than just firing a rule.\n\nIts headline numbers — 200+ spreadsheets retired, scale from 260 to 900+ offices, 90%+ weekly active usage — are projected targets the design was built for, not measured results.",
+      "sources": [
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-posting-asst",
+      "topic": "case-study",
+      "question": "Tell me about Posting Assistant",
+      "aliases": [
+        "posting assistant",
+        "insurance payment posting",
+        "OCR workflow",
+        "wisdom AI product"
+      ],
+      "answer": "Insurance payment posting at Wisdom was chaotic: documents arrived in every format, specialists jumped between screens comparing EOBs, and every posting needed a judgment call.\n\nRather than automate it outright, he designed an assistive workflow. OCR and LLMs extract the key data from scanned documents and present it in a structured review interface, with the specialist still deciding. He ran observational research with OBS Studio to capture how specialists actually worked across multiple monitors, plus 40+ interviews for this product specifically.\n\nResult: about 40% less manual posting time, and a foundation for fuller automation later.",
+      "sources": [
+        "posting-asst"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-connect-api",
+      "topic": "case-study",
+      "question": "Tell me about Plastiq Connect",
+      "aliases": [
+        "connect api",
+        "plastiq connect",
+        "embedded payments widget",
+        "developer portal",
+        "PCI product"
+      ],
+      "answer": "An embedded payments product built 0→1 at Plastiq: a PCI Level 1 widget letting enterprise clients put card and ACH payments inside their own platforms, white-labelled to their brand.\n\nHe defined the product with the PM from zero and designed both the widget and the developer portal through iterative wireframing and expert interviews. PCI Level 1 was treated as a design constraint from day one rather than a compliance review at the end.\n\n$20M+ monthly volume in month one, three partnerships secured pre-launch, and client onboarding down to eight weeks.",
+      "sources": [
+        "connect-api"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-athena",
+      "topic": "case-study",
+      "question": "Tell me about the Athena Design System",
+      "aliases": [
+        "athena design system",
+        "plastiq design system",
+        "storybook",
+        "design system case study"
+      ],
+      "answer": "Plastiq's products had drifted: inconsistent components, duplicate work, engineering unable to pick up what design produced, and no governing process.\n\nHe co-led the design system effort. They audited every product holistically before building anything, then ran workshops to align product, design and engineering on principles and KPIs — deliberately doing the alignment work before producing assets. He partnered with engineering on a Storybook implementation and documented layout grid, dashboard components, the payment widget and feedback indicators.\n\nEngineering pickup time for global components dropped, 3+ products standardised on it, and it became the foundation for Plastiq's IPO-era brand.",
+      "sources": [
+        "athena-ds"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-disney-cct",
+      "topic": "case-study",
+      "question": "Tell me about the Disney Critical Communication Tool",
+      "aliases": [
+        "critical communication tool",
+        "disney CCT",
+        "incident communication",
+        "subscription manager"
+      ],
+      "answer": "In 2019 a fire in Italy disrupted Disney network coverage and the right people were never notified. The existing tool either missed stakeholders entirely or flooded them.\n\nHe led all UX solo across a large cross-functional team, designing a self-service subscription manager that was scalable — brands and tags addable without architecture changes. The work ran through interviews with the Support Center, affinity mapping, journey maps, MoSCoW prioritisation and usability testing, with two versions of the subscription manager scrapped and rebuilt.\n\n1,600+ users, 200,000+ emails sent, 250 critical incidents covered. It's the deepest case study on the site.",
+      "sources": [
+        "disney-cct"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-disney-uap",
+      "topic": "case-study",
+      "question": "Tell me about the Disney Unified Ad Platform",
+      "aliases": [
+        "unified ad platform",
+        "disney ad sales",
+        "ESPN freeform FX",
+        "ad platform consolidation"
+      ],
+      "answer": "ESPN, Freeform, FX Networks and National Geographic each ran their own ad sales platform. No standardisation, no cross-brand collaboration, and booking across Disney's portfolio meant working in four different systems.\n\nHe audited complex data sets across all four brands — reporting, client relations, dashboards, internal communications — then unified nomenclature, process and front-end UI against the backend architecture. He led two designers on it.\n\nFour brands consolidated into one system, tied to millions in booking impact.\n\nFair warning: this is the thinnest case study on the site relative to what the work involved.",
+      "sources": [
+        "disney-uap"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-page-builder",
+      "topic": "case-study",
+      "question": "Tell me about Page Builder 2.0",
+      "aliases": [
+        "page builder",
+        "simplero",
+        "no code builder",
+        "CRM page builder",
+        "churn"
+      ],
+      "answer": "Simplero's page builder was so limiting that users were writing custom CSS to work around it and threatening to move to competitors. It also blocked migration from other platforms, so it was actively driving churn.\n\nHe led the full rebuild from scratch in two months — user and expert interviews, competitive analysis, and the product requirements, since there was no PM and he owned that role. He worked directly with the Lead Engineer to ship fast.\n\nFour core capabilities shipped, contributing to a 9% increase in sales.",
+      "sources": [
+        "page-builder"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cs-plastiq-mktg",
+      "topic": "case-study",
+      "question": "Tell me about the Plastiq marketing site",
+      "aliases": [
+        "plastiq marketing site",
+        "pre IPO brand",
+        "brand relaunch",
+        "website redesign"
+      ],
+      "answer": "Plastiq needed a full site overhaul in three to four weeks ahead of going public. The old site buried products in navigation and didn't communicate value to investors or target customers.\n\nHe took the creative lead role without being formally assigned it — building the visual language, brand direction and content strategy, and running workshops to align an eight-person cross-functional team across design, copy, marketing and engineering.\n\nDelivered on the three-to-four week timeline and WCAG compliant at launch.",
+      "sources": [
+        "plastiq-mktg"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "healthcare-experience",
+      "topic": "domain",
+      "question": "Does Omar have healthcare experience?",
+      "aliases": [
+        "healthcare SaaS",
+        "medical software",
+        "health tech experience",
+        "dental",
+        "HIPAA"
+      ],
+      "answer": "Two years of it, as founding designer at Wisdom — an AI-powered dental operations platform — from February 2024 to February 2026.\n\nHe was the sole design lead across four products: Management Portal, Reporting, Insurance Verification and Posting Assistant. The work was revenue-cycle operations rather than clinical: insurance payment posting, A/R aging, claims, and the ops layer running hundreds of dental offices.\n\nThat means real exposure to regulated healthcare workflows and the people doing them — 200+ interviews at Wisdom — rather than consumer health.",
+      "sources": [
+        "posting-asst",
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "enterprise-experience",
+      "topic": "domain",
+      "question": "Has Omar worked at enterprise scale?",
+      "aliases": [
+        "enterprise experience",
+        "large company",
+        "big org",
+        "fortune 500",
+        "corporate"
+      ],
+      "answer": "Yes — two years at Disney, 2019 to 2021.\n\nHe led UX on the Critical Communication Tool, adopted by 1,600+ users and used to coordinate 250 critical incidents, and on the Unified Ad Platform that consolidated ad sales across ESPN, Freeform, FX Networks and National Geographic into one system tied to millions in bookings.\n\nEnterprise there meant the real version: four brands with their own tooling and nomenclature, large cross-functional teams, and workflows where the product failing has operational consequences.",
+      "sources": [
+        "disney-cct",
+        "disney-uap"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "zero-to-one",
+      "topic": "domain",
+      "question": "Does Omar have 0→1 experience?",
+      "aliases": [
+        "zero to one",
+        "greenfield",
+        "building from scratch",
+        "new product",
+        "early stage"
+      ],
+      "answer": "Repeatedly, and at different kinds of zero.\n\nPlastiq Connect was 0→1 on a regulated product — defined with the PM from nothing, shipped to $20M+ monthly volume in its first month. Wisdom was 0→1 on the org as well as the product: he was the founding designer, so design process, system and products all started empty.\n\nPage Builder 2.0 was a rebuild from scratch in two months with no PM, so he owned the product requirements too.\n\nHe describes his draw as hard problems with messy data, edge cases and operational constraints — which is usually what 0→1 actually looks like.",
+      "sources": [
+        "connect-api",
+        "mgmt-portal",
+        "page-builder"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "api-developer-tools",
+      "topic": "domain",
+      "question": "Has Omar designed for developers or APIs?",
+      "aliases": [
+        "developer experience",
+        "API design",
+        "devtools",
+        "designing for engineers",
+        "technical audience design"
+      ],
+      "answer": "Yes — Plastiq Connect included a developer portal alongside the payments widget, designed for engineers integrating an embedded payments product into their own platform.\n\nThat meant designing partner integration workflows and documentation surfaces for a technical audience, not just end-user screens. Clients consistently called out the portal's solidity, and onboarding time landed at eight weeks.\n\nHe also works in React and HTML/CSS/JS himself, so the handoff to engineering tends to be a conversation about implementation rather than a spec thrown over a wall.",
+      "sources": [
+        "connect-api"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "accessibility",
+      "topic": "domain",
+      "question": "How does Omar handle accessibility?",
+      "aliases": [
+        "a11y",
+        "WCAG",
+        "accessible design",
+        "screen readers",
+        "inclusive design"
+      ],
+      "answer": "He treats it as a design-system requirement rather than QA cleanup. The design system powering this site states that plainly: WCAG AA is the floor, and focus states, keyboard flows, contrast, touch targets and reduced motion are requirements rather than fixes.\n\nIn practice: the Plastiq marketing site shipped WCAG compliant at launch on a three-to-four week timeline, and the Disney Critical Communication Tool carried accessibility as an explicit tag alongside mobile-first and scalable.\n\nOn this site every moving treatment has a stable equivalent under reduced motion, and that behaviour is enforced by automated browser tests.",
+      "sources": [
+        "plastiq-mktg",
+        "disney-cct"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "brand-visual",
+      "topic": "domain",
+      "question": "Does Omar do brand and visual design?",
+      "aliases": [
+        "visual design",
+        "brand work",
+        "art direction",
+        "creative direction",
+        "marketing design"
+      ],
+      "answer": "Yes, though it isn't the centre of the practice.\n\nOn the Plastiq marketing site he took the creative lead role without being assigned it — building the visual language, brand direction and content strategy for a pre-IPO relaunch, and running workshops to align an eight-person cross-functional team.\n\nThe Athena design system fed directly into Plastiq's IPO-era brand evolution.\n\nHis background starts there: he grew up in Brooklyn as an artist and came to design through Photoshop, music covers and flyers before moving into product.",
+      "sources": [
+        "plastiq-mktg",
+        "athena-ds"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "working-with-engineers",
+      "topic": "process",
+      "question": "How does Omar work with engineers?",
+      "aliases": [
+        "engineering collaboration",
+        "working with developers",
+        "handoff process",
+        "dev partnership"
+      ],
+      "answer": "Close, and usually in the same artifacts rather than across a handoff.\n\nOn Athena he partnered with engineering on the Storybook implementation instead of shipping specs. On Page Builder 2.0 he worked directly with the Lead Engineer to ship a full rebuild in two months. On the Unified Ad Platform he aligned the front-end UI to the backend architecture rather than designing around it.\n\nHe writes React and HTML/CSS/JS, which changes the conversation — his framing is that he'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck.",
+      "sources": [
+        "athena-ds",
+        "page-builder",
+        "disney-uap"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "working-with-pms",
+      "topic": "process",
+      "question": "How does Omar work with product managers?",
+      "aliases": [
+        "PM collaboration",
+        "product partnership",
+        "working with product",
+        "stakeholder management"
+      ],
+      "answer": "As a partner in defining the product, and occasionally as the substitute for one.\n\nOn Plastiq Connect he worked with the PM to define the product vision from zero. On Page Builder 2.0 there was no PM, so he owned the product requirements himself alongside the design.\n\nHe also does the alignment work directly — co-leading workshops on Athena to set principles and KPIs, and running an eight-person cross-functional workshop on the Plastiq relaunch.\n\nHis stated preference is starting in plain text: writing, mapping the problem and naming the tradeoffs before moving to screens.",
+      "sources": [
+        "connect-api",
+        "page-builder",
+        "athena-ds"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "handling-ambiguity",
+      "topic": "process",
+      "question": "How does Omar handle ambiguous problems?",
+      "aliases": [
+        "undefined problems",
+        "messy problems",
+        "ambiguity",
+        "where does he start",
+        "unclear requirements"
+      ],
+      "answer": "He starts in writing, not in Figma.\n\nHis own description: begin in plain text — writing, mapping the problem, naming the tradeoffs and cutting through ambiguity — then move quickly into flows, prototypes and working artifacts.\n\nThe pattern shows up in the work. On Athena the audit and the alignment workshops came before any asset was produced. On Management Portal the problem arrived as 200+ interconnected spreadsheets across 260 offices, and the design work was largely deciding what risk looked like before building anything to display it.\n\nHe describes the draw as hard problems with messy data, edge cases and operational constraints.",
+      "sources": [
+        "athena-ds",
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "measuring-success",
+      "topic": "process",
+      "question": "How does Omar measure whether design worked?",
+      "aliases": [
+        "success metrics",
+        "impact measurement",
+        "how do you know it worked",
+        "outcomes",
+        "KPIs"
+      ],
+      "answer": "By what the product changed operationally, and he's careful about which numbers are earned.\n\nMeasured: about 40% less manual posting time on Posting Assistant, a 9% sales increase on Page Builder 2.0, $20M+ monthly volume in month one on Plastiq Connect, 1,600+ users and 250 critical incidents covered on Disney's Critical Communication Tool.\n\nProjected: Management Portal's targets — 200+ spreadsheets retired, 260 to 900+ offices, 90%+ weekly active usage — are what the design was built for, and the site labels them as projections rather than results.\n\nOn Athena the team set KPIs in workshops before building.",
+      "sources": [
+        "posting-asst",
+        "page-builder",
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "prototyping",
+      "topic": "process",
+      "question": "Does Omar prototype?",
+      "aliases": [
+        "prototypes",
+        "rapid prototyping",
+        "figma prototypes",
+        "does he build prototypes"
+      ],
+      "answer": "Constantly, and he'd rather prototype than present.\n\nHis stated preference: put a rough prototype in a teammate's hands rather than spend another week polishing a deck. Plastiq Connect was designed through iterative wireframing and expert interviews, and Page Builder 2.0 went from nothing to shipped in two months.\n\nBecause he works in React and HTML/CSS/JS, prototypes can go as far as real code when that's the faster way to answer the question — this site being one example.\n\nAI-assisted prototyping is listed among his core skills.",
+      "sources": [
+        "connect-api",
+        "page-builder"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "facilitation",
+      "topic": "process",
+      "question": "Does Omar run workshops or facilitate?",
+      "aliases": [
+        "workshops",
+        "facilitation",
+        "alignment sessions",
+        "design sprints",
+        "stakeholder alignment"
+      ],
+      "answer": "Yes, and usually to unblock alignment rather than as process theatre.\n\nOn Athena he co-developed a series of workshops that established the design system's KPIs, then gathered research to evangelise the system across the organisation — deliberately doing the alignment work before producing assets.\n\nOn the Plastiq marketing relaunch he ran workshops to align an eight-person cross-functional team spanning design, copy, marketing and engineering, on a three-to-four week timeline.\n\nHis own caveat on process: not for process theatre — for speed, consistency and better product quality.",
+      "sources": [
+        "athena-ds",
+        "plastiq-mktg"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "does-he-write",
+      "topic": "process",
+      "question": "Does Omar write?",
+      "aliases": [
+        "writing",
+        "substack",
+        "blog",
+        "does he publish",
+        "thought leadership"
+      ],
+      "answer": "Yes — he publishes on Substack, linked from the contact section and the footer.\n\nWriting is also part of how he works rather than a side activity. He describes starting problems in plain text: writing, mapping the problem and naming the tradeoffs before moving into design.\n\nThat shows up in the artifacts too. This repository is public and documents its own design system, deployment runbook and AI-assisted workflow in writing.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "location",
+      "topic": "practical",
+      "question": "Where is Omar based?",
+      "aliases": [
+        "location",
+        "where does he live",
+        "timezone",
+        "remote",
+        "is he in the US"
+      ],
+      "answer": "Torrington, Connecticut, working remote. US Eastern time.\n\nHis recent roles have all been remote — Wisdom was New York remote, Simplero Brooklyn remote, Plastiq San Francisco remote. The Disney role was on site in Bristol, Connecticut.\n\nSo he's worked remote with teams across US timezones for several years, and it's the default rather than an accommodation.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "availability",
+      "topic": "practical",
+      "question": "Is Omar available, and how soon?",
+      "aliases": [
+        "when can he start",
+        "availability",
+        "notice period",
+        "is he free",
+        "capacity"
+      ],
+      "answer": "He currently runs an independent practice and is embedded with Welcome Lend plus a few companies he keeps private, so availability depends on what you're asking for.\n\nFractional and consulting engagements are live options alongside full-time roles.\n\nRather than guessing at timing here, the honest answer is to ask him — there's a 20-minute intro call link in the contact section, or omar@designedbyomar.com.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "contract-or-fulltime",
+      "topic": "practical",
+      "question": "Does Omar do contract work or only full-time?",
+      "aliases": [
+        "freelance",
+        "contract",
+        "fractional",
+        "consulting",
+        "part time",
+        "full time only"
+      ],
+      "answer": "Both. He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nHis current practice is consulting and embedded work — at Welcome Lend he's an embedded senior design lead, rebuilding their design system and shipping work brokers use daily.\n\nSo a fractional or contract engagement isn't a fallback for him; it's what he's doing now.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "how-to-contact",
+      "topic": "practical",
+      "question": "How do I get in touch with Omar?",
+      "aliases": [
+        "contact",
+        "email",
+        "reach out",
+        "book a call",
+        "get in touch",
+        "hire him"
+      ],
+      "answer": "Fastest is the 20-minute intro call link in the contact section of this site.\n\nOtherwise: omar@designedbyomar.com. He's also on LinkedIn, GitHub, Substack and Behance, all linked from the contact section and the footer.\n\nHis resume is downloadable from the hero and the contact section if you need dates and titles before reaching out.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "resume",
+      "topic": "practical",
+      "question": "Can I see Omar's resume?",
+      "aliases": [
+        "cv",
+        "download resume",
+        "pdf resume",
+        "where is his resume"
+      ],
+      "answer": "Yes — it's linked from the hero and the contact section of this site as a PDF.\n\nIt covers the five most recent roles with dates and titles, a selected-impact summary, and the core expertise list. If you want the narrative version instead, the eight case studies go considerably deeper than a resume bullet can.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "how-site-built",
+      "topic": "meta",
+      "question": "How was this site built?",
+      "aliases": [
+        "what is this site built with",
+        "tech stack",
+        "did he build this site",
+        "how does this portfolio work"
+      ],
+      "answer": "He built it himself: React 19 and Vite, deployed on Vercel.\n\nA post-build step generates a real static route for every case study with its own metadata, structured data and sitemap entry — and injects the full case-study text into the HTML so crawlers, ATS scrapers and AI assistants can read it without running JavaScript.\n\nIt ships enforced security headers, consent-gated analytics, a published design system, and an automated test suite that runs on every pull request.\n\nThe repository is public, and it documents its own AI-assisted workflow in docs/ai-workflow.md.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "is-this-ai",
+      "topic": "meta",
+      "question": "Am I talking to Omar or to an AI?",
+      "aliases": [
+        "is this a bot",
+        "are you real",
+        "is this omar",
+        "chatbot or human",
+        "who am I talking to"
+      ],
+      "answer": "Neither, exactly. These answers were drafted from the case studies published on this site and then reviewed by Omar before going live — so they're pre-written rather than generated live, and nothing here is improvised.\n\nThat's deliberate. On a hiring site an assistant that invents a detail is worse than one that admits it doesn't know, so this one can only tell you things he has actually approved.\n\nIf a question isn't covered, it'll say so and point you at him rather than guess.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "what-data-collected",
+      "topic": "meta",
+      "question": "What data does this assistant collect?",
+      "aliases": [
+        "privacy",
+        "do you store my questions",
+        "is this tracked",
+        "data collection"
+      ],
+      "answer": "Nothing is sent anywhere when you ask a question — the answers are a static file already loaded in your browser, so there's no server call and no external service involved.\n\nIf you accepted analytics, the site records that a question was asked, which helps Omar see which answers are missing. If you declined, it doesn't.\n\nThe full picture is in the privacy policy, linked in the footer.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-free-work",
+      "topic": "refusal",
+      "question": "Will Omar do a design exercise or spec work?",
+      "aliases": [
+        "design test",
+        "take home",
+        "free work",
+        "spec work",
+        "design challenge",
+        "sample project"
+      ],
+      "answer": "Not something the site answers on his behalf, because it depends entirely on what's being asked and at what stage.\n\nWhat is worth saying: there are eight case studies here covering the real thing — the research, the tradeoffs, the versions that got scrapped — and the site itself is production work he wrote and shipped. That's usually a better read on how he thinks than a weekend exercise.\n\nIf you need to see something specific, ask him directly. Booking link is in the contact section.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-guarantee",
+      "topic": "refusal",
+      "question": "Can Omar guarantee similar results for us?",
+      "aliases": [
+        "will it work for us",
+        "guarantee outcomes",
+        "can he replicate",
+        "same results",
+        "promise"
+      ],
+      "answer": "No, and anyone who says yes is selling something.\n\nThe numbers on this site belong to specific products with specific constraints — a 40% posting-time reduction at Wisdom, $20M+ monthly volume at Plastiq, 1,600+ users at Disney. They describe what happened there, not what's promised elsewhere. Where a figure is a target rather than a result, the site labels it projected.\n\nWhat transfers is the approach, not the outcome. Whether it fits your situation is a conversation worth having directly.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-personal",
+      "topic": "refusal",
+      "question": "Tell me about Omar's personal life",
+      "aliases": [
+        "family",
+        "personal",
+        "age",
+        "married",
+        "politics",
+        "religion",
+        "kids"
+      ],
+      "answer": "The site keeps that brief on purpose. What's public: he's an amateur boxer, a music producer and a dedicated father, and he grew up in Brooklyn.\n\nBeyond that it isn't covered here, and it isn't relevant to whether he's right for a role.\n\nIf you're trying to get a sense of how he thinks or what he's like to work with, the About section and the case studies are the better read — or just talk to him.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-company-opinions",
+      "topic": "refusal",
+      "question": "What does Omar think about [a company or person]?",
+      "aliases": [
+        "opinion on company",
+        "what does he think of",
+        "is X a good company",
+        "thoughts on former colleague"
+      ],
+      "answer": "Not something this assistant will do — opinions about companies or people aren't published here, and relaying them second-hand through a bot on his own portfolio would be a bad idea regardless.\n\nWhat's documented is the work: where he was, what he built, what it changed.\n\nIf you want his read on something, that's a conversation. Booking link is in the contact section.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-references",
+      "topic": "refusal",
+      "question": "Can I get references or contact his former colleagues?",
+      "aliases": [
+        "references",
+        "referees",
+        "can I talk to his manager",
+        "backchannel",
+        "reference check"
+      ],
+      "answer": "Not through this site, and not through an assistant — references are his to offer, not a bot's to hand out.\n\nThere are attributed quotes from stakeholders inside the case studies, which give some sense of how the work landed with the people it was built for.\n\nFor actual references, ask him. He'll arrange them directly: booking link in the contact section, or omar@designedbyomar.com.",
+      "sources": [],
+      "status": "draft"
     }
   ]
 }
