@@ -4,6 +4,9 @@ All notable changes to designedbyomar.com are documented here.
 
 ## [Unreleased]
 
+### Fixed
+- Copy: career length corrected from "15+ years" to "10+ years" in the hero stat card and the About drawer summary, matching the resume. The published resume states 10+ years in both its title line and summary while the site claimed 15+, and the resume is linked from the hero — so a visitor could see both figures in one session. Same class of correction as the claims-accuracy pass in #60/#61. The career-wide "500+ interviews" stat is unchanged and remains scoped in its label
+
 ### Added
 - Docs: a `Releases` section in `README.md` and a `Cutting A Release` procedure in the deployment runbook. Versions are recorded in `VERSION`, `package.json`, and the changelog heading, and all three have to agree — they drifted four patches apart between May and September 2026 because nothing read `VERSION` and no procedure existed. Covers semver choice, the verify-before-commit gate, tagging, and publishing a GitHub release
 
