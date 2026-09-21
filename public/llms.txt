@@ -20,7 +20,7 @@ Book a call: [20-minute intro call](https://calendar.app.google/4NcXLDoniazZ5VT7
 - [Athena Design System 2.0](https://www.designedbyomar.com/work/athena-ds/) : enterprise design system behind Plastiq's IPO-era brand
 - [Plastiq Marketing Site](https://www.designedbyomar.com/work/plastiq-mktg/) : fintech marketing site and conversion flow
 - [Critical Communication Tool](https://www.designedbyomar.com/work/disney-cct/) : enterprise broadcast communication workflow
-- [Unified Ad Platform](https://www.designedbyomar.com/work/disney-uap/) : ad operations and campaign management platform
+- [Unified Ad Platform](https://www.designedbyomar.com/work/disney-uap/) : consolidating Disney ad-sales brands onto AdVisor without regressing the ESPN baseline
 
 ## Topics
 - product design
