@@ -1,0 +1,188 @@
+{
+  "_note": "Pre-generated answers for the Ask assistant. Drafted from the site's own published prose and the resume, then reviewed by hand. Only status:'approved' entries ship — see scripts/build-ask-corpus.mjs and the content tests.",
+  "_voice": "Third person. 'Omar' and 'he', never 'I'. Verdict first, then specifics, then let the citation cards carry the rest.",
+  "answers": [
+    {
+      "id": "design-systems",
+      "topic": "design-systems",
+      "question": "Has Omar built design systems at scale?",
+      "aliases": [
+        "design system experience",
+        "has he built a design system",
+        "design systems at scale",
+        "design system work",
+        "does he do design systems",
+        "design tokens experience"
+      ],
+      "answer": "Yes — three, and he treats them as infrastructure for a team rather than a personal artifact.\n\nAthena Design System 2.0 at Plastiq is the deepest. He co-led it, audited every product to find where nomenclature and patterns had diverged, then ran workshops to align product, design and engineering on principles and KPIs before producing a single asset. He partnered with engineering on the Storybook implementation, and it became the foundation for Plastiq's IPO-era brand — 3+ products standardised on it.\n\nHe rebuilt the design system at Welcome Lend in his current practice. The third runs this portfolio and is published at /design-system.",
+      "sources": [
+        "athena-ds"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "fintech-depth",
+      "topic": "fintech",
+      "question": "What's Omar's fintech and payments experience?",
+      "aliases": [
+        "fintech experience",
+        "payments experience",
+        "has he worked in fintech",
+        "financial services background",
+        "PCI compliance experience",
+        "embedded payments"
+      ],
+      "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — and it was 0→1 on a regulated product.\n\nPlastiq Connect is a PCI Level 1 embedded payments widget that let enterprise clients put card and ACH payments inside their own platforms. He defined the product with the PM from zero, designed both the widget and the developer portal, and treated PCI Level 1 as a design constraint from day one rather than a compliance pass at the end.\n\nIt cleared $20M+ in monthly volume in month one, with three partnerships secured pre-launch and client onboarding down to eight weeks.\n\nWorth saying plainly: the published case study is shorter than the credential deserves.",
+      "sources": [
+        "connect-api"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ai-llm-work",
+      "topic": "ai",
+      "question": "What AI or LLM work has Omar actually shipped?",
+      "aliases": [
+        "AI experience",
+        "has he shipped AI products",
+        "LLM product design",
+        "machine learning work",
+        "AI workflow design",
+        "what AI has he built"
+      ],
+      "answer": "Two products at Wisdom, both designed so the model assists rather than decides.\n\nPosting Assistant handles insurance payment posting. OCR and LLMs pull data out of scanned documents and surface it in a structured review interface, but specialists keep the judgment calls. He chose the assistive path over full automation deliberately, to preserve specialist trust. It cut manual posting time by about 40%.\n\nManagement Portal includes an LLM-powered Office Watchlist that flags offices when A/R aging crosses thresholds — over-60 and over-90 balances, week-over-week spikes — and explains what changed rather than just reporting that a rule fired. Its outcome metrics are projected rather than measured.",
+      "sources": [
+        "posting-asst",
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "leadership-or-ic",
+      "topic": "leadership",
+      "question": "Is Omar a design leader or an individual contributor?",
+      "aliases": [
+        "has he managed designers",
+        "does he lead teams",
+        "leadership experience",
+        "is he hands on",
+        "team lead or IC",
+        "has he managed people"
+      ],
+      "answer": "Both, and the roles track it.\n\nHe was the founding and sole design lead at Wisdom for two years, owning design across Management Portal, Reporting, Insurance Verification and Posting Assistant. At Plastiq he co-led the Athena design system and ran the cross-functional workshops that set its principles. On Disney's Unified Ad Platform he led two designers.\n\nHe's stayed hands-on throughout. He describes his current engagements as equal parts consulting and building — as likely to be rebuilding a design system as shipping a feature to production.\n\nIf you're hiring a lead who still works in the file, that's the shape of it.",
+      "sources": [
+        "athena-ds",
+        "disney-uap",
+        "mgmt-portal"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "technical-depth",
+      "topic": "technical",
+      "question": "Is Omar actually technical, or only a designer?",
+      "aliases": [
+        "can he code",
+        "does he write code",
+        "technical skills",
+        "is he a design engineer",
+        "front end ability",
+        "does he work in react"
+      ],
+      "answer": "He writes production code, and this site is the evidence.\n\nIt's a React and Vite build he wrote himself: a generated static route per case study, enforced security headers, consent-gated analytics, and an automated test suite that runs on every pull request. Not a template.\n\nDay to day he works in Figma, React, HTML, CSS and JavaScript, and uses Claude Code, ChatGPT and Codex inside the design workflow rather than beside it.\n\nOn Athena he partnered with engineering on the Storybook implementation instead of handing off specs. His own framing: he'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck.",
+      "sources": [
+        "athena-ds"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "research-process",
+      "topic": "research",
+      "question": "What does Omar's research process look like?",
+      "aliases": [
+        "how does he do user research",
+        "research methods",
+        "does he talk to users",
+        "discovery process",
+        "user interviews",
+        "how does he validate"
+      ],
+      "answer": "He starts by watching people work rather than asking them what they want.\n\nOn Posting Assistant he ran observational research using OBS Studio to capture the multiple monitors specialists actually worked across, alongside 40+ interviews for that product specifically.\n\nOn Disney's Critical Communication Tool he interviewed the Support Center and found they were handling roughly 1,600 calls a month, producing about 1,300 tickets, with around 150 initial criticals. That number shaped what got built. The work ran through affinity mapping, journey maps, MoSCoW prioritisation and usability testing.\n\nAcross his career he puts the interview count at 500+, including 200+ at Wisdom.",
+      "sources": [
+        "posting-asst",
+        "disney-cct"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "work-history",
+      "topic": "background",
+      "question": "Where has Omar worked, and for how long?",
+      "aliases": [
+        "work history",
+        "employment history",
+        "career timeline",
+        "where has he worked",
+        "previous companies",
+        "how long at each job",
+        "resume summary"
+      ],
+      "answer": "Five roles, most recent first.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice, embedded with Welcome Lend plus a few companies he keeps private.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Sole designer on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
+      "sources": [
+        "mgmt-portal",
+        "connect-api",
+        "disney-cct"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "looking-for",
+      "topic": "hiring",
+      "question": "What kind of role is Omar looking for?",
+      "aliases": [
+        "is he available",
+        "what roles is he open to",
+        "is he looking for work",
+        "full time or contract",
+        "can we hire him",
+        "is he open to opportunities"
+      ],
+      "answer": "He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nThe work he's drawn to is consistent: hard product problems with messy data, edge cases, operational constraints and users whose job depends on the thing working. Complex B2B, AI workflows, fintech, healthcare SaaS, enterprise platforms.\n\nHe currently runs an independent practice and is embedded with Welcome Lend, so fractional and consulting engagements are live options alongside full-time.\n\nThe fastest way to find out whether it's a fit is to ask him — there's a 20-minute intro call link in the contact section.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-compensation",
+      "topic": "refusal",
+      "question": "What are Omar's salary expectations?",
+      "aliases": [
+        "how much does he cost",
+        "rate",
+        "compensation expectations",
+        "what does he charge",
+        "day rate",
+        "salary range",
+        "budget"
+      ],
+      "answer": "Fair question, and it isn't published on the site.\n\nIt genuinely depends on scope, level, and whether the engagement is full-time, fractional or consulting — those land in different places.\n\nThe fastest path is to ask him directly. There's a 20-minute intro call link in the contact section, or email omar@designedbyomar.com. If you can say roughly what the role is and where the budget sits, he'll tell you straight away whether it's worth both your time.",
+      "sources": [],
+      "status": "draft"
+    },
+    {
+      "id": "refuse-employer-opinions",
+      "topic": "refusal",
+      "question": "Why did Omar leave his last role?",
+      "aliases": [
+        "why did he leave",
+        "what went wrong at",
+        "opinion on former employer",
+        "did he get fired",
+        "problems with previous manager",
+        "why is he looking"
+      ],
+      "answer": "Not something the site covers — and not something worth relaying second-hand through a bot on his own portfolio.\n\nThe history itself is public: five roles with dates, on the resume and in the work-history answer here. The reasoning behind any particular move is a conversation, not a FAQ entry.\n\nIf you're doing reference work or weighing fit, ask him directly — booking link in the contact section, or omar@designedbyomar.com.",
+      "sources": [],
+      "status": "draft"
+    }
+  ]
+}
