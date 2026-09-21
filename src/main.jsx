@@ -1820,23 +1820,23 @@ const KeyFacts = () => {
 const FAQ_ITEMS = [
   {
     question: 'What kind of product designer is Omar?',
-    answer: 'I am a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. I work across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
+    answer: 'Omar is a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. He works across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
   },
   {
     question: 'What types of companies is Omar best suited for?',
-    answer: 'I am strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
+    answer: 'He is strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
   },
   {
     question: 'Is Omar more of a design leader or an individual contributor?',
-    answer: 'Both. I operate at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
+    answer: 'Both. He operates at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
   },
   {
     question: 'What kinds of problems should a team bring Omar in to solve?',
-    answer: 'Bring me in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. My work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
+    answer: 'Bring him in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. His work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
   },
   {
     question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
+    answer: 'At Wisdom, Omar designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
     links: [
       { label: 'Posting Assistant', href: '/work/posting-asst/' },
       { label: 'Management Portal', href: '/work/mgmt-portal/' },
@@ -1844,14 +1844,14 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is Omar’s experience with fintech and embedded payments?',
-    answer: 'At Plastiq, I led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
+    answer: 'At Plastiq, Omar led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
     links: [
       { label: 'Connect API Payments', href: '/work/connect-api/' },
     ],
   },
   {
     question: 'What enterprise product experience does Omar have?',
-    answer: 'At Disney, I designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
+    answer: 'At Disney, Omar designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
     links: [
       { label: 'Critical Communication Tool', href: '/work/disney-cct/' },
       { label: 'Unified Ad Platform', href: '/work/disney-uap/' },
@@ -1859,18 +1859,18 @@ const FAQ_ITEMS = [
   },
   {
     question: 'How does Omar approach design systems?',
-    answer: 'I treat design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, I co-led Athena Design System 2.0.',
+    answer: 'He treats design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, he co-led Athena Design System 2.0.',
     links: [
       { label: 'Athena Design System 2.0', href: '/work/athena-ds/' },
     ],
   },
   {
     question: 'How does Omar work with founders and engineers?',
-    answer: 'I move between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
+    answer: 'He moves between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
   },
   {
     question: 'What business outcomes has Omar influenced?',
-    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
+    answer: 'His work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
   },
 ];
 

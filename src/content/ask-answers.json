@@ -32,7 +32,7 @@
         "PCI compliance experience",
         "embedded payments"
       ],
-      "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — and it was 0→1 on a regulated product.\n\nPlastiq Connect is a PCI Level 1 embedded payments widget that let enterprise clients put card and ACH payments inside their own platforms. He defined the product with the PM from zero, designed both the widget and the developer portal, and treated PCI Level 1 as a design constraint from day one rather than a compliance pass at the end.\n\nIt cleared $20M+ in monthly volume in month one, with three partnerships secured pre-launch and client onboarding down to eight weeks.\n\nWorth saying plainly: the published case study is shorter than the credential deserves.",
+      "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — and it was 0→1 on a regulated product.\n\nPlastiq Connect is a PCI Level 1 embedded payments widget that let enterprise clients put card and ACH payments inside their own platforms. He defined the product with the PM from zero, designed both the widget and the developer portal, and treated PCI Level 1 as a design constraint from day one rather than a compliance pass at the end.\n\nIt cleared $20M+ in monthly volume in month one, with three partnerships secured pre-launch and client onboarding down to eight weeks.",
       "sources": [
         "connect-api"
       ],
@@ -276,7 +276,7 @@
         "ESPN freeform FX",
         "ad platform consolidation"
       ],
-      "answer": "ESPN, Freeform, FX Networks and National Geographic each ran their own ad sales platform. No standardisation, no cross-brand collaboration, and booking across Disney's portfolio meant working in four different systems.\n\nHe audited complex data sets across all four brands — reporting, client relations, dashboards, internal communications — then unified nomenclature, process and front-end UI against the backend architecture. He led two designers on it.\n\nFour brands consolidated into one system, tied to millions in booking impact.\n\nFair warning: this is the thinnest case study on the site relative to what the work involved.",
+      "answer": "ESPN, Freeform, FX Networks and National Geographic each ran their own ad sales platform. No standardisation, no cross-brand collaboration, and booking across Disney's portfolio meant working in four different systems.\n\nHe audited complex data sets across all four brands — reporting, client relations, dashboards, internal communications — then unified nomenclature, process and front-end UI against the backend architecture. He led two designers on it.\n\nFour brands consolidated into one system, tied to millions in booking impact.",
       "sources": [
         "disney-uap"
       ],
