@@ -148,7 +148,7 @@ const HERO_STATS = [
     motion: { phase: 1.8, radiusX: 7, radiusY: 5, boostX: 8, boostY: 6, parallaxX: -0.36, parallaxY: 0.10, rotate: 1.3, rotateBoost: 0.85, rotateDir: -1 },
   },
   {
-    value: '3 design systems',
+    value: '4 design systems',
     label: 'Consistency at scale',
     desktop: { top: '18%', right: '2%', maxWidth: 180 },
     mobile: { top: '14%', right: '0%', maxWidth: 148 },
