@@ -2053,7 +2053,7 @@
       },
       {
         "type": "paragraph",
-        "text": "AdVisor is Disney's ad-sales platform. When this project started it served ESPN and no one else, while ABC, Freeform, FX Networks, National Geographic and the rest each ran their own tooling. The work was consolidating those brands onto one platform — and the constraint that shaped everything was that ESPN's existing workflow could not regress while it happened."
+        "text": "AdVisor is the ad-sales platform at Disney's Direct-to-Consumer and International group. When this project started it served ESPN and no one else. ABC, Disney, Hulu, ABC News, Freeform, FX Networks and National Geographic each ran its own tooling — jda, WideOrbit, PACE, NCS and OnAir among them — so booking across the portfolio meant working in unrelated systems. The work was consolidating those seven brands onto one platform, and the constraint that shaped everything was that ESPN's existing workflow could not regress while it happened."
       },
       {
         "type": "paragraph",
@@ -2078,6 +2078,7 @@
         "type": "list",
         "items": [
           "Partnered with 7–10 engineers, one PM, one business analyst, brand directors and sales/ops stakeholders",
+          "Mentored the two designers on this project and others on the wider design team",
           "Owned discovery, workflow mapping and stakeholder alignment",
           "Owned UX strategy, interaction design, visual design and design-system alignment",
           "Owned engineering handoff"
@@ -2090,7 +2091,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Consolidation was a workflow problem before it was a UI problem. The difficulty came from several directions at once:"
+        "text": "Consolidation was a workflow problem before it was a UI problem. Complex products fail when the team simplifies away the constraints their users actually work under, so the standard here was to simplify without dumbing down. The difficulty came from several directions at once:"
       },
       {
         "type": "list",
@@ -2125,11 +2126,35 @@
       {
         "type": "heading",
         "level": 2,
+        "text": "What the audit covered"
+      },
+      {
+        "type": "paragraph",
+        "text": "Before anything was designed, the existing platforms were audited across every brand — reporting, client relations, dashboards and data visualisation, and the internal communications teams relied on to move work between them. It is what turned the legacy-language problem from an impression into an inventory: the same business concept named several different ways, each name load-bearing for the team that used it."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/disney-uap/02-icon-audit-findings.webp",
+        "alt": "Icon audit findings documenting inconsistent iconography across the existing brand platforms and the consolidated set proposed to replace it",
+        "caption": "An icon audit fed the standardised pattern set."
+      },
+      {
+        "type": "heading",
+        "level": 2,
         "text": "Mapping the decision flow, not the screens"
       },
       {
         "type": "paragraph",
         "text": "Discovery started with the decision flow rather than the interface. The goal was finding where users needed speed, where they needed control, where they needed validation, and where they needed confidence before committing to an action."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Stakeholder interviews across brands and functions",
+          "Workflow mapping and current-state journeys",
+          "Pain-point clustering across the mapped workflow",
+          "Constraints, assumptions and edge cases documented as first-class inputs"
+        ]
       },
       {
         "type": "image",
@@ -2146,6 +2171,10 @@
         "src": "/Images/case-studies/disney-uap/06-current-state-workflow-map.webp",
         "alt": "Detailed current-state workflow diagram spanning the traffic window from five days to air through day of air, showing log freeze, manual scheduling, copy instructions, agency confirmations and change management across swimlanes",
         "caption": "A detailed current-state workflow revealed decision points across teams and timing windows."
+      },
+      {
+        "type": "paragraph",
+        "text": "The map traced how a single decision actually moved: through sales, traffic, promo, legal, operations, research and accounting. Seeing the whole chain at once is what made the product conversations concrete — people who had only ever worked one step of it could finally point at where it broke."
       },
       {
         "type": "heading",
@@ -2210,7 +2239,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Complex tasks were structured around how expert users already thought about the work: summary first, then validation, then exceptions, then action. Progressive disclosure kept the density manageable without hiding the things people needed to check."
+        "text": "Complex tasks were structured around how expert users already thought about the work: summary first, then validation, then exceptions, then action. Expert users do not need less information — they need the right information at the right decision moment, so progressive disclosure was used to control timing rather than volume."
       },
       {
         "type": "image",
@@ -2234,16 +2263,14 @@
         "text": "The interaction patterns were designed to be reused. Navigation, search, forms, validation, status and save/submit actions were standardised so engineering could translate them into scalable React components, and so the work could later align to Adapt, Disney's cross-brand design system."
       },
       {
+        "type": "paragraph",
+        "text": "That went further than a pattern list. By the end, UX and engineering had started an ad-sales design system in its own right — documentation alongside the React components — built so the team could switch it on when they were ready instead of retrofitting one later."
+      },
+      {
         "type": "image",
         "src": "/Images/case-studies/disney-uap/09-reusable-form-patterns.webp",
         "alt": "RFP creation form showing client information, flight dates, budget, marketing materials and required-field validation, with repeated patterns for inputs, selects and save actions",
         "caption": "Repeated patterns: navigation, search, forms, validation, status and save/submit actions."
-      },
-      {
-        "type": "image",
-        "src": "/Images/case-studies/disney-uap/02-icon-audit-findings.webp",
-        "alt": "Icon audit findings documenting inconsistent iconography across the existing brand platforms and the consolidated set proposed to replace it",
-        "caption": "An icon audit fed the standardised pattern set."
       },
       {
         "type": "heading",
@@ -2252,11 +2279,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Product: Disney ad-sales brands unified under AdVisor, ESPN functionality preserved, and brand-specific needs supported inside a shared workflow."
+        "text": "Product: the first wave brought FX Networks, National Geographic and Freeform onto AdVisor, with ESPN functionality preserved and brand-specific needs still supported inside a shared workflow. Ahead of full rollout — Freeform users still to be onboarded — the teams already migrated were running their day-to-day work in the new system rather than the one it replaced."
       },
       {
         "type": "paragraph",
-        "text": "System: standardised product language, reusable interaction patterns, and groundwork laid for Adapt alignment."
+        "text": "System: standardised product language, reusable interaction patterns, and an ad-sales design system started with documentation and React components intended for Adapt alignment."
       },
       {
         "type": "paragraph",
