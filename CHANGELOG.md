@@ -6,6 +6,8 @@ All notable changes to designedbyomar.com are documented here.
 
 ### Fixed
 - Copy: career length corrected from "15+ years" to "10+ years" in the hero stat card and the About drawer summary, matching the resume. The published resume states 10+ years in both its title line and summary while the site claimed 15+, and the resume is linked from the hero — so a visitor could see both figures in one session. Same class of correction as the claims-accuracy pass in #60/#61. The career-wide "500+ interviews" stat is unchanged and remains scoped in its label
+- Copy: the hero stat now reads "4 design systems", not 3. Omar built the Wisdom design system from scratch as founding designer alongside Management Portal, Reporting, Insurance Verification and Posting Assistant; it was missing from the count. A case study for it is on the roadmap
+- `llms.txt`: Athena Design System 2.0 was described as an "enterprise healthcare design system". It was built at Plastiq, a payments company — corrected to "enterprise design system behind Plastiq's IPO-era brand". This file exists for AI crawlers, so the error was being served to exactly the consumers most likely to repeat it verbatim
 
 ### Added
 - Docs: a `Releases` section in `README.md` and a `Cutting A Release` procedure in the deployment runbook. Versions are recorded in `VERSION`, `package.json`, and the changelog heading, and all three have to agree — they drifted four patches apart between May and September 2026 because nothing read `VERSION` and no procedure existed. Covers semver choice, the verify-before-commit gate, tagging, and publishing a GitHub release
