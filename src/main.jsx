@@ -1980,11 +1980,27 @@ const Ask = ({ prefersReducedMotion }) => {
   const submit = (event) => {
     event.preventDefault();
     if (!index) return;
-    const hit = matchQuestion(query, index);
-    if (hit) { show(hit.answer); return; }
+    const asked = query.trim();
+    const hit = matchQuestion(asked, index);
+    if (hit) {
+      trackPortfolioEvent('ask_submit', {
+        matched: true,
+        answer_id: hit.answer.id,
+        score: Math.round(hit.score * 100) / 100,
+      });
+      show(hit.answer);
+      return;
+    }
+    // The question itself is the point of this event: it is the only signal
+    // for which answers are missing. Disclosed in the privacy policy, and the
+    // consent gate in trackAnalyticsEvent means a declined visitor sends
+    // nothing at all.
+    const near = nearestTopic(asked, index);
+    trackPortfolioEvent('ask_submit', { matched: false });
+    trackPortfolioEvent('ask_no_match', { question: asked, nearest_id: near?.id ?? 'none' });
     setResult(null);
     setMissed(true);
-    setNearest(nearestTopic(query, index));
+    setNearest(near);
   };
 
   if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
@@ -2011,7 +2027,11 @@ const Ask = ({ prefersReducedMotion }) => {
           <button
             key={answer.id}
             type="button"
-            onClick={() => { setQuery(''); show(answer); }}
+            onClick={() => {
+              trackPortfolioEvent('ask_suggested_click', { answer_id: answer.id });
+              setQuery('');
+              show(answer);
+            }}
             style={{
               minHeight: 44,
               padding: '10px 14px',
@@ -2095,7 +2115,7 @@ const Ask = ({ prefersReducedMotion }) => {
             {sourcesFor(result).length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {sourcesFor(result).map(caseStudy => (
-                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} style={{
+                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: result.id, case_study_id: caseStudy.id })} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 'var(--space-2)',
@@ -2133,7 +2153,7 @@ const Ask = ({ prefersReducedMotion }) => {
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
-                <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} style={{
+                <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'none', case_study_id: caseStudy.id })} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
                   padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
                   color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
@@ -2143,7 +2163,7 @@ const Ask = ({ prefersReducedMotion }) => {
                   <AppIcon icon={ArrowUpRight} size={12} />
                 </a>
               ))}
-              <a href="mailto:omar@designedbyomar.com" style={{
+              <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
                 padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
                 color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
@@ -2642,8 +2662,13 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
+
+        <h2 style={sectionHeadingStyle}>The Ask Box</h2>
+        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. Nothing you type is sent to a language model, and no answer is generated while you wait.</p>
+        <p style={{ margin: 0 }}>When someone asks a question the written set does not cover, the wording of that question is recorded in an analytics event. That record is the only way I can see which answers are missing and write them. It is not used to identify you, and if you declined analytics, nothing is sent at all — the feature still works.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
         <p style={{ margin: 0 }}>Google Analytics 4 helps measure site activity and performance. GA4 may use cookies to collect analytics information after you accept analytics. This data is processed by Google on my behalf and may be stored or processed in locations outside your country, depending on Google's systems and infrastructure.</p>
