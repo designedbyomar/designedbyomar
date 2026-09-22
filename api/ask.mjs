@@ -22,7 +22,6 @@
  */
 import { groq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
-import answersDoc from '../src/content/ask-answers.json' with { type: 'json' };
 import { buildIndex, matchQuestion, nearestTopic } from '../src/ask.mjs';
 
 export const config = { runtime: 'edge' };
@@ -64,8 +63,28 @@ const rateLimited = (ip) => {
   return recent.length > RATE_LIMIT;
 };
 
-const approved = (answersDoc.answers ?? []).filter(a => a.status === 'approved' || a.status === undefined);
-const index = buildIndex(approved);
+/**
+ * The answers are fetched from the published file rather than imported.
+ *
+ * Two reasons. Vercel's function bundler rejects the `with { type: 'json' }`
+ * attribute that Node requires for a JSON import, so importing the source is
+ * not portable. And the published file is the one `postbuild.js` filters to
+ * approved answers only — consuming it means a draft cannot reach this
+ * endpoint even by mistake, which importing the source would not guarantee.
+ *
+ * Cached in module scope, so this costs one same-origin CDN fetch per cold
+ * start and nothing thereafter.
+ */
+let cache = null;
+
+const fetchAnswers = async (origin) => {
+  if (cache) return cache;
+  const response = await fetch(new URL('/ask-answers.json', origin));
+  if (!response.ok) throw new Error(`ask-answers.json: ${response.status}`);
+  const doc = await response.json();
+  cache = { answers: doc.answers ?? [], index: buildIndex(doc.answers ?? []) };
+  return cache;
+};
 
 const headers = (source, sources, answerId = '') => ({
   'Content-Type': 'text/plain; charset=utf-8',
@@ -94,6 +113,7 @@ ${context}`;
 export const createHandler = ({
   generate = generateFromGroq,
   hasApiKey = () => Boolean(process.env.GROQ_API_KEY),
+  loadAnswers = fetchAnswers,
 } = {}) => async function handler(request) {
   if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
@@ -105,6 +125,14 @@ export const createHandler = ({
   }
   const question = String(body?.question ?? '').trim().slice(0, MAX_QUESTION_CHARS);
   if (!question) return textResponse('', 'fallback');
+
+  let approved, index;
+  try {
+    ({ answers: approved, index } = await loadAnswers(request.url));
+  } catch {
+    return textResponse('', 'fallback');
+  }
+  if (!approved.length) return textResponse('', 'fallback');
 
   // 1. A written answer, whenever one exists. This is the common path.
   const hit = matchQuestion(question, index);

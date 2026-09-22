@@ -11,14 +11,23 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
+import { buildIndex } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
-/** A handler wired to a recording stub instead of the real provider. */
-const loadHandler = ({ generateThrows = false, hasApiKey = true } = {}) => {
+/**
+ * A handler wired to stubs instead of the network. The answers are injected
+ * the same way production fetches them, so these tests exercise the real
+ * routing without a key, a provider or a published file.
+ */
+const loadHandler = ({ generateThrows = false, hasApiKey = true, answersFail = false } = {}) => {
   const calls = [];
   const handler = createHandler({
     hasApiKey: () => hasApiKey,
+    loadAnswers: async () => {
+      if (answersFail) throw new Error('answers unavailable');
+      return { answers: doc.answers, index: buildIndex(doc.answers) };
+    },
     generate: (options) => {
       calls.push(options);
       if (generateThrows) throw new Error('provider unavailable');
@@ -105,4 +114,13 @@ test('a malformed or empty request never errors', async () => {
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   }
+});
+
+test('an unreachable answer file degrades instead of erroring', async () => {
+  const { handler, calls } = loadHandler({ answersFail: true });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0);
 });
