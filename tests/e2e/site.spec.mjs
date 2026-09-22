@@ -559,3 +559,130 @@ test('Athena case study points to the live design system', async ({ page }) => {
   await page.goto('/work/connect-api/');
   await expect(page.locator('article a[href="/design-system"]')).toHaveCount(0);
 });
+
+// ============================================================
+// Ask assistant
+// ============================================================
+
+/** Scroll the FAQ section into view and wait for the Ask panel to load. */
+const openAsk = async (page) => {
+  await page.locator('#faq').scrollIntoViewIfNeeded();
+  await expect(page.getByText('Ask something else')).toBeVisible();
+};
+
+const askInput = (page) => page.locator('#faq input[type="text"]');
+const askLive = (page) => page.locator('#faq [aria-live="polite"]');
+
+test('Ask answers are not fetched until the FAQ section is reached', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => { if (request.url().includes('ask-answers')) requests.push(request.url()); });
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  expect(requests, 'the answer set must stay off the critical path').toHaveLength(0);
+
+  await openAsk(page);
+  expect(requests, 'and must be fetched once when the section is reached').toHaveLength(1);
+});
+
+test('Ask returns a written answer with a citation into the case study', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  await page.locator('#faq-questions-list button').filter({ hasText: /design systems at scale/i }).first().click();
+  await expect(askLive(page).getByText(/treats them as infrastructure/i)).toBeVisible();
+
+  const citation = askLive(page).locator('a[href^="/work/"]').first();
+  await expect(citation).toHaveAttribute('href', '/work/athena-ds/');
+  await citation.click();
+  await expect(page).toHaveURL(/\/work\/athena-ds\/?$/);
+});
+
+test('Ask matches a typed question', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  await askInput(page).fill('what fintech work has he done');
+  await page.locator('#faq button[type="submit"]').click();
+  await expect(askLive(page).getByText(/Two years at Plastiq/i)).toBeVisible();
+});
+
+test('Ask refuses a question it has no written answer for', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  await askInput(page).fill('how do penguins pay for parking in antarctica');
+  await page.locator('#faq button[type="submit"]').click();
+
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
+});
+
+test('Ask is keyboard reachable and announces its answer politely', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  await askInput(page).focus();
+  await expect(askInput(page)).toBeFocused();
+  await askInput(page).fill('where has he worked');
+  await askInput(page).press('Enter');
+
+  await expect(askLive(page)).toHaveAttribute('aria-live', 'polite');
+  await expect(askLive(page).getByText(/Five roles, most recent first/i)).toBeVisible();
+});
+
+test('Ask still answers when analytics are declined, and sends nothing', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'declined');
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+  });
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('how do penguins pay for parking in antarctica');
+  await page.locator('#faq button[type="submit"]').click();
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+
+  const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
+  expect(events.filter(e => e.eventName.startsWith('ask_')), 'a declined visitor must send no ask_* events').toHaveLength(0);
+});
+
+test('Ask reports a missed question so the gap can be closed', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'accepted');
+    window.__omarAnalyticsConsent = 'accepted';
+    window.__omarGaReady = true;
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+  });
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('how do penguins pay for parking in antarctica');
+  await page.locator('#faq button[type="submit"]').click();
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+
+  const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
+  expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
+  expect(miss.params.question).toBe('how do penguins pay for parking in antarctica');
+});
+
+test('the privacy policy discloses what the Ask box records', async ({ page }) => {
+  await page.goto('/privacy');
+  await expect(page.getByRole('heading', { name: /The Ask Box/i })).toBeVisible();
+  await expect(page.getByText(/wording of that question is recorded in an analytics event/i)).toBeVisible();
+  await expect(page.getByText(/Nothing you type is sent to a language model/i)).toBeVisible();
+});
+
+test('the design system documents the Ask component', async ({ page }) => {
+  await page.goto('/design-system');
+  await page.locator('#ask').scrollIntoViewIfNeeded();
+  await expect(page.getByRole('heading', { name: 'Ask', exact: true })).toBeVisible();
+  await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
+  await expect(page.getByText(/Only approved/i)).toBeVisible();
+});

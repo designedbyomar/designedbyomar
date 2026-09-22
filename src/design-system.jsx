@@ -65,6 +65,7 @@ const NAV_GROUPS = [
       { id: 'copy-actions', label: 'Copy actions' },
       { id: 'navigation-drawers', label: 'Navigation and drawers' },
       { id: 'cookie-banner', label: 'Cookie banner' },
+      { id: 'ask', label: 'Ask' },
     ],
   },
   {
@@ -1198,6 +1199,70 @@ const ComponentsSection = () => (
           </div>
         </div>
       </ExampleFrame>
+    </section>
+
+    <section id="ask" className="ds-section" aria-labelledby="ask-title">
+      <SectionHeader eyebrow="Components" title="Ask">
+        Answers in the FAQ section are written in advance and matched, never generated. The component
+        exists to shorten the distance between a hiring question and the case study that answers it,
+        so every part of it either answers or hands off.
+      </SectionHeader>
+      <ExampleFrame label="Suggested prompts">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {['Has Omar built design systems at scale?', "What's Omar's fintech and payments experience?"].map(label => (
+            <button key={label} type="button" style={{
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              color: 'var(--fg-secondary)',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              borderRadius: 'var(--radius-standard)',
+              textAlign: 'left',
+            }}>{label}</button>
+          ))}
+        </div>
+      </ExampleFrame>
+      <ExampleFrame label="Answer with citation">
+        <div style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', gap: 16, padding: 20, borderRadius: 'var(--radius-comfort)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
+            Has Omar built design systems at scale?
+          </p>
+          <p style={{ margin: 0, color: 'var(--fg-secondary)', lineHeight: 1.6 }}>
+            Yes — four, and he treats them as infrastructure for a team rather than a personal artifact.
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+              Athena Design System 2.0
+              <AppIcon icon={ArrowUpRight} size={12} />
+            </span>
+          </div>
+        </div>
+      </ExampleFrame>
+      <div className="ds-card-grid">
+        <DocCard title="Refuse rather than guess" meta="The governing rule">
+          Matching is inverse-document-frequency weighted token overlap over each answer&rsquo;s question
+          and aliases. Below threshold, or when too little of the question is in vocabulary, the
+          component declines and offers the nearest case study plus email. A confident wrong answer
+          costs more than no answer.
+        </DocCard>
+        <DocCard title="Approved only" meta="Content gate">
+          Answers carry a review status and a fingerprint of the case studies they cite. Only approved
+          answers reach the build, and an approved answer whose sources change fails the content tests
+          — so it drops out rather than contradicting the page it links to.
+        </DocCard>
+        <DocCard title="Off the critical path" meta="Loading">
+          The answer set is fetched when the section scrolls into view, not imported into the bundle.
+          It never affects LCP, and the panel renders nothing when there is nothing approved to show.
+        </DocCard>
+        <DocCard title="Accessibility" meta="Required behaviour">
+          The answer region is <code>aria-live=&quot;polite&quot;</code> so a reply is announced without stealing
+          focus. Every control clears 44px, the input is labelled, and no answer depends on motion.
+        </DocCard>
+      </div>
     </section>
   </>
 );
