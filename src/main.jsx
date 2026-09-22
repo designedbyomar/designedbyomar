@@ -9,6 +9,7 @@ import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
+import { buildIndex, matchQuestion, nearestTopic } from './ask.mjs';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -1820,23 +1821,23 @@ const KeyFacts = () => {
 const FAQ_ITEMS = [
   {
     question: 'What kind of product designer is Omar?',
-    answer: 'I am a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. I work across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
+    answer: 'Omar is a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. He works across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
   },
   {
     question: 'What types of companies is Omar best suited for?',
-    answer: 'I am strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
+    answer: 'He is strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
   },
   {
     question: 'Is Omar more of a design leader or an individual contributor?',
-    answer: 'Both. I operate at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
+    answer: 'Both. He operates at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
   },
   {
     question: 'What kinds of problems should a team bring Omar in to solve?',
-    answer: 'Bring me in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. My work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
+    answer: 'Bring him in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. His work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
   },
   {
     question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, I designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
+    answer: 'At Wisdom, Omar designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
     links: [
       { label: 'Posting Assistant', href: '/work/posting-asst/' },
       { label: 'Management Portal', href: '/work/mgmt-portal/' },
@@ -1844,14 +1845,14 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is Omar’s experience with fintech and embedded payments?',
-    answer: 'At Plastiq, I led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
+    answer: 'At Plastiq, Omar led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
     links: [
       { label: 'Connect API Payments', href: '/work/connect-api/' },
     ],
   },
   {
     question: 'What enterprise product experience does Omar have?',
-    answer: 'At Disney, I designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
+    answer: 'At Disney, Omar designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
     links: [
       { label: 'Critical Communication Tool', href: '/work/disney-cct/' },
       { label: 'Unified Ad Platform', href: '/work/disney-uap/' },
@@ -1859,18 +1860,18 @@ const FAQ_ITEMS = [
   },
   {
     question: 'How does Omar approach design systems?',
-    answer: 'I treat design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, I co-led Athena Design System 2.0.',
+    answer: 'He treats design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, he co-led Athena Design System 2.0.',
     links: [
       { label: 'Athena Design System 2.0', href: '/work/athena-ds/' },
     ],
   },
   {
     question: 'How does Omar work with founders and engineers?',
-    answer: 'I move between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
+    answer: 'He moves between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
   },
   {
     question: 'What business outcomes has Omar influenced?',
-    answer: 'My work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
+    answer: 'His work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
   },
 ];
 
@@ -1903,6 +1904,284 @@ const FAQAnswer = ({ item }) => {
         );
       })}
     </>
+  );
+};
+
+// ============================================================
+// Ask — pre-generated answers, matched client-side
+// ============================================================
+
+/**
+ * Suggested prompts, in preference order. Most visitors click rather than
+ * type, so these carry the feature and implicitly set its scope. Ids that are
+ * not approved yet are skipped, so this list can name answers ahead of review.
+ */
+const ASK_SUGGESTED_IDS = ['design-systems', 'fintech-depth', 'leadership-or-ic', 'technical-depth'];
+
+const ASK_MAX_SUGGESTIONS = 4;
+
+const loadAskAnswers = async () => {
+  // Dev reads the source file so drafts are visible while reviewing. The
+  // production build writes a filtered copy containing approved answers only,
+  // so draft text never ships — see generateAskAnswers in postbuild.js.
+  if (import.meta.env.DEV) {
+    const mod = await import('./content/ask-answers.json');
+    return (mod.default ?? mod).answers ?? [];
+  }
+  const response = await fetch('/ask-answers.json');
+  if (!response.ok) throw new Error(`ask-answers.json: ${response.status}`);
+  const doc = await response.json();
+  return doc.answers ?? [];
+};
+
+const Ask = ({ prefersReducedMotion }) => {
+  const [answers, setAnswers] = React.useState(null);
+  const [query, setQuery] = React.useState('');
+  const [result, setResult] = React.useState(null);
+  // `missed` is tracked separately from `nearest` because a miss with no
+  // nearby topic is still a miss, and still has to say so.
+  const [missed, setMissed] = React.useState(false);
+  const [nearest, setNearest] = React.useState(null);
+  const sentinelRef = React.useRef(null);
+
+  // Loaded when the section comes into view rather than on focus: the fetch
+  // lands well after LCP, and the panel never renders as an empty shell before
+  // we know whether there is anything approved to show.
+  React.useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return undefined;
+    let cancelled = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      observer.disconnect();
+      loadAskAnswers()
+        .then(loaded => { if (!cancelled) setAnswers(loaded); })
+        .catch(() => { if (!cancelled) setAnswers([]); });
+    }, { rootMargin: '200px' });
+    observer.observe(node);
+    return () => { cancelled = true; observer.disconnect(); };
+  }, []);
+
+  const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
+
+  const suggestions = React.useMemo(() => {
+    if (!answers?.length) return [];
+    const byId = new Map(answers.map(a => [a.id, a]));
+    const picked = ASK_SUGGESTED_IDS.map(id => byId.get(id)).filter(Boolean);
+    for (const answer of answers) {
+      if (picked.length >= ASK_MAX_SUGGESTIONS) break;
+      if (!picked.includes(answer)) picked.push(answer);
+    }
+    return picked.slice(0, ASK_MAX_SUGGESTIONS);
+  }, [answers]);
+
+  const show = (answer) => { setResult(answer); setMissed(false); setNearest(null); };
+
+  const submit = (event) => {
+    event.preventDefault();
+    if (!index) return;
+    const asked = query.trim();
+    const hit = matchQuestion(asked, index);
+    if (hit) {
+      trackPortfolioEvent('ask_submit', {
+        matched: true,
+        answer_id: hit.answer.id,
+        score: Math.round(hit.score * 100) / 100,
+      });
+      show(hit.answer);
+      return;
+    }
+    // The question itself is the point of this event: it is the only signal
+    // for which answers are missing. Disclosed in the privacy policy, and the
+    // consent gate in trackAnalyticsEvent means a declined visitor sends
+    // nothing at all.
+    const near = nearestTopic(asked, index);
+    trackPortfolioEvent('ask_submit', { matched: false });
+    trackPortfolioEvent('ask_no_match', { question: asked, nearest_id: near?.id ?? 'none' });
+    setResult(null);
+    setMissed(true);
+    setNearest(near);
+  };
+
+  if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
+
+  const sourcesFor = (answer) => (answer.sources ?? [])
+    .map(id => CASE_STUDIES.find(c => c.id === id))
+    .filter(Boolean);
+
+  return (
+    <div ref={sentinelRef} style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-4)',
+      paddingTop: 'var(--space-6)',
+      marginTop: 'var(--space-2)',
+      borderTop: '1px solid var(--color-gray-100)',
+    }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        Ask something else
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        {suggestions.map(answer => (
+          <button
+            key={answer.id}
+            type="button"
+            onClick={() => {
+              trackPortfolioEvent('ask_suggested_click', { answer_id: answer.id });
+              setQuery('');
+              show(answer);
+            }}
+            style={{
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              color: 'var(--fg-secondary)',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              borderRadius: 'var(--radius-standard)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: prefersReducedMotion ? 'none' : 'background var(--duration-fast), color var(--duration-fast)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--fg-secondary)'; }}
+          >
+            {answer.question}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          aria-label="Ask a question about Omar's work"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Ask about a project, a skill, a role…"
+          autoComplete="off"
+          style={{
+            flex: '1 1 260px',
+            minWidth: 0,
+            minHeight: 44,
+            padding: '10px 14px',
+            fontFamily: 'inherit',
+            fontSize: 'var(--font-size-body-md)',
+            color: 'var(--fg-primary)',
+            background: 'var(--bg-base)',
+            border: 'none',
+            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            borderRadius: 'var(--radius-standard)',
+          }}
+        />
+        <button type="submit" disabled={!query.trim()} style={{
+          minHeight: 44,
+          padding: '10px 18px',
+          fontFamily: 'inherit',
+          fontSize: 'var(--font-size-body-md)',
+          fontWeight: 'var(--font-weight-medium)',
+          color: query.trim() ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+          borderRadius: 'var(--radius-standard)',
+          cursor: query.trim() ? 'pointer' : 'not-allowed',
+        }}>
+          Ask
+        </button>
+      </form>
+
+      <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        {result && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-5) var(--space-6)',
+            borderRadius: 'var(--radius-comfort)',
+            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+          }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
+              {result.question}
+            </p>
+            {result.answer.split('\n\n').map((paragraph, i) => (
+              <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
+                {paragraph}
+              </p>
+            ))}
+            {sourcesFor(result).length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {sourcesFor(result).map(caseStudy => (
+                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: result.id, case_study_id: caseStudy.id })} style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    fontSize: 'var(--font-size-body-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--fg-primary)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-standard)',
+                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                  }}>
+                    {caseStudy.title}
+                    <AppIcon icon={ArrowUpRight} size={12} />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {missed && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-5) var(--space-6)',
+            borderRadius: 'var(--radius-comfort)',
+            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+          }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
+              {nearest
+                ? 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing \u2014 the closest published work is below, and email is faster for anything specific.'
+                : 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing, email is the faster route.'}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
+                <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'none', case_study_id: caseStudy.id })} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                  padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                  boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                }}>
+                  {caseStudy.title}
+                  <AppIcon icon={ArrowUpRight} size={12} />
+                </a>
+              ))}
+              <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              }}>
+                Email Omar
+                <AppIcon icon={ArrowUpRight} size={12} />
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
+        These answers are written in advance from the published case studies and reviewed by hand —
+        nothing here is generated when you ask.
+      </p>
+    </div>
   );
 };
 
@@ -2089,6 +2368,7 @@ const FAQ = ({ scrollToSection }) => {
               transition: 'transform var(--duration-fast-mid) ease',
             }} />
           </button>
+          <Ask prefersReducedMotion={prefersReducedMotion} />
         </div>
       </Reveal>
     </section>
@@ -2382,8 +2662,13 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
+
+        <h2 style={sectionHeadingStyle}>The Ask Box</h2>
+        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. Nothing you type is sent to a language model, and no answer is generated while you wait.</p>
+        <p style={{ margin: 0 }}>When someone asks a question the written set does not cover, the wording of that question is recorded in an analytics event. That record is the only way I can see which answers are missing and write them. It is not used to identify you, and if you declined analytics, nothing is sent at all — the feature still works.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
         <p style={{ margin: 0 }}>Google Analytics 4 helps measure site activity and performance. GA4 may use cookies to collect analytics information after you accept analytics. This data is processed by Google on my behalf and may be stored or processed in locations outside your country, depending on Google's systems and infrastructure.</p>

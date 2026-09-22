@@ -32,9 +32,10 @@
     "build": "vite build && node postbuild.js",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
-    "test": "npm run test:build && npm run test:seo && playwright test",
+    "test": "npm run test:build && npm run test:seo && npm run test:content && playwright test",
     "test:build": "npm run build",
     "test:seo": "node --test tests/seo-static.test.mjs",
+    "test:content": "node --test tests/ask-answers.test.mjs tests/ask-matcher.test.mjs",
     "test:e2e": "npm run build && playwright test",
     "test:e2e:ui": "npm run build && playwright test --ui",
     "optimize:image": "node scripts/optimize-image.mjs"
