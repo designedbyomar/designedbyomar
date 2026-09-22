@@ -18,7 +18,7 @@
       "sources": [
         "athena-ds"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
@@ -37,7 +37,7 @@
       "sources": [
         "connect-api"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
@@ -57,7 +57,7 @@
         "posting-asst",
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e263e75211c2"
     },
     {
@@ -78,7 +78,7 @@
         "disney-uap",
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "796f0b1307d3"
     },
     {
@@ -97,7 +97,7 @@
       "sources": [
         "athena-ds"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
@@ -117,7 +117,7 @@
         "posting-asst",
         "disney-cct"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "25bf2de40a54"
     },
     {
@@ -139,7 +139,7 @@
         "connect-api",
         "disney-cct"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "44e4b6f2886b"
     },
     {
@@ -156,7 +156,7 @@
       ],
       "answer": "He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nThe work he's drawn to is consistent: hard product problems with messy data, edge cases, operational constraints and users whose job depends on the thing working. Complex B2B, AI workflows, fintech, healthcare SaaS, enterprise platforms.\n\nHe currently runs an independent practice and is embedded with Welcome Lend, so fractional and consulting engagements are live options alongside full-time.\n\nThe fastest way to find out whether it's a fit is to ask him — there's a 20-minute intro call link in the contact section.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -174,7 +174,7 @@
       ],
       "answer": "Fair question, and it isn't published on the site.\n\nIt genuinely depends on scope, level, and whether the engagement is full-time, fractional or consulting — those land in different places.\n\nThe fastest path is to ask him directly. There's a 20-minute intro call link in the contact section, or email omar@designedbyomar.com. If you can say roughly what the role is and where the budget sits, he'll tell you straight away whether it's worth both your time.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -191,7 +191,7 @@
       ],
       "answer": "Not something the site covers — and not something worth relaying second-hand through a bot on his own portfolio.\n\nThe history itself is public: five roles with dates, on the resume and in the work-history answer here. The reasoning behind any particular move is a conversation, not a FAQ entry.\n\nIf you're doing reference work or weighing fit, ask him directly — booking link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -209,7 +209,7 @@
       "sources": [
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "c0a25c7eca25"
     },
     {
@@ -226,7 +226,7 @@
       "sources": [
         "posting-asst"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "76e22e92a91e"
     },
     {
@@ -244,7 +244,7 @@
       "sources": [
         "connect-api"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
@@ -261,7 +261,7 @@
       "sources": [
         "athena-ds"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
@@ -278,7 +278,7 @@
       "sources": [
         "disney-cct"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "f10c47c2e8b7"
     },
     {
@@ -297,7 +297,7 @@
       "sources": [
         "disney-uap"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "a79b67ab924b"
     },
     {
@@ -315,7 +315,7 @@
       "sources": [
         "page-builder"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "775392485cca"
     },
     {
@@ -332,7 +332,7 @@
       "sources": [
         "plastiq-mktg"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "797f880f31bb"
     },
     {
@@ -351,7 +351,7 @@
         "posting-asst",
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e263e75211c2"
     },
     {
@@ -370,7 +370,7 @@
         "disney-cct",
         "disney-uap"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "2e9b3acbfec1"
     },
     {
@@ -390,7 +390,7 @@
         "mgmt-portal",
         "page-builder"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "9606bfc90228"
     },
     {
@@ -408,7 +408,7 @@
       "sources": [
         "connect-api"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
@@ -427,7 +427,7 @@
         "plastiq-mktg",
         "disney-cct"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e99663a0e010"
     },
     {
@@ -446,7 +446,7 @@
         "plastiq-mktg",
         "athena-ds"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "7a5f14813144"
     },
     {
@@ -465,7 +465,7 @@
         "page-builder",
         "disney-uap"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "b95a580b8ad8"
     },
     {
@@ -484,7 +484,7 @@
         "page-builder",
         "athena-ds"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "91b8e8b2ff05"
     },
     {
@@ -503,7 +503,7 @@
         "athena-ds",
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "3afa0e22789d"
     },
     {
@@ -523,7 +523,7 @@
         "page-builder",
         "mgmt-portal"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "71a021fce746"
     },
     {
@@ -541,7 +541,7 @@
         "connect-api",
         "page-builder"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "170e45c77264"
     },
     {
@@ -560,7 +560,7 @@
         "athena-ds",
         "plastiq-mktg"
       ],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "7a5f14813144"
     },
     {
@@ -576,7 +576,7 @@
       ],
       "answer": "Yes — he publishes on Substack, linked from the contact section and the footer.\n\nWriting is also part of how he works rather than a side activity. He describes starting problems in plain text: writing, mapping the problem and naming the tradeoffs before moving into design.\n\nThat shows up in the artifacts too. This repository is public and documents its own design system, deployment runbook and AI-assisted workflow in writing.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -592,7 +592,7 @@
       ],
       "answer": "Torrington, Connecticut, working remote. US Eastern time.\n\nHis recent roles have all been remote — Wisdom was New York remote, Simplero Brooklyn remote, Plastiq San Francisco remote. The Disney role was on site in Bristol, Connecticut.\n\nSo he's worked remote with teams across US timezones for several years, and it's the default rather than an accommodation.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -608,7 +608,7 @@
       ],
       "answer": "He currently runs an independent practice and is embedded with Welcome Lend plus a few companies he keeps private, so availability depends on what you're asking for.\n\nFractional and consulting engagements are live options alongside full-time roles.\n\nRather than guessing at timing here, the honest answer is to ask him — there's a 20-minute intro call link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -625,7 +625,7 @@
       ],
       "answer": "Both. He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nHis current practice is consulting and embedded work — at Welcome Lend he's an embedded senior design lead, rebuilding their design system and shipping work brokers use daily.\n\nSo a fractional or contract engagement isn't a fallback for him; it's what he's doing now.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -642,7 +642,7 @@
       ],
       "answer": "Fastest is the 20-minute intro call link in the contact section of this site.\n\nOtherwise: omar@designedbyomar.com. He's also on LinkedIn, GitHub, Substack and Behance, all linked from the contact section and the footer.\n\nHis resume is downloadable from the hero and the contact section if you need dates and titles before reaching out.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -657,7 +657,7 @@
       ],
       "answer": "Yes — it's linked from the hero and the contact section of this site as a PDF.\n\nIt covers the five most recent roles with dates and titles, a selected-impact summary, and the core expertise list. If you want the narrative version instead, the eight case studies go considerably deeper than a resume bullet can.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -672,7 +672,7 @@
       ],
       "answer": "He built it himself: React 19 and Vite, deployed on Vercel.\n\nA post-build step generates a real static route for every case study with its own metadata, structured data and sitemap entry — and injects the full case-study text into the HTML so crawlers, ATS scrapers and AI assistants can read it without running JavaScript.\n\nIt ships enforced security headers, consent-gated analytics, a published design system, and an automated test suite that runs on every pull request.\n\nThe repository is public, and it documents its own AI-assisted workflow in docs/ai-workflow.md.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -688,7 +688,7 @@
       ],
       "answer": "Neither, exactly. These answers were drafted from the case studies published on this site and then reviewed by Omar before going live — so they're pre-written rather than generated live, and nothing here is improvised.\n\nThat's deliberate. On a hiring site an assistant that invents a detail is worse than one that admits it doesn't know, so this one can only tell you things he has actually approved.\n\nIf a question isn't covered, it'll say so and point you at him rather than guess.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -703,7 +703,7 @@
       ],
       "answer": "Nothing is sent anywhere when you ask a question — the answers are a static file already loaded in your browser, so there's no server call and no external service involved.\n\nIf you accepted analytics, the site records that a question was asked, which helps Omar see which answers are missing. If you declined, it doesn't.\n\nThe full picture is in the privacy policy, linked in the footer.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -720,7 +720,7 @@
       ],
       "answer": "Not something the site answers on his behalf, because it depends entirely on what's being asked and at what stage.\n\nWhat is worth saying: there are eight case studies here covering the real thing — the research, the tradeoffs, the versions that got scrapped — and the site itself is production work he wrote and shipped. That's usually a better read on how he thinks than a weekend exercise.\n\nIf you need to see something specific, ask him directly. Booking link is in the contact section.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -736,7 +736,7 @@
       ],
       "answer": "No, and anyone who says yes is selling something.\n\nThe numbers on this site belong to specific products with specific constraints — a 40% posting-time reduction at Wisdom, $20M+ monthly volume at Plastiq, 1,600+ users at Disney. They describe what happened there, not what's promised elsewhere. Where a figure is a target rather than a result, the site labels it projected.\n\nWhat transfers is the approach, not the outcome. Whether it fits your situation is a conversation worth having directly.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -754,7 +754,7 @@
       ],
       "answer": "The site keeps that brief on purpose. What's public: he's an amateur boxer, a music producer and a dedicated father, and he grew up in Brooklyn.\n\nBeyond that it isn't covered here, and it isn't relevant to whether he's right for a role.\n\nIf you're trying to get a sense of how he thinks or what he's like to work with, the About section and the case studies are the better read — or just talk to him.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -769,7 +769,7 @@
       ],
       "answer": "Not something this assistant will do — opinions about companies or people aren't published here, and relaying them second-hand through a bot on his own portfolio would be a bad idea regardless.\n\nWhat's documented is the work: where he was, what he built, what it changed.\n\nIf you want his read on something, that's a conversation. Booking link is in the contact section.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     },
     {
@@ -785,7 +785,7 @@
       ],
       "answer": "Not through this site, and not through an assistant — references are his to offer, not a bot's to hand out.\n\nThere are attributed quotes from stakeholders inside the case studies, which give some sense of how the work landed with the people it was built for.\n\nFor actual references, ask him. He'll arrange them directly: booking link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
     }
   ]
