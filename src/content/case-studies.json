@@ -818,11 +818,11 @@
   {
     "id": "connect-api",
     "num": "04",
-    "year": "2021",
+    "year": "2021–22",
     "client": "Plastiq",
     "title": "Connect API Payments",
     "subtitle": "PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.",
-    "metaDescription": "Designed Plastiq's PCI Level 1-compliant payments widget from zero — $20M+ monthly volume in month one, three enterprise partnerships secured pre-launch.",
+    "metaDescription": "Plastiq Connect 0→1: an embedded payments widget partners ship under their own brand, plus the developer portal behind it. $20M+ monthly volume in month one.",
     "coverImage": "/Images/case-studies/connect-api/cover.webp",
     "ogImage": "/Images/case-studies/connect-api/cover.webp",
     "role": "Lead Product Designer",
@@ -848,8 +848,8 @@
     ],
     "accent": "develop",
     "challenge": "Build a PCI-compliant embedded payments widget that would let enterprise clients integrate card and ACH payments into their own platforms — while eliminating merchant fees, expanding working capital, and onboarding partners in weeks.",
-    "approach": "Worked closely with the PM to define the product vision from zero. Designed an end-to-end payment widget and developer portal through iterative wireframing and expert interviews. Baked PCI Level 1 certification into the design process from day one — not as an afterthought. Partnered with Billfire, Brex, and PayGround before launch.",
-    "outcome": "$20M+ monthly payment volume exceeded in the first month. Three strategic partnerships secured pre-launch. Clients consistently commented on the solidity and intuitiveness of the partner portal. Clients can get up and running in 8 weeks.",
+    "approach": "Set the product vision with the PM from nothing, then designed both sides of it — the payer-facing widget a partner embeds under their own brand, and the portal the partner’s developers use to integrate it. Built white-labelling into the token architecture as a partner override layer rather than a per-client skin, and designed the compliance constraints into the payment screens rather than around them. Billfire, Brex and PayGround committed before launch.",
+    "outcome": "$20M+ monthly payment volume exceeded in the first month, with three partnerships secured pre-launch and partners going from signed to live in about eight weeks. The component set the widget was assembled from became the most complete part of the system, and expansion work continued into 2022 across wallet, bank-linking and partner-software integrations.",
     "body": [
       {
         "type": "heading",
@@ -858,7 +858,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Plastiq Connect transformed API payments, crafting an end-to-end payment widget and a developer portal. Through iterative wireframing and expert interviews, the solution achieved client recognition for its solidity and intuitive design. This project sets a new standard, emphasizing security, usability, and collaborative design in shaping the future of financial transactions."
+        "text": "Plastiq Connect let a company put card and bank payments inside its own product. A buyer could pay a vendor by card even where that vendor did not accept cards, and the vendor was paid the way it already got paid — domestic wire, ACH or a paper check in the mail. Plastiq sat in the middle and absorbed the difference."
+      },
+      {
+        "type": "paragraph",
+        "text": "Two products came out of that. A payer-facing widget the partner embedded and branded as their own, and a partner-facing portal for the developers integrating it. Different users, different problems, one system underneath."
       },
       {
         "type": "image",
@@ -869,26 +873,78 @@
       {
         "type": "heading",
         "level": 2,
-        "text": "Navigating Complexity: Designing Plastiq Connect to Tackle the Challenges of API Payments"
+        "text": "My role"
       },
       {
         "type": "paragraph",
-        "text": "The challenge was to create a solution that provided flexibility to payers and vendors, ensuring seamless transactions across various payment methods. Plastiq Connect aimed to eliminate merchant fees, enhance security, expedite payment processes for sellers, and allow buyers to pay vendors by card regardless of acceptance. Additionally, the project focused on expanding working capital for sellers and providing a robust framework for capturing additional revenue and insights from in-product customer payments."
+        "text": "Lead product designer, 0→1. The core build ran roughly April to November 2021 with one product manager, one business analyst and five to seven engineers; expansion work continued through 2022."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Set the product vision with the PM, from nothing",
+          "Owned the payer flow end to end, and the partner portal alongside it",
+          "Built the component set the widget was assembled from, including the partner-specific overrides",
+          "Ran expert interviews and competitive research, including against Stripe Connect",
+          "Owned engineering handoff"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What compliance actually constrained"
+      },
+      {
+        "type": "paragraph",
+        "text": "PCI compliance is usually described as a checkbox. In practice it decides what a payment screen is allowed to show, and the decisions it forces are visible in the design."
+      },
+      {
+        "type": "paragraph",
+        "text": "Stored card data is never redisplayed in full — a saved method shows as a masked number with its brand mark and nothing more. The security claim is made once, precisely, at the boundary of the card block rather than scattered through the form: a padlock and a single line stating that payment method information is held in a digital vault under AES 256-bit encryption."
+      },
+      {
+        "type": "paragraph",
+        "text": "The card fields are not fenced into a differently styled “secure zone” — the form reads as one continuous thing, with the assurance carried by the masking, the lock and that one sentence. Compliance shows up in this design as precision about what is stated and where, not as a visual quarantine."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/08-white-label-payment-method.webp",
+        "alt": "Connect payment method modal over a blurred partner checkout page, with Pay with Card and Pay with Bank tabs, a masked saved card number with brand mark, expiry and CVV, billing address fields, a padlock and digital-vault encryption notice, and a Powered by Plastiq footer",
+        "caption": "The widget over a partner’s own checkout: masked card data, the encryption notice at the card block boundary, and Plastiq disclosed in the footer."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Designing the payer flow"
+      },
+      {
+        "type": "paragraph",
+        "text": "Six steps, and the order is the argument:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Payer details — who is paying",
+          "Recipient information — who is being paid, with category and country",
+          "Delivery method — domestic wire, paper check or ACH transfer",
+          "Payment method — card or bank, with saved methods selectable where they exist",
+          "Payment details — amount, invoice or account number, account name, memo, attachments",
+          "Review payment — amount, fees, total, masked method, delivery date, recipient, authorisation, submit"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Delivery method is settled before payment method, which inverts the habit from consumer checkout. The vendor’s constraint is the fixed one: they accept a wire, or a check, or ACH, and no choice the payer makes changes that. Asking how the money has to arrive before asking how the payer wants to send it means the flow never offers a combination that cannot settle."
       },
       {
         "type": "image",
         "src": "/Images/case-studies/connect-api/02-add-payment-method-card.webp",
         "alt": "Add payment method flow: selecting from saved cards and bank accounts, then entering cardholder name, card number, expiry, CVV, country and billing address",
-        "caption": "Adding a card, with saved cards and bank accounts selectable from the same list."
-      },
-      {
-        "type": "heading",
-        "level": 2,
-        "text": "The solution: Crafting a Seamless Financial Ecosystem"
+        "caption": "Saved cards and bank accounts selectable from one list, with entry for a new method in the same step."
       },
       {
         "type": "paragraph",
-        "text": "At the epicenter of Plastiq Connect's success was a meticulous design solution, where my daily collaboration with the product manager played a pivotal role in shaping the product's vision."
+        "text": "Two things on the payment details step do not exist in consumer checkout. Attachments, because a business payment travels with an invoice or a purchase order and whoever reconciles it later needs the document on the record. And explicit “(Optional)” marking — in a form this long, saying what is not required is how you keep it from reading as an interrogation. Continue stays disabled until the step validates, so the flow fails before submission rather than after."
       },
       {
         "type": "image",
@@ -897,41 +953,62 @@
         "caption": "Every number the payer is committing to — amount, fee, total, delivery method and recipient — on one screen before submit."
       },
       {
-        "type": "heading",
-        "level": 3,
-        "text": "End-to-End Payment Widget and Developer Portal: A Gateway to Innovation"
-      },
-      {
         "type": "paragraph",
-        "text": "In close collaboration with the product manager, we set a clear vision for the product. Iterating tirelessly on wireframes, we crafted a solution that not only satisfied business needs but also ensured a seamless onboarding experience for potential clients. The design process involved countless hours of expert interviews and iteration of initial ideas and strategies. By remaining agile and respecting the collective vision of the company and potential clients, we produced a solution that stood at the intersection of innovation and usability."
+        "text": "The review step is where regulation becomes copy. Anyone paying by bank is told they can revoke the authorisation by contacting Plastiq at least three working days before the delivery date. Anyone paying without an account accepts guest terms there, because paying as a guest was a first-class path and not a shortcut bolted on afterwards. Texas requirements are a component of their own, since a state-specific disclosure has to appear in the flow rather than in a help page nobody opens."
       },
       {
         "type": "heading",
-        "level": 3,
-        "text": "Security Beyond Standards: PCI Level 1 Certification and Bank-Grade Protection"
+        "level": 2,
+        "text": "Three passes at the same six steps"
       },
       {
         "type": "paragraph",
-        "text": "The commitment to security was not just a checkbox but an integral part of the design process. The implementation of PCI Level 1 certification and bank-grade security measures was a result of continuous iteration and expert interviews. This rigorous approach reassured our partners and users, garnering frequent comments on the solidity of the product's design."
+        "text": "The flow went through three full versions. What changed between them is the useful part: the six steps and their order held from the first version to the last. What grew was coverage — more delivery-method combinations, filled and empty states for each, and eventually a parallel set of accounts-receivable screens alongside the payable ones."
+      },
+      {
+        "type": "paragraph",
+        "text": "That is the outcome you want from sequencing work done early. The decision about what order to ask things in was made once, against the constraint that the vendor’s accepted method is fixed, and then it survived two rebuilds. The versions after it were about completeness, not about reconsidering the spine."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Designing for someone else’s brand"
+      },
+      {
+        "type": "paragraph",
+        "text": "White-labelling was structural, not a skin. The token set has two layers: a base palette and type scale, and a partner layer that overrides it — partner-scoped colour collections alongside partner paragraph and field-label type styles. A partner’s blue becomes the primary while Connect’s own teal stays Plastiq’s brand, and nothing in the widget has to be redrawn."
+      },
+      {
+        "type": "paragraph",
+        "text": "For Nearside it went further than tokens: a parallel component set — button, field, input, labels, upload — living beside the generic one, so partner-specific behaviour had somewhere to go that was not a fork of the widget."
+      },
+      {
+        "type": "paragraph",
+        "text": "One thing stayed fixed. Plastiq is disclosed in the footer of every screen even though the partner’s brand is everywhere else. A payer handing over a card is entitled to know who is processing it, and that mattered more than the cleanliness of the white label."
       },
       {
         "type": "image",
         "src": "/Images/case-studies/connect-api/04-connect-teal-design-tokens.webp",
         "alt": "Design token documentation for Connect Teal: the raw hex value, the connect-teal-400 token, alias tokens for navigation states, and contrast results marked 1.81 FAIL on white text and 11.63 AAA on black",
-        "caption": "Colour documented as a chain: raw value to token to alias, with contrast results recorded against each usage."
+        "caption": "Colour documented as a chain — raw value to token to alias — with contrast results recorded against each usage, including the ones that fail."
       },
       {
         "type": "heading",
-        "level": 3,
-        "text": "Seamless Integration with Freedom of Choice: UI Design Excellence"
+        "level": 2,
+        "text": "The other product: the partner portal"
       },
       {
         "type": "paragraph",
-        "text": "The UI design was a labor of love, guided by the principles of usability and clarity. Clients frequently commented on the solid design of the product, particularly highlighting the intuitiveness of the partner portal. The portal, developed through countless iterations, provided an easy way for developers to integrate Connect into their systems, ensuring a smooth and intuitive experience."
+        "text": "The portal’s user is a developer integrating the widget, and their questions are not a payer’s. Where are my keys. What is hitting my endpoint. Which transaction broke. The navigation answers those directly — get started, overview, transaction search, dashboard, API keys, IP whitelisting, webhooks, SDKs and widgets, reporting — with a sandbox and production split and the running version number pinned in the footer, so nobody has to guess which environment they are changing."
       },
       {
-        "type": "paragraph",
-        "text": "In essence, our design solution was not just about creating a product; it was about fostering a collaborative vision, iterating tirelessly, and respecting the diverse needs of clients. Plastiq Connect's end-to-end payment widget and developer portal, coupled with stringent security measures and an intuitive UI, emerged as a testament to the success that can be achieved through a harmonious blend of collaboration, innovation, and user-centric design."
+        "type": "list",
+        "items": [
+          "API keys capped at two per account, shown masked to the last four characters, with the full lifecycle designed — none yet, created, rotated, deleted early, expired — and a confirmation that names the key by those last four rather than saying “key deleted”",
+          "IP whitelisting capped at fifty, accepting single addresses and CIDR ranges, validating the offending row inline instead of rejecting the whole list",
+          "Transaction search with a per-transaction issue state distinct from an empty result, because “no results” and “this payment has a problem” are different answers",
+          "Team roles and permissions, with invitations that expire and say so"
+        ]
       },
       {
         "type": "image",
@@ -940,73 +1017,14 @@
         "caption": "The partner portal: keys, whitelisting, reporting and permissions in one place for the developer integrating the widget."
       },
       {
-        "type": "image",
-        "src": "/Images/case-studies/connect-api/06-v2-dashboard-concept.webp",
-        "alt": "V2 concept for the partner dashboard with payment volume charts by currency, an onboarding checklist, implementation guide and link to Connect documentation",
-        "caption": "V2 and beyond: pairing the volume data with an onboarding checklist and route into the docs."
-      },
-      {
-        "type": "heading",
-        "level": 2,
-        "text": "Shaping Future Transactions"
-      },
-      {
         "type": "paragraph",
-        "text": "Even though I was the sole (lead) product designer and architect, the journey with Plastiq Connect was a collaborative triumph. Working tirelessly alongside the product manager and business analyst, we collectively crafted a PCI-compliant end-to-end payment widget that not only met but exceeded industry standards, redefining the landscape of secure and seamless financial transactions. This was done through countless hours of expert interview and iteration of initial ideas and strategies for the product. By remaining agile and respecting and incorporating the collective vision of the company and potential clients I was able to produce"
+        "text": "The operational states got the same attention as the happy path, because in a developer tool the failure is the product. An expired invitation is a dead end that produces a support ticket unless the page tells you exactly what happened and what to do, including how long the window was."
       },
       {
-        "type": "heading",
-        "level": 2,
-        "text": "Key KPI's"
-      },
-      {
-        "type": "heading",
-        "level": 3,
-        "text": "Strategic Partnerships (Pre-Launch)"
-      },
-      {
-        "type": "list",
-        "items": [
-          "Successfully collaborated with Billfire, Brex, and PayGround",
-          "Resulted in partnerships secured before the official launch"
-        ]
-      },
-      {
-        "type": "heading",
-        "level": 3,
-        "text": "Monthly Payment Volume (Post-Launch)"
-      },
-      {
-        "type": "list",
-        "items": [
-          "Exceeded $20 million monthly payment volume in the first month of launch",
-          "Demonstrated the success of teamwork, strategic design, and valuable partnerships"
-        ]
-      },
-      {
-        "type": "heading",
-        "level": 3,
-        "text": "Client Satisfaction"
-      },
-      {
-        "type": "list",
-        "items": [
-          "Frequent client comments on the solidity and intuitive design",
-          "Particularly noted the intuitiveness of the partner portal"
-        ]
-      },
-      {
-        "type": "heading",
-        "level": 3,
-        "text": "Developer Integration Ease"
-      },
-      {
-        "type": "list",
-        "items": [
-          "Partner portal offered an easy integration path for developers",
-          "Contributed to the overall success of Plastiq Connect in the API payments landscape",
-          "Clients can get up and running in as little as 8 weeks"
-        ]
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/09-invitation-expired-state.webp",
+        "alt": "Plastiq Connect error page reading “your link has expired” with a broken-link icon and guidance to contact an administrator for a new link, noting invitations expire within 24 hours",
+        "caption": "The expired-invitation page: what happened, who to ask, and the 24-hour rule stated rather than implied."
       },
       {
         "type": "image",
@@ -1015,9 +1033,114 @@
         "caption": "The same portal on mobile, including webhooks, keys and the partner invitation flow."
       },
       {
+        "type": "heading",
+        "level": 2,
+        "text": "How the portal got to that shape"
+      },
+      {
+        "type": "paragraph",
+        "text": "The portal did not start there. The developer tools — API keys, IP whitelisting, webhooks — were worked through in a separate exploration file at three fidelities: lo-fi, then hi-fi, then a dedicated deep dive on manual key rotation, the one flow with enough branching to deserve its own study. There is also a page explicitly labelled “concepts, do not use”, which is the cheapest documentation a design file can carry: it stops someone reopening a dead idea six months later."
+      },
+      {
+        "type": "paragraph",
+        "text": "The state names that came out of the hi-fi pass — zero state, key created, key rotated, filled with validation error, scroll list, delete item, read-only saved — carried into the live portal essentially unchanged. The design converged early and stayed converged."
+      },
+      {
+        "type": "paragraph",
+        "text": "The analytics and operations half of the portal — dashboard, transaction search, reporting — was designed later and directly in the live file rather than explored separately first. Transaction search ended up the most component-heavy page in the product: detail layout, disbursement information, payment originator, status icons, a timeline, and an issue block, because tracing a payment that went wrong is a different task from finding one that went right."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Extending the surface"
+      },
+      {
+        "type": "paragraph",
+        "text": "Once the core shipped, the work moved to everywhere else Connect could sit. These reached design and discovery rather than production, and are worth naming for what they were:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Wallet — stored payment methods layered over both the card and bank paths, so a returning payer picks a saved method from a dropdown instead of re-entering it",
+          "Plaid — the full bank-linking sequence: pick a bank, or fall back to entering routing and account numbers by hand; personal or business; checking or savings; authorise; verify by phone, email or text. The manual path exists because bank pickers do not cover every institution, and a payer blocked at bank selection is a payer who leaves",
+          "Freshbooks — Connect embedded as a panel inside a partner’s own accounts-payable product, a different surface from a checkout, with a numbered flow for creating recipients by wire, check or ACH",
+          "Internationalisation — honestly a typography feasibility audit: one string set in five typefaces across the twelve most spoken languages, which found at least one script a candidate face could not render. Worth knowing before a partner in that market asks, not after"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "The Freshbooks work is where the design file stops being pictures and starts being specification. Written into it, next to the screens: the check payable field should be prefilled with the recipient name; wire payments need a country selection; ACH does not, because ACH is US-only. Three lines, each one a decision an engineer would otherwise have to ask about or guess at."
+      },
+      {
+        "type": "paragraph",
+        "text": "The Plaid file carries the same habit in a less comfortable form — a known limitation in the authorisation flow, that a user has to come back to verify, recorded in the design rather than left to surface in QA. Documenting the thing that does not work yet is how the next person avoids designing on top of it."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/06-v2-dashboard-concept.webp",
+        "alt": "V2 concept for the partner dashboard with payment volume charts by currency, an onboarding checklist, implementation guide and link to Connect documentation",
+        "caption": "A later dashboard concept, pairing volume data with an onboarding checklist and a route into the docs."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The receivable side: getting a business paid"
+      },
+      {
+        "type": "paragraph",
+        "text": "Paying is only half of a payments product. A business on the receiving end has to be onboarded and underwritten before money can be sent to it, and that is its own design problem — a long, invasive form that people abandon."
+      },
+      {
+        "type": "paragraph",
+        "text": "The know-your-business flow asks for the deposit account, the business address, the industry, the EIN, monthly expenses, employee count, years in operation, whether the business carries a corporate card, what goods or services it sells, what kinds of customers it sells to, proof of web presence, and a sample invoice or contract — up to twelve files, with the accepted formats and the size limit stated rather than discovered on rejection. It ends by telling the applicant the review takes under 24 hours."
+      },
+      {
+        "type": "paragraph",
+        "text": "The pattern throughout is the same one as the invoice upload on the payable side: when you have to ask for something intrusive, say what it is for and what happens next. A form this long cannot be made short, so the work goes into making it finishable — constraints declared up front, a stated turnaround at the end, and no step that fails silently."
+      },
+      {
+        "type": "paragraph",
+        "text": "Registration had three routes, which matters for an embedded product: through Plastiq’s own site, through a partner-hosted link, or inline in the widget with no Plastiq account at all. The third is the one that makes it genuinely embedded rather than a redirect wearing a partner’s colours."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The partners"
+      },
+      {
+        "type": "paragraph",
+        "text": "Billfire, Brex and PayGround all committed before launch, which for a 0→1 payments product is the harder proof — they were integrating against something that did not have a track record yet."
+      },
+      {
+        "type": "paragraph",
+        "text": "PayGround is the one that shows what the flexibility was for. It is a patient-facing app for medical bills, built by a founder who had faced twenty-one separate bills from different providers, each with its own portal, its own accepted method, and paper statements arriving after he had already paid. Connect let a patient pay any provider by ACH, credit, debit or an HSA or FSA account — while each provider kept receiving payment the way it always had, by check or ACH deposit. Two different sets of rules on either side of one transaction, which is exactly the problem the delivery-method-first sequencing was built for."
+      },
+      {
         "type": "quote",
-        "text": "Plastiq’s APIs enabled us to seamlessly integrate our mobile app and payments capabilities. From day one, we received a ton of support from the team at Plastiq, helping with engagement and fueling the project.",
-        "attribution": "Adam Younger, COO of Payground"
+        "text": "Plastiq’s APIs enabled us to seamlessly integrate our mobile app and payments capabilities. From day one, we received a ton of support from team Plastiq, helping with engagement and fueling the project.",
+        "attribution": "Adam Younger, COO of PayGround"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcomes"
+      },
+      {
+        "type": "paragraph",
+        "text": "The widget and portal cleared $20M+ in monthly payment volume within the first month of launch, with three partnerships secured before it. Partners could go from signed to live in about eight weeks — the number Plastiq went on to publish as its own integration commitment."
+      },
+      {
+        "type": "paragraph",
+        "text": "The component set the widget was assembled from became the most complete part of the system, and it was built inside the product rather than in a separate library file, which is why it survived. A parallel effort to stand up a formal Connect design system stayed in discovery; the one that shipped was the one attached to something being shipped."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Reflection"
+      },
+      {
+        "type": "paragraph",
+        "text": "The unusual part of this project was designing two products for two audiences who never meet and cannot be shown the same thing. The payer sees a form and should never think about Plastiq beyond one line in the footer. The developer sees Plastiq’s machinery and needs every seam labelled. Getting the payer flow right meant hiding structure; getting the portal right meant exposing it. The token architecture is what let both be true at once — one system, two very different faces, and no fork to maintain."
       }
     ]
   },
