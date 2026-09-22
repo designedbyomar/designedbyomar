@@ -9,6 +9,7 @@ import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
+import { buildIndex, matchQuestion, nearestTopic } from './ask.mjs';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -1906,6 +1907,264 @@ const FAQAnswer = ({ item }) => {
   );
 };
 
+// ============================================================
+// Ask — pre-generated answers, matched client-side
+// ============================================================
+
+/**
+ * Suggested prompts, in preference order. Most visitors click rather than
+ * type, so these carry the feature and implicitly set its scope. Ids that are
+ * not approved yet are skipped, so this list can name answers ahead of review.
+ */
+const ASK_SUGGESTED_IDS = ['design-systems', 'fintech-depth', 'leadership-or-ic', 'technical-depth'];
+
+const ASK_MAX_SUGGESTIONS = 4;
+
+const loadAskAnswers = async () => {
+  // Dev reads the source file so drafts are visible while reviewing. The
+  // production build writes a filtered copy containing approved answers only,
+  // so draft text never ships — see generateAskAnswers in postbuild.js.
+  if (import.meta.env.DEV) {
+    const mod = await import('./content/ask-answers.json');
+    return (mod.default ?? mod).answers ?? [];
+  }
+  const response = await fetch('/ask-answers.json');
+  if (!response.ok) throw new Error(`ask-answers.json: ${response.status}`);
+  const doc = await response.json();
+  return doc.answers ?? [];
+};
+
+const Ask = ({ prefersReducedMotion }) => {
+  const [answers, setAnswers] = React.useState(null);
+  const [query, setQuery] = React.useState('');
+  const [result, setResult] = React.useState(null);
+  // `missed` is tracked separately from `nearest` because a miss with no
+  // nearby topic is still a miss, and still has to say so.
+  const [missed, setMissed] = React.useState(false);
+  const [nearest, setNearest] = React.useState(null);
+  const sentinelRef = React.useRef(null);
+
+  // Loaded when the section comes into view rather than on focus: the fetch
+  // lands well after LCP, and the panel never renders as an empty shell before
+  // we know whether there is anything approved to show.
+  React.useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return undefined;
+    let cancelled = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      observer.disconnect();
+      loadAskAnswers()
+        .then(loaded => { if (!cancelled) setAnswers(loaded); })
+        .catch(() => { if (!cancelled) setAnswers([]); });
+    }, { rootMargin: '200px' });
+    observer.observe(node);
+    return () => { cancelled = true; observer.disconnect(); };
+  }, []);
+
+  const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
+
+  const suggestions = React.useMemo(() => {
+    if (!answers?.length) return [];
+    const byId = new Map(answers.map(a => [a.id, a]));
+    const picked = ASK_SUGGESTED_IDS.map(id => byId.get(id)).filter(Boolean);
+    for (const answer of answers) {
+      if (picked.length >= ASK_MAX_SUGGESTIONS) break;
+      if (!picked.includes(answer)) picked.push(answer);
+    }
+    return picked.slice(0, ASK_MAX_SUGGESTIONS);
+  }, [answers]);
+
+  const show = (answer) => { setResult(answer); setMissed(false); setNearest(null); };
+
+  const submit = (event) => {
+    event.preventDefault();
+    if (!index) return;
+    const hit = matchQuestion(query, index);
+    if (hit) { show(hit.answer); return; }
+    setResult(null);
+    setMissed(true);
+    setNearest(nearestTopic(query, index));
+  };
+
+  if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
+
+  const sourcesFor = (answer) => (answer.sources ?? [])
+    .map(id => CASE_STUDIES.find(c => c.id === id))
+    .filter(Boolean);
+
+  return (
+    <div ref={sentinelRef} style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-4)',
+      paddingTop: 'var(--space-6)',
+      marginTop: 'var(--space-2)',
+      borderTop: '1px solid var(--color-gray-100)',
+    }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        Ask something else
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        {suggestions.map(answer => (
+          <button
+            key={answer.id}
+            type="button"
+            onClick={() => { setQuery(''); show(answer); }}
+            style={{
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              color: 'var(--fg-secondary)',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              borderRadius: 'var(--radius-standard)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: prefersReducedMotion ? 'none' : 'background var(--duration-fast), color var(--duration-fast)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--fg-secondary)'; }}
+          >
+            {answer.question}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          aria-label="Ask a question about Omar's work"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Ask about a project, a skill, a role…"
+          autoComplete="off"
+          style={{
+            flex: '1 1 260px',
+            minWidth: 0,
+            minHeight: 44,
+            padding: '10px 14px',
+            fontFamily: 'inherit',
+            fontSize: 'var(--font-size-body-md)',
+            color: 'var(--fg-primary)',
+            background: 'var(--bg-base)',
+            border: 'none',
+            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            borderRadius: 'var(--radius-standard)',
+          }}
+        />
+        <button type="submit" disabled={!query.trim()} style={{
+          minHeight: 44,
+          padding: '10px 18px',
+          fontFamily: 'inherit',
+          fontSize: 'var(--font-size-body-md)',
+          fontWeight: 'var(--font-weight-medium)',
+          color: query.trim() ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+          borderRadius: 'var(--radius-standard)',
+          cursor: query.trim() ? 'pointer' : 'not-allowed',
+        }}>
+          Ask
+        </button>
+      </form>
+
+      <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        {result && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-5) var(--space-6)',
+            borderRadius: 'var(--radius-comfort)',
+            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+          }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
+              {result.question}
+            </p>
+            {result.answer.split('\n\n').map((paragraph, i) => (
+              <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
+                {paragraph}
+              </p>
+            ))}
+            {sourcesFor(result).length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {sourcesFor(result).map(caseStudy => (
+                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    fontSize: 'var(--font-size-body-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--fg-primary)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-standard)',
+                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                  }}>
+                    {caseStudy.title}
+                    <AppIcon icon={ArrowUpRight} size={12} />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {missed && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-5) var(--space-6)',
+            borderRadius: 'var(--radius-comfort)',
+            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+          }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
+              {nearest
+                ? 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing \u2014 the closest published work is below, and email is faster for anything specific.'
+                : 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing, email is the faster route.'}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
+                <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                  padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                  boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                }}>
+                  {caseStudy.title}
+                  <AppIcon icon={ArrowUpRight} size={12} />
+                </a>
+              ))}
+              <a href="mailto:omar@designedbyomar.com" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              }}>
+                Email Omar
+                <AppIcon icon={ArrowUpRight} size={12} />
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
+        These answers are written in advance from the published case studies and reviewed by hand —
+        nothing here is generated when you ask.
+      </p>
+    </div>
+  );
+};
+
 const FAQ = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
   const [openIndex, setOpenIndex] = React.useState(-1);
@@ -2089,6 +2348,7 @@ const FAQ = ({ scrollToSection }) => {
               transition: 'transform var(--duration-fast-mid) ease',
             }} />
           </button>
+          <Ask prefersReducedMotion={prefersReducedMotion} />
         </div>
       </Reveal>
     </section>

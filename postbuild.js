@@ -303,6 +303,25 @@ function caseStudyContentHtml(c) {
   ].join('');
 }
 
+/**
+ * Ship only the approved Ask answers, as a separate file the page fetches on
+ * first interaction.
+ *
+ * Two reasons it is not imported into the bundle. Drafts would travel with it —
+ * filtering at runtime still ships the text — and the answer set has no
+ * business in the critical path when most visitors never open it.
+ */
+function generateAskAnswers(distDir) {
+  const doc = require('./src/content/ask-answers.json');
+  const approved = doc.answers
+    .filter(answer => answer.status === 'approved')
+    .map(({ id, question, aliases, answer, sources, topic }) => ({ id, question, aliases, answer, sources, topic }));
+
+  fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved }));
+  const held = doc.answers.length - approved.length;
+  console.log(`\u2705 Ask: ${approved.length} approved answer(s) shipped${held ? `, ${held} draft(s) withheld` : ''}.`);
+}
+
 function generateRoutes() {
   const distDir = './dist';
   if (!fs.existsSync(distDir)) return;
@@ -376,6 +395,7 @@ function generateRoutes() {
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
+  generateAskAnswers(distDir);
   generateSitemap(distDir);
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
