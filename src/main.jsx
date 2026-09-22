@@ -9,7 +9,7 @@ import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
-import { buildIndex, matchQuestion, nearestTopic } from './ask.mjs';
+import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -1838,6 +1838,20 @@ const ASK_SUGGESTED_IDS = [
 
 const ASK_MAX_SUGGESTIONS = 6;
 
+/**
+ * Follow-ups shown once an answer is on screen. Fewer than the opening set:
+ * they sit above an answer the reader is still reading, and the point is a
+ * next step, not a second menu.
+ */
+const ASK_MAX_FOLLOW_UPS = 4;
+
+/**
+ * Refusals answer a question honestly when it is asked, but suggesting one
+ * invites it. Nothing on a hiring page should prompt a visitor to ask whether
+ * Omar will work for free.
+ */
+const isSuggestable = (answer) => answer.topic !== 'refusal';
+
 const loadAskAnswers = async () => {
   // Dev reads the source file so drafts are visible while reviewing. The
   // production build writes a filtered copy containing approved answers only,
@@ -1890,16 +1904,38 @@ const Ask = ({ prefersReducedMotion }) => {
 
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
 
-  const suggestions = React.useMemo(() => {
+  const openingSuggestions = React.useMemo(() => {
     if (!answers?.length) return [];
     const byId = new Map(answers.map(a => [a.id, a]));
     const picked = ASK_SUGGESTED_IDS.map(id => byId.get(id)).filter(Boolean);
     for (const answer of answers) {
       if (picked.length >= ASK_MAX_SUGGESTIONS) break;
-      if (!picked.includes(answer)) picked.push(answer);
+      if (!picked.includes(answer) && isSuggestable(answer)) picked.push(answer);
     }
     return picked.slice(0, ASK_MAX_SUGGESTIONS);
   }, [answers]);
+
+  // The question that produced whatever is on screen. Held rather than read
+  // from `query`, which keeps changing as the visitor types the next one.
+  const answered = result?.question ?? drafted?.question ?? null;
+
+  /**
+   * Once an answer is showing, the opening six are stale — they are the same
+   * six the visitor has already passed over. Rank the set against the question
+   * just answered instead, so the row becomes a next step rather than a menu
+   * that never changes.
+   */
+  const followUps = React.useMemo(() => {
+    if (!index || !answered) return [];
+    return rankNearest(
+      answered,
+      index,
+      ASK_MAX_FOLLOW_UPS + 1,
+      a => isSuggestable(a) && a.id !== result?.id,
+    ).slice(0, ASK_MAX_FOLLOW_UPS);
+  }, [index, answered, result]);
+
+  const suggestions = followUps.length ? followUps : openingSuggestions;
 
   /**
    * Every interaction that takes over the answer region claims it first.
@@ -1962,14 +1998,14 @@ const Ask = ({ prefersReducedMotion }) => {
       if (kind === 'generated' && response.body) {
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let text = '';
-        setDrafted({ text: '', sources: sourceIds });
+        setDrafted({ text: '', sources: sourceIds, question: asked });
         setMissed(false);
         for (;;) {
           const { value, done } = await reader.read();
           if (done) break;
           if (!current()) { await reader.cancel().catch(() => {}); return 'superseded'; }
           text += value;
-          setDrafted({ text, sources: sourceIds });
+          setDrafted({ text, sources: sourceIds, question: asked });
         }
         if (text.trim()) return 'generated';
       }
@@ -2036,7 +2072,7 @@ const Ask = ({ prefersReducedMotion }) => {
       borderTop: '1px solid var(--color-gray-100)',
     }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        Ask something else
+        {followUps.length ? 'Related' : 'Ask something else'}
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
@@ -2045,7 +2081,10 @@ const Ask = ({ prefersReducedMotion }) => {
             key={answer.id}
             type="button"
             onClick={() => {
-              trackPortfolioEvent('ask_suggested_click', { answer_id: answer.id });
+              trackPortfolioEvent('ask_suggested_click', {
+                answer_id: answer.id,
+                context: followUps.length ? 'related' : 'opening',
+              });
               setQuery('');
               show(answer);
             }}
@@ -2227,8 +2266,8 @@ const Ask = ({ prefersReducedMotion }) => {
           }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
               {nearest
-                ? 'Nothing written covers that one, and it could not be drafted either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
-                : 'Nothing written covers that one, and it could not be drafted either. Rather than guess, email is the faster route.'}
+                ? 'That one has no written answer, and drafting one did not work either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
+                : 'That one has no written answer, and drafting one did not work either. Rather than guess, email is the faster route.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (

@@ -127,14 +127,25 @@ export const matchQuestion = (query, index) => {
  * Returns fewer than `limit` when fewer answers share any vocabulary with the
  * question — padding the list with arbitrary answers would be worse than a
  * short one, since every extra entry is context the model may draw from.
+ *
+ * `accept` decides which answers are eligible. It defaults to the grounding
+ * rule — an answer with no citable source is no use to a model — but the UI
+ * ranks for a different purpose and passes its own: a third of the set is
+ * sourceless, including availability, location and how to make contact, which
+ * are exactly the follow-ups worth offering a reader.
  */
-export const rankNearest = (query, index, limit = 3) => {
+export const rankNearest = (
+  query,
+  index,
+  limit = 3,
+  accept = (answer) => Boolean(answer.sources?.length),
+) => {
   const queryTokens = [...new Set(tokenize(query))];
   if (!queryTokens.length) return [];
 
   const scored = [];
   for (const doc of index.docs) {
-    if (!doc.answer.sources?.length) continue;
+    if (!accept(doc.answer)) continue;
     let matched = 0;
     for (const token of queryTokens) if (doc.tokens.has(token)) matched += index.idf(token);
     if (matched > 0) scored.push({ answer: doc.answer, matched });

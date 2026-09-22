@@ -1245,6 +1245,12 @@ const ComponentsSection = () => (
         </div>
       </ExampleFrame>
       <div className="ds-card-grid">
+        <DocCard title="Prompts follow the reader" meta="Suggestions">
+          The opening prompts cover the breadth of the set. Once an answer is on screen they are
+          replaced by follow-ups ranked against the question just answered, because the opening six
+          are the six the reader has already passed over. Refusals are never offered as a prompt:
+          they answer honestly when asked, but suggesting one invites it.
+        </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
           Matching is inverse-document-frequency weighted token overlap over each answer&rsquo;s question
           and aliases. Below threshold, or when too little of the question is in vocabulary, the

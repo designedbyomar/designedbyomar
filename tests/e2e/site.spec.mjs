@@ -582,6 +582,37 @@ test('Ask answers are not fetched until the FAQ section is reached', async ({ pa
   expect(requests, 'and must be fetched once when the section is reached').toHaveLength(1);
 });
 
+test('the suggestion row becomes related follow-ups once an answer is showing', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  const prompts = page.locator('#ask-panel button[type="button"]');
+  const opening = await prompts.allInnerTexts();
+  expect(opening).toHaveLength(6);
+
+  await prompts.filter({ hasText: /fintech and payments/i }).first().click();
+
+  // The row retitles and re-ranks against the question just answered, rather
+  // than leaving the same six the visitor has already passed over.
+  await expect(page.getByText('Related')).toBeVisible();
+  await expect(page.getByText('Ask something else')).toHaveCount(0);
+
+  const related = await prompts.allInnerTexts();
+  expect(related.length).toBeGreaterThan(0);
+  expect(related.length).toBeLessThanOrEqual(4);
+  expect(related, 'a follow-up must not repeat the answer on screen')
+    .not.toContain("What's Omar's fintech and payments experience?");
+  expect(related).not.toEqual(opening);
+
+  // Refusals answer honestly when asked but are never offered as a prompt.
+  for (const text of related) {
+    expect(text).not.toMatch(/for free|references|how much|salary/i);
+  }
+
+  // The typed route stays available alongside them.
+  await expect(askInput(page)).toBeVisible();
+});
+
 test('Ask returns a written answer with a citation into the case study', async ({ page }) => {
   await page.goto('/');
   await openAsk(page);
@@ -611,7 +642,7 @@ test('Ask refuses a question it has no written answer for', async ({ page }) => 
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
 });
 
@@ -641,7 +672,7 @@ test('Ask still answers when analytics are declined, and sends nothing', async (
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
 
   const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
   expect(events.filter(e => e.eventName.startsWith('ask_')), 'a declined visitor must send no ask_* events').toHaveLength(0);
@@ -662,7 +693,7 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
 
   const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
   expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
@@ -712,7 +743,7 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -758,5 +789,5 @@ test('picking a suggestion mid-stream does not resurrect the draft', async ({ pa
 
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
-  await expect(askLive(page).getByText(/no written answer for that one/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toHaveCount(0);
 });
