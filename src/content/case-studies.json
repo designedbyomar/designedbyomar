@@ -885,9 +885,30 @@
           "Set the product vision with the PM, from nothing",
           "Owned the payer flow end to end, and the partner portal alongside it",
           "Built the component set the widget was assembled from, including the partner-specific overrides",
-          "Ran expert interviews and competitive research, including against Stripe Connect",
+          "Ran the expert interviews — prospective partners’ engineering and product teams, plus Plastiq’s own sales, operations and compliance staff — and the competitive benchmark against Stripe Connect",
           "Owned engineering handoff"
         ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What the research covered"
+      },
+      {
+        "type": "paragraph",
+        "text": "Two groups, and the choice of groups is itself a decision. The engineering and product teams of prospective partners — the people who would actually have to integrate this — and Plastiq’s own sales, operations and compliance staff, who knew the payment rails, the underwriting rules and what the support queue already looked like."
+      },
+      {
+        "type": "paragraph",
+        "text": "Not payers. For an embedded product the partner is the customer, and it is the partner’s integration team that can end a deal in a technical review. Worth stating plainly rather than implying broader coverage: the research went deep with integrators and internal domain experts, and the payer was reached through them."
+      },
+      {
+        "type": "paragraph",
+        "text": "The competitive benchmark was Stripe Connect, and it settled what this product actually competed on. Not feature breadth — Stripe wins that. The wedge was that a partner could hand PCI scope and risk operations to Plastiq instead of building and certifying them in-house. Once that was the answer, the design brief changed: the job was to make “you do not have to build this” legible within the first few minutes of looking at the product."
+      },
+      {
+        "type": "paragraph",
+        "text": "That is why the portal opens on getting started rather than a dashboard, why sandbox is a top-level environment instead of a buried setting, and why documentation is linked from inside each feature rather than living on a separate site. A partner evaluating whether to outsource compliance is really asking how quickly they can prove it works."
       },
       {
         "type": "heading",
@@ -1127,7 +1148,7 @@
       },
       {
         "type": "paragraph",
-        "text": "The widget and portal cleared $20M+ in monthly payment volume within the first month of launch, with three partnerships secured before it. Partners could go from signed to live in about eight weeks — the number Plastiq went on to publish as its own integration commitment."
+        "text": "The widget and portal cleared $20M+ in monthly payment volume within the first month of launch, with three partnerships secured before it. Partners could go from signed to live in about eight weeks — and that was a design target, not a sales number. The portal, the sandbox environment, the key lifecycle, the inline documentation links and the version label pinned in the footer all exist to compress the span between a signed contract and a first successful API call. Of the three headline numbers, it is the one design can properly claim, and Plastiq went on to publish it as its own integration commitment."
       },
       {
         "type": "paragraph",
