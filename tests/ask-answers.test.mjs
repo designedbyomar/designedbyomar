@@ -9,6 +9,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { fingerprintSources } from '../scripts/ask-fingerprint.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 const caseStudies = JSON.parse(readFileSync(new URL('../src/content/case-studies.json', import.meta.url), 'utf8'));
@@ -24,6 +25,23 @@ const AGENCY_VOICE = ['meticulous design solution', 'labor of love', 'collaborat
  * Matches the outcome claim, not the raw number: describing the problem state
  * ("200+ spreadsheets across 260 offices") is factual and must stay allowed.
  */
+/**
+ * Claims that were true of an earlier version of the site and have since been
+ * corrected. Same idea as PROJECTED_CLAIMS: once a factual error is fixed in
+ * public copy, it must not survive in the answer set, where it would contradict
+ * the very case study the answer links to. This list grows as claims retire.
+ */
+const RETIRED_CLAIMS = [
+  [/\bfour brands\b|\b1\s*(?:\u2192|to|-)\s*4\s*brands?\b/i,
+    'Unified Ad Platform brought seven brands onto AdVisor, the platform ESPN already ran. "Four brands" is the framing corrected in #73/#74.'],
+  [/ESPN[^.]{0,90}each ran (?:their|its) own/i,
+    'ESPN was already operating on AdVisor and did not run a separate platform.'],
+  [/\b(?:three|3)\s+design systems\b|\byes\s*[\u2014\u2013-]\s*three\b/i,
+    'The count is four since the Wisdom design system was added in #72.'],
+  [/\b15\+?\s*years\b/i,
+    'Career length is 10+ years, matching the resume — corrected in #71.'],
+];
+
 const PROJECTED_CLAIMS = /(retir\w+ 200\+|200\+ (?:excel|spreadsheet)\w* (?:to )?retir|260\s*(?:→|to)\s*900|900\+ offices|90%\+? weekly)/i;
 
 test('every cited source is a real case study', () => {
@@ -113,5 +131,37 @@ test('answers stay within a readable length', () => {
 test('every answer carries a review status', () => {
   for (const a of answers) {
     assert.ok(['draft', 'approved'].includes(a.status), `${a.id}: status must be "draft" or "approved", got "${a.status}"`);
+  }
+});
+
+test('no answer repeats a claim the site has since corrected', () => {
+  for (const a of answers) {
+    for (const [pattern, why] of RETIRED_CLAIMS) {
+      assert.ok(!pattern.test(a.answer), `${a.id}: ${why}`);
+    }
+  }
+});
+
+test('every answer is fingerprinted against its sources', () => {
+  for (const a of answers) {
+    assert.equal(
+      typeof a.sourcesFingerprint,
+      'string',
+      `${a.id}: missing sourcesFingerprint — run "node scripts/ask-fingerprint.mjs --write"`,
+    );
+  }
+});
+
+test('approved answers still match the case studies they cite', () => {
+  // The staleness guard. An approved answer is approved *against a specific
+  // version* of its sources; if those change, approval lapses and the answer
+  // drops out of the build rather than contradicting the site.
+  for (const a of answers) {
+    if (a.status !== 'approved') continue;
+    assert.equal(
+      a.sourcesFingerprint,
+      fingerprintSources(caseStudies, a.sources ?? []),
+      `${a.id}: its sources changed since this answer was approved. Re-read it against ${a.sources.join(', ')}, then re-stamp with "node scripts/ask-fingerprint.mjs --write".`,
+    );
   }
 });

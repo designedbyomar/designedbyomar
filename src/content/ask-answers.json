@@ -14,11 +14,12 @@
         "does he do design systems",
         "design tokens experience"
       ],
-      "answer": "Yes — three, and he treats them as infrastructure for a team rather than a personal artifact.\n\nAthena Design System 2.0 at Plastiq is the deepest. He co-led it, audited every product to find where nomenclature and patterns had diverged, then ran workshops to align product, design and engineering on principles and KPIs before producing a single asset. He partnered with engineering on the Storybook implementation, and it became the foundation for Plastiq's IPO-era brand — 3+ products standardised on it.\n\nHe rebuilt the design system at Welcome Lend in his current practice. The third runs this portfolio and is published at /design-system.",
+      "answer": "Yes — four, and he treats them as infrastructure for a team rather than a personal artifact.\n\nAthena Design System 2.0 at Plastiq is the deepest. He co-led it, audited every product to find where nomenclature and patterns had diverged, then ran workshops to align product, design and engineering on principles and KPIs before producing a single asset. He partnered with engineering on the Storybook implementation, and it became the foundation for Plastiq's IPO-era brand.\n\nHe built Wisdom's system from scratch as founding designer, rebuilt the one at Welcome Lend, and the fourth runs this portfolio and is published at /design-system. Earlier, at Disney, he and engineering started an ad-sales system — documentation and React components — and handed the foundation on.",
       "sources": [
         "athena-ds"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
       "id": "fintech-depth",
@@ -32,11 +33,12 @@
         "PCI compliance experience",
         "embedded payments"
       ],
-      "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — and it was 0→1 on a regulated product.\n\nPlastiq Connect is a PCI Level 1 embedded payments widget that let enterprise clients put card and ACH payments inside their own platforms. He defined the product with the PM from zero, designed both the widget and the developer portal, and treated PCI Level 1 as a design constraint from day one rather than a compliance pass at the end.\n\nIt cleared $20M+ in monthly volume in month one, with three partnerships secured pre-launch and client onboarding down to eight weeks.",
+      "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — 0→1 on a regulated product.\n\nPlastiq Connect is an embedded payments product: a partner puts card and bank payments inside their own platform, under their own brand, and Plastiq carries the compliance and the disbursement. Benchmarking against Stripe Connect settled what it competed on — not feature breadth, but letting a partner hand PCI scope and risk operations over rather than build and certify them.\n\nCompliance is visible in the design: masked stored cards, the encryption notice at the card-block boundary, beneficial-owner collection in the payer form, and a Texas step that fires on the payer's billing address.\n\n$20M+ monthly volume in month one, three pre-launch partnerships, eight weeks signed to live.",
       "sources": [
         "connect-api"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
       "id": "ai-llm-work",
@@ -55,7 +57,8 @@
         "posting-asst",
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e263e75211c2"
     },
     {
       "id": "leadership-or-ic",
@@ -69,13 +72,14 @@
         "team lead or IC",
         "has he managed people"
       ],
-      "answer": "Both, and the roles track it.\n\nHe was the founding and sole design lead at Wisdom for two years, owning design across Management Portal, Reporting, Insurance Verification and Posting Assistant. At Plastiq he co-led the Athena design system and ran the cross-functional workshops that set its principles. On Disney's Unified Ad Platform he led two designers.\n\nHe's stayed hands-on throughout. He describes his current engagements as equal parts consulting and building — as likely to be rebuilding a design system as shipping a feature to production.\n\nIf you're hiring a lead who still works in the file, that's the shape of it.",
+      "answer": "Both, and the roles track it.\n\nHe was the founding and sole design lead at Wisdom for two years, owning design across Management Portal, Reporting, Insurance Verification and Posting Assistant. At Plastiq he co-led the Athena design system and ran the cross-functional workshops that set its principles. On Disney's Unified Ad Platform he led two designers and mentored others on the wider design team.\n\nHe has stayed hands-on throughout, describing his current engagements as equal parts consulting and building — as likely to be rebuilding a design system as shipping a feature to production.",
       "sources": [
         "athena-ds",
         "disney-uap",
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "796f0b1307d3"
     },
     {
       "id": "technical-depth",
@@ -93,7 +97,8 @@
       "sources": [
         "athena-ds"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
       "id": "research-process",
@@ -112,7 +117,8 @@
         "posting-asst",
         "disney-cct"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "25bf2de40a54"
     },
     {
       "id": "work-history",
@@ -127,13 +133,14 @@
         "how long at each job",
         "resume summary"
       ],
-      "answer": "Five roles, most recent first.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice, embedded with Welcome Lend plus a few companies he keeps private.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Sole designer on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
+      "answer": "Five roles, most recent first.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice, embedded with Welcome Lend plus a few companies he keeps private.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Lead designer, 0→1, on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
       "sources": [
         "mgmt-portal",
         "connect-api",
         "disney-cct"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "44e4b6f2886b"
     },
     {
       "id": "looking-for",
@@ -149,7 +156,8 @@
       ],
       "answer": "He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nThe work he's drawn to is consistent: hard product problems with messy data, edge cases, operational constraints and users whose job depends on the thing working. Complex B2B, AI workflows, fintech, healthcare SaaS, enterprise platforms.\n\nHe currently runs an independent practice and is embedded with Welcome Lend, so fractional and consulting engagements are live options alongside full-time.\n\nThe fastest way to find out whether it's a fit is to ask him — there's a 20-minute intro call link in the contact section.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-compensation",
@@ -166,7 +174,8 @@
       ],
       "answer": "Fair question, and it isn't published on the site.\n\nIt genuinely depends on scope, level, and whether the engagement is full-time, fractional or consulting — those land in different places.\n\nThe fastest path is to ask him directly. There's a 20-minute intro call link in the contact section, or email omar@designedbyomar.com. If you can say roughly what the role is and where the budget sits, he'll tell you straight away whether it's worth both your time.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-employer-opinions",
@@ -182,7 +191,8 @@
       ],
       "answer": "Not something the site covers — and not something worth relaying second-hand through a bot on his own portfolio.\n\nThe history itself is public: five roles with dates, on the resume and in the work-history answer here. The reasoning behind any particular move is a conversation, not a FAQ entry.\n\nIf you're doing reference work or weighing fit, ask him directly — booking link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "cs-mgmt-portal",
@@ -199,7 +209,8 @@
       "sources": [
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "c0a25c7eca25"
     },
     {
       "id": "cs-posting-asst",
@@ -215,7 +226,8 @@
       "sources": [
         "posting-asst"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "76e22e92a91e"
     },
     {
       "id": "cs-connect-api",
@@ -228,11 +240,12 @@
         "developer portal",
         "PCI product"
       ],
-      "answer": "An embedded payments product built 0→1 at Plastiq: a PCI Level 1 widget letting enterprise clients put card and ACH payments inside their own platforms, white-labelled to their brand.\n\nHe defined the product with the PM from zero and designed both the widget and the developer portal through iterative wireframing and expert interviews. PCI Level 1 was treated as a design constraint from day one rather than a compliance review at the end.\n\n$20M+ monthly volume in month one, three partnerships secured pre-launch, and client onboarding down to eight weeks.",
+      "answer": "Plastiq Connect let a company put card and bank payments inside its own product, under its own brand. A buyer could pay a vendor by card even where that vendor did not accept cards, and the vendor was paid the way it already got paid — wire, ACH or a posted check.\n\nTwo products came out of it: the payer-facing widget a partner embedded, and the portal their developers used to integrate it. He led design 0→1 on both.\n\nCompliance shaped the screens rather than sitting beside them — stored cards shown masked, the encryption notice placed at the boundary of the card block, and a Texas step triggered by the payer's billing address.\n\n$20M+ monthly volume in month one, three partnerships secured pre-launch, and eight weeks from signed to live.",
       "sources": [
         "connect-api"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
       "id": "cs-athena",
@@ -248,7 +261,8 @@
       "sources": [
         "athena-ds"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "9e7ebc916dd9"
     },
     {
       "id": "cs-disney-cct",
@@ -264,7 +278,8 @@
       "sources": [
         "disney-cct"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "f10c47c2e8b7"
     },
     {
       "id": "cs-disney-uap",
@@ -273,14 +288,17 @@
       "aliases": [
         "unified ad platform",
         "disney ad sales",
+        "advisor platform",
         "ESPN freeform FX",
-        "ad platform consolidation"
+        "ad platform consolidation",
+        "disney brand consolidation"
       ],
-      "answer": "ESPN, Freeform, FX Networks and National Geographic each ran their own ad sales platform. No standardisation, no cross-brand collaboration, and booking across Disney's portfolio meant working in four different systems.\n\nHe audited complex data sets across all four brands — reporting, client relations, dashboards, internal communications — then unified nomenclature, process and front-end UI against the backend architecture. He led two designers on it.\n\nFour brands consolidated into one system, tied to millions in booking impact.",
+      "answer": "AdVisor was Disney's ad-sales platform, and when the project started it served ESPN and nobody else. ABC, Disney, Hulu, ABC News, Freeform, FX Networks and National Geographic each ran their own tooling, so booking across the portfolio meant working in unrelated systems.\n\nThe job was bringing those seven brands onto AdVisor without regressing the workflow ESPN depended on daily. He started by mapping the decision flow rather than the screens — a current-state map tracing how a single decision moved through sales, traffic, promo, legal, operations, research and accounting.\n\nEight brand perspectives aligned on a shared model, ESPN's baseline preserved, and reusable patterns that fed Disney's Adapt design system. He led two designers and mentored others on the wider team.",
       "sources": [
         "disney-uap"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "a79b67ab924b"
     },
     {
       "id": "cs-page-builder",
@@ -297,7 +315,8 @@
       "sources": [
         "page-builder"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "775392485cca"
     },
     {
       "id": "cs-plastiq-mktg",
@@ -313,7 +332,8 @@
       "sources": [
         "plastiq-mktg"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "797f880f31bb"
     },
     {
       "id": "healthcare-experience",
@@ -331,7 +351,8 @@
         "posting-asst",
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e263e75211c2"
     },
     {
       "id": "enterprise-experience",
@@ -344,12 +365,13 @@
         "fortune 500",
         "corporate"
       ],
-      "answer": "Yes — two years at Disney, 2019 to 2021.\n\nHe led UX on the Critical Communication Tool, adopted by 1,600+ users and used to coordinate 250 critical incidents, and on the Unified Ad Platform that consolidated ad sales across ESPN, Freeform, FX Networks and National Geographic into one system tied to millions in bookings.\n\nEnterprise there meant the real version: four brands with their own tooling and nomenclature, large cross-functional teams, and workflows where the product failing has operational consequences.",
+      "answer": "Yes — two years at Disney, 2019 to 2021.\n\nHe led UX on the Critical Communication Tool, adopted by 1,600+ users and used to coordinate 250 critical incidents. On the Unified Ad Platform he brought seven Disney ad-sales brands onto AdVisor — the platform ESPN already ran on — without regressing the workflow ESPN depended on every day.\n\nEnterprise there meant the real version: eight brand perspectives to align, each with its own tooling and vocabulary, a single decision crossing seven business functions, and workflows where the product failing has consequences measured in bookings.",
       "sources": [
         "disney-cct",
         "disney-uap"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "2e9b3acbfec1"
     },
     {
       "id": "zero-to-one",
@@ -362,13 +384,14 @@
         "new product",
         "early stage"
       ],
-      "answer": "Repeatedly, and at different kinds of zero.\n\nPlastiq Connect was 0→1 on a regulated product — defined with the PM from nothing, shipped to $20M+ monthly volume in its first month. Wisdom was 0→1 on the org as well as the product: he was the founding designer, so design process, system and products all started empty.\n\nPage Builder 2.0 was a rebuild from scratch in two months with no PM, so he owned the product requirements too.\n\nHe describes his draw as hard problems with messy data, edge cases and operational constraints — which is usually what 0→1 actually looks like.",
+      "answer": "Repeatedly, and at different kinds of zero.\n\nPlastiq Connect was 0→1 on a regulated product — two products defined from nothing with one PM, one business analyst and five to seven engineers, shipped to $20M+ monthly volume in its first month. Wisdom was 0→1 on the organisation as well as the product: he was the founding designer, so process, system and products all started empty.\n\nPage Builder 2.0 was a rebuild from scratch in two months with no PM, so he owned the product requirements too.\n\nHe describes his draw as hard problems with messy data, edge cases and operational constraints — which is usually what 0→1 actually looks like.",
       "sources": [
         "connect-api",
         "mgmt-portal",
         "page-builder"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "9606bfc90228"
     },
     {
       "id": "api-developer-tools",
@@ -381,11 +404,12 @@
         "designing for engineers",
         "technical audience design"
       ],
-      "answer": "Yes — Plastiq Connect included a developer portal alongside the payments widget, designed for engineers integrating an embedded payments product into their own platform.\n\nThat meant designing partner integration workflows and documentation surfaces for a technical audience, not just end-user screens. Clients consistently called out the portal's solidity, and onboarding time landed at eight weeks.\n\nHe also works in React and HTML/CSS/JS himself, so the handoff to engineering tends to be a conversation about implementation rather than a spec thrown over a wall.",
+      "answer": "Yes — Plastiq Connect's partner portal was a product in its own right, built for the engineers integrating the payments widget.\n\nTheir questions are not a payer's: where the keys are, what is hitting the endpoint, which transaction broke. So API keys were capped and shown masked to their last four characters with the whole rotate-and-expire lifecycle designed, IP whitelisting accepted CIDR ranges and validated the offending row inline, and transaction search carried a per-transaction issue state distinct from an empty result. Sandbox and production were split in the navigation.\n\nEight weeks from signed to live was a design target, not a sales number.\n\nHe also writes React and HTML/CSS/JS, so handoff tends to be a conversation.",
       "sources": [
         "connect-api"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "3d5aeeaf5186"
     },
     {
       "id": "accessibility",
@@ -403,7 +427,8 @@
         "plastiq-mktg",
         "disney-cct"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e99663a0e010"
     },
     {
       "id": "brand-visual",
@@ -421,7 +446,8 @@
         "plastiq-mktg",
         "athena-ds"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "7a5f14813144"
     },
     {
       "id": "working-with-engineers",
@@ -433,13 +459,14 @@
         "handoff process",
         "dev partnership"
       ],
-      "answer": "Close, and usually in the same artifacts rather than across a handoff.\n\nOn Athena he partnered with engineering on the Storybook implementation instead of shipping specs. On Page Builder 2.0 he worked directly with the Lead Engineer to ship a full rebuild in two months. On the Unified Ad Platform he aligned the front-end UI to the backend architecture rather than designing around it.\n\nHe writes React and HTML/CSS/JS, which changes the conversation — his framing is that he'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck.",
+      "answer": "Close, and usually in the same artifacts rather than across a handoff.\n\nOn Athena he partnered with engineering on the Storybook implementation instead of shipping specs. On Page Builder 2.0 he worked with the Lead Engineer to ship a full rebuild in two months. On Plastiq Connect the specification went past screens — spacing called out per breakpoint, the mobile button block annotated as pinned, and the fee popover specified separately for desktop hover and mobile tap, because a finger has no hover state.\n\nOn the Unified Ad Platform he aligned the front-end to the backend architecture rather than designing around it.\n\nHe writes React and HTML/CSS/JS, which changes the conversation.",
       "sources": [
         "athena-ds",
         "page-builder",
         "disney-uap"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "b95a580b8ad8"
     },
     {
       "id": "working-with-pms",
@@ -451,13 +478,14 @@
         "working with product",
         "stakeholder management"
       ],
-      "answer": "As a partner in defining the product, and occasionally as the substitute for one.\n\nOn Plastiq Connect he worked with the PM to define the product vision from zero. On Page Builder 2.0 there was no PM, so he owned the product requirements himself alongside the design.\n\nHe also does the alignment work directly — co-leading workshops on Athena to set principles and KPIs, and running an eight-person cross-functional workshop on the Plastiq relaunch.\n\nHis stated preference is starting in plain text: writing, mapping the problem and naming the tradeoffs before moving to screens.",
+      "answer": "As a partner in defining the product, and occasionally as the substitute for one.\n\nOn Plastiq Connect he set the product vision with the PM from nothing, alongside one business analyst and five to seven engineers. On Page Builder 2.0 there was no PM, so he owned the product requirements himself next to the design.\n\nHe also does the alignment work directly — co-leading workshops on Athena to set principles and KPIs, and running an eight-person cross-functional workshop on the Plastiq relaunch.\n\nHis stated preference is starting in plain text: writing, mapping the problem and naming the tradeoffs before moving to screens.",
       "sources": [
         "connect-api",
         "page-builder",
         "athena-ds"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "91b8e8b2ff05"
     },
     {
       "id": "handling-ambiguity",
@@ -475,7 +503,8 @@
         "athena-ds",
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "3afa0e22789d"
     },
     {
       "id": "measuring-success",
@@ -494,7 +523,8 @@
         "page-builder",
         "mgmt-portal"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "71a021fce746"
     },
     {
       "id": "prototyping",
@@ -506,12 +536,13 @@
         "figma prototypes",
         "does he build prototypes"
       ],
-      "answer": "Constantly, and he'd rather prototype than present.\n\nHis stated preference: put a rough prototype in a teammate's hands rather than spend another week polishing a deck. Plastiq Connect was designed through iterative wireframing and expert interviews, and Page Builder 2.0 went from nothing to shipped in two months.\n\nBecause he works in React and HTML/CSS/JS, prototypes can go as far as real code when that's the faster way to answer the question — this site being one example.\n\nAI-assisted prototyping is listed among his core skills.",
+      "answer": "Constantly, and he'd rather prototype than present.\n\nHis stated preference: put a rough prototype in a teammate's hands rather than spend another week polishing a deck. Plastiq Connect was worked out through iterative wireframing and interviews with the engineering and product teams who would integrate it, and Page Builder 2.0 went from nothing to shipped in two months.\n\nBecause he works in React and HTML/CSS/JS, prototypes can go as far as real code when that is the faster way to answer the question — this site being one example.\n\nAI-assisted prototyping is listed among his core skills.",
       "sources": [
         "connect-api",
         "page-builder"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "170e45c77264"
     },
     {
       "id": "facilitation",
@@ -529,7 +560,8 @@
         "athena-ds",
         "plastiq-mktg"
       ],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "7a5f14813144"
     },
     {
       "id": "does-he-write",
@@ -544,7 +576,8 @@
       ],
       "answer": "Yes — he publishes on Substack, linked from the contact section and the footer.\n\nWriting is also part of how he works rather than a side activity. He describes starting problems in plain text: writing, mapping the problem and naming the tradeoffs before moving into design.\n\nThat shows up in the artifacts too. This repository is public and documents its own design system, deployment runbook and AI-assisted workflow in writing.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "location",
@@ -559,7 +592,8 @@
       ],
       "answer": "Torrington, Connecticut, working remote. US Eastern time.\n\nHis recent roles have all been remote — Wisdom was New York remote, Simplero Brooklyn remote, Plastiq San Francisco remote. The Disney role was on site in Bristol, Connecticut.\n\nSo he's worked remote with teams across US timezones for several years, and it's the default rather than an accommodation.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "availability",
@@ -574,7 +608,8 @@
       ],
       "answer": "He currently runs an independent practice and is embedded with Welcome Lend plus a few companies he keeps private, so availability depends on what you're asking for.\n\nFractional and consulting engagements are live options alongside full-time roles.\n\nRather than guessing at timing here, the honest answer is to ask him — there's a 20-minute intro call link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "contract-or-fulltime",
@@ -590,7 +625,8 @@
       ],
       "answer": "Both. He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nHis current practice is consulting and embedded work — at Welcome Lend he's an embedded senior design lead, rebuilding their design system and shipping work brokers use daily.\n\nSo a fractional or contract engagement isn't a fallback for him; it's what he's doing now.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "how-to-contact",
@@ -606,7 +642,8 @@
       ],
       "answer": "Fastest is the 20-minute intro call link in the contact section of this site.\n\nOtherwise: omar@designedbyomar.com. He's also on LinkedIn, GitHub, Substack and Behance, all linked from the contact section and the footer.\n\nHis resume is downloadable from the hero and the contact section if you need dates and titles before reaching out.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "resume",
@@ -620,7 +657,8 @@
       ],
       "answer": "Yes — it's linked from the hero and the contact section of this site as a PDF.\n\nIt covers the five most recent roles with dates and titles, a selected-impact summary, and the core expertise list. If you want the narrative version instead, the eight case studies go considerably deeper than a resume bullet can.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "how-site-built",
@@ -634,7 +672,8 @@
       ],
       "answer": "He built it himself: React 19 and Vite, deployed on Vercel.\n\nA post-build step generates a real static route for every case study with its own metadata, structured data and sitemap entry — and injects the full case-study text into the HTML so crawlers, ATS scrapers and AI assistants can read it without running JavaScript.\n\nIt ships enforced security headers, consent-gated analytics, a published design system, and an automated test suite that runs on every pull request.\n\nThe repository is public, and it documents its own AI-assisted workflow in docs/ai-workflow.md.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "is-this-ai",
@@ -649,7 +688,8 @@
       ],
       "answer": "Neither, exactly. These answers were drafted from the case studies published on this site and then reviewed by Omar before going live — so they're pre-written rather than generated live, and nothing here is improvised.\n\nThat's deliberate. On a hiring site an assistant that invents a detail is worse than one that admits it doesn't know, so this one can only tell you things he has actually approved.\n\nIf a question isn't covered, it'll say so and point you at him rather than guess.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "what-data-collected",
@@ -663,7 +703,8 @@
       ],
       "answer": "Nothing is sent anywhere when you ask a question — the answers are a static file already loaded in your browser, so there's no server call and no external service involved.\n\nIf you accepted analytics, the site records that a question was asked, which helps Omar see which answers are missing. If you declined, it doesn't.\n\nThe full picture is in the privacy policy, linked in the footer.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-free-work",
@@ -679,7 +720,8 @@
       ],
       "answer": "Not something the site answers on his behalf, because it depends entirely on what's being asked and at what stage.\n\nWhat is worth saying: there are eight case studies here covering the real thing — the research, the tradeoffs, the versions that got scrapped — and the site itself is production work he wrote and shipped. That's usually a better read on how he thinks than a weekend exercise.\n\nIf you need to see something specific, ask him directly. Booking link is in the contact section.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-guarantee",
@@ -694,7 +736,8 @@
       ],
       "answer": "No, and anyone who says yes is selling something.\n\nThe numbers on this site belong to specific products with specific constraints — a 40% posting-time reduction at Wisdom, $20M+ monthly volume at Plastiq, 1,600+ users at Disney. They describe what happened there, not what's promised elsewhere. Where a figure is a target rather than a result, the site labels it projected.\n\nWhat transfers is the approach, not the outcome. Whether it fits your situation is a conversation worth having directly.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-personal",
@@ -711,7 +754,8 @@
       ],
       "answer": "The site keeps that brief on purpose. What's public: he's an amateur boxer, a music producer and a dedicated father, and he grew up in Brooklyn.\n\nBeyond that it isn't covered here, and it isn't relevant to whether he's right for a role.\n\nIf you're trying to get a sense of how he thinks or what he's like to work with, the About section and the case studies are the better read — or just talk to him.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-company-opinions",
@@ -725,7 +769,8 @@
       ],
       "answer": "Not something this assistant will do — opinions about companies or people aren't published here, and relaying them second-hand through a bot on his own portfolio would be a bad idea regardless.\n\nWhat's documented is the work: where he was, what he built, what it changed.\n\nIf you want his read on something, that's a conversation. Booking link is in the contact section.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     },
     {
       "id": "refuse-references",
@@ -740,7 +785,8 @@
       ],
       "answer": "Not through this site, and not through an assistant — references are his to offer, not a bot's to hand out.\n\nThere are attributed quotes from stakeholders inside the case studies, which give some sense of how the work landed with the people it was built for.\n\nFor actual references, ask him. He'll arrange them directly: booking link in the contact section, or omar@designedbyomar.com.",
       "sources": [],
-      "status": "draft"
+      "status": "draft",
+      "sourcesFingerprint": "e3b0c44298fc"
     }
   ]
 }
