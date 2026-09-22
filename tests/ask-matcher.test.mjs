@@ -28,6 +28,12 @@ test('distinctive terms route to the right answer', () => {
     ['tell me about the unified ad platform', 'cs-disney-uap'],
     ['has he designed for developers', 'api-developer-tools'],
     ['where has he worked', 'work-history'],
+    // Folded in from the FAQ accordion; these compete with the answers above
+    // for vocabulary, so they are pinned rather than assumed.
+    ['what kind of product designer is he', 'kind-of-designer'],
+    ['what company fit is he', 'company-fit'],
+    ['what problems does he solve', 'problems-to-solve'],
+    ['what business impact has he had', 'business-outcomes'],
   ];
   for (const [query, expected] of cases) {
     const hit = matchQuestion(query, index);
@@ -50,4 +56,20 @@ test('a miss still yields a nearest topic with a citation to offer', () => {
   const near = nearestTopic('payments compliance', index);
   assert.ok(near, 'expected a nearest topic');
   assert.ok(near.sources.length > 0, 'nearest topic must carry a citation');
+});
+
+test('a shared filler word cannot outweigh a distinctive one', () => {
+  // Regression. Adding "what enterprise work has he done" as an alias put
+  // "work" and "done" into the vocabulary, where their rarity gave them more
+  // weight than "fintech" — and "what fintech work has he done" started
+  // matching enterprise-experience. Aliases are now keyword-shaped; this pins
+  // the behaviour rather than the shape, since the shape is not the real rule.
+  const cases = [
+    ['what fintech work has he done', 'fintech-depth'],
+    ['what enterprise work has he done', 'enterprise-experience'],
+    ['what design system work has he done', 'design-systems'],
+  ];
+  for (const [query, expected] of cases) {
+    assert.equal(matchQuestion(query, index)?.answer.id, expected, `"${query}" misrouted`);
+  }
 });
