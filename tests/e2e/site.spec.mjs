@@ -727,3 +727,39 @@ test('the design system documents the Ask component', async ({ page }) => {
   await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
   await expect(page.getByText(/Only approved/i)).toBeVisible();
 });
+
+test('picking a suggestion mid-stream does not resurrect the draft', async ({ page }) => {
+  // Regression. show() cleared the draft but did not cancel its reader, so
+  // later chunks rebuilt it — and the superseded request then ran its own
+  // fallback, replacing the answer the visitor had just chosen.
+  await page.route('**/api/ask', async (route) => {
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Ask-Source': 'generated',
+        'X-Ask-Sources': 'connect-api',
+        'X-Ask-Answer-Id': '',
+      },
+      body: 'This draft belongs to the previous question.',
+    });
+  });
+
+  await page.goto('/');
+  await openAsk(page);
+
+  await askInput(page).fill('how did the design system governance model change after launch');
+  await page.locator('#faq button[type="submit"]').click();
+
+  // Take over with a reviewed answer while the draft is still in flight.
+  await page.locator('#faq button').filter({ hasText: /design systems at scale/i }).first().click();
+  await expect(askLive(page).getByText(/treats them as infrastructure/i)).toBeVisible();
+
+  // Give the superseded response time to land and try to render.
+  await page.waitForTimeout(2000);
+
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toHaveCount(0);
+});

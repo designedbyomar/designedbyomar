@@ -62,11 +62,22 @@ export const buildIndex = (answers) => {
 export const MATCH_THRESHOLD = 0.42;
 
 /**
- * A query has to be at least this much in-vocabulary to be worth answering.
- * "how do penguins pay for parking in antarctica" shares one word with the
- * corpus; answering it from that one word is how a matcher embarrasses itself.
+ * More than half a question's content words must be in the corpus vocabulary.
+ *
+ * The obvious case is "how do penguins pay for parking in antarctica", which
+ * shares almost nothing. The instructive one is "does he know kubernetes":
+ * `kubernetes` is unknown, so the whole match rested on `know` — a word that
+ * happens to appear exactly once in the answer set and therefore carries a
+ * high IDF weight despite meaning nothing. That returned a confident answer
+ * about measuring design success.
+ *
+ * No rarity threshold separates `know` from `prototype` or `remote`, which are
+ * equally rare and genuinely topical. The signal that does separate them is
+ * the *unknown* word: a question naming something the corpus has never seen is
+ * usually a question the corpus cannot answer. Strictly more than half, so one
+ * known word out of two is refused.
  */
-export const MIN_KNOWN_RATIO = 0.4;
+export const MIN_KNOWN_RATIO = 0.51;
 
 /**
  * Best answer for a typed question, or null when nothing clears the threshold.
@@ -108,16 +119,32 @@ export const matchQuestion = (query, index) => {
   return best;
 };
 
-/** Nearest answer regardless of threshold — used to make a miss useful. */
-export const nearestTopic = (query, index) => {
+/**
+ * Answers ranked by the same weighting the matcher uses, best first, ignoring
+ * the accept threshold. Used to make a miss useful: the caller either offers
+ * the closest published work, or hands the top few to a model as grounding.
+ *
+ * Returns fewer than `limit` when fewer answers share any vocabulary with the
+ * question — padding the list with arbitrary answers would be worse than a
+ * short one, since every extra entry is context the model may draw from.
+ */
+export const rankNearest = (query, index, limit = 3) => {
   const queryTokens = [...new Set(tokenize(query))];
-  if (!queryTokens.length) return null;
-  let best = null;
+  if (!queryTokens.length) return [];
+
+  const scored = [];
   for (const doc of index.docs) {
     if (!doc.answer.sources?.length) continue;
     let matched = 0;
     for (const token of queryTokens) if (doc.tokens.has(token)) matched += index.idf(token);
-    if (matched > 0 && (!best || matched > best.matched)) best = { answer: doc.answer, matched };
+    if (matched > 0) scored.push({ answer: doc.answer, matched });
   }
-  return best?.answer ?? null;
+
+  return scored
+    .sort((a, b) => b.matched - a.matched)
+    .slice(0, limit)
+    .map(entry => entry.answer);
 };
+
+/** Nearest single answer regardless of threshold. */
+export const nearestTopic = (query, index) => rankNearest(query, index, 1)[0] ?? null;

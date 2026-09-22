@@ -1946,6 +1946,10 @@ const Ask = ({ prefersReducedMotion }) => {
   // `result` so the UI can never present unreviewed text as reviewed.
   const [drafted, setDrafted] = React.useState(null);
   const [drafting, setDrafting] = React.useState(false);
+  // Identifies the interaction that owns the answer region, so a response
+  // arriving for an older one can be discarded rather than rendered.
+  const requestRef = React.useRef(0);
+  const abortRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
 
   // Loaded when the section comes into view rather than on focus: the fetch
@@ -1979,7 +1983,31 @@ const Ask = ({ prefersReducedMotion }) => {
     return picked.slice(0, ASK_MAX_SUGGESTIONS);
   }, [answers]);
 
-  const show = (answer) => { setResult(answer); setMissed(false); setNearest(null); setDrafted(null); };
+  /**
+   * Every interaction that takes over the answer region claims it first.
+   *
+   * A draft streams in over several seconds, and the visitor can pick a
+   * suggestion while it is still arriving. Clearing the draft is not enough:
+   * the reader keeps yielding chunks that rebuild it, and the superseded
+   * request still runs its fallback at the end — which would replace the
+   * answer they just chose. Claiming aborts the request and invalidates every
+   * write that belonged to it.
+   */
+  const claim = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    requestRef.current += 1;
+    return requestRef.current;
+  };
+
+  const show = (answer) => {
+    claim();
+    setResult(answer);
+    setMissed(false);
+    setNearest(null);
+    setDrafted(null);
+    setDrafting(false);
+  };
 
   const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
 
@@ -1989,13 +2017,21 @@ const Ask = ({ prefersReducedMotion }) => {
    * provider down — lands on the fallback the site shipped before this existed.
    */
   const draft = async (asked, near) => {
+    const token = requestRef.current;
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const current = () => requestRef.current === token;
+
     setDrafting(true);
     try {
       const response = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: asked }),
+        signal: controller.signal,
       });
+      if (!current()) return 'superseded';
+
       const kind = response.headers.get('X-Ask-Source');
       const sourceIds = (response.headers.get('X-Ask-Sources') ?? '').split(',').filter(Boolean);
 
@@ -2013,16 +2049,20 @@ const Ask = ({ prefersReducedMotion }) => {
         for (;;) {
           const { value, done } = await reader.read();
           if (done) break;
+          if (!current()) { await reader.cancel().catch(() => {}); return 'superseded'; }
           text += value;
           setDrafted({ text, sources: sourceIds });
         }
         if (text.trim()) return 'generated';
       }
     } catch {
-      // fall through
+      // Aborted, offline, or the provider failed — all land on the fallback
+      // below unless something newer has taken over.
     } finally {
-      setDrafting(false);
+      if (current()) setDrafting(false);
     }
+
+    if (!current()) return 'superseded';
     fallBack(near);
     return 'fallback';
   };
@@ -2047,10 +2087,13 @@ const Ask = ({ prefersReducedMotion }) => {
     // nothing at all.
     const near = nearestTopic(asked, index);
     trackPortfolioEvent('ask_submit', { matched: false });
+    claim();
     setResult(null);
     setMissed(false);
+    setDrafted(null);
     setNearest(near);
     draft(asked, near).then(answered => {
+      if (answered === 'superseded') return;
       trackPortfolioEvent('ask_no_match', {
         question: asked,
         nearest_id: near?.id ?? 'none',
