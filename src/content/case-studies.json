@@ -980,7 +980,7 @@
       {
         "type": "image",
         "src": "/Images/case-studies/connect-api/13-texas-compliance-step.webp",
-        "alt": "Widget step headed Texas requires more information, explaining that Texas law requires a Taxpayer Identification Number to process payments for payers domiciled in the state and listing Employer Identification Number, Social Security Number, Alien Registration Number and Passport Number as alternatives, with a Federal ID Selection dropdown open on Employee Identification Number, a note that information is stored in a digital vault under AES 256-bit encryption with a Learn More link, and Save and Back buttons",
+        "alt": "Widget step headed Texas requires more information, explaining that Texas law requires a Taxpayer Identification Number to process payments for payers domiciled in the state and listing Employer Identification Number, Social Security Number, Alien Registration Number and Passport Number as alternatives, with a Federal ID Selection dropdown open on the EIN option, a note that information is stored in a digital vault under AES 256-bit encryption with a Learn More link, and Save and Back buttons",
         "caption": "The Texas step, triggered only when the payer’s billing address is in Texas. The statute’s own reasoning is in the interface, with the acceptable alternatives listed rather than left to be guessed at."
       },
       {
