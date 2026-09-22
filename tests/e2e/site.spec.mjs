@@ -95,16 +95,19 @@ test('the Ask section offers suggested questions instead of an accordion', async
 });
 
 test('the approved answers are in the served HTML for non-JS consumers', async ({ page }) => {
-  // The accordion was client-rendered, so none of its text ever reached a
-  // crawler. This asserts the replacement is strictly better, not just equal.
-  const response = await page.request.get('/');
-  const html = await response.text();
-  expect(html).toContain('Questions and answers about Omar Tavarez');
+  // The panel is client-rendered, so none of its text reaches a crawler. The
+  // answers are injected into /ask, which is the page that should rank for
+  // them — putting them on the homepage as well would publish the same 4,600
+  // words on two indexed URLs.
+  const html = await (await page.request.get('/ask/')).text();
   expect(html).toContain('What kind of product designer is Omar?');
+  expect(html).toContain("What's Omar's fintech and payments experience?");
 
-  // Only the homepage — index.html is the template every other route is built from.
-  const work = await (await page.request.get('/work/')).text();
-  expect(work).not.toContain('Questions and answers about Omar Tavarez');
+  for (const route of ['/', '/work/', '/privacy/']) {
+    const other = await (await page.request.get(route)).text();
+    expect(other, `${route} must not duplicate the answers`)
+      .not.toContain('What kind of product designer is Omar?');
+  }
 });
 
 test('About drawer opens from nav and section controls, then closes', async ({ page }) => {
@@ -746,6 +749,79 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+});
+
+test('the /ask route stands on its own', async ({ page }) => {
+  // `vite preview` does not resolve extensionless clean URLs, so it serves the
+  // SPA shell here and the route resolves on the client — the same as /privacy
+  // and /work behave under preview today. The served document's own title and
+  // canonical are asserted against the build artifact in the SEO tests.
+  await page.goto('/ask');
+
+  await expect(page.getByRole('heading', { level: 1, name: /Ask about the work/i })).toBeVisible();
+
+  // It is the page, so it must not wait to be scrolled to.
+  await expect(page.locator('#ask-panel button[type="button"]').first()).toBeVisible();
+  await expect(page.locator('#ask-panel input[type="text"]')).toBeVisible();
+});
+
+test('an answer on /ask has a link of its own that reopens it', async ({ page, context }) => {
+  await page.goto('/ask');
+
+  await page.locator('#ask-panel button[type="button"]').filter({ hasText: /fintech and payments/i }).first().click();
+  await expect(page).toHaveURL(/#fintech-depth$/);
+
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.locator('[data-ask-share="true"]').click();
+  await expect(page.getByText('Copied')).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toMatch(/\/ask#fintech-depth$/);
+
+  // The point of the link is that someone else can open it cold.
+  const fresh = await context.newPage();
+  await fresh.goto(copied.replace(/^https?:\/\/[^/]+/, ''));
+  await expect(fresh.getByText(/embedded payments product/i).first()).toBeVisible();
+  await fresh.close();
+});
+
+test('a miss on /ask stops the URL pointing at the previous answer', async ({ page }) => {
+  await page.goto('/ask');
+
+  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expect(page).toHaveURL(/#.+$/);
+
+  await page.locator('#ask-panel input[type="text"]').fill('how do penguins pay for parking in antarctica');
+  await page.locator('#ask-panel button[type="submit"]').click();
+  await expect(page.getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(page).toHaveURL(/\/ask$/);
+});
+
+test('a case study offers the way back to asking', async ({ page }) => {
+  // A citation in the panel leads out here. Without this the assistant simply
+  // disappears at the moment the reader acted on it.
+  await page.goto('/work/connect-api/');
+  const back = page.getByRole('link', { name: /Ask about this work/i });
+  await expect(back).toBeVisible();
+  await expect(back).toHaveAttribute('href', '/ask');
+
+  await back.click();
+  await expect(page.getByRole('heading', { level: 1, name: /Ask about the work/i })).toBeVisible();
+});
+
+test('the homepage section links out to the full set', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+  const link = page.getByRole('link', { name: /See every answer/i });
+  await expect(link).toHaveAttribute('href', '/ask');
+});
+
+test('the homepage panel leaves the URL alone', async ({ page }) => {
+  // Writing a hash here would fight the #faq anchor the nav still uses.
+  await page.goto('/');
+  await openAsk(page);
+  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expect(askLive(page).locator('p').first()).toBeVisible();
+  expect(new URL(page.url()).hash).toBe('');
 });
 
 test('the design system documents the Ask component', async ({ page }) => {

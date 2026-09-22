@@ -8,6 +8,9 @@ const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
 const DESIGN_SYSTEM_URL = `${SITE_ORIGIN}/design-system`;
+const ASK_TITLE = 'Ask about the work — Omar Tavarez';
+const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
+const ASK_URL = `${SITE_ORIGIN}/ask`;
 
 const personSchema = {
   '@type': 'Person',
@@ -129,6 +132,28 @@ const privacyStructuredData = () => ({
   ],
 });
 
+const askStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: ASK_TITLE,
+      url: ASK_URL,
+      description: ASK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
+// Deliberately not FAQPage. Google limits that rich result to "well-known,
+// authoritative government and health websites", so it would buy nothing and
+// invite a structured-data warning for a mismatch with the visible page.
+
 const workStructuredData = () => ({
   '@context': 'https://schema.org',
   '@graph': [
@@ -191,6 +216,7 @@ function generateSitemap(distDir) {
   const staticPages = [
     { loc: `${SITE_ORIGIN}/`,              changefreq: 'weekly',  priority: '1.0' },
     { loc: `${SITE_ORIGIN}/work`,          changefreq: 'weekly',  priority: '0.9' },
+    { loc: ASK_URL,                        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${SITE_ORIGIN}/design-system`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
   ];
@@ -242,14 +268,6 @@ function rootContentRange(html, label) {
 function injectRootContent(html, innerHtml, label) {
   const { start, end } = rootContentRange(html, label);
   return `${html.slice(0, start)}${innerHtml}${html.slice(end)}`;
-}
-
-// Same target, but keeps what is already inside #root. The homepage template
-// ships a hidden H1 there, and replacing it outright silently drops the site's
-// only static H1 — caught by the SEO tests, which is what they are for.
-function appendRootContent(html, innerHtml, label) {
-  const { end } = rootContentRange(html, label);
-  return `${html.slice(0, end)}${innerHtml}${html.slice(end)}`;
 }
 
 function injectH1(html, text) {
@@ -319,7 +337,7 @@ function caseStudyContentHtml(c) {
  * filtering at runtime still ships the text — and the answer set has no
  * business in the critical path when most visitors never open it.
  */
-function generateAskAnswers(distDir) {
+function generateAskAnswers(distDir, indexHtml) {
   const doc = require('./src/content/ask-answers.json');
   const approved = doc.answers
     .filter(answer => answer.status === 'approved')
@@ -327,27 +345,35 @@ function generateAskAnswers(distDir) {
 
   fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved }));
 
-  // Put the answers in the homepage's served HTML too.
+  // The Ask panel is client-rendered, so none of its text reaches a crawler, an
+  // ATS scraper or an assistant reading the page without JavaScript. The answers
+  // are injected into /ask so those consumers get all of them.
   //
-  // The FAQ accordion that used to live here was client-rendered, so none of
-  // its text ever reached a crawler, an ATS scraper or an assistant reading the
-  // page without JavaScript. The Ask panel is the same. Injecting the approved
-  // answers means those consumers get all of them where they previously got
-  // nothing — the visible section shrank, the machine-readable one grew.
-  //
-  // Deliberately last: index.html is the template every other route is built
-  // from, and it is read into memory before this runs, so only the homepage
-  // gets the block.
-  if (approved.length) {
-    const article = [
-      `<article style="${HIDDEN_STYLE}">`,
-      '<h2>Questions and answers about Omar Tavarez</h2>',
-      ...approved.map((a) => `<h3>${escapeAttr(a.question)}</h3><p>${escapeAttr(a.answer)}</p>`),
-      '</article>',
-    ].join('');
-    const indexPath = `${distDir}/index.html`;
-    fs.writeFileSync(indexPath, appendRootContent(fs.readFileSync(indexPath, 'utf8'), article, 'ask answers'));
-  }
+  // They live here rather than on the homepage, where they were first put: the
+  // same 4,600 words on two indexed URLs is a duplicate-content problem, and
+  // /ask is the page that should rank for them. It also keeps roughly 10KB
+  // gzipped off the homepage, which is the one page in the critical path.
+  const askDir = `${distDir}/ask`;
+  fs.mkdirSync(askDir, { recursive: true });
+  const answersHtml = approved.length ? [
+    `<article style="${HIDDEN_STYLE}">`,
+    ...approved.map((a) => `<h2>${escapeAttr(a.question)}</h2><p>${escapeAttr(a.answer)}</p>`),
+    '</article>',
+  ].join('') : '';
+  const askHtml = injectRootContent(
+    setStructuredData(
+      setMeta(indexHtml, {
+        title: ASK_TITLE,
+        description: ASK_DESCRIPTION,
+        url: ASK_URL,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      askStructuredData(),
+    ),
+    `<h1 style="${HIDDEN_STYLE}">${escapeAttr(ASK_TITLE)}</h1>${answersHtml}`,
+    ASK_TITLE,
+  );
+  fs.writeFileSync(`${askDir}/index.html`, askHtml);
 
   const held = doc.answers.length - approved.length;
   console.log(`\u2705 Ask: ${approved.length} approved answer(s) shipped${held ? `, ${held} draft(s) withheld` : ''}.`);
@@ -426,7 +452,7 @@ function generateRoutes() {
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
-  generateAskAnswers(distDir);
+  generateAskAnswers(distDir, indexHtml);
   generateSitemap(distDir);
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
@@ -436,4 +462,4 @@ if (require.main === module) (async () => {
   generateRoutes();
 })();
 
-module.exports = { injectRootContent };
+module.exports = { injectRootContent, escapeAttr };

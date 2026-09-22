@@ -6,7 +6,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const { injectRootContent } = require('../postbuild.js');
+const { injectRootContent, escapeAttr } = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const PRINCIPAL_TITLE = 'Principal Product Designer';
@@ -259,6 +259,49 @@ test('static prose is scoped to case-study routes only', () => {
       `${page} does not carry case-study prose`,
     );
   });
+});
+
+test('the Ask route ships every approved answer to non-JS consumers', () => {
+  const html = readDist('ask', 'index.html');
+  const approved = JSON.parse(readText('src', 'content', 'ask-answers.json'))
+    .answers.filter((a) => a.status === 'approved');
+  assert.ok(approved.length > 0, 'there is at least one approved answer');
+
+  // The panel is client-rendered, so a crawler, an ATS scraper or an assistant
+  // reading without JavaScript sees only what is injected here.
+  for (const answer of approved) {
+    assert.ok(
+      html.includes(`<h2>${escapeAttr(answer.question)}</h2>`),
+      `/ask is missing the question for "${answer.id}"`,
+    );
+  }
+
+  const h1s = [...html.matchAll(/<h1\b/gi)];
+  assert.equal(h1s.length, 1, '/ask has exactly one h1');
+  assert.ok(html.includes('Ask about the work'), '/ask names itself in its h1');
+
+  // FAQPage is limited by Google to government and health sites, so claiming it
+  // buys nothing and risks a mismatch warning against the visible page.
+  const structuredData = getStructuredData(html);
+  const types = (structuredData['@graph'] ?? []).map((node) => node?.['@type']);
+  assert.ok(types.includes('WebPage'), '/ask declares a WebPage');
+  assert.ok(!types.includes('FAQPage'), '/ask does not claim FAQPage');
+});
+
+test('the answers live on one URL only', () => {
+  // They were on the homepage first. The same 4,600 words on two indexed URLs
+  // is a duplicate-content problem, and it put ~10KB gzipped in the critical
+  // path of the one page that cannot afford it.
+  const probe = JSON.parse(readText('src', 'content', 'ask-answers.json'))
+    .answers.find((a) => a.status === 'approved').question;
+
+  assert.ok(readDist('ask', 'index.html').includes(probe), '/ask carries the answers');
+  for (const page of [['index.html'], ['work', 'index.html'], ['privacy', 'index.html']]) {
+    assert.ok(!readDist(...page).includes(probe), `${page.join('/')} does not duplicate them`);
+  }
+
+  // And the homepage keeps the static h1 it had before any of this.
+  assert.equal([...readDist('index.html').matchAll(/<h1\b/gi)].length, 1, 'homepage has exactly one h1');
 });
 
 test('migrated case-study bodies ship images and prose in the static HTML', () => {

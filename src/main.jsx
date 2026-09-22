@@ -1421,6 +1421,24 @@ const CaseStudyPage = ({ c, onBack }) => {
         Back to work
       </a>
 
+      {/*
+        A citation in the Ask panel lands here, and until this link existed the
+        assistant simply disappeared at that point — the reader had to know to
+        scroll the homepage to find it again.
+      */}
+      <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'case_study', case_study_id: c.id })} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+        fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
+        marginBottom: 40, marginLeft: 'var(--space-6)', transition: 'color var(--duration-fast)',
+      }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
+      >
+        Ask about this work
+        <AppIcon icon={ArrowUpRight} size={12} />
+      </a>
+
       {/* Cover */}
       <div className="cs-cover" style={{
         position: 'relative', width: '100%',
@@ -1866,7 +1884,29 @@ const loadAskAnswers = async () => {
   return doc.answers ?? [];
 };
 
-const Ask = ({ prefersReducedMotion }) => {
+const usePrefersReducedMotion = () => {
+  const [reduced, setReduced] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduced(mq.matches);
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  }, []);
+  return reduced;
+};
+
+/**
+ * `linkable` is set when the panel is the page rather than a section of one.
+ * It turns the answer on screen into part of the URL, so an answer can be sent
+ * to someone else — the thing a reader most wants to do with a good one, and
+ * impossible while the panel only exists mid-scroll on the homepage. The
+ * homepage panel leaves the URL alone, or it would fight the #faq anchor.
+ */
+const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const [answers, setAnswers] = React.useState(null);
   const [query, setQuery] = React.useState('');
   const [result, setResult] = React.useState(null);
@@ -1883,24 +1923,60 @@ const Ask = ({ prefersReducedMotion }) => {
   const requestRef = React.useRef(0);
   const abortRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
+  const [copiedLink, setCopiedLink] = React.useState(false);
+  const copyResetRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+  }, []);
+
+  const copyLink = async (answer) => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/ask#${answer.id}`);
+      setCopiedLink(true);
+      trackPortfolioEvent('ask_share_click', { answer_id: answer.id });
+      if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+      copyResetRef.current = window.setTimeout(() => setCopiedLink(false), 1200);
+    } catch {
+      // No clipboard permission, or an insecure origin. The URL already points
+      // at this answer, so the address bar is still a working fallback.
+      setCopiedLink(false);
+    }
+  };
 
   // Loaded when the section comes into view rather than on focus: the fetch
   // lands well after LCP, and the panel never renders as an empty shell before
   // we know whether there is anything approved to show.
   React.useEffect(() => {
+    let cancelled = false;
+    const load = () => loadAskAnswers()
+      .then(loaded => { if (!cancelled) setAnswers(loaded); })
+      .catch(() => { if (!cancelled) setAnswers([]); });
+
+    // On /ask the panel is the page, so there is nothing to scroll to and
+    // nothing to protect — a deep-linked answer has to resolve on arrival.
+    if (linkable) { load(); return () => { cancelled = true; }; }
+
     const node = sentinelRef.current;
     if (!node || typeof IntersectionObserver === 'undefined') return undefined;
-    let cancelled = false;
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
-      loadAskAnswers()
-        .then(loaded => { if (!cancelled) setAnswers(loaded); })
-        .catch(() => { if (!cancelled) setAnswers([]); });
+      load();
     }, { rootMargin: '200px' });
     observer.observe(node);
     return () => { cancelled = true; observer.disconnect(); };
-  }, []);
+  }, [linkable]);
+
+  // Resolve /ask#<answer-id> once the set is in. Sets state directly rather
+  // than going through show(), which would rewrite the hash it just read.
+  React.useEffect(() => {
+    if (!linkable || !answers?.length) return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    const answer = answers.find(a => a.id === id);
+    if (answer) setResult(answer);
+  }, [linkable, answers]);
 
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
 
@@ -1961,6 +2037,8 @@ const Ask = ({ prefersReducedMotion }) => {
     setNearest(null);
     setDrafted(null);
     setDrafting(false);
+    setCopiedLink(false);
+    if (linkable) history.replaceState(null, '', `#${answer.id}`);
   };
 
   const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
@@ -2041,6 +2119,9 @@ const Ask = ({ prefersReducedMotion }) => {
     // nothing at all.
     const near = nearestTopic(asked, index);
     trackPortfolioEvent('ask_submit', { matched: false });
+    // Nothing written is on screen any more, so the hash must not keep
+    // pointing at the answer that was.
+    if (linkable) history.replaceState(null, '', window.location.pathname);
     claim();
     setResult(null);
     setMissed(false);
@@ -2160,9 +2241,41 @@ const Ask = ({ prefersReducedMotion }) => {
             borderRadius: 'var(--radius-comfort)',
             boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
           }}>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
-              {result.question}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+              <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
+                {result.question}
+              </p>
+              {linkable && (
+                <button
+                  type="button"
+                  data-ask-share="true"
+                  onClick={() => copyLink(result)}
+                  aria-label={copiedLink ? 'Link copied' : 'Copy a link to this answer'}
+                  style={{
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 'var(--font-size-body-sm)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: copiedLink ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
+                    background: 'transparent',
+                    border: 'none',
+                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                    borderRadius: 'var(--radius-standard)',
+                    cursor: 'pointer',
+                    transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
+                  }}
+                >
+                  <AppIcon icon={copiedLink ? Check : Copy} size={13} />
+                  {copiedLink ? 'Copied' : 'Copy link'}
+                </button>
+              )}
+            </div>
             {result.answer.split('\n\n').map((paragraph, i) => (
               <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
                 {paragraph}
@@ -2305,17 +2418,7 @@ const Ask = ({ prefersReducedMotion }) => {
 
 const AskSection = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setPrefersReducedMotion(mq.matches);
-    mq.addEventListener?.('change', sync);
-    return () => mq.removeEventListener?.('change', sync);
-  }, []);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
 
@@ -2379,9 +2482,68 @@ const AskSection = ({ scrollToSection }) => {
 
         <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           <Ask prefersReducedMotion={prefersReducedMotion} />
+          <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'faq_section' })} className="text-link" style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            minHeight: 44,
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            color: 'var(--fg-secondary)',
+          }}>
+            See every answer
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
         </div>
       </Reveal>
     </section>
+  );
+};
+
+/**
+ * The same panel as a page of its own.
+ *
+ * Two things the homepage section cannot do. An answer here has a URL, so a
+ * recruiter can send one to a hiring manager instead of describing it. And it
+ * is somewhere to link back to: every citation in the panel leads out to a
+ * case study, and until this existed, taking one left the reader with no way
+ * back to asking.
+ */
+const AskPage = () => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  return (
+    <article style={{ maxWidth: 880, margin: '0 auto', padding: '40px 24px 96px' }}>
+      <a href="/" onClick={(e) => { e.preventDefault(); history.pushState(null, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+        fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
+        marginBottom: 40, transition: 'color var(--duration-fast)',
+      }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
+      >
+        <AppIcon icon={ArrowLeft} size={12} />
+        Back to home
+      </a>
+
+      <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-5)' }}>
+        Ask about the work.
+      </h1>
+      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 720 }}>
+        Pick a question or type your own. The answers are written in advance from the published case
+        studies, so what you get back is what I would actually say. Ask something they do not cover
+        and it will draft a reply from them, and tell you that is what it did.
+      </p>
+      <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', margin: 0, maxWidth: 720 }}>
+        Every answer here has its own link, so you can send one on.
+      </p>
+
+      <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
+        <Ask prefersReducedMotion={prefersReducedMotion} linkable />
+      </div>
+    </article>
   );
 };
 
@@ -3431,6 +3593,8 @@ const App = () => {
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
+          ) : route.type === 'ask' ? (
+            <AskPage />
           ) : route.type === 'work' ? (
             <WorkIndexPage />
           ) : currentCase ? (

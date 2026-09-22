@@ -1251,6 +1251,13 @@ const ComponentsSection = () => (
           are the six the reader has already passed over. Refusals are never offered as a prompt:
           they answer honestly when asked, but suggesting one invites it.
         </DocCard>
+        <DocCard title="One panel, two placements" meta="Composition">
+          The same component renders as a section of the homepage and as the <code>/ask</code> page.
+          On the page each answer takes the URL, so one can be sent to someone else; in the section
+          it leaves the URL alone, or it would fight the <code>#faq</code> anchor the nav uses. The
+          page also gives a case study somewhere to link back to — every citation leads out of the
+          panel, and the reader needs a way back to asking.
+        </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
           Matching is inverse-document-frequency weighted token overlap over each answer&rsquo;s question
           and aliases. Below threshold, or when too little of the question is in vocabulary, the
