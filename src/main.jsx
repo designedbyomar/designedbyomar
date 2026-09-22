@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
@@ -774,7 +774,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             <a href="#faq" onClick={goSection('faq')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >FAQ</a>
+            >Ask</a>
             <a href="#contact" onClick={goSection('contact')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
@@ -808,7 +808,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout('mobile_nav'); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
-              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
+              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Ask</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44,
@@ -1818,107 +1818,25 @@ const KeyFacts = () => {
   );
 };
 
-const FAQ_ITEMS = [
-  {
-    question: 'What kind of product designer is Omar?',
-    answer: 'Omar is a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. He works across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
-  },
-  {
-    question: 'What types of companies is Omar best suited for?',
-    answer: 'He is strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
-  },
-  {
-    question: 'Is Omar more of a design leader or an individual contributor?',
-    answer: 'Both. He operates at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
-  },
-  {
-    question: 'What kinds of problems should a team bring Omar in to solve?',
-    answer: 'Bring him in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. His work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
-  },
-  {
-    question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, Omar designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
-    links: [
-      { label: 'Posting Assistant', href: '/work/posting-asst/' },
-      { label: 'Management Portal', href: '/work/mgmt-portal/' },
-    ],
-  },
-  {
-    question: 'What is Omar’s experience with fintech and embedded payments?',
-    answer: 'At Plastiq, Omar led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
-    links: [
-      { label: 'Connect API Payments', href: '/work/connect-api/' },
-    ],
-  },
-  {
-    question: 'What enterprise product experience does Omar have?',
-    answer: 'At Disney, Omar designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
-    links: [
-      { label: 'Critical Communication Tool', href: '/work/disney-cct/' },
-      { label: 'Unified Ad Platform', href: '/work/disney-uap/' },
-    ],
-  },
-  {
-    question: 'How does Omar approach design systems?',
-    answer: 'He treats design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, he co-led Athena Design System 2.0.',
-    links: [
-      { label: 'Athena Design System 2.0', href: '/work/athena-ds/' },
-    ],
-  },
-  {
-    question: 'How does Omar work with founders and engineers?',
-    answer: 'He moves between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
-  },
-  {
-    question: 'What business outcomes has Omar influenced?',
-    answer: 'His work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
-  },
-];
-
-const DEFAULT_VISIBLE_FAQ_INDICES = [0, 1, 2, 3, 4, 7];
-
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const FAQAnswer = ({ item }) => {
-  if (!item.links?.length) return item.answer;
-
-  const linkLabels = item.links
-    .map(link => link.label)
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length);
-
-  if (!linkLabels.length) return item.answer;
-
-  const segments = item.answer.split(new RegExp(`(${linkLabels.map(escapeRegExp).join('|')})`, 'g'));
-  const linkByLabel = new Map(item.links.map(link => [link.label, link.href]));
-
-  return (
-    <>
-      {segments.map((segment, index) => {
-        const href = linkByLabel.get(segment);
-        if (!href) return <React.Fragment key={`${segment}-${index}`}>{segment}</React.Fragment>;
-        return (
-          <a key={segment} href={href} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
-            {segment}
-          </a>
-        );
-      })}
-    </>
-  );
-};
-
 // ============================================================
 // Ask — pre-generated answers, matched client-side
 // ============================================================
 
 /**
- * Suggested prompts, in preference order. Most visitors click rather than
- * type, so these carry the feature and implicitly set its scope. Ids that are
- * not approved yet are skipped, so this list can name answers ahead of review.
+ * Suggested prompts, in preference order. With the FAQ accordion gone these
+ * carry the section on their own, so they cover the breadth it used to show
+ * rather than only the top few. Ids that are not approved are skipped.
  */
-const ASK_SUGGESTED_IDS = ['design-systems', 'fintech-depth', 'leadership-or-ic', 'technical-depth'];
+const ASK_SUGGESTED_IDS = [
+  'kind-of-designer',
+  'design-systems',
+  'fintech-depth',
+  'ai-llm-work',
+  'leadership-or-ic',
+  'technical-depth',
+];
 
-const ASK_MAX_SUGGESTIONS = 4;
+const ASK_MAX_SUGGESTIONS = 6;
 
 const loadAskAnswers = async () => {
   // Dev reads the source file so drafts are visible while reviewing. The
@@ -2303,10 +2221,8 @@ const Ask = ({ prefersReducedMotion }) => {
   );
 };
 
-const FAQ = ({ scrollToSection }) => {
+const AskSection = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
-  const [openIndex, setOpenIndex] = React.useState(-1);
-  const [showAllQuestions, setShowAllQuestions] = React.useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2320,16 +2236,6 @@ const FAQ = ({ scrollToSection }) => {
   }, []);
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
-  const visibleFaqItems = showAllQuestions
-    ? FAQ_ITEMS.map((item, index) => ({ item, index }))
-    : DEFAULT_VISIBLE_FAQ_INDICES.map(index => ({ item: FAQ_ITEMS[index], index }));
-  const toggleQuestionVisibility = () => {
-    setShowAllQuestions(showingAll => {
-      const nextShowingAll = !showingAll;
-      if (!nextShowingAll && !DEFAULT_VISIBLE_FAQ_INDICES.includes(openIndex)) setOpenIndex(-1);
-      return nextShowingAll;
-    });
-  };
 
   return (
     <section id="faq" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6)' }}>
@@ -2351,13 +2257,14 @@ const FAQ = ({ scrollToSection }) => {
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', paddingBottom: isStacked ? 'var(--space-4)' : 0 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
+              <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>Ask
             </div>
             <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-              Questions founders and hiring teams usually ask.
+              Ask about the work.
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              Quick answers on how I work, where I add value, and what kind of products I'm best suited for.
+              Pick a question or type your own. The answers are written in advance from the published
+              case studies, so what you get back is what I would actually say.
             </p>
           </div>
           <a href="#contact" onClick={(event) => {
@@ -2387,105 +2294,7 @@ const FAQ = ({ scrollToSection }) => {
           </a>
         </div>
 
-        <div id="faq-questions-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
-          {visibleFaqItems.map(({ item, index }) => {
-            const isOpen = openIndex === index;
-            const answerId = `faq-answer-${index}`;
-            const buttonId = `faq-question-${index}`;
-            return (
-              <div key={item.question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'} style={{
-                borderRadius: 'var(--radius-comfort)',
-                boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
-                transition: prefersReducedMotion ? 'none' : 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
-              }}>
-                <button
-                  id={buttonId}
-                  type="button"
-                  aria-expanded={isOpen}
-                  aria-controls={answerId}
-                  onClick={() => {
-                    trackPortfolioEvent('faq_interaction', {
-                      faq_index: index,
-                      faq_question: item.question,
-                      action: isOpen ? 'close' : 'open',
-                    });
-                    setOpenIndex(isOpen ? -1 : index);
-                  }}
-                  style={{
-                    width: '100%',
-                    minHeight: 68,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 'var(--space-4)',
-                    padding: 'var(--space-5) var(--space-6)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--fg-primary)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <span style={{
-                    fontSize: 'var(--font-size-body-lg)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    lineHeight: 'var(--line-height-snug)',
-                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-secondary)',
-                    transition: 'color var(--duration-fast-mid) ease',
-                  }}>
-                    {item.question}
-                  </span>
-                  <AppIcon icon={ChevronDown} size={18} style={{
-                    flexShrink: 0,
-                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
-                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform var(--duration-fast-mid) ease, color var(--duration-fast-mid) ease',
-                  }} />
-                </button>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateRows: isOpen ? '1fr' : '0fr',
-                  transition: prefersReducedMotion ? 'none' : 'grid-template-rows var(--duration-base-plus) ease',
-                }}>
-                  <div
-                    id={answerId}
-                    role="region"
-                    aria-labelledby={buttonId}
-                    className="faq-answer"
-                    style={{
-                      overflow: 'hidden',
-                      opacity: isOpen ? 1 : 0,
-                      transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast-mid) ease',
-                    }}
-                  >
-                    <p style={{
-                      margin: 0,
-                      padding: '0 var(--space-6) var(--space-6)',
-                      fontSize: 'var(--font-size-body-lg)',
-                      lineHeight: 'var(--line-height-loose)',
-                      color: 'var(--fg-secondary)',
-                      maxWidth: 720,
-                    }}>
-                      <FAQAnswer item={item} />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          <button
-            type="button"
-            aria-expanded={showAllQuestions}
-            className="text-link faq-view-all-link"
-            onClick={() => toggleQuestionVisibility()}
-          >
-            {showAllQuestions ? 'Show fewer questions' : 'View all questions'}
-            <AppIcon icon={ChevronDown} size={14} style={{
-              transform: showAllQuestions ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform var(--duration-fast-mid) ease',
-            }} />
-          </button>
+        <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           <Ask prefersReducedMotion={prefersReducedMotion} />
         </div>
       </Reveal>
@@ -2991,17 +2800,6 @@ const buildHomeStructuredData = () => ({
       description: 'Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
     },
     personSchema,
-    {
-      '@type': 'FAQPage',
-      mainEntity: FAQ_ITEMS.map(item => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer,
-        },
-      })),
-    },
   ],
 });
 
@@ -3560,7 +3358,7 @@ const App = () => {
               <About onOpenDrawer={() => openAboutDrawer('about_section')} />
               <Work />
               <KeyFacts />
-              <FAQ scrollToSection={scrollToSection} />
+              <AskSection scrollToSection={scrollToSection} />
               <Contact />
             </>
           )}

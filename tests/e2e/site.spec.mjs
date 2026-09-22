@@ -75,32 +75,36 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
 });
 
-test('FAQ accordion opens, closes, and toggles the full question list', async ({ page }) => {
+test('the Ask section offers suggested questions instead of an accordion', async ({ page }) => {
   await page.goto('/');
 
   const faq = page.locator('#faq');
   await faq.scrollIntoViewIfNeeded();
-  await expect(faq.locator('.faq-item')).toHaveCount(6);
 
-  const firstQuestion = page.locator('#faq-question-0');
-  const firstAnswer = page.locator('#faq-answer-0');
-  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'false');
-  await expect(firstAnswer).toBeHidden();
+  // The accordion was replaced, not hidden.
+  await expect(faq.locator('.faq-item')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /View all questions/i })).toHaveCount(0);
 
-  await firstQuestion.click();
-  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'true');
-  await expect(firstAnswer).toBeVisible();
+  await expect(faq.getByRole('heading', { name: /Ask about the work/i })).toBeVisible();
+  await expect(page.getByText('Ask something else')).toBeVisible();
+  await expect(page.locator('#ask-panel button[type="button"]')).toHaveCount(6);
 
-  await firstQuestion.click();
-  await expect(firstQuestion).toHaveAttribute('aria-expanded', 'false');
-  await expect(firstAnswer).toBeHidden();
+  // Nav points here under its new label, via the anchor that already existed.
+  const navLink = page.getByRole('banner').getByRole('link', { name: 'Ask' });
+  await expect(navLink).toHaveAttribute('href', '#faq');
+});
 
-  await page.getByRole('button', { name: /View all questions/i }).click();
-  await expect(faq.locator('.faq-item')).toHaveCount(10);
-  await expect(page.getByRole('button', { name: /Show fewer questions/i })).toBeVisible();
+test('the approved answers are in the served HTML for non-JS consumers', async ({ page }) => {
+  // The accordion was client-rendered, so none of its text ever reached a
+  // crawler. This asserts the replacement is strictly better, not just equal.
+  const response = await page.request.get('/');
+  const html = await response.text();
+  expect(html).toContain('Questions and answers about Omar Tavarez');
+  expect(html).toContain('What kind of product designer is Omar?');
 
-  await page.getByRole('button', { name: /Show fewer questions/i }).click();
-  await expect(faq.locator('.faq-item')).toHaveCount(6);
+  // Only the homepage — index.html is the template every other route is built from.
+  const work = await (await page.request.get('/work/')).text();
+  expect(work).not.toContain('Questions and answers about Omar Tavarez');
 });
 
 test('About drawer opens from nav and section controls, then closes', async ({ page }) => {
@@ -211,17 +215,10 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   await expectLatestAnalyticsEvent(page, 'about_drawer_open', { source: 'nav' });
   await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
 
-  const firstQuestion = page.locator('#faq-question-0');
-  await firstQuestion.click();
-  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
-    faq_index: 0,
-    action: 'open',
-  });
-  await firstQuestion.click();
-  await expectLatestAnalyticsEvent(page, 'faq_interaction', {
-    faq_index: 0,
-    action: 'close',
-  });
+  await page.locator('#faq').scrollIntoViewIfNeeded();
+  await expect(page.getByText('Ask something else')).toBeVisible();
+  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expectLatestAnalyticsEvent(page, 'ask_suggested_click', { answer_id: 'kind-of-designer' });
 
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await page.locator('#contact [data-copy-button="true"]').click();
@@ -589,7 +586,7 @@ test('Ask returns a written answer with a citation into the case study', async (
   await page.goto('/');
   await openAsk(page);
 
-  await page.locator('#faq-questions-list button').filter({ hasText: /design systems at scale/i }).first().click();
+  await page.locator('#ask-panel button').filter({ hasText: /design systems at scale/i }).first().click();
   await expect(askLive(page).getByText(/treats them as infrastructure/i)).toBeVisible();
 
   const citation = askLive(page).locator('a[href^="/work/"]').first();

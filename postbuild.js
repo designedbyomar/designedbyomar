@@ -244,6 +244,14 @@ function injectRootContent(html, innerHtml, label) {
   return `${html.slice(0, start)}${innerHtml}${html.slice(end)}`;
 }
 
+// Same target, but keeps what is already inside #root. The homepage template
+// ships a hidden H1 there, and replacing it outright silently drops the site's
+// only static H1 — caught by the SEO tests, which is what they are for.
+function appendRootContent(html, innerHtml, label) {
+  const { end } = rootContentRange(html, label);
+  return `${html.slice(0, end)}${innerHtml}${html.slice(end)}`;
+}
+
 function injectH1(html, text) {
   return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeAttr(text)}</h1>`, text);
 }
@@ -318,6 +326,29 @@ function generateAskAnswers(distDir) {
     .map(({ id, question, aliases, answer, sources, topic }) => ({ id, question, aliases, answer, sources, topic }));
 
   fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved }));
+
+  // Put the answers in the homepage's served HTML too.
+  //
+  // The FAQ accordion that used to live here was client-rendered, so none of
+  // its text ever reached a crawler, an ATS scraper or an assistant reading the
+  // page without JavaScript. The Ask panel is the same. Injecting the approved
+  // answers means those consumers get all of them where they previously got
+  // nothing — the visible section shrank, the machine-readable one grew.
+  //
+  // Deliberately last: index.html is the template every other route is built
+  // from, and it is read into memory before this runs, so only the homepage
+  // gets the block.
+  if (approved.length) {
+    const article = [
+      `<article style="${HIDDEN_STYLE}">`,
+      '<h2>Questions and answers about Omar Tavarez</h2>',
+      ...approved.map((a) => `<h3>${escapeAttr(a.question)}</h3><p>${escapeAttr(a.answer)}</p>`),
+      '</article>',
+    ].join('');
+    const indexPath = `${distDir}/index.html`;
+    fs.writeFileSync(indexPath, appendRootContent(fs.readFileSync(indexPath, 'utf8'), article, 'ask answers'));
+  }
+
   const held = doc.answers.length - approved.length;
   console.log(`\u2705 Ask: ${approved.length} approved answer(s) shipped${held ? `, ${held} draft(s) withheld` : ''}.`);
 }
