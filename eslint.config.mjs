@@ -50,6 +50,21 @@ export default [
     },
   },
   {
+    // Vercel edge functions run against web-standard globals — Request,
+    // Response, AbortSignal — plus process.env for secrets.
+    files: ['api/**/*.mjs'],
+    languageOptions: {
+      ...moduleLanguageOptions,
+      globals: {
+        ...globals.browser,
+        process: 'readonly',
+      },
+    },
+    rules: {
+      'no-unused-vars': noUnusedVars,
+    },
+  },
+  {
     files: ['postbuild.js'],
     languageOptions: {
       ecmaVersion: 'latest',

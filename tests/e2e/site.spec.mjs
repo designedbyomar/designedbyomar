@@ -672,11 +672,52 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
   expect(miss.params.question).toBe('how do penguins pay for parking in antarctica');
 });
 
-test('the privacy policy discloses what the Ask box records', async ({ page }) => {
+test('the privacy policy discloses what the Ask box records and where it goes', async ({ page }) => {
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { name: /The Ask Box/i })).toBeVisible();
-  await expect(page.getByText(/wording of that question is recorded in an analytics event/i)).toBeVisible();
-  await expect(page.getByText(/Nothing you type is sent to a language model/i)).toBeVisible();
+  await expect(page.getByText(/answered in your browser and nothing you type leaves this site/i)).toBeVisible();
+  await expect(page.getByText(/wording of the question is recorded in an analytics event/i)).toBeVisible();
+  await expect(page.getByText(/sent, along with excerpts of the published answers closest to it, to Groq/i)).toBeVisible();
+  // The claim that nothing is ever sent to a model was true before the
+  // endpoint existed and must not survive anywhere in the policy.
+  await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
+});
+
+test('a drafted answer is labelled as unreviewed', async ({ page }) => {
+  await page.route('**/api/ask', route => route.fulfill({
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Ask-Source': 'generated',
+      'X-Ask-Sources': 'connect-api',
+      'X-Ask-Answer-Id': '',
+    },
+    body: 'Omar has not published an answer covering that.',
+  }));
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('how do penguins pay for parking in antarctica');
+  await page.locator('#faq button[type="submit"]').click();
+
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toBeVisible();
+  await expect(askLive(page).getByText(/has not been reviewed/i)).toBeVisible();
+  await expect(askLive(page).locator('a[href="/work/connect-api/"]')).toBeVisible();
+});
+
+test('the Ask box degrades to its written fallback when the endpoint fails', async ({ page }) => {
+  // The path that must never break: no key, rate limited, provider down, or
+  // offline all land here.
+  await page.route('**/api/ask', route => route.abort('failed'));
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('how do penguins pay for parking in antarctica');
+  await page.locator('#faq button[type="submit"]').click();
+
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toBeVisible();
+  await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
 
 test('the design system documents the Ask component', async ({ page }) => {
@@ -685,4 +726,40 @@ test('the design system documents the Ask component', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Ask', exact: true })).toBeVisible();
   await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
   await expect(page.getByText(/Only approved/i)).toBeVisible();
+});
+
+test('picking a suggestion mid-stream does not resurrect the draft', async ({ page }) => {
+  // Regression. show() cleared the draft but did not cancel its reader, so
+  // later chunks rebuilt it — and the superseded request then ran its own
+  // fallback, replacing the answer the visitor had just chosen.
+  await page.route('**/api/ask', async (route) => {
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Ask-Source': 'generated',
+        'X-Ask-Sources': 'connect-api',
+        'X-Ask-Answer-Id': '',
+      },
+      body: 'This draft belongs to the previous question.',
+    });
+  });
+
+  await page.goto('/');
+  await openAsk(page);
+
+  await askInput(page).fill('how did the design system governance model change after launch');
+  await page.locator('#faq button[type="submit"]').click();
+
+  // Take over with a reviewed answer while the draft is still in flight.
+  await page.locator('#faq button').filter({ hasText: /design systems at scale/i }).first().click();
+  await expect(askLive(page).getByText(/treats them as infrastructure/i)).toBeVisible();
+
+  // Give the superseded response time to land and try to render.
+  await page.waitForTimeout(2000);
+
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/no written answer for that one/i)).toHaveCount(0);
 });

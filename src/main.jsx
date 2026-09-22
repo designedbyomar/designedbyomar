@@ -1942,6 +1942,14 @@ const Ask = ({ prefersReducedMotion }) => {
   // nearby topic is still a miss, and still has to say so.
   const [missed, setMissed] = React.useState(false);
   const [nearest, setNearest] = React.useState(null);
+  // A drafted reply, when the written set had no answer. Held apart from
+  // `result` so the UI can never present unreviewed text as reviewed.
+  const [drafted, setDrafted] = React.useState(null);
+  const [drafting, setDrafting] = React.useState(false);
+  // Identifies the interaction that owns the answer region, so a response
+  // arriving for an older one can be discarded rather than rendered.
+  const requestRef = React.useRef(0);
+  const abortRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
 
   // Loaded when the section comes into view rather than on focus: the fetch
@@ -1975,11 +1983,93 @@ const Ask = ({ prefersReducedMotion }) => {
     return picked.slice(0, ASK_MAX_SUGGESTIONS);
   }, [answers]);
 
-  const show = (answer) => { setResult(answer); setMissed(false); setNearest(null); };
+  /**
+   * Every interaction that takes over the answer region claims it first.
+   *
+   * A draft streams in over several seconds, and the visitor can pick a
+   * suggestion while it is still arriving. Clearing the draft is not enough:
+   * the reader keeps yielding chunks that rebuild it, and the superseded
+   * request still runs its fallback at the end — which would replace the
+   * answer they just chose. Claiming aborts the request and invalidates every
+   * write that belonged to it.
+   */
+  const claim = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    requestRef.current += 1;
+    return requestRef.current;
+  };
+
+  const show = (answer) => {
+    claim();
+    setResult(answer);
+    setMissed(false);
+    setNearest(null);
+    setDrafted(null);
+    setDrafting(false);
+  };
+
+  const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
+
+  /**
+   * Nothing written covers this. Ask the endpoint, which grounds a reply in the
+   * nearest reviewed answers. Any failure — offline, rate limited, no key,
+   * provider down — lands on the fallback the site shipped before this existed.
+   */
+  const draft = async (asked, near) => {
+    const token = requestRef.current;
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const current = () => requestRef.current === token;
+
+    setDrafting(true);
+    try {
+      const response = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: asked }),
+        signal: controller.signal,
+      });
+      if (!current()) return 'superseded';
+
+      const kind = response.headers.get('X-Ask-Source');
+      const sourceIds = (response.headers.get('X-Ask-Sources') ?? '').split(',').filter(Boolean);
+
+      if (kind === 'reviewed') {
+        const id = response.headers.get('X-Ask-Answer-Id');
+        const reviewed = answers.find(a => a.id === id);
+        if (reviewed) { show(reviewed); return 'reviewed'; }
+      }
+
+      if (kind === 'generated' && response.body) {
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        let text = '';
+        setDrafted({ text: '', sources: sourceIds });
+        setMissed(false);
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (!current()) { await reader.cancel().catch(() => {}); return 'superseded'; }
+          text += value;
+          setDrafted({ text, sources: sourceIds });
+        }
+        if (text.trim()) return 'generated';
+      }
+    } catch {
+      // Aborted, offline, or the provider failed — all land on the fallback
+      // below unless something newer has taken over.
+    } finally {
+      if (current()) setDrafting(false);
+    }
+
+    if (!current()) return 'superseded';
+    fallBack(near);
+    return 'fallback';
+  };
 
   const submit = (event) => {
     event.preventDefault();
-    if (!index) return;
+    if (!index || drafting) return;
     const asked = query.trim();
     const hit = matchQuestion(asked, index);
     if (hit) {
@@ -1997,10 +2087,19 @@ const Ask = ({ prefersReducedMotion }) => {
     // nothing at all.
     const near = nearestTopic(asked, index);
     trackPortfolioEvent('ask_submit', { matched: false });
-    trackPortfolioEvent('ask_no_match', { question: asked, nearest_id: near?.id ?? 'none' });
+    claim();
     setResult(null);
-    setMissed(true);
+    setMissed(false);
+    setDrafted(null);
     setNearest(near);
+    draft(asked, near).then(answered => {
+      if (answered === 'superseded') return;
+      trackPortfolioEvent('ask_no_match', {
+        question: asked,
+        nearest_id: near?.id ?? 'none',
+        answered_by: answered,
+      });
+    });
   };
 
   if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
@@ -2134,6 +2233,68 @@ const Ask = ({ prefersReducedMotion }) => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {drafting && !drafted && (
+          <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
+            Nothing written covers that one — drafting from the published answers…
+          </p>
+        )}
+
+        {drafted && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-5) var(--space-6)',
+            borderRadius: 'var(--radius-comfort)',
+            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+          }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--font-size-body-sm)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--fg-tertiary)',
+            }}>
+              Drafted, not reviewed
+            </div>
+            {drafted.text.split('\n\n').map((paragraph, i) => (
+              <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
+                {paragraph}
+              </p>
+            ))}
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
+              There is no written answer to that question, so this was drafted from the published
+              answers below and has not been reviewed. For anything that matters, email Omar.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {drafted.sources
+                .map(id => CASE_STUDIES.find(c => c.id === id))
+                .filter(Boolean)
+                .slice(0, 3)
+                .map(caseStudy => (
+                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'drafted', case_study_id: caseStudy.id })} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                    padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                  }}>
+                    {caseStudy.title}
+                    <AppIcon icon={ArrowUpRight} size={12} />
+                  </a>
+                ))}
+              <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+                padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
+                boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              }}>
+                Email Omar
+                <AppIcon icon={ArrowUpRight} size={12} />
+              </a>
+            </div>
           </div>
         )}
 
@@ -2662,13 +2823,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is also sent to Groq to draft a reply</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. Nothing you type is sent to a language model, and no answer is generated while you wait.</p>
-        <p style={{ margin: 0 }}>When someone asks a question the written set does not cover, the wording of that question is recorded in an analytics event. That record is the only way I can see which answers are missing and write them. It is not used to identify you, and if you declined analytics, nothing is sent at all — the feature still works.</p>
+        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. When your question matches one of them, it is answered in your browser and nothing you type leaves this site.</p>
+        <p style={{ margin: 0 }}>When no written answer covers your question, two things happen. The wording of the question is recorded in an analytics event, which is the only way I can see which answers are missing and write them. And the question is sent, along with excerpts of the published answers closest to it, to Groq, who run the model that drafts a reply. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through.</p>
+        <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
         <p style={{ margin: 0 }}>Google Analytics 4 helps measure site activity and performance. GA4 may use cookies to collect analytics information after you accept analytics. This data is processed by Google on my behalf and may be stored or processed in locations outside your country, depending on Google's systems and infrastructure.</p>

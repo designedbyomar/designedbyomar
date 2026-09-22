@@ -41,6 +41,16 @@ test('questions outside the answer set are refused rather than guessed', () => {
   }
 });
 
+test('a question naming something the corpus has never seen is refused', () => {
+  // Regression. "does he know kubernetes" returned the measuring-success
+  // answer: `kubernetes` was out of vocabulary, so the entire match rested on
+  // `know`, which appears once in the set and therefore scored highly despite
+  // carrying no topic. A confident wrong answer is the worst outcome here.
+  for (const query of ['does he know kubernetes', 'has he used rust', 'does he know terraform']) {
+    assert.equal(matchQuestion(query, index), null, `"${query}" should not match`);
+  }
+});
+
 test('an empty or stopword-only query matches nothing', () => {
   assert.equal(matchQuestion('', index), null);
   assert.equal(matchQuestion('what is the', index), null);
