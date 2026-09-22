@@ -22,7 +22,7 @@
  */
 import { groq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
-import { buildIndex, matchQuestion, nearestTopic } from '../src/ask.mjs';
+import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 
 export const config = { runtime: 'edge' };
 
@@ -139,11 +139,17 @@ export const createHandler = ({
   if (hit) return textResponse(hit.answer.answer, 'reviewed', hit.answer.sources ?? [], hit.answer.id);
 
   // 2. Nothing matched. Gather the nearest reviewed answers as grounding.
-  const near = nearestTopic(question, index);
-  const context = [near, ...approved.filter(a => a !== near)]
-    .filter(Boolean)
-    .slice(0, CONTEXT_ANSWERS);
+  // Every entry here is text the model may draw from, so all of them are
+  // ranked by relevance. Taking the nearest one and padding from the top of
+  // the array sent two unrelated answers on every miss.
+  const context = rankNearest(question, index, CONTEXT_ANSWERS);
   const sources = [...new Set(context.flatMap(a => a.sources ?? []))];
+
+  // No reviewed answer shares any vocabulary with the question, so there is
+  // nothing to ground a reply in. Asking the model anyway would mean asking it
+  // to speak from an empty context, which is the one thing this design exists
+  // to prevent.
+  if (!context.length) return textResponse('', 'fallback');
 
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   if (!hasApiKey() || rateLimited(ip)) return textResponse('', 'fallback', sources);

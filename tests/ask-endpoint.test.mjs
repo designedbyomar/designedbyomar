@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
-import { buildIndex } from '../src/ask.mjs';
+import { buildIndex, rankNearest } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
@@ -37,6 +37,11 @@ const loadHandler = ({ generateThrows = false, hasApiKey = true, answersFail = f
   return { handler, calls };
 };
 
+// A question the written set does not answer but which still shares
+// vocabulary with it — so there is something to ground a reply in. The
+// penguin question shares nothing and now takes the empty-context path.
+const MISS_WITH_CONTEXT = 'how did the design system governance model change after launch';
+
 const post = (question) => new Request('https://designedbyomar.com/api/ask', {
   method: 'POST',
   headers: { 'content-type': 'application/json', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250)}` },
@@ -56,7 +61,7 @@ test('a question the written set covers is answered without calling a model', as
 
 test('a question with no written answer is grounded in reviewed answers only', async () => {
   const { handler, calls } = loadHandler();
-  const response = await handler(post('how do penguins pay for parking in antarctica'));
+  const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'generated');
   assert.equal(calls.length, 1, 'the model is called exactly once on a miss');
@@ -75,7 +80,7 @@ test('a question with no written answer is grounded in reviewed answers only', a
 
 test('with no API key configured it degrades instead of failing', async () => {
   const { handler, calls } = loadHandler({ hasApiKey: false });
-  const response = await handler(post('how do penguins pay for parking in antarctica'));
+  const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200, 'a missing key must not surface as an error');
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
@@ -84,7 +89,7 @@ test('with no API key configured it degrades instead of failing', async () => {
 
 test('a provider failure degrades to the fallback the site already shipped', async () => {
   const { handler } = loadHandler({ generateThrows: true });
-  const response = await handler(post('how do penguins pay for parking in antarctica'));
+  const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
@@ -95,7 +100,7 @@ test('one visitor cannot drain the daily quota', async () => {
   const sameVisitor = () => new Request('https://designedbyomar.com/api/ask', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.9' },
-    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+    body: JSON.stringify({ question: MISS_WITH_CONTEXT }),
   });
 
   const sources = [];
@@ -123,4 +128,29 @@ test('an unreachable answer file degrades instead of erroring', async () => {
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(calls.length, 0);
+});
+
+test('grounding context is ranked, not padded from the top of the array', () => {
+  // Regression. Only the nearest answer was chosen by relevance; the rest came
+  // from the start of the approved array, so a payments question was grounded
+  // in design-systems and ai-llm-work.
+  const index = buildIndex(doc.answers);
+  const ranked = rankNearest('what compliance work has he done on payments', index, 3);
+
+  assert.ok(ranked.length > 1, 'expected several grounding answers');
+  assert.equal(ranked[0].id, 'fintech-depth');
+
+  const ids = ranked.map(a => a.id);
+  const arrayOrder = doc.answers.filter(a => a.sources?.length).slice(0, 3).map(a => a.id);
+  assert.notDeepEqual(ids, arrayOrder, 'context must not be the first entries of the array');
+});
+
+test('a question sharing no vocabulary is never sent to the model', async () => {
+  const { handler, calls } = loadHandler();
+  // Nothing in the answer set shares a token with this, so there is nothing to
+  // ground a reply in — asking anyway would mean an empty context block.
+  const response = await handler(post('zxqw flibbertigibbet wombat'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0, 'the model must not be asked to speak from an empty context');
 });
