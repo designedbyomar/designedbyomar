@@ -930,8 +930,8 @@
       {
         "type": "image",
         "src": "/Images/case-studies/connect-api/08-white-label-payment-method.webp",
-        "alt": "Connect payment method modal over a blurred partner checkout page, with Pay with Card and Pay with Bank tabs, a masked saved card number with brand mark, expiry and CVV, billing address fields, a padlock and digital-vault encryption notice, and a Powered by Plastiq footer",
-        "caption": "The widget over a partner’s own checkout: masked card data, the encryption notice at the card block boundary, and Plastiq disclosed in the footer."
+        "alt": "Connect payment method modal with Pay with Card and Pay with Bank tabs, a masked saved card number showing only the last four digits beside its card-brand mark, expiry and CVV with an info affordance, country and billing address fields, a padlock beside a notice that payment method information is stored in a digital vault under AES 256-bit encryption, and a Powered by Plastiq footer",
+        "caption": "The payment method step. The card is masked to its last four digits, the encryption notice sits at the boundary of the card block, and Plastiq is disclosed in the footer under the partner’s branding."
       },
       {
         "type": "heading",
@@ -978,6 +978,20 @@
         "text": "The review step is where regulation becomes copy. Anyone paying by bank is told they can revoke the authorisation by contacting Plastiq at least three working days before the delivery date. Anyone paying without an account accepts guest terms there, because paying as a guest was a first-class path and not a shortcut bolted on afterwards. Texas requirements are a component of their own, since a state-specific disclosure has to appear in the flow rather than in a help page nobody opens."
       },
       {
+        "type": "paragraph",
+        "text": "Compliance surfaces as fields, too. The payer step asks for beneficial owners with helper text on how to enter them — an anti-money-laundering requirement that cannot be hidden in an appendix, so it has to be made answerable in the flow. The recipient step classifies who is being paid: pick a category, and the form asks “could you be more specific?” before offering a subcategory. That pairing is how a recipient gets risk-classified without the payer ever being shown the word risk."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/12-recipient-information.webp",
+        "alt": "Recipient information step showing an optional recipient name, a required business name, a recipient category dropdown with an info affordance, a prompt reading could you be more specific followed by a recipient subcategory dropdown, then country, address, city, state, zip, email and phone fields",
+        "caption": "Classification as progressive disclosure: category first, then a prompt for the subcategory that narrows it."
+      },
+      {
+        "type": "paragraph",
+        "text": "The fee is presented as a breakdown rather than a number. Opening it itemises the base fee and then a recipient subsidy line that offsets it, so a payer can see not just what they are paying but which part of it someone else absorbed. The same screen states the descriptor that will appear on the card statement. Both exist for the same reason: a payer who cannot reconcile a charge later opens a dispute, and a dispute costs more than the explanation would have. The amount itself stays editable at review, and submit repeats at the top and bottom, because the screen is long enough that finding the button again is a real cost."
+      },
+      {
         "type": "heading",
         "level": 2,
         "text": "Three passes at the same six steps"
@@ -997,7 +1011,7 @@
       },
       {
         "type": "paragraph",
-        "text": "White-labelling was structural, not a skin. The token set has two layers: a base palette and type scale, and a partner layer that overrides it — partner-scoped colour collections alongside partner paragraph and field-label type styles. A partner’s blue becomes the primary while Connect’s own teal stays Plastiq’s brand, and nothing in the widget has to be redrawn."
+        "text": "White-labelling was structural, not a skin. The token set has two layers: a base palette and type scale, and a partner layer that overrides it. That layer runs deeper than colour — partner-scoped colours carry their own opacity steps as named tokens, there are separate partner type roles for paragraph, field label and caption, and effects, gradients and strokes are tokenised alongside them. A partner’s blue becomes the primary while Connect’s own teal stays Plastiq’s brand, and nothing in the widget has to be redrawn."
       },
       {
         "type": "paragraph",
@@ -1012,6 +1026,35 @@
         "src": "/Images/case-studies/connect-api/04-connect-teal-design-tokens.webp",
         "alt": "Design token documentation for Connect Teal: the raw hex value, the connect-teal-400 token, alias tokens for navigation states, and contrast results marked 1.81 FAIL on white text and 11.63 AAA on black",
         "caption": "Colour documented as a chain — raw value to token to alias — with contrast results recorded against each usage, including the ones that fail."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Specifying it for engineering"
+      },
+      {
+        "type": "paragraph",
+        "text": "A widget that ships inside other companies’ products cannot be handed over as a picture. It gets rebuilt by engineers who will not be in the room, so the specification has to answer the questions they would otherwise have to ask."
+      },
+      {
+        "type": "paragraph",
+        "text": "Spacing is called out per breakpoint with real values rather than left to inference, and the mobile layout names its own behaviour — the button block pins to the bottom rather than flowing with the content, so the primary action stays reachable on a form that scrolls."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/10-layout-spacing-redlines.webp",
+        "alt": "Layout spacing specification showing the payer information step at desktop and mobile widths with coloured spacing overlays and numeric values called out between every element, and an annotation marking the mobile button block as pinned to the bottom",
+        "caption": "Spacing specified per breakpoint, with the mobile button block annotated as pinned rather than inline."
+      },
+      {
+        "type": "paragraph",
+        "text": "Interactions were specified the same way, separately per input method rather than once and hoped for. The fee breakdown opens as a popover anchored beside its info icon on desktop hover, and as a centred fixed panel on mobile tap — two different behaviours, because a finger has no hover state and a popover anchored to a small target is a popover half off the screen. The overlay behind it is specified down to its colour and opacity."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/11-fee-popover-spec.webp",
+        "alt": "Tooltip popover specification for fees, showing the popover itemising a base fee and an offsetting recipient subsidy, guidance noting a drop shadow and a 40% opacity overlay, and two annotated variants — desktop on hover positioned next to the info icon, and mobile on tap centred and fixed",
+        "caption": "One component, two specified behaviours: anchored to the info icon on desktop hover, centred and fixed on mobile tap."
       },
       {
         "type": "heading",
@@ -1121,7 +1164,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Registration had three routes, which matters for an embedded product: through Plastiq’s own site, through a partner-hosted link, or inline in the widget with no Plastiq account at all. The third is the one that makes it genuinely embedded rather than a redirect wearing a partner’s colours."
+        "text": "Registration had three routes, which matters for an embedded product: through Plastiq’s own site, through a partner-hosted link — built out for Billfire, so any biller they pointed at it could register and onboard without touching Plastiq’s own front door — or inline in the widget with no Plastiq account at all. The third is the one that makes it genuinely embedded rather than a redirect wearing a partner’s colours."
       },
       {
         "type": "heading",
