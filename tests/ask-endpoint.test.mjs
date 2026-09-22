@@ -1,0 +1,108 @@
+/**
+ * The endpoint's contract is which of three paths a question takes, so that is
+ * what is tested. The model is never called here — the point of these tests is
+ * that it is called as rarely as possible, and that nothing breaks when it
+ * cannot be called at all.
+ *
+ * The handler is imported with the provider stubbed, so no key and no network
+ * are needed.
+ */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHandler } from '../api/ask.mjs';
+
+const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
+
+/** A handler wired to a recording stub instead of the real provider. */
+const loadHandler = ({ generateThrows = false, hasApiKey = true } = {}) => {
+  const calls = [];
+  const handler = createHandler({
+    hasApiKey: () => hasApiKey,
+    generate: (options) => {
+      calls.push(options);
+      if (generateThrows) throw new Error('provider unavailable');
+      return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
+    },
+  });
+  return { handler, calls };
+};
+
+const post = (question) => new Request('https://designedbyomar.com/api/ask', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250)}` },
+  body: JSON.stringify({ question }),
+});
+
+test('a question the written set covers is answered without calling a model', async () => {
+  const { handler, calls } = loadHandler();
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(calls.length, 0, 'the model must not be called when a written answer exists');
+
+  const expected = doc.answers.find(a => a.id === 'fintech-depth').answer;
+  assert.equal(await response.text(), expected, 'the reviewed answer must be returned verbatim');
+});
+
+test('a question with no written answer is grounded in reviewed answers only', async () => {
+  const { handler, calls } = loadHandler();
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(calls.length, 1, 'the model is called exactly once on a miss');
+
+  const { system } = calls[0];
+  assert.match(system, /ONLY the reviewed answers/i);
+  assert.match(system, /third person/i);
+  // Everything in the prompt must be text Omar approved.
+  const quoted = system.split('REVIEWED ANSWERS:')[1];
+  const approvedText = doc.answers.map(a => a.answer).join('\n');
+  for (const line of quoted.split('\nA: ').slice(1)) {
+    const snippet = line.split('\n')[0].slice(0, 60);
+    assert.ok(approvedText.includes(snippet), `prompt contains text not from an approved answer: ${snippet}`);
+  }
+});
+
+test('with no API key configured it degrades instead of failing', async () => {
+  const { handler, calls } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.status, 200, 'a missing key must not surface as an error');
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0);
+});
+
+test('a provider failure degrades to the fallback the site already shipped', async () => {
+  const { handler } = loadHandler({ generateThrows: true });
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+});
+
+test('one visitor cannot drain the daily quota', async () => {
+  const { handler } = loadHandler();
+  const sameVisitor = () => new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.9' },
+    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+  });
+
+  const sources = [];
+  for (let i = 0; i < 9; i += 1) sources.push((await handler(sameVisitor())).headers.get('X-Ask-Source'));
+
+  assert.ok(sources.includes('generated'), 'early requests are answered');
+  assert.equal(sources.at(-1), 'fallback', 'later requests from the same visitor are capped');
+});
+
+test('a malformed or empty request never errors', async () => {
+  const { handler } = loadHandler();
+  for (const body of ['not json', JSON.stringify({}), JSON.stringify({ question: '   ' })]) {
+    const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body,
+    }));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  }
+});
