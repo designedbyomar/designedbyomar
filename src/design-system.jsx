@@ -1203,9 +1203,11 @@ const ComponentsSection = () => (
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
       <SectionHeader eyebrow="Components" title="Ask">
-        Answers in the FAQ section are written in advance and matched, never generated. The component
-        exists to shorten the distance between a hiring question and the case study that answers it,
-        so every part of it either answers or hands off.
+        Answers in the Ask section are written in advance and matched in the browser. When nothing
+        written covers a question, a reply is drafted from the reviewed set and labelled as drafted —
+        the two are never presented as the same thing. The component exists to shorten the distance
+        between a hiring question and the case study that answers it, so every part of it either
+        answers or hands off.
       </SectionHeader>
       <ExampleFrame label="Suggested prompts">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>

@@ -696,7 +696,7 @@
         "chatbot or human",
         "who am I talking to"
       ],
-      "answer": "Neither, exactly. These answers were drafted from the case studies published on this site and then reviewed by Omar before going live — so they're pre-written rather than generated live, and nothing here is improvised.\n\nThat's deliberate. On a hiring site an assistant that invents a detail is worse than one that admits it doesn't know, so this one can only tell you things he has actually approved.\n\nIf a question isn't covered, it'll say so and point you at him rather than guess.",
+      "answer": "Neither, exactly. Most of what you get back was drafted from the case studies published on this site and then reviewed by Omar before going live — so it is pre-written rather than improvised.\n\nWhen a question falls outside that set, a model drafts a reply from the closest reviewed answers, and that reply is labelled “drafted, not reviewed” wherever it appears. The label is the point: reviewed and drafted are never presented as the same thing.\n\nOn a hiring site, an assistant that quietly invents a detail is worse than one that flags what has not been checked. For anything that matters, email him.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"

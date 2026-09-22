@@ -2227,8 +2227,8 @@ const Ask = ({ prefersReducedMotion }) => {
           }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
               {nearest
-                ? 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing \u2014 the closest published work is below, and email is faster for anything specific.'
-                : 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing, email is the faster route.'}
+                ? 'Nothing written covers that one, and it could not be drafted either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
+                : 'Nothing written covers that one, and it could not be drafted either. Rather than guess, email is the faster route.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
@@ -2257,8 +2257,8 @@ const Ask = ({ prefersReducedMotion }) => {
       </div>
 
       <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-        These answers are written in advance from the published case studies and reviewed by hand —
-        nothing here is generated when you ask.
+        These answers are written in advance from the published case studies and reviewed by hand.
+        When nothing written covers a question, a reply is drafted from them and labelled as drafted.
       </p>
     </div>
   );
@@ -2307,7 +2307,8 @@ const AskSection = ({ scrollToSection }) => {
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
               Pick a question or type your own. The answers are written in advance from the published
-              case studies, so what you get back is what I would actually say.
+              case studies, so what you get back is what I would actually say. Ask something they do
+              not cover and it will draft a reply from them, and tell you that is what it did.
             </p>
           </div>
           <a href="#contact" onClick={(event) => {
@@ -2637,7 +2638,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. When your question matches one of them, it is answered in your browser and nothing you type leaves this site.</p>
+        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. When your question matches one of them, it is answered in your browser and nothing you type leaves this site.</p>
         <p style={{ margin: 0 }}>When no written answer covers your question, two things happen. The wording of the question is recorded in an analytics event, which is the only way I can see which answers are missing and write them. And the question is sent, along with excerpts of the published answers closest to it, to Groq, who run the model that drafts a reply. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
