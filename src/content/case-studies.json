@@ -930,8 +930,8 @@
       {
         "type": "image",
         "src": "/Images/case-studies/connect-api/08-white-label-payment-method.webp",
-        "alt": "Connect payment method modal with Pay with Card and Pay with Bank tabs, a masked saved card number showing only the last four digits beside its card-brand mark, expiry and CVV with an info affordance, country and billing address fields, a padlock beside a notice that payment method information is stored in a digital vault under AES 256-bit encryption, and a Powered by Plastiq footer",
-        "caption": "The payment method step. The card is masked to its last four digits, the encryption notice sits at the boundary of the card block, and Plastiq is disclosed in the footer under the partner’s branding."
+        "alt": "Connect payment method step shown as a panel over a partner’s own checkout page, which is blurred behind it. Pay with Card and Pay with Bank tabs, a note that a fee may apply to card payments, empty cardholder name, card number, expiry, CVV, country and billing address fields, a padlock beside a notice that payment method information is stored in a digital vault under AES 256-bit encryption, a disabled Continue button, and a Powered by Plastiq footer",
+        "caption": "The widget running inside a partner’s checkout. Continue stays disabled until the step validates, the encryption notice sits at the boundary of the card block, and Plastiq is disclosed in the footer."
       },
       {
         "type": "heading",
@@ -975,7 +975,13 @@
       },
       {
         "type": "paragraph",
-        "text": "The review step is where regulation becomes copy. Anyone paying by bank is told they can revoke the authorisation by contacting Plastiq at least three working days before the delivery date. Anyone paying without an account accepts guest terms there, because paying as a guest was a first-class path and not a shortcut bolted on afterwards. Texas requirements are a component of their own, since a state-specific disclosure has to appear in the flow rather than in a help page nobody opens."
+        "text": "The review step is where regulation becomes copy. Anyone paying by bank is told they can revoke the authorisation by contacting Plastiq at least three working days before the delivery date. Anyone paying without an account accepts guest terms there, because paying as a guest was a first-class path and not a shortcut bolted on afterwards. Texas requirements are a component of their own, triggered only when the payer’s billing address is in Texas, because a state-specific disclosure has to appear in the flow rather than in a help page nobody opens — and it carries the reason, not just the field."
+      },
+      {
+        "type": "image",
+        "src": "/Images/case-studies/connect-api/13-texas-compliance-step.webp",
+        "alt": "Widget step headed Texas requires more information, explaining that Texas law requires a Taxpayer Identification Number to process payments for payers domiciled in the state and listing Employer Identification Number, Social Security Number, Alien Registration Number and Passport Number as alternatives, with a Federal ID Selection dropdown open on Employee Identification Number, a note that information is stored in a digital vault under AES 256-bit encryption with a Learn More link, and Save and Back buttons",
+        "caption": "The Texas step, triggered only when the payer’s billing address is in Texas. The statute’s own reasoning is in the interface, with the acceptable alternatives listed rather than left to be guessed at."
       },
       {
         "type": "paragraph",
