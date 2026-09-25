@@ -165,3 +165,37 @@ test('approved answers still match the case studies they cite', () => {
     );
   }
 });
+
+/**
+ * The assistant must not misdescribe itself.
+ *
+ * Three answers explain how the Ask box works, and each behaviour change has
+ * left at least one of them asserting something that stopped being true. The
+ * grounded fallback made four wrong; a hand sweep for the wordings it knew
+ * about fixed those and missed a fifth, `what-data-collected`, which made the
+ * same claim in different words. Routing would have made a sixth wrong.
+ *
+ * So this asserts the absolute claims rather than any particular phrasing. It
+ * will fail on a false positive one day — the fix then is to reword the answer,
+ * not to loosen the pattern, because these are exactly the sentences a reader
+ * uses to decide whether to trust the thing.
+ */
+test('no answer claims nothing is sent, or that nothing is generated', () => {
+  const forbidden = [
+    [/nothing\s+(?:is\s+)?sent\s+anywhere/i, 'typed questions that are not verbatim are sent to be matched'],
+    [/no\s+server\s+call/i, 'a non-exact question calls /api/ask'],
+    [/no\s+external\s+service/i, 'Groq routes and drafts'],
+    [/never\s+generated/i, 'an uncovered question is drafted by a model'],
+    [/nothing\s+(?:here\s+)?is\s+(?:ever\s+)?improvised/i, 'a drafted reply is not pre-written'],
+    [/only\s+tell\s+you\s+things\s+he\s+has\s+(?:actually\s+)?approved/i, 'a drafted reply is not approved'],
+  ];
+
+  for (const a of answers) {
+    for (const [pattern, why] of forbidden) {
+      assert.ok(
+        !pattern.test(a.answer),
+        `${a.id}: matches ${pattern} — ${why}. Reword the answer rather than relaxing this test.`,
+      );
+    }
+  }
+});

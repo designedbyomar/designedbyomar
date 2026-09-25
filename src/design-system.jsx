@@ -1203,9 +1203,11 @@ const ComponentsSection = () => (
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
       <SectionHeader eyebrow="Components" title="Ask">
-        Answers in the Ask section are written in advance and matched in the browser. When nothing
-        written covers a question, a reply is drafted from the reviewed set and labelled as drafted —
-        the two are never presented as the same thing. The component exists to shorten the distance
+        Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or a
+        verbatim question is matched in the browser; anything else is matched by a model, because word
+        overlap answered “is he a manager” with a refusal. When nothing written covers a question, a
+        reply is drafted from the reviewed set and labelled as drafted — the two are never presented
+        as the same thing. The component exists to shorten the distance
         between a hiring question and the case study that answers it, so every part of it either
         answers or hands off.
       </SectionHeader>

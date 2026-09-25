@@ -21,7 +21,7 @@
  * client reads incrementally, with no SDK on the browser side.
  */
 import { groq } from '@ai-sdk/groq';
-import { streamText } from 'ai';
+import { generateText, streamText } from 'ai';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 
 export const config = { runtime: 'edge' };
@@ -40,10 +40,35 @@ const generateFromGroq = ({ system, prompt }) => streamText({
   abortSignal: AbortSignal.timeout(TIMEOUT_MS),
 }).textStream;
 
+/**
+ * Routing is a different job from writing, on a different model.
+ *
+ * It returns an id, so it wants determinism and speed, not prose — hence
+ * temperature 0, a 20-token ceiling and a much shorter timeout. Groq meters
+ * per model, so routing does not draw down the budget the drafting model
+ * needs, and a routing outage cannot take drafting with it.
+ */
+const routeWithGroq = async ({ system, prompt }) => {
+  const { text } = await generateText({
+    model: groq(ROUTER_MODEL),
+    system,
+    prompt,
+    temperature: 0,
+    maxOutputTokens: 20,
+    abortSignal: AbortSignal.timeout(ROUTER_TIMEOUT_MS),
+  });
+  return text;
+};
+
 const MODEL = 'llama-3.3-70b-versatile';
+const ROUTER_MODEL = 'llama-3.1-8b-instant';
 const CONTEXT_ANSWERS = 3;
 const MAX_QUESTION_CHARS = 400;
 const TIMEOUT_MS = 8000;
+// Routing sits in front of every typed question, so it gets a much tighter
+// budget than drafting: past this the visitor is better served by the local
+// match than by waiting.
+const ROUTER_TIMEOUT_MS = 3000;
 
 /** Per-visitor ceiling, so one person cannot drain the daily free quota. */
 const RATE_LIMIT = 6;
@@ -86,16 +111,20 @@ const fetchAnswers = async (origin) => {
   return cache;
 };
 
-const headers = (source, sources, answerId = '') => ({
+// `matchedBy` records which mechanism chose a reviewed answer — exact, router
+// or the local overlap fallback. Without it the three are indistinguishable at
+// the client, and whether routing is actually an improvement is unanswerable.
+const headers = (source, sources, answerId = '', matchedBy = '') => ({
   'Content-Type': 'text/plain; charset=utf-8',
   'Cache-Control': 'no-store',
   'X-Ask-Source': source,
   'X-Ask-Sources': sources.join(','),
   'X-Ask-Answer-Id': answerId,
+  'X-Ask-Matched-By': matchedBy,
 });
 
-const textResponse = (body, source, sources = [], answerId = '') =>
-  new Response(body, { status: 200, headers: headers(source, sources, answerId) });
+const textResponse = (body, source, sources = [], answerId = '', matchedBy = '') =>
+  new Response(body, { status: 200, headers: headers(source, sources, answerId, matchedBy) });
 
 const hasText = (chunk) => typeof chunk === 'string'
   ? chunk.length > 0
@@ -143,6 +172,22 @@ const readUntilText = async (stream) => {
   });
 };
 
+/**
+ * The catalogue the router chooses from: every approved question, by id.
+ *
+ * Questions only, not aliases or answers. A model handles paraphrase natively,
+ * so aliases add nothing and nearly triple the prompt; answer bodies would add
+ * text the router might be tempted to quote, and it is not being asked to write.
+ */
+const buildRouterPrompt = (catalogue) => `You match a visitor's question to one of Omar Tavarez's pre-written answers.
+
+Reply with exactly one id from the list below, or the single word NONE. No punctuation, no explanation, no other text.
+
+Match on what the visitor is actually asking, not on shared words. "is he a manager" is asking about his level and leadership, not about opinions of employers. Choose NONE unless one of these answers genuinely addresses the question — a confident wrong match is worse than NONE, because the visitor is told something that does not answer them.
+
+ANSWERS:
+${catalogue}`;
+
 /** Everything the model is allowed to know, and the rules it answers under. */
 const buildPrompt = (context) => `You answer questions about Omar Tavarez on his portfolio site, using ONLY the reviewed answers provided below.
 
@@ -158,6 +203,7 @@ ${context}`;
 
 export const createHandler = ({
   generate = generateFromGroq,
+  route = routeWithGroq,
   hasApiKey = () => Boolean(process.env.GROQ_API_KEY),
   loadAnswers = fetchAnswers,
 } = {}) => async function handler(request) {
@@ -180,14 +226,57 @@ export const createHandler = ({
   }
   if (!approved.length) return textResponse('', 'fallback');
 
-  // 1. A written answer, whenever one exists. This is the common path.
-  const hit = matchQuestion(question, index);
-  if (hit) return textResponse(hit.answer.answer, 'reviewed', hit.answer.sources ?? [], hit.answer.id);
+  const reviewed = (answer, matchedBy) =>
+    textResponse(answer.answer, 'reviewed', answer.sources ?? [], answer.id, matchedBy);
 
-  // 2. Nothing matched. Gather the nearest reviewed answers as grounding.
-  // Every entry here is text the model may draw from, so all of them are
-  // ranked by relevance. Taking the nearest one and padding from the top of
-  // the array sent two unrelated answers on every miss.
+  // 1. An exact hit — the typed string is a question or alias verbatim. The one
+  // case token overlap cannot get wrong, so it is answered without a model.
+  const hit = matchQuestion(question, index);
+  if (hit?.exact) return reviewed(hit.answer, 'exact');
+
+  // A non-exact hit is held, not returned. Token overlap is confidently wrong
+  // often enough that it is the fallback for a routing failure, not the answer:
+  // "is he a manager" scored 1.00 against a refusal answer.
+  const local = hit ? () => reviewed(hit.answer, 'local') : null;
+
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  // Counted once per request, before any model is touched, so a question that
+  // routes and then drafts still costs the visitor one of their six.
+  const unavailable = !hasApiKey() || rateLimited(ip);
+
+  // 2. Ask the router which written answer this is, if any. It sees every
+  // question in the set, because the right answer often shares no vocabulary
+  // with how the visitor phrased it — for "is he a manager" the correct answer
+  // is not even among the nearest three by overlap.
+  let declined = false;
+  if (!unavailable) {
+    try {
+      const raw = await route({
+        system: buildRouterPrompt(approved.map(a => `${a.id}: ${a.question}`).join('\n')),
+        prompt: question,
+      });
+      // Validated against the set rather than trusted: a model can return an id
+      // that does not exist, and that must not become a 500 or an empty answer.
+      const id = String(raw ?? '').trim().replace(/[^A-Za-z0-9-]/g, '');
+      const picked = approved.find(a => a.id === id);
+      if (picked) return reviewed(picked, 'router');
+      // NONE, or anything unrecognisable, means the router looked at all of them
+      // and found nothing. That judgement beats the local overlap, so drafting
+      // is the next step rather than the held local hit.
+      declined = true;
+    } catch {
+      // Timed out, rate limited upstream, provider down. Nothing was decided,
+      // so the local hit is still the best available answer.
+    }
+  }
+
+  // 3. Routing could not run. Serve the local match if there was one, so the
+  // feature is never worse than it was before routing existed.
+  if (!declined && local) return local();
+
+  // 4. Nothing written covers it. Gather the nearest reviewed answers as
+  // grounding. Every entry is text the model may draw from, so all of them are
+  // ranked by relevance.
   const context = rankNearest(question, index, CONTEXT_ANSWERS);
   const sources = [...new Set(context.flatMap(a => a.sources ?? []))];
 
@@ -196,9 +285,7 @@ export const createHandler = ({
   // to speak from an empty context, which is the one thing this design exists
   // to prevent.
   if (!context.length) return textResponse('', 'fallback');
-
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (!hasApiKey() || rateLimited(ip)) return textResponse('', 'fallback', sources);
+  if (unavailable) return textResponse('', 'fallback', sources);
 
   try {
     const stream = await generate({

@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
-import { buildIndex, rankNearest } from '../src/ask.mjs';
+import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
@@ -20,13 +20,29 @@ const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', i
  * the same way production fetches them, so these tests exercise the real
  * routing without a key, a provider or a published file.
  */
-const loadHandler = ({ generateThrows = false, generateStreamError = false, generateEmpty = false, hasApiKey = true, answersFail = false } = {}) => {
+const loadHandler = ({
+  generateThrows = false,
+  generateStreamError = false,
+  generateEmpty = false,
+  hasApiKey = true,
+  answersFail = false,
+  // The router declines by default, so every existing test keeps taking the
+  // path it was written for.
+  routeReturns = 'NONE',
+  routeThrows = false,
+} = {}) => {
   const calls = [];
+  const routeCalls = [];
   const handler = createHandler({
     hasApiKey: () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
       return { answers: doc.answers, index: buildIndex(doc.answers) };
+    },
+    route: async (options) => {
+      routeCalls.push(options);
+      if (routeThrows) throw new Error('router unavailable');
+      return routeReturns;
     },
     generate: (options) => {
       calls.push(options);
@@ -36,8 +52,10 @@ const loadHandler = ({ generateThrows = false, generateStreamError = false, gene
       return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
     },
   });
-  return { handler, calls };
+  return { handler, calls, routeCalls };
 };
+
+const answerFor = (id) => doc.answers.find(a => a.id === id);
 
 // A question the written set does not answer but which still shares
 // vocabulary with it — so there is something to ground a reply in. The
@@ -50,15 +68,94 @@ const post = (question) => new Request('https://designedbyomar.com/api/ask', {
   body: JSON.stringify({ question }),
 });
 
-test('a question the written set covers is answered without calling a model', async () => {
-  const { handler, calls } = loadHandler();
-  const response = await handler(post('what fintech work has he done'));
+test('an exact hit is answered without calling any model', async () => {
+  // Verbatim alias. The one result token overlap cannot get wrong, so it costs
+  // nothing — not even a routing call.
+  const { handler, calls, routeCalls } = loadHandler();
+  const response = await handler(post('fintech experience'));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
-  assert.equal(calls.length, 0, 'the model must not be called when a written answer exists');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'exact');
+  assert.equal(routeCalls.length, 0, 'an exact hit must not be routed');
+  assert.equal(calls.length, 0, 'an exact hit must not reach the drafting model');
 
-  const expected = doc.answers.find(a => a.id === 'fintech-depth').answer;
-  assert.equal(await response.text(), expected, 'the reviewed answer must be returned verbatim');
+  assert.equal(await response.text(), answerFor('fintech-depth').answer, 'returned verbatim');
+});
+
+test('the router decides a non-exact question, and its pick is returned verbatim', async () => {
+  const { handler, calls, routeCalls } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'router');
+  assert.equal(response.headers.get('X-Ask-Answer-Id'), 'leadership-or-ic');
+  assert.equal(calls.length, 0, 'a routed hit must not reach the drafting model');
+  assert.equal(await response.text(), answerFor('leadership-or-ic').answer);
+
+  // The catalogue is what makes this possible: the right answer shares no
+  // vocabulary with the question, so a shortlist by overlap would not contain it.
+  assert.match(routeCalls[0].system, /leadership-or-ic: /);
+  assert.equal(
+    doc.answers.filter(a => routeCalls[0].system.includes(`${a.id}: `)).length,
+    doc.answers.length,
+    'the router must see every written question, not a shortlist',
+  );
+});
+
+test('the reported bug: a hiring question no longer returns a refusal', async () => {
+  // "is he a manager" scored 1.00 against refuse-employer-opinions — a
+  // legitimate hiring question answered with "I will not discuss that".
+  const local = matchQuestion('is he a manager', buildIndex(doc.answers));
+  assert.equal(local.answer.topic, 'refusal', 'the local matcher still picks a refusal here');
+  assert.equal(local.exact, false, 'and not as an exact hit, so it is routable');
+
+  const { handler } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Answer-Id'), 'leadership-or-ic');
+  assert.notEqual(answerFor(response.headers.get('X-Ask-Answer-Id')).topic, 'refusal');
+});
+
+test('an id the router invented is never served', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'leadership-and-vision' });
+  const response = await handler(post('is he a manager'));
+
+  // Unrecognisable means the router did not choose one of them, so drafting is
+  // next — it must not 500, and must not echo the invented id back.
+  assert.equal(response.status, 200);
+  assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'leadership-and-vision');
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(calls.length, 1);
+});
+
+test('NONE means draft, even when token overlap thought it had a match', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'NONE' });
+  const response = await handler(post('is he a manager'));
+
+  // The router saw all 48 and declined. That beats an overlap score, so the
+  // held local hit is deliberately not used.
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(calls.length, 1);
+});
+
+test('a router failure falls back to the local match rather than nothing', async () => {
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  const response = await handler(post('is he a manager'));
+
+  // Nothing was decided, so the site must be no worse than it was before
+  // routing existed — which is to say, it serves the local match.
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
+  assert.equal(calls.length, 0);
+});
+
+test('with no key the local match is still served', async () => {
+  const { handler, routeCalls } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(routeCalls.length, 0, 'no key means no routing call is attempted');
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
 });
 
 test('a question with no written answer is grounded in reviewed answers only', async () => {
