@@ -711,7 +711,7 @@
         "is this tracked",
         "data collection"
       ],
-      "answer": "Nothing is sent anywhere when you ask a question — the answers are a static file already loaded in your browser, so there's no server call and no external service involved.\n\nIf you accepted analytics, the site records that a question was asked, which helps Omar see which answers are missing. If you declined, it doesn't.\n\nThe full picture is in the privacy policy, linked in the footer.",
+      "answer": "Questions that match a written answer are answered in your browser from the static corpus. When nothing matches, the question is sent to Groq with excerpts from the closest published answers so it can draft a reply.\n\nIf you accepted analytics, the wording of the question is recorded in an analytics event so Omar can see which answers are missing. If you declined, it isn't recorded.\n\nThe full picture is in the privacy policy, linked in the footer.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"

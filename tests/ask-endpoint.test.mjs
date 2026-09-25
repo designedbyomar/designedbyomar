@@ -20,7 +20,7 @@ const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', i
  * the same way production fetches them, so these tests exercise the real
  * routing without a key, a provider or a published file.
  */
-const loadHandler = ({ generateThrows = false, hasApiKey = true, answersFail = false } = {}) => {
+const loadHandler = ({ generateThrows = false, generateStreamError = false, generateEmpty = false, hasApiKey = true, answersFail = false } = {}) => {
   const calls = [];
   const handler = createHandler({
     hasApiKey: () => hasApiKey,
@@ -31,6 +31,8 @@ const loadHandler = ({ generateThrows = false, hasApiKey = true, answersFail = f
     generate: (options) => {
       calls.push(options);
       if (generateThrows) throw new Error('provider unavailable');
+      if (generateStreamError) return new ReadableStream({ start(c) { c.error(new Error('provider unavailable')); } });
+      if (generateEmpty) return new ReadableStream({ start(c) { c.close(); } });
       return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
     },
   });
@@ -89,6 +91,22 @@ test('with no API key configured it degrades instead of failing', async () => {
 
 test('a provider failure degrades to the fallback the site already shipped', async () => {
   const { handler } = loadHandler({ generateThrows: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+});
+
+test('a provider stream error before its first chunk degrades to the fallback', async () => {
+  const { handler } = loadHandler({ generateStreamError: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+});
+
+test('an empty provider stream degrades to the fallback', async () => {
+  const { handler } = loadHandler({ generateEmpty: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);

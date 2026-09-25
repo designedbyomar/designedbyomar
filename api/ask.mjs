@@ -97,6 +97,52 @@ const headers = (source, sources, answerId = '') => ({
 const textResponse = (body, source, sources = [], answerId = '') =>
   new Response(body, { status: 200, headers: headers(source, sources, answerId) });
 
+const hasText = (chunk) => typeof chunk === 'string'
+  ? chunk.length > 0
+  : chunk instanceof Uint8Array && chunk.byteLength > 0;
+
+const readUntilText = async (stream) => {
+  const reader = stream.getReader();
+  const buffered = [];
+
+  try {
+    while (true) {
+      const result = await reader.read();
+      if (result.done) return null;
+      buffered.push(result.value);
+      if (hasText(result.value)) break;
+    }
+  } catch {
+    return null;
+  }
+
+  return new ReadableStream({
+    start(controller) {
+      for (const chunk of buffered) controller.enqueue(chunk);
+
+      const pump = async () => {
+        try {
+          while (true) {
+            const result = await reader.read();
+            if (result.done) {
+              controller.close();
+              return;
+            }
+            controller.enqueue(result.value);
+          }
+        } catch (error) {
+          controller.error(error);
+        }
+      };
+
+      pump();
+    },
+    cancel(reason) {
+      return reader.cancel(reason);
+    },
+  });
+};
+
 /** Everything the model is allowed to know, and the rules it answers under. */
 const buildPrompt = (context) => `You answer questions about Omar Tavarez on his portfolio site, using ONLY the reviewed answers provided below.
 
@@ -155,11 +201,13 @@ export const createHandler = ({
   if (!hasApiKey() || rateLimited(ip)) return textResponse('', 'fallback', sources);
 
   try {
-    const stream = generate({
+    const stream = await generate({
       system: buildPrompt(context.map(a => `Q: ${a.question}\nA: ${a.answer}`).join('\n\n')),
       prompt: question,
     });
-    return new Response(stream, { status: 200, headers: headers('generated', sources) });
+    const responseStream = await readUntilText(stream);
+    if (!responseStream) return textResponse('', 'fallback', sources);
+    return new Response(responseStream, { status: 200, headers: headers('generated', sources) });
   } catch {
     return textResponse('', 'fallback', sources);
   }

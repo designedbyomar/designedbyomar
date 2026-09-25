@@ -645,7 +645,7 @@ test('Ask refuses a question it has no written answer for', async ({ page }) => 
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
 });
 
@@ -675,7 +675,7 @@ test('Ask still answers when analytics are declined, and sends nothing', async (
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
 
   const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
   expect(events.filter(e => e.eventName.startsWith('ask_')), 'a declined visitor must send no ask_* events').toHaveLength(0);
@@ -696,7 +696,7 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
 
   const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
   expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
@@ -746,7 +746,7 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -792,7 +792,7 @@ test('a miss on /ask stops the URL pointing at the previous answer', async ({ pa
 
   await page.locator('#ask-panel input[type="text"]').fill('how do penguins pay for parking in antarctica');
   await page.locator('#ask-panel button[type="submit"]').click();
-  await expect(page.getByText(/no written answer, and drafting one did not work/i)).toBeVisible();
+  await expect(page.getByText(/could not be drafted either/i)).toBeVisible();
   await expect(page).toHaveURL(/\/ask$/);
 });
 

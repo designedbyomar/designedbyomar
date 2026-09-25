@@ -2379,8 +2379,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
               {nearest
-                ? 'That one has no written answer, and drafting one did not work either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
-                : 'That one has no written answer, and drafting one did not work either. Rather than guess, email is the faster route.'}
+                ? 'That one has no written answer, and it could not be drafted either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
+                : 'That one has no written answer, and it could not be drafted either. Rather than guess, email is the faster route.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
