@@ -1917,7 +1917,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // A drafted reply, when the written set had no answer. Held apart from
   // `result` so the UI can never present unreviewed text as reviewed.
   const [drafted, setDrafted] = React.useState(null);
-  const [drafting, setDrafting] = React.useState(false);
+  // null | 'looking' | 'drafting'. Two waits, and they say different things:
+  // looking is still hoping for a written answer, drafting has given up on one.
+  // Reporting the second while the first is true was simply untrue.
+  const [phase, setPhase] = React.useState(null);
   // Identifies the interaction that owns the answer region, so a response
   // arriving for an older one can be discarded rather than rendered.
   const requestRef = React.useRef(0);
@@ -1972,10 +1975,17 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // than going through show(), which would rewrite the hash it just read.
   React.useEffect(() => {
     if (!linkable || !answers?.length) return;
-    const id = decodeURIComponent(window.location.hash.slice(1));
-    if (!id) return;
-    const answer = answers.find(a => a.id === id);
-    if (answer) setResult(answer);
+
+    const resolveHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+      const answer = answers.find(a => a.id === id);
+      if (answer) setResult(answer);
+    };
+
+    resolveHash();
+    window.addEventListener('hashchange', resolveHash);
+    return () => window.removeEventListener('hashchange', resolveHash);
   }, [linkable, answers]);
 
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
@@ -2013,6 +2023,11 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
   const suggestions = followUps.length ? followUps : openingSuggestions;
 
+  // Drives both the submit guard and the button's disabled styling, so the two
+  // cannot disagree — a button that looks pressable and does nothing is worse
+  // than one that looks disabled.
+  const canSubmit = Boolean(query.trim()) && Boolean(index) && !phase;
+
   /**
    * Every interaction that takes over the answer region claims it first.
    *
@@ -2036,7 +2051,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setMissed(false);
     setNearest(null);
     setDrafted(null);
-    setDrafting(false);
+    setPhase(null);
     setCopiedLink(false);
     if (linkable) history.replaceState(null, '', `#${answer.id}`);
   };
@@ -2044,17 +2059,21 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
 
   /**
-   * Nothing written covers this. Ask the endpoint, which grounds a reply in the
-   * nearest reviewed answers. Any failure — offline, rate limited, no key,
-   * provider down — lands on the fallback the site shipped before this existed.
+   * Token overlap could not be trusted with this one. Ask the endpoint, which
+   * puts every written question to a model and returns the one this is asking
+   * for — or, when none of them is, drafts a reply grounded in the nearest.
+   *
+   * Any failure — offline, rate limited, no key, provider down — lands on the
+   * local match if there was one, and otherwise on the fallback the site
+   * shipped before any of this existed.
    */
-  const draft = async (asked, near) => {
+  const ask = async (asked, near, localHit) => {
     const token = requestRef.current;
     const controller = new AbortController();
     abortRef.current = controller;
     const current = () => requestRef.current === token;
 
-    setDrafting(true);
+    setPhase('looking');
     try {
       const response = await fetch('/api/ask', {
         method: 'POST',
@@ -2070,12 +2089,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       if (kind === 'reviewed') {
         const id = response.headers.get('X-Ask-Answer-Id');
         const reviewed = answers.find(a => a.id === id);
-        if (reviewed) { show(reviewed); return 'reviewed'; }
+        // 'exact' cannot reach here — the client answers those itself — so this
+        // is the router's pick, or the endpoint's own local fallback.
+        if (reviewed) { show(reviewed); return response.headers.get('X-Ask-Matched-By') || 'router'; }
       }
 
       if (kind === 'generated' && response.body) {
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let text = '';
+        setPhase('drafting');
         setDrafted({ text: '', sources: sourceIds, question: asked });
         setMissed(false);
         for (;;) {
@@ -2088,37 +2110,45 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         if (text.trim()) return 'generated';
       }
     } catch {
-      // Aborted, offline, or the provider failed — all land on the fallback
-      // below unless something newer has taken over.
+      // Aborted, offline, or the provider failed — handled below unless
+      // something newer has taken over.
     } finally {
-      if (current()) setDrafting(false);
+      if (current()) setPhase(null);
     }
 
     if (!current()) return 'superseded';
+
+    // The endpoint could not help. A local match is still better than telling
+    // the visitor there is nothing, so routing never makes the site worse than
+    // it was before routing existed.
+    if (localHit) { show(localHit.answer); return 'local'; }
+
     fallBack(near);
     return 'fallback';
   };
 
   const submit = (event) => {
     event.preventDefault();
-    if (!index || drafting) return;
+    if (!canSubmit) return;
     const asked = query.trim();
     const hit = matchQuestion(asked, index);
-    if (hit) {
-      trackPortfolioEvent('ask_submit', {
-        matched: true,
-        answer_id: hit.answer.id,
-        score: Math.round(hit.score * 100) / 100,
-      });
+
+    // An exact hit — the typed string is a question or alias verbatim. The only
+    // result token overlap cannot get wrong, so it is answered here and nothing
+    // is sent anywhere. Everything else is routed, because a non-exact match
+    // scoring 1.00 is as likely to be wrong as right.
+    if (hit?.exact) {
+      trackPortfolioEvent('ask_submit', { matched: true, matched_by: 'exact', answer_id: hit.answer.id });
       show(hit.answer);
       return;
     }
+
     // The question itself is the point of this event: it is the only signal
     // for which answers are missing. Disclosed in the privacy policy, and the
     // consent gate in trackAnalyticsEvent means a declined visitor sends
     // nothing at all.
     const near = nearestTopic(asked, index);
-    trackPortfolioEvent('ask_submit', { matched: false });
+    trackPortfolioEvent('ask_submit', { matched: false, matched_by: 'routing' });
     // Nothing written is on screen any more, so the hash must not keep
     // pointing at the answer that was.
     if (linkable) history.replaceState(null, '', window.location.pathname);
@@ -2127,12 +2157,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setMissed(false);
     setDrafted(null);
     setNearest(near);
-    draft(asked, near).then(answered => {
+    ask(asked, near, hit).then(answered => {
       if (answered === 'superseded') return;
       trackPortfolioEvent('ask_no_match', {
         question: asked,
         nearest_id: near?.id ?? 'none',
+        // 'router' and 'local' both mean a written answer was served; they are
+        // kept apart so the routing can be judged against the matcher it replaced.
         answered_by: answered,
+        local_score: hit ? Math.round(hit.score * 100) / 100 : 0,
       });
     });
   };
@@ -2193,40 +2226,51 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       </div>
 
       <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          aria-label="Ask a question about Omar's work"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Ask about a project, a skill, a role…"
-          autoComplete="off"
-          style={{
-            flex: '1 1 260px',
-            minWidth: 0,
-            minHeight: 44,
-            padding: '10px 14px',
-            fontFamily: 'inherit',
-            fontSize: 'var(--font-size-body-md)',
-            color: 'var(--fg-primary)',
-            background: 'var(--bg-base)',
-            border: 'none',
-            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            borderRadius: 'var(--radius-standard)',
-          }}
-        />
-        <button type="submit" disabled={!query.trim()} style={{
+        {/*
+          The wrapper carries the gradient ring. An input is a replaced element
+          and cannot host ::before/::after, so the ring has nowhere to live
+          without it — see .ask-field in index.html.
+        */}
+        <div className="ask-field" style={{ flex: '1 1 260px', minWidth: 0, display: 'flex' }}>
+          <input
+            type="text"
+            aria-label="Ask a question about Omar's work"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Ask about a project, a skill, a role…"
+            autoComplete="off"
+            style={{
+              flex: '1 1 auto',
+              minWidth: 0,
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-md)',
+              color: 'var(--fg-primary)',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 'var(--radius-standard)',
+            }}
+          />
+        </div>
+        {/* Disabled and primary both match .ds-button in design-system-page.css. */}
+        <button type="submit" disabled={!canSubmit} style={{
           minHeight: 44,
           padding: '10px 18px',
           fontFamily: 'inherit',
           fontSize: 'var(--font-size-body-md)',
           fontWeight: 'var(--font-weight-medium)',
-          color: query.trim() ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
-          background: 'transparent',
+          color: canSubmit ? 'var(--bg-page)' : 'var(--fg-disabled)',
+          background: canSubmit ? 'var(--fg-primary)' : 'var(--bg-subtle)',
+          opacity: canSubmit ? 1 : 0.72,
           border: 'none',
-          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
           borderRadius: 'var(--radius-standard)',
-          cursor: query.trim() ? 'pointer' : 'not-allowed',
-        }}>
+          cursor: canSubmit ? 'pointer' : 'not-allowed',
+          transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast)',
+        }}
+          onMouseEnter={e => { if (canSubmit) e.currentTarget.style.opacity = '0.86'; }}
+          onMouseLeave={e => { if (canSubmit) e.currentTarget.style.opacity = '1'; }}
+        >
           Ask
         </button>
       </form>
@@ -2306,7 +2350,13 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           </div>
         )}
 
-        {drafting && !drafted && (
+        {phase === 'looking' && (
+          <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
+            Looking for a written answer…
+          </p>
+        )}
+
+        {phase === 'drafting' && !drafted && (
           <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
             Nothing written covers that one — drafting from the published answers…
           </p>
@@ -2839,8 +2889,9 @@ const PrivacyPolicyPage = ({ onBack }) => {
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. When your question matches one of them, it is answered in your browser and nothing you type leaves this site.</p>
-        <p style={{ margin: 0 }}>When no written answer covers your question, two things happen. The wording of the question is recorded in an analytics event, which is the only way I can see which answers are missing and write them. And the question is sent, along with excerpts of the published answers closest to it, to Groq, who run the model that drafts a reply. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through.</p>
+        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing one word for word, is answered in your browser: nothing is sent and nothing leaves this site.</p>
+        <p style={{ margin: 0 }}>Anything else you type is sent to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question goes to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you.</p>
+        <p style={{ margin: 0 }}>If none of them fits, the question is sent again with excerpts of the closest published answers so a reply can be drafted from them. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of the question is also recorded in an analytics event, which is the only way I can see which answers are missing and write them.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
@@ -2999,6 +3050,9 @@ const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
+const ASK_TITLE = 'Ask about the work — Omar Tavarez';
+const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
+const ASK_URL = `${SITE_ORIGIN}/ask`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
 const toAbsoluteUrl = (pathOrUrl) => {
@@ -3066,6 +3120,24 @@ const buildWorkStructuredData = () => ({
   ],
 });
 
+const buildAskStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: ASK_TITLE,
+      url: ASK_URL,
+      description: ASK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
 const buildRouteStructuredData = (route, currentCase) => {
   if (currentCase) {
     const url = `${SITE_ORIGIN}/work/${currentCase.id}/`;
@@ -3121,6 +3193,10 @@ const buildRouteStructuredData = (route, currentCase) => {
     return buildWorkStructuredData();
   }
 
+  if (route.type === 'ask') {
+    return buildAskStructuredData();
+  }
+
   return buildHomeStructuredData();
 };
 
@@ -3136,6 +3212,17 @@ const syncStructuredData = (route, currentCase) => {
 };
 
 const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'ask') {
+    return {
+      title: ASK_TITLE,
+      description: ASK_DESCRIPTION,
+      url: ASK_URL,
+      robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
+    };
+  }
+
   if (route.type === 'work') {
     return {
       title: WORK_TITLE,

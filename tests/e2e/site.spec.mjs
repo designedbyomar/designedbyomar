@@ -706,12 +706,15 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
 test('the privacy policy discloses what the Ask box records and where it goes', async ({ page }) => {
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { name: /The Ask Box/i })).toBeVisible();
-  await expect(page.getByText(/answered in your browser and nothing you type leaves this site/i)).toBeVisible();
-  await expect(page.getByText(/wording of the question is recorded in an analytics event/i)).toBeVisible();
-  await expect(page.getByText(/sent, along with excerpts of the published answers closest to it, to Groq/i)).toBeVisible();
-  // The claim that nothing is ever sent to a model was true before the
-  // endpoint existed and must not survive anywhere in the policy.
+  // All three cases have to be stated, because they differ in what leaves the
+  // browser: a verbatim question, a routed one, and one nothing covers.
+  await expect(page.getByText(/answered in your browser: nothing is sent/i)).toBeVisible();
+  await expect(page.getByText(/Anything else you type is sent to be matched/i)).toBeVisible();
+  await expect(page.getByText(/excerpts of the closest published answers/i)).toBeVisible();
+  await expect(page.getByText(/wording of the question is also recorded in an analytics event/i)).toBeVisible();
+  // Claims that were true before the endpoint existed and must not come back.
   await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
+  await expect(page.getByText(/nothing you type leaves this site/i)).toHaveCount(0);
 });
 
 test('a drafted answer is labelled as unreviewed', async ({ page }) => {
@@ -751,6 +754,145 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
 
+test('with the endpoint down, a local match still answers', async ({ page }) => {
+  // Routing must never make the site worse than it was before routing existed.
+  // "has he worked with react" is a non-exact match, so it would previously have
+  // been answered locally — with the endpoint unreachable it still must be.
+  await page.route('**/api/ask', route => route.abort('failed'));
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('has he worked with react');
+  await page.locator('#faq button[type="submit"]').click();
+
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+  await expect(askLive(page).locator('p').first()).toBeVisible();
+});
+
+test('a verbatim question is answered without touching the network', async ({ page }) => {
+  // The carve-out the privacy policy relies on. An exact alias must never be
+  // routed, and neither must a suggested prompt.
+  const requests = [];
+  page.on('request', r => { if (r.url().includes('/api/ask')) requests.push(r.url()); });
+
+  await page.goto('/');
+  await openAsk(page);
+
+  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expect(askLive(page).locator('p').first()).toBeVisible();
+  expect(requests, 'a suggested prompt must not be routed').toHaveLength(0);
+
+  await askInput(page).fill('fintech experience');
+  await page.locator('#faq button[type="submit"]').click();
+  await expect(askLive(page).getByText(/embedded payments product/i).first()).toBeVisible();
+  expect(requests, 'a verbatim alias must not be routed').toHaveLength(0);
+});
+
+test('a routed question says it is looking, not that it is drafting', async ({ page }) => {
+  // The two waits mean different things, and the drafting copy asserts that
+  // nothing written covers the question — which is not yet known.
+  await page.route('**/api/ask', async route => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Ask-Source': 'reviewed',
+        'X-Ask-Sources': 'athena-ds',
+        'X-Ask-Answer-Id': 'design-systems',
+        'X-Ask-Matched-By': 'router',
+      },
+      body: 'routed',
+    });
+  });
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('is he a manager');
+  await page.locator('#faq button[type="submit"]').click();
+
+  await expect(askLive(page).getByText(/Looking for a written answer/i)).toBeVisible();
+  await expect(askLive(page).getByText(/drafting from the published answers/i)).toHaveCount(0);
+
+  // The router's pick is rendered from the local copy, reviewed, not as a draft.
+  await expect(askLive(page).getByText(/Has Omar built design systems at scale/i)).toBeVisible();
+  await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+});
+
+test('the input ring is visible at rest, still until hovered, and leaves focus alone', async ({ page }) => {
+  // This file runs reducedMotion: 'reduce' for every test, so the spin has to be
+  // asserted with that opted out — and suppressed under it, below.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await openAsk(page);
+
+  const field = page.locator('.ask-field');
+  const ring = () => field.evaluate(n => {
+    const s = getComputedStyle(n, '::before');
+    return { opacity: s.opacity, animation: s.animationName, image: s.backgroundImage };
+  });
+
+  const rest = await ring();
+  expect(rest.opacity, 'visible at rest — the input is what a visitor has to find').toBe('1');
+  expect(rest.image).toContain('conic-gradient');
+  expect(rest.animation, 'but still, so it does not compete with the answer text').toBe('none');
+
+  await field.hover();
+  expect((await ring()).animation, 'it spins on hover').toBe('contact-border-spin');
+
+  // The explicit requirement: the ring must not disturb the focus state. It is a
+  // pseudo-element, so the outline still comes from the input itself.
+  const input = page.locator('#ask-panel input[type="text"]');
+  await input.focus();
+  const outline = await input.evaluate(n => {
+    const s = getComputedStyle(n);
+    return { style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset };
+  });
+  expect(outline).toEqual({ style: 'solid', width: '2px', offset: '3px' });
+  expect((await ring()).animation, 'and on focus-within').toBe('contact-border-spin');
+});
+
+test('the input ring never spins for a visitor who asked for less motion', async ({ page }) => {
+  // beforeEach already sets reducedMotion: 'reduce'. The ring must stay — it is
+  // the affordance — while the rotation goes.
+  await page.goto('/');
+  await openAsk(page);
+
+  const field = page.locator('.ask-field');
+  await field.hover();
+  await page.locator('#ask-panel input[type="text"]').focus();
+
+  const ring = await field.evaluate(n => {
+    const s = getComputedStyle(n, '::before');
+    return { opacity: s.opacity, animation: s.animationName };
+  });
+  expect(ring.opacity, 'the ring is still visible').toBe('1');
+  expect(ring.animation, 'but nothing rotates').toBe('none');
+});
+
+test('the submit button is disabled until something is typed', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  const submit = page.locator('#faq button[type="submit"]');
+  await expect(submit).toBeDisabled();
+  const off = await submit.evaluate(n => getComputedStyle(n).cursor);
+  expect(off).toBe('not-allowed');
+
+  await askInput(page).fill('is he a manager');
+  await expect(submit).toBeEnabled();
+
+  // Primary: filled with the foreground colour, not the disabled surface.
+  const on = await submit.evaluate(n => {
+    const s = getComputedStyle(n);
+    return { cursor: s.cursor, background: s.backgroundColor, opacity: s.opacity };
+  });
+  expect(on.cursor).toBe('pointer');
+  expect(on.opacity).toBe('1');
+  expect(on.background).not.toBe(off.background);
+});
+
 test('the /ask route stands on its own', async ({ page }) => {
   // `vite preview` does not resolve extensionless clean URLs, so it serves the
   // SPA shell here and the route resolves on the client — the same as /privacy
@@ -759,10 +901,26 @@ test('the /ask route stands on its own', async ({ page }) => {
   await page.goto('/ask');
 
   await expect(page.getByRole('heading', { level: 1, name: /Ask about the work/i })).toBeVisible();
+  await expect(page).toHaveTitle('Ask about the work — Omar Tavarez');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.designedbyomar.com/ask');
+  const askPageSchema = await page.locator('#structured-data').evaluate(node => JSON.parse(node.textContent));
+  expect(askPageSchema['@graph'][0]).toMatchObject({
+    '@type': 'WebPage',
+    name: 'Ask about the work — Omar Tavarez',
+    url: 'https://www.designedbyomar.com/ask',
+  });
 
   // It is the page, so it must not wait to be scrolled to.
   await expect(page.locator('#ask-panel button[type="button"]').first()).toBeVisible();
   await expect(page.locator('#ask-panel input[type="text"]')).toBeVisible();
+});
+
+test('changing the hash on /ask selects the matching answer', async ({ page }) => {
+  await page.goto('/ask');
+  await expect(page.locator('#ask-panel button[type="button"]').first()).toBeVisible();
+
+  await page.evaluate(() => { window.location.hash = 'fintech-depth'; });
+  await expect(page.getByText(/Two years at Plastiq/i).first()).toBeVisible();
 });
 
 test('an answer on /ask has a link of its own that reopens it', async ({ page, context }) => {
@@ -865,5 +1023,5 @@ test('picking a suggestion mid-stream does not resurrect the draft', async ({ pa
 
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
-  await expect(askLive(page).getByText(/no written answer, and drafting one did not work/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/could not be drafted either/i)).toHaveCount(0);
 });
