@@ -21,6 +21,7 @@ import {
 } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
+import { onMediaChange } from './media-query.js';
 import {
   Button,
   CopyButton,
@@ -265,8 +266,7 @@ const usePrefersReducedMotion = () => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setReduced(query.matches);
     sync();
-    query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
+    return onMediaChange(query, sync);
   }, []);
 
   return reduced;
@@ -615,7 +615,7 @@ const PixelOrbitIcons = ({ theme = 'dark' }) => {
     };
 
     const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
-    motionMQ.addEventListener('change', onMotionChange);
+    const stopWatchingMotion = onMediaChange(motionMQ, onMotionChange);
     resize();
     window.addEventListener('resize', resize);
     const observer = typeof IntersectionObserver === 'undefined' ? null
@@ -628,7 +628,7 @@ const PixelOrbitIcons = ({ theme = 'dark' }) => {
       cancelAnimationFrame(rafRef.current);
       observer?.disconnect();
       document.removeEventListener('visibilitychange', onVis);
-      motionMQ.removeEventListener('change', onMotionChange);
+      stopWatchingMotion();
       window.removeEventListener('resize', resize);
     };
   }, [theme]);
@@ -1203,9 +1203,13 @@ const ComponentsSection = () => (
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
       <SectionHeader eyebrow="Components" title="Ask">
-        Answers in the FAQ section are written in advance and matched, never generated. The component
-        exists to shorten the distance between a hiring question and the case study that answers it,
-        so every part of it either answers or hands off.
+        Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or a
+        verbatim question is matched in the browser; anything else is matched by a model, because word
+        overlap answered “is he a manager” with a refusal. When nothing written covers a question, a
+        reply is drafted from the reviewed set and labelled as drafted — the two are never presented
+        as the same thing. The component exists to shorten the distance
+        between a hiring question and the case study that answers it, so every part of it either
+        answers or hands off.
       </SectionHeader>
       <ExampleFrame label="Suggested prompts">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -1243,11 +1247,28 @@ const ComponentsSection = () => (
         </div>
       </ExampleFrame>
       <div className="ds-card-grid">
+        <DocCard title="Prompts follow the reader" meta="Suggestions">
+          The opening prompts cover the breadth of the set. Once an answer is on screen they are
+          replaced by follow-ups ranked against the question just answered, because the opening six
+          are the six the reader has already passed over. Refusals are never offered as a prompt:
+          they answer honestly when asked, but suggesting one invites it.
+        </DocCard>
+        <DocCard title="One panel, two placements" meta="Composition">
+          The same component renders as a section of the homepage and as the <code>/ask</code> page.
+          On the page each answer takes the URL, so one can be sent to someone else; in the section
+          it leaves the URL alone, or it would fight the <code>#faq</code> anchor the nav uses. The
+          page also gives a case study somewhere to link back to — every citation leads out of the
+          panel, and the reader needs a way back to asking.
+        </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
-          Matching is inverse-document-frequency weighted token overlap over each answer&rsquo;s question
-          and aliases. Below threshold, or when too little of the question is in vocabulary, the
-          component declines and offers the nearest case study plus email. A confident wrong answer
-          costs more than no answer.
+          A confident wrong answer costs more than no answer. Deciding which written answer a question
+          wants is the model&rsquo;s job, and it may decline; when it does, or when it picks nothing
+          recognisable, the component drafts a labelled reply or offers the nearest case study plus
+          email. Inverse-document-frequency weighted overlap over each answer&rsquo;s question and
+          aliases still runs in the browser, but only to catch a verbatim question and to answer at all
+          when the model cannot be reached. Its threshold and vocabulary floor govern that path alone
+          &mdash; relying on them for everything is what produced the wrong answers routing exists to
+          fix.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">
           Answers carry a review status and a fingerprint of the case studies they cite. Only approved
@@ -1470,8 +1491,7 @@ const DesignSystem = () => {
   React.useEffect(() => {
     const mq = window.matchMedia('(max-width: 1054px)');
     const handler = (e) => setNavOpen(!e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    return onMediaChange(mq, handler);
   }, []);
 
   React.useLayoutEffect(() => {

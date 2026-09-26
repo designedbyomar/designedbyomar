@@ -8,6 +8,9 @@ const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
 const DESIGN_SYSTEM_URL = `${SITE_ORIGIN}/design-system`;
+const ASK_TITLE = 'Ask about the work — Omar Tavarez';
+const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
+const ASK_URL = `${SITE_ORIGIN}/ask`;
 
 const personSchema = {
   '@type': 'Person',
@@ -42,9 +45,26 @@ const imageType = (imageUrl) => {
   return 'image/png';
 };
 
+/**
+ * For a double-quoted attribute value. `'` is escaped too, though nothing here
+ * writes a single-quoted attribute — it costs a replace and removes the trap
+ * for whoever writes the first one.
+ */
 const escapeAttr = (value) => String(value)
   .replace(/&/g, '&amp;')
   .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+/**
+ * For text between tags. Quotes need no escaping there, so this is the minimal
+ * correct set and reads as what it is: `escapeAttr` was doing this job in a
+ * dozen places, and a function named for attributes doing it invites the
+ * reasonable suspicion that the text was unescaped.
+ */
+const escapeText = (value) => String(value)
+  .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;');
 
@@ -129,6 +149,28 @@ const privacyStructuredData = () => ({
   ],
 });
 
+const askStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: ASK_TITLE,
+      url: ASK_URL,
+      description: ASK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
+// Deliberately not FAQPage. Google limits that rich result to "well-known,
+// authoritative government and health websites", so it would buy nothing and
+// invite a structured-data warning for a mismatch with the visible page.
+
 const workStructuredData = () => ({
   '@context': 'https://schema.org',
   '@graph': [
@@ -191,6 +233,7 @@ function generateSitemap(distDir) {
   const staticPages = [
     { loc: `${SITE_ORIGIN}/`,              changefreq: 'weekly',  priority: '1.0' },
     { loc: `${SITE_ORIGIN}/work`,          changefreq: 'weekly',  priority: '0.9' },
+    { loc: ASK_URL,                        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${SITE_ORIGIN}/design-system`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
   ];
@@ -245,7 +288,7 @@ function injectRootContent(html, innerHtml, label) {
 }
 
 function injectH1(html, text) {
-  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeAttr(text)}</h1>`, text);
+  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeText(text)}</h1>`, text);
 }
 
 // The full case-study record as static HTML. The rendered React view labels these
@@ -257,25 +300,31 @@ function injectH1(html, text) {
 function caseStudyBodyHtml(rawBody) {
   const body = normalizeBlocks(rawBody);
   if (!body.length) return '';
-  const esc = escapeAttr;
-  const li = (items) => items.map((i) => `<li>${esc(i)}</li>`).join('');
+  // Text between tags and values inside attributes are escaped differently.
+  // This used to alias one helper for both, which is what made the helper look
+  // wrong at every text-node call site.
+  const txt = escapeText;
+  const attr = escapeAttr;
+  const li = (items) => items.map((i) => `<li>${txt(i)}</li>`).join('');
+  const figure = (src, alt, caption) =>
+    `<figure><img src="${attr(src)}" alt="${attr(alt || '')}">${caption ? `<figcaption>${txt(caption)}</figcaption>` : ''}</figure>`;
 
   return body.map((b) => {
     switch (b.type) {
       case 'heading':
-        return `<h${b.level}>${esc(b.text)}</h${b.level}>`;
+        return `<h${b.level}>${txt(b.text)}</h${b.level}>`;
       case 'paragraph':
-        return `<p>${esc(b.text)}</p>`;
+        return `<p>${txt(b.text)}</p>`;
       case 'list':
         return `<ul>${li(b.items)}</ul>`;
       case 'quote':
-        return `<blockquote><p>${esc(b.text)}</p>${b.attribution ? `<cite>${esc(b.attribution)}</cite>` : ''}</blockquote>`;
+        return `<blockquote><p>${txt(b.text)}</p>${b.attribution ? `<cite>${txt(b.attribution)}</cite>` : ''}</blockquote>`;
       case 'callout':
-        return `<aside><h3>${esc(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
+        return `<aside><h3>${txt(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
       case 'gallery':
-        return `<div class="cs-gallery">${(b.images || []).map((img) => `<figure><img src="${esc(img.src)}" alt="${esc(img.alt || '')}">${img.caption ? `<figcaption>${esc(img.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`;
+        return `<div class="cs-gallery">${(b.images || []).map((img) => figure(img.src, img.alt, img.caption)).join('')}</div>`;
       case 'image':
-        return `<figure><img src="${esc(b.src)}" alt="${esc(b.alt || '')}">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ''}</figure>`;
+        return figure(b.src, b.alt, b.caption);
       default:
         return '';
     }
@@ -284,14 +333,14 @@ function caseStudyBodyHtml(rawBody) {
 function caseStudyContentHtml(c) {
   const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeAttr).join(' · ');
   const list = (items) => (items && items.length ? `<ul>${items.join('')}</ul>` : '');
-  const tags = list((c.tags || []).map((t) => `<li>${escapeAttr(t)}</li>`));
-  const metrics = list((c.metrics || []).map((m) => `<li>${escapeAttr(m.value)} — ${escapeAttr(m.label)}${m.qualifier ? ` (${escapeAttr(m.qualifier)})` : ''}</li>`));
-  const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeAttr(body)}</p>` : '');
+  const tags = list((c.tags || []).map((t) => `<li>${escapeText(t)}</li>`));
+  const metrics = list((c.metrics || []).map((m) => `<li>${escapeText(m.value)} — ${escapeText(m.label)}${m.qualifier ? ` (${escapeText(m.qualifier)})` : ''}</li>`));
+  const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeText(body)}</p>` : '');
 
   return [
     `<article style="${HIDDEN_STYLE}">`,
-    `<h1>${escapeAttr(c.title)}</h1>`,
-    c.subtitle ? `<p>${escapeAttr(c.subtitle)}</p>` : '',
+    `<h1>${escapeText(c.title)}</h1>`,
+    c.subtitle ? `<p>${escapeText(c.subtitle)}</p>` : '',
     meta ? `<p>${meta}</p>` : '',
     tags,
     metrics,
@@ -311,13 +360,44 @@ function caseStudyContentHtml(c) {
  * filtering at runtime still ships the text — and the answer set has no
  * business in the critical path when most visitors never open it.
  */
-function generateAskAnswers(distDir) {
+function generateAskAnswers(distDir, indexHtml) {
   const doc = require('./src/content/ask-answers.json');
   const approved = doc.answers
     .filter(answer => answer.status === 'approved')
     .map(({ id, question, aliases, answer, sources, topic }) => ({ id, question, aliases, answer, sources, topic }));
 
   fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved }));
+
+  // The Ask panel is client-rendered, so none of its text reaches a crawler, an
+  // ATS scraper or an assistant reading the page without JavaScript. The answers
+  // are injected into /ask so those consumers get all of them.
+  //
+  // They live here rather than on the homepage, where they were first put: the
+  // same 4,600 words on two indexed URLs is a duplicate-content problem, and
+  // /ask is the page that should rank for them. It also keeps roughly 10KB
+  // gzipped off the homepage, which is the one page in the critical path.
+  const askDir = `${distDir}/ask`;
+  fs.mkdirSync(askDir, { recursive: true });
+  const answersHtml = approved.length ? [
+    `<article style="${HIDDEN_STYLE}">`,
+    ...approved.map((a) => `<h2>${escapeText(a.question)}</h2><p>${escapeText(a.answer)}</p>`),
+    '</article>',
+  ].join('') : '';
+  const askHtml = injectRootContent(
+    setStructuredData(
+      setMeta(indexHtml, {
+        title: ASK_TITLE,
+        description: ASK_DESCRIPTION,
+        url: ASK_URL,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      askStructuredData(),
+    ),
+    `<h1 style="${HIDDEN_STYLE}">${escapeText(ASK_TITLE)}</h1>${answersHtml}`,
+    ASK_TITLE,
+  );
+  fs.writeFileSync(`${askDir}/index.html`, askHtml);
+
   const held = doc.answers.length - approved.length;
   console.log(`\u2705 Ask: ${approved.length} approved answer(s) shipped${held ? `, ${held} draft(s) withheld` : ''}.`);
 }
@@ -395,7 +475,7 @@ function generateRoutes() {
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
-  generateAskAnswers(distDir);
+  generateAskAnswers(distDir, indexHtml);
   generateSitemap(distDir);
   console.log('✅ Generated static routes with unique SEO metadata.');
 }
@@ -405,4 +485,4 @@ if (require.main === module) (async () => {
   generateRoutes();
 })();
 
-module.exports = { injectRootContent };
+module.exports = { injectRootContent, escapeAttr, escapeText };

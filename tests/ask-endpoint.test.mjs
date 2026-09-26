@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
-import { buildIndex, rankNearest } from '../src/ask.mjs';
+import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
@@ -20,22 +20,46 @@ const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', i
  * the same way production fetches them, so these tests exercise the real
  * routing without a key, a provider or a published file.
  */
-const loadHandler = ({ generateThrows = false, hasApiKey = true, answersFail = false } = {}) => {
+const loadHandler = ({
+  generateThrows = false,
+  generateStreamError = false,
+  generateEmpty = false,
+  hasApiKey = true,
+  answersFail = false,
+  // The router declines by default, so every existing test keeps taking the
+  // path it was written for.
+  routeReturns = 'NONE',
+  routeThrows = false,
+  generateStalls = false,
+} = {}) => {
   const calls = [];
+  const routeCalls = [];
   const handler = createHandler({
     hasApiKey: () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
       return { answers: doc.answers, index: buildIndex(doc.answers) };
     },
+    route: async (options) => {
+      routeCalls.push(options);
+      if (routeThrows) throw new Error('router unavailable');
+      return routeReturns;
+    },
     generate: (options) => {
       calls.push(options);
       if (generateThrows) throw new Error('provider unavailable');
+      if (generateStreamError) return new ReadableStream({ start(c) { c.error(new Error('provider unavailable')); } });
+      if (generateEmpty) return new ReadableStream({ start(c) { c.close(); } });
+      // Opens, then never yields and never closes — the case a provider-side
+      // abort signal is supposed to catch, and which must be bounded here too.
+      if (generateStalls) return new ReadableStream({ start() {}, cancel() {} });
       return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
     },
   });
-  return { handler, calls };
+  return { handler, calls, routeCalls };
 };
+
+const answerFor = (id) => doc.answers.find(a => a.id === id);
 
 // A question the written set does not answer but which still shares
 // vocabulary with it — so there is something to ground a reply in. The
@@ -48,15 +72,132 @@ const post = (question) => new Request('https://designedbyomar.com/api/ask', {
   body: JSON.stringify({ question }),
 });
 
-test('a question the written set covers is answered without calling a model', async () => {
-  const { handler, calls } = loadHandler();
-  const response = await handler(post('what fintech work has he done'));
+test('an exact hit is answered without calling any model', async () => {
+  // Verbatim alias. The one result token overlap cannot get wrong, so it costs
+  // nothing — not even a routing call.
+  const { handler, calls, routeCalls } = loadHandler();
+  const response = await handler(post('fintech experience'));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
-  assert.equal(calls.length, 0, 'the model must not be called when a written answer exists');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'exact');
+  assert.equal(routeCalls.length, 0, 'an exact hit must not be routed');
+  assert.equal(calls.length, 0, 'an exact hit must not reach the drafting model');
 
-  const expected = doc.answers.find(a => a.id === 'fintech-depth').answer;
-  assert.equal(await response.text(), expected, 'the reviewed answer must be returned verbatim');
+  assert.equal(await response.text(), answerFor('fintech-depth').answer, 'returned verbatim');
+});
+
+test('the router decides a non-exact question, and its pick is returned verbatim', async () => {
+  const { handler, calls, routeCalls } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'router');
+  assert.equal(response.headers.get('X-Ask-Answer-Id'), 'leadership-or-ic');
+  assert.equal(calls.length, 0, 'a routed hit must not reach the drafting model');
+  assert.equal(await response.text(), answerFor('leadership-or-ic').answer);
+
+  // The catalogue is what makes this possible: the right answer shares no
+  // vocabulary with the question, so a shortlist by overlap would not contain it.
+  assert.match(routeCalls[0].system, /leadership-or-ic: /);
+  assert.equal(
+    doc.answers.filter(a => routeCalls[0].system.includes(`${a.id}: `)).length,
+    doc.answers.length,
+    'the router must see every written question, not a shortlist',
+  );
+});
+
+test('the reported bug: a hiring question no longer returns a refusal', async () => {
+  // "is he a manager" scored 1.00 against refuse-employer-opinions — a
+  // legitimate hiring question answered with "I will not discuss that".
+  const local = matchQuestion('is he a manager', buildIndex(doc.answers));
+  assert.equal(local.answer.topic, 'refusal', 'the local matcher still picks a refusal here');
+  assert.equal(local.exact, false, 'and not as an exact hit, so it is routable');
+
+  const { handler } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Answer-Id'), 'leadership-or-ic');
+  assert.notEqual(answerFor(response.headers.get('X-Ask-Answer-Id')).topic, 'refusal');
+});
+
+test('an id the router invented is never served', async () => {
+  const { handler } = loadHandler({ routeReturns: 'leadership-and-vision' });
+  const response = await handler(post('is he a manager'));
+
+  // It must not 500, and must not echo the invented id back.
+  assert.equal(response.status, 200);
+  assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'leadership-and-vision');
+});
+
+/**
+ * An answer the router did not give is not the same as an answer it declined to
+ * give, and only the second should outrank the local match.
+ *
+ * Treating them alike meant a truncated or empty response discarded an answer
+ * the site already had, turning a question it could answer into an unreviewed
+ * draft. Both halves are asserted, because fixing one direction by breaking the
+ * other would pass a looser test.
+ */
+for (const [label, routeReturns] of [
+  ['an empty response', ''],
+  ['whitespace only', '   \n  '],
+  ['a truncated id', 'leadership-or'],
+  ['an id that does not exist', 'leadership-and-vision'],
+  ['a refusal to answer', 'I cannot help with that'],
+]) {
+  test(`${label} from the router serves the local match, not a draft`, async () => {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'reviewed', `${label} must not reach drafting`);
+    assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
+    assert.equal(calls.length, 0);
+  });
+}
+
+for (const [label, routeReturns] of [
+  ['NONE', 'NONE'],
+  ['lower-case none', 'none'],
+  ['NONE with punctuation', 'NONE.'],
+  ['a sentence declining', 'None of these answer that.'],
+]) {
+  test(`${label} is a decision, so it drafts rather than using the local match`, async () => {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must be read as a decline`);
+    assert.equal(calls.length, 1);
+  });
+}
+
+test('NONE means draft, even when token overlap thought it had a match', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'NONE' });
+  const response = await handler(post('is he a manager'));
+
+  // The router saw all 48 and declined. That beats an overlap score, so the
+  // held local hit is deliberately not used.
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(calls.length, 1);
+});
+
+test('a router failure falls back to the local match rather than nothing', async () => {
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  const response = await handler(post('is he a manager'));
+
+  // Nothing was decided, so the site must be no worse than it was before
+  // routing existed — which is to say, it serves the local match.
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
+  assert.equal(calls.length, 0);
+});
+
+test('with no key the local match is still served', async () => {
+  const { handler, routeCalls } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(routeCalls.length, 0, 'no key means no routing call is attempted');
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
 });
 
 test('a question with no written answer is grounded in reviewed answers only', async () => {
@@ -89,6 +230,22 @@ test('with no API key configured it degrades instead of failing', async () => {
 
 test('a provider failure degrades to the fallback the site already shipped', async () => {
   const { handler } = loadHandler({ generateThrows: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+});
+
+test('a provider stream error before its first chunk degrades to the fallback', async () => {
+  const { handler } = loadHandler({ generateStreamError: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+});
+
+test('an empty provider stream degrades to the fallback', async () => {
+  const { handler } = loadHandler({ generateEmpty: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
@@ -153,4 +310,20 @@ test('a question sharing no vocabulary is never sent to the model', async () => 
 
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(calls.length, 0, 'the model must not be asked to speak from an empty context');
+});
+
+// Bounded explicitly: `node --test` has no default timeout, so a regression
+// here would hang CI indefinitely instead of reporting a failure.
+test('a stream that never yields is abandoned rather than hung on', { timeout: 15000 }, async (t) => {
+  // The failure this guards is a hang, so the assertion is as much about
+  // finishing as about the result. The endpoint's own first-chunk timeout has
+  // to fire; nothing in this test aborts for it.
+  t.diagnostic('waiting on the endpoint first-chunk timeout');
+  const started = Date.now();
+  const { handler } = loadHandler({ generateStalls: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.ok(Date.now() - started < 15000, 'and it gives up long before an edge function would');
 });

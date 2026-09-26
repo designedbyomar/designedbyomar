@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
+import { AppIcon, ArrowLeft, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
-import { buildIndex, matchQuestion, nearestTopic } from './ask.mjs';
+import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
+import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -208,8 +209,7 @@ const Portrait = ({ galaxy, theme }) => {
     const mediaQuery = window.matchMedia('(hover: none), (pointer: coarse)');
     const sync = () => setIsTouchLayout(mediaQuery.matches);
     sync();
-    mediaQuery.addEventListener?.('change', sync);
-    return () => mediaQuery.removeEventListener?.('change', sync);
+    return onMediaChange(mediaQuery, sync);
   }, []);
 
   React.useEffect(() => {
@@ -217,8 +217,7 @@ const Portrait = ({ galaxy, theme }) => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setPrefersReducedMotion(mediaQuery.matches);
     sync();
-    mediaQuery.addEventListener?.('change', sync);
-    return () => mediaQuery.removeEventListener?.('change', sync);
+    return onMediaChange(mediaQuery, sync);
   }, []);
 
   React.useEffect(() => {
@@ -774,7 +773,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             <a href="#faq" onClick={goSection('faq')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >FAQ</a>
+            >Ask</a>
             <a href="#contact" onClick={goSection('contact')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
@@ -808,7 +807,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
               <button onClick={() => { closeMobileMenu(); onOpenAbout('mobile_nav'); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
-              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>FAQ</a>
+              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Ask</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44,
@@ -1421,6 +1420,24 @@ const CaseStudyPage = ({ c, onBack }) => {
         Back to work
       </a>
 
+      {/*
+        A citation in the Ask panel lands here, and until this link existed the
+        assistant simply disappeared at that point — the reader had to know to
+        scroll the homepage to find it again.
+      */}
+      <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'case_study', case_study_id: c.id })} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+        fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
+        marginBottom: 40, marginLeft: 'var(--space-6)', transition: 'color var(--duration-fast)',
+      }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
+      >
+        Ask about this work
+        <AppIcon icon={ArrowUpRight} size={12} />
+      </a>
+
       {/* Cover */}
       <div className="cs-cover" style={{
         position: 'relative', width: '100%',
@@ -1711,10 +1728,10 @@ const KeyFacts = () => {
       if (e.matches) cancelAnimationFrame(animRef.current);
       else animRef.current = requestAnimationFrame(loop);
     };
-    mq.addEventListener('change', onMotionChange);
+    const stopWatching = onMediaChange(mq, onMotionChange);
     return () => {
       cancelAnimationFrame(animRef.current);
-      mq.removeEventListener('change', onMotionChange);
+      stopWatching();
     };
   }, []);
 
@@ -1818,107 +1835,39 @@ const KeyFacts = () => {
   );
 };
 
-const FAQ_ITEMS = [
-  {
-    question: 'What kind of product designer is Omar?',
-    answer: 'Omar is a principal product designer focused on complex B2B products, AI workflows, enterprise platforms, fintech, healthcare SaaS, and design systems. He works across strategy, research, UX architecture, prototyping, UI systems, and launch execution.',
-  },
-  {
-    question: 'What types of companies is Omar best suited for?',
-    answer: 'He is strongest in startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products, or internal operational systems.',
-  },
-  {
-    question: 'Is Omar more of a design leader or an individual contributor?',
-    answer: 'Both. He operates at a principal IC level while bringing design leadership skills: product strategy, stakeholder alignment, design systems, roadmap thinking, mentorship, and cross-functional influence.',
-  },
-  {
-    question: 'What kinds of problems should a team bring Omar in to solve?',
-    answer: 'Bring him in when the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations. His work is especially useful when teams need senior design judgment and hands-on execution at the same time.',
-  },
-  {
-    question: 'What is Omar’s experience with AI and healthcare SaaS?',
-    answer: 'At Wisdom, Omar designed AI-assisted dental operations workflows including Posting Assistant and Management Portal. Posting Assistant cut manual posting time by about 40%. Management Portal was designed to retire 200+ tracking spreadsheets and scoped to carry operations from 260 to 900+ offices. Its core decision was an office watchlist pairing an LLM with rules-based thresholds, so at-risk accounts are ranked with an explanation of why each one triggered rather than leaving Team Leads to read raw data.',
-    links: [
-      { label: 'Posting Assistant', href: '/work/posting-asst/' },
-      { label: 'Management Portal', href: '/work/mgmt-portal/' },
-    ],
-  },
-  {
-    question: 'What is Omar’s experience with fintech and embedded payments?',
-    answer: 'At Plastiq, Omar led 0→1 design for Connect API Payments, a PCI-compliant embedded payments and API product. The work helped support early customers including Billfire, Brex, and PayGround and reached $20M+ in monthly payment volume.',
-    links: [
-      { label: 'Connect API Payments', href: '/work/connect-api/' },
-    ],
-  },
-  {
-    question: 'What enterprise product experience does Omar have?',
-    answer: 'At Disney, Omar designed enterprise workflow and communication tools across media brands. Critical Communication Tool grew to 1,600+ users and supported 200,000+ critical communications, while Unified Ad Platform helped consolidate cross-brand ad-sales workflows.',
-    links: [
-      { label: 'Critical Communication Tool', href: '/work/disney-cct/' },
-      { label: 'Unified Ad Platform', href: '/work/disney-uap/' },
-    ],
-  },
-  {
-    question: 'How does Omar approach design systems?',
-    answer: 'He treats design systems as product infrastructure: reusable foundations that improve consistency, speed, engineering alignment, governance, and long-term quality. At Plastiq, he co-led Athena Design System 2.0.',
-    links: [
-      { label: 'Athena Design System 2.0', href: '/work/athena-ds/' },
-    ],
-  },
-  {
-    question: 'How does Omar work with founders and engineers?',
-    answer: 'He moves between vision and implementation: clarifying ambiguous ideas, mapping workflows, prototyping quickly, documenting edge cases, and partnering with engineering early so the product direction is practical enough to ship.',
-  },
-  {
-    question: 'What business outcomes has Omar influenced?',
-    answer: 'His work has contributed to outcomes including a 40% reduction in manual posting time, 200+ interviews and discovery sessions across Wisdom products, $20M+ monthly payment volume, 1,600+ internal tool users, and 200,000+ critical communications.',
-  },
-];
-
-const DEFAULT_VISIBLE_FAQ_INDICES = [0, 1, 2, 3, 4, 7];
-
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const FAQAnswer = ({ item }) => {
-  if (!item.links?.length) return item.answer;
-
-  const linkLabels = item.links
-    .map(link => link.label)
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length);
-
-  if (!linkLabels.length) return item.answer;
-
-  const segments = item.answer.split(new RegExp(`(${linkLabels.map(escapeRegExp).join('|')})`, 'g'));
-  const linkByLabel = new Map(item.links.map(link => [link.label, link.href]));
-
-  return (
-    <>
-      {segments.map((segment, index) => {
-        const href = linkByLabel.get(segment);
-        if (!href) return <React.Fragment key={`${segment}-${index}`}>{segment}</React.Fragment>;
-        return (
-          <a key={segment} href={href} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
-            {segment}
-          </a>
-        );
-      })}
-    </>
-  );
-};
-
 // ============================================================
 // Ask — pre-generated answers, matched client-side
 // ============================================================
 
 /**
- * Suggested prompts, in preference order. Most visitors click rather than
- * type, so these carry the feature and implicitly set its scope. Ids that are
- * not approved yet are skipped, so this list can name answers ahead of review.
+ * Suggested prompts, in preference order. With the FAQ accordion gone these
+ * carry the section on their own, so they cover the breadth it used to show
+ * rather than only the top few. Ids that are not approved are skipped.
  */
-const ASK_SUGGESTED_IDS = ['design-systems', 'fintech-depth', 'leadership-or-ic', 'technical-depth'];
+const ASK_SUGGESTED_IDS = [
+  'kind-of-designer',
+  'design-systems',
+  'fintech-depth',
+  'ai-llm-work',
+  'leadership-or-ic',
+  'technical-depth',
+];
 
-const ASK_MAX_SUGGESTIONS = 4;
+const ASK_MAX_SUGGESTIONS = 6;
+
+/**
+ * Follow-ups shown once an answer is on screen. Fewer than the opening set:
+ * they sit above an answer the reader is still reading, and the point is a
+ * next step, not a second menu.
+ */
+const ASK_MAX_FOLLOW_UPS = 4;
+
+/**
+ * Refusals answer a question honestly when it is asked, but suggesting one
+ * invites it. Nothing on a hiring page should prompt a visitor to ask whether
+ * Omar will work for free.
+ */
+const isSuggestable = (answer) => answer.topic !== 'refusal';
 
 const loadAskAnswers = async () => {
   // Dev reads the source file so drafts are visible while reviewing. The
@@ -1934,7 +1883,28 @@ const loadAskAnswers = async () => {
   return doc.answers ?? [];
 };
 
-const Ask = ({ prefersReducedMotion }) => {
+const usePrefersReducedMotion = () => {
+  const [reduced, setReduced] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduced(mq.matches);
+    return onMediaChange(mq, sync);
+  }, []);
+  return reduced;
+};
+
+/**
+ * `linkable` is set when the panel is the page rather than a section of one.
+ * It turns the answer on screen into part of the URL, so an answer can be sent
+ * to someone else — the thing a reader most wants to do with a good one, and
+ * impossible while the panel only exists mid-scroll on the homepage. The
+ * homepage panel leaves the URL alone, or it would fight the #faq anchor.
+ */
+const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const [answers, setAnswers] = React.useState(null);
   const [query, setQuery] = React.useState('');
   const [result, setResult] = React.useState(null);
@@ -1945,43 +1915,107 @@ const Ask = ({ prefersReducedMotion }) => {
   // A drafted reply, when the written set had no answer. Held apart from
   // `result` so the UI can never present unreviewed text as reviewed.
   const [drafted, setDrafted] = React.useState(null);
-  const [drafting, setDrafting] = React.useState(false);
+  // null | 'looking' | 'drafting'. Two waits, and they say different things:
+  // looking is still hoping for a written answer, drafting has given up on one.
+  // Reporting the second while the first is true was simply untrue.
+  const [phase, setPhase] = React.useState(null);
   // Identifies the interaction that owns the answer region, so a response
   // arriving for an older one can be discarded rather than rendered.
   const requestRef = React.useRef(0);
   const abortRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
+  // 'idle' | 'copied' | 'failed'. A rejected clipboard write used to look
+  // identical to never having pressed the button, and clipboard writes are
+  // rejected routinely — insecure origin, denied permission, no gesture.
+  const [copyState, setCopyState] = React.useState('idle');
+  const copyResetRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+  }, []);
+
+  const settle = (state) => {
+    setCopyState(state);
+    if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+    copyResetRef.current = window.setTimeout(() => setCopyState('idle'), 1200);
+  };
+
+  const copyLink = async (answer) => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/ask#${answer.id}`);
+      trackPortfolioEvent('ask_share_click', { answer_id: answer.id });
+      settle('copied');
+    } catch {
+      // No clipboard permission, or an insecure origin. show() has already put
+      // this answer's id in the hash, so the address bar is the link — say so
+      // rather than leaving the press looking like it did nothing.
+      settle('failed');
+    }
+  };
 
   // Loaded when the section comes into view rather than on focus: the fetch
   // lands well after LCP, and the panel never renders as an empty shell before
   // we know whether there is anything approved to show.
   React.useEffect(() => {
+    let cancelled = false;
+    const load = () => loadAskAnswers()
+      .then(loaded => { if (!cancelled) setAnswers(loaded); })
+      .catch(() => { if (!cancelled) setAnswers([]); });
+
+    // On /ask the panel is the page, so there is nothing to scroll to and
+    // nothing to protect — a deep-linked answer has to resolve on arrival.
+    if (linkable) { load(); return () => { cancelled = true; }; }
+
     const node = sentinelRef.current;
     if (!node || typeof IntersectionObserver === 'undefined') return undefined;
-    let cancelled = false;
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
-      loadAskAnswers()
-        .then(loaded => { if (!cancelled) setAnswers(loaded); })
-        .catch(() => { if (!cancelled) setAnswers([]); });
+      load();
     }, { rootMargin: '200px' });
     observer.observe(node);
     return () => { cancelled = true; observer.disconnect(); };
-  }, []);
+  }, [linkable]);
 
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
 
-  const suggestions = React.useMemo(() => {
+  const openingSuggestions = React.useMemo(() => {
     if (!answers?.length) return [];
     const byId = new Map(answers.map(a => [a.id, a]));
     const picked = ASK_SUGGESTED_IDS.map(id => byId.get(id)).filter(Boolean);
     for (const answer of answers) {
       if (picked.length >= ASK_MAX_SUGGESTIONS) break;
-      if (!picked.includes(answer)) picked.push(answer);
+      if (!picked.includes(answer) && isSuggestable(answer)) picked.push(answer);
     }
     return picked.slice(0, ASK_MAX_SUGGESTIONS);
   }, [answers]);
+
+  // The question that produced whatever is on screen. Held rather than read
+  // from `query`, which keeps changing as the visitor types the next one.
+  const answered = result?.question ?? drafted?.question ?? null;
+
+  /**
+   * Once an answer is showing, the opening six are stale — they are the same
+   * six the visitor has already passed over. Rank the set against the question
+   * just answered instead, so the row becomes a next step rather than a menu
+   * that never changes.
+   */
+  const followUps = React.useMemo(() => {
+    if (!index || !answered) return [];
+    return rankNearest(
+      answered,
+      index,
+      ASK_MAX_FOLLOW_UPS + 1,
+      a => isSuggestable(a) && a.id !== result?.id,
+    ).slice(0, ASK_MAX_FOLLOW_UPS);
+  }, [index, answered, result]);
+
+  const suggestions = followUps.length ? followUps : openingSuggestions;
+
+  // Drives both the submit guard and the button's disabled styling, so the two
+  // cannot disagree — a button that looks pressable and does nothing is worse
+  // than one that looks disabled.
+  const canSubmit = Boolean(query.trim()) && Boolean(index) && !phase;
 
   /**
    * Every interaction that takes over the answer region claims it first.
@@ -2000,29 +2034,74 @@ const Ask = ({ prefersReducedMotion }) => {
     return requestRef.current;
   };
 
-  const show = (answer) => {
+  /**
+   * Take over the answer region for `answer`, cancelling whatever held it.
+   *
+   * Kept separate from show() for the one caller that must not touch the URL:
+   * the hash listener is reacting to the URL, so writing it back would be
+   * circular. Everything else about taking over is identical, and has to be —
+   * without the claim, an in-flight request resolves over the top of a
+   * deep-linked answer, which is how this went wrong.
+   */
+  const take = (answer) => {
     claim();
     setResult(answer);
     setMissed(false);
     setNearest(null);
     setDrafted(null);
-    setDrafting(false);
+    setPhase(null);
+    setCopyState('idle');
   };
+
+  const show = (answer) => {
+    take(answer);
+    if (linkable) history.replaceState(null, '', `#${answer.id}`);
+  };
+
+  /**
+   * Resolve /ask#<answer-id>, on arrival and on every later hash change.
+   *
+   * Goes through take(), not a bare setResult: following a link to another
+   * answer while a request is in flight has to cancel that request, or it
+   * resolves over the top and the page stops showing the answer its URL names.
+   * The listener is registered after `take` exists so it uses the real one.
+   */
+  React.useEffect(() => {
+    if (!linkable || !answers?.length) return undefined;
+
+    const resolveHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+      const answer = answers.find(a => a.id === id);
+      if (answer) take(answer);
+    };
+
+    resolveHash();
+    window.addEventListener('hashchange', resolveHash);
+    return () => window.removeEventListener('hashchange', resolveHash);
+    // `take` is stable in everything that matters — refs and setters — so it is
+    // deliberately not a dependency; including it would re-register per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkable, answers]);
 
   const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
 
   /**
-   * Nothing written covers this. Ask the endpoint, which grounds a reply in the
-   * nearest reviewed answers. Any failure — offline, rate limited, no key,
-   * provider down — lands on the fallback the site shipped before this existed.
+   * Token overlap could not be trusted with this one. Ask the endpoint, which
+   * puts every written question to a model and returns the one this is asking
+   * for — or, when none of them is, drafts a reply grounded in the nearest.
+   *
+   * Any failure — offline, rate limited, no key, provider down — lands on the
+   * local match if there was one, and otherwise on the fallback the site
+   * shipped before any of this existed.
    */
-  const draft = async (asked, near) => {
+  const ask = async (asked, near, localHit) => {
     const token = requestRef.current;
     const controller = new AbortController();
     abortRef.current = controller;
     const current = () => requestRef.current === token;
 
-    setDrafting(true);
+    setPhase('looking');
     try {
       const response = await fetch('/api/ask', {
         method: 'POST',
@@ -2038,66 +2117,99 @@ const Ask = ({ prefersReducedMotion }) => {
       if (kind === 'reviewed') {
         const id = response.headers.get('X-Ask-Answer-Id');
         const reviewed = answers.find(a => a.id === id);
-        if (reviewed) { show(reviewed); return 'reviewed'; }
+        // 'exact' cannot reach here — the client answers those itself — so this
+        // is the router's pick, or the endpoint's own local fallback.
+        const matchedBy = response.headers.get('X-Ask-Matched-By') || 'router';
+        if (reviewed) {
+          show(reviewed);
+          // A written answer was served, so this is not a missing answer and the
+          // wording is not recorded. Only the id, which is not personal and is
+          // what says whether routing is picking sensibly.
+          trackPortfolioEvent('ask_routed', { answer_id: reviewed.id, matched_by: matchedBy });
+          return matchedBy;
+        }
       }
 
       if (kind === 'generated' && response.body) {
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let text = '';
-        setDrafted({ text: '', sources: sourceIds });
+        setPhase('drafting');
+        setDrafted({ text: '', sources: sourceIds, question: asked });
         setMissed(false);
         for (;;) {
           const { value, done } = await reader.read();
           if (done) break;
           if (!current()) { await reader.cancel().catch(() => {}); return 'superseded'; }
           text += value;
-          setDrafted({ text, sources: sourceIds });
+          setDrafted({ text, sources: sourceIds, question: asked });
         }
         if (text.trim()) return 'generated';
       }
     } catch {
-      // Aborted, offline, or the provider failed — all land on the fallback
-      // below unless something newer has taken over.
+      // Aborted, offline, or the provider failed — handled below unless
+      // something newer has taken over.
     } finally {
-      if (current()) setDrafting(false);
+      if (current()) setPhase(null);
     }
 
     if (!current()) return 'superseded';
+
+    // The endpoint could not help. A local match is still better than telling
+    // the visitor there is nothing, so routing never makes the site worse than
+    // it was before routing existed.
+    if (localHit) {
+      show(localHit.answer);
+      trackPortfolioEvent('ask_routed', { answer_id: localHit.answer.id, matched_by: 'local' });
+      return 'local';
+    }
+
     fallBack(near);
     return 'fallback';
   };
 
   const submit = (event) => {
     event.preventDefault();
-    if (!index || drafting) return;
+    if (!canSubmit) return;
     const asked = query.trim();
     const hit = matchQuestion(asked, index);
-    if (hit) {
-      trackPortfolioEvent('ask_submit', {
-        matched: true,
-        answer_id: hit.answer.id,
-        score: Math.round(hit.score * 100) / 100,
-      });
+
+    // An exact hit — the typed string is a question or alias verbatim. The only
+    // result token overlap cannot get wrong, so it is answered here and nothing
+    // is sent anywhere. Everything else is routed, because a non-exact match
+    // scoring 1.00 is as likely to be wrong as right.
+    if (hit?.exact) {
+      trackPortfolioEvent('ask_submit', { matched: true, matched_by: 'exact', answer_id: hit.answer.id });
       show(hit.answer);
       return;
     }
+
     // The question itself is the point of this event: it is the only signal
     // for which answers are missing. Disclosed in the privacy policy, and the
     // consent gate in trackAnalyticsEvent means a declined visitor sends
     // nothing at all.
     const near = nearestTopic(asked, index);
-    trackPortfolioEvent('ask_submit', { matched: false });
+    trackPortfolioEvent('ask_submit', { matched: false, matched_by: 'routing' });
+    // Nothing written is on screen any more, so the hash must not keep
+    // pointing at the answer that was.
+    if (linkable) history.replaceState(null, '', window.location.pathname);
     claim();
     setResult(null);
     setMissed(false);
     setDrafted(null);
     setNearest(near);
-    draft(asked, near).then(answered => {
+    ask(asked, near, hit).then(answered => {
       if (answered === 'superseded') return;
+      // A written answer was served — by the router or by the local fallback —
+      // so `ask_routed` has already reported it, without the wording. Recording
+      // it here too would put covered questions into the missing-answer count,
+      // which is the one signal that decides what gets written next, and would
+      // send their wording against what the privacy policy says.
+      if (answered === 'router' || answered === 'local') return;
       trackPortfolioEvent('ask_no_match', {
         question: asked,
         nearest_id: near?.id ?? 'none',
         answered_by: answered,
+        local_score: hit ? Math.round(hit.score * 100) / 100 : 0,
       });
     });
   };
@@ -2118,7 +2230,7 @@ const Ask = ({ prefersReducedMotion }) => {
       borderTop: '1px solid var(--color-gray-100)',
     }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        Ask something else
+        {followUps.length ? 'Related' : 'Ask something else'}
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
@@ -2127,7 +2239,10 @@ const Ask = ({ prefersReducedMotion }) => {
             key={answer.id}
             type="button"
             onClick={() => {
-              trackPortfolioEvent('ask_suggested_click', { answer_id: answer.id });
+              trackPortfolioEvent('ask_suggested_click', {
+                answer_id: answer.id,
+                context: followUps.length ? 'related' : 'opening',
+              });
               setQuery('');
               show(answer);
             }}
@@ -2155,40 +2270,51 @@ const Ask = ({ prefersReducedMotion }) => {
       </div>
 
       <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          aria-label="Ask a question about Omar's work"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Ask about a project, a skill, a role…"
-          autoComplete="off"
-          style={{
-            flex: '1 1 260px',
-            minWidth: 0,
-            minHeight: 44,
-            padding: '10px 14px',
-            fontFamily: 'inherit',
-            fontSize: 'var(--font-size-body-md)',
-            color: 'var(--fg-primary)',
-            background: 'var(--bg-base)',
-            border: 'none',
-            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            borderRadius: 'var(--radius-standard)',
-          }}
-        />
-        <button type="submit" disabled={!query.trim()} style={{
+        {/*
+          The wrapper carries the gradient ring. An input is a replaced element
+          and cannot host ::before/::after, so the ring has nowhere to live
+          without it — see .ask-field in index.html.
+        */}
+        <div className="ask-field" style={{ flex: '1 1 260px', minWidth: 0, display: 'flex' }}>
+          <input
+            type="text"
+            aria-label="Ask a question about Omar's work"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Ask about a project, a skill, a role…"
+            autoComplete="off"
+            style={{
+              flex: '1 1 auto',
+              minWidth: 0,
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-md)',
+              color: 'var(--fg-primary)',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 'var(--radius-standard)',
+            }}
+          />
+        </div>
+        {/* Disabled and primary both match .ds-button in design-system-page.css. */}
+        <button type="submit" disabled={!canSubmit} style={{
           minHeight: 44,
           padding: '10px 18px',
           fontFamily: 'inherit',
           fontSize: 'var(--font-size-body-md)',
           fontWeight: 'var(--font-weight-medium)',
-          color: query.trim() ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
-          background: 'transparent',
+          color: canSubmit ? 'var(--bg-page)' : 'var(--fg-disabled)',
+          background: canSubmit ? 'var(--fg-primary)' : 'var(--bg-subtle)',
+          opacity: canSubmit ? 1 : 0.72,
           border: 'none',
-          boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
           borderRadius: 'var(--radius-standard)',
-          cursor: query.trim() ? 'pointer' : 'not-allowed',
-        }}>
+          cursor: canSubmit ? 'pointer' : 'not-allowed',
+          transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast)',
+        }}
+          onMouseEnter={e => { if (canSubmit) e.currentTarget.style.opacity = '0.86'; }}
+          onMouseLeave={e => { if (canSubmit) e.currentTarget.style.opacity = '1'; }}
+        >
           Ask
         </button>
       </form>
@@ -2203,9 +2329,44 @@ const Ask = ({ prefersReducedMotion }) => {
             borderRadius: 'var(--radius-comfort)',
             boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
           }}>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
-              {result.question}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+              <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
+                {result.question}
+              </p>
+              {linkable && (
+                <button
+                  type="button"
+                  data-ask-share="true"
+                  onClick={() => copyLink(result)}
+                  aria-label={{
+                    copied: 'Link copied',
+                    failed: 'Copying failed — the link is in the address bar',
+                  }[copyState] ?? 'Copy a link to this answer'}
+                  style={{
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 'var(--font-size-body-sm)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: copyState === 'copied' ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
+                    background: 'transparent',
+                    border: 'none',
+                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+                    borderRadius: 'var(--radius-standard)',
+                    cursor: 'pointer',
+                    transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
+                  }}
+                >
+                  <AppIcon icon={copyState === 'copied' ? Check : Copy} size={13} />
+                  {{ copied: 'Copied', failed: 'Use the address bar' }[copyState] ?? 'Copy link'}
+                </button>
+              )}
+            </div>
             {result.answer.split('\n\n').map((paragraph, i) => (
               <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
                 {paragraph}
@@ -2236,7 +2397,13 @@ const Ask = ({ prefersReducedMotion }) => {
           </div>
         )}
 
-        {drafting && !drafted && (
+        {phase === 'looking' && (
+          <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
+            Looking for a written answer…
+          </p>
+        )}
+
+        {phase === 'drafting' && !drafted && (
           <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
             Nothing written covers that one — drafting from the published answers…
           </p>
@@ -2309,8 +2476,8 @@ const Ask = ({ prefersReducedMotion }) => {
           }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
               {nearest
-                ? 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing \u2014 the closest published work is below, and email is faster for anything specific.'
-                : 'There is no written answer for that one. These are pre-written rather than generated, so instead of guessing, email is the faster route.'}
+                ? 'That one has no written answer, and it could not be drafted either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
+                : 'That one has no written answer, and it could not be drafted either. Rather than guess, email is the faster route.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
@@ -2339,40 +2506,18 @@ const Ask = ({ prefersReducedMotion }) => {
       </div>
 
       <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-        These answers are written in advance from the published case studies and reviewed by hand —
-        nothing here is generated when you ask.
+        These answers are written in advance from the published case studies and reviewed by hand.
+        When nothing written covers a question, a reply is drafted from them and labelled as drafted.
       </p>
     </div>
   );
 };
 
-const FAQ = ({ scrollToSection }) => {
+const AskSection = ({ scrollToSection }) => {
   const viewportWidth = useViewportWidth();
-  const [openIndex, setOpenIndex] = React.useState(-1);
-  const [showAllQuestions, setShowAllQuestions] = React.useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setPrefersReducedMotion(mq.matches);
-    mq.addEventListener?.('change', sync);
-    return () => mq.removeEventListener?.('change', sync);
-  }, []);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
-  const visibleFaqItems = showAllQuestions
-    ? FAQ_ITEMS.map((item, index) => ({ item, index }))
-    : DEFAULT_VISIBLE_FAQ_INDICES.map(index => ({ item: FAQ_ITEMS[index], index }));
-  const toggleQuestionVisibility = () => {
-    setShowAllQuestions(showingAll => {
-      const nextShowingAll = !showingAll;
-      if (!nextShowingAll && !DEFAULT_VISIBLE_FAQ_INDICES.includes(openIndex)) setOpenIndex(-1);
-      return nextShowingAll;
-    });
-  };
 
   return (
     <section id="faq" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6)' }}>
@@ -2394,13 +2539,15 @@ const FAQ = ({ scrollToSection }) => {
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', paddingBottom: isStacked ? 'var(--space-4)' : 0 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>FAQ
+              <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>Ask
             </div>
             <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-              Questions founders and hiring teams usually ask.
+              Ask about the work.
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              Quick answers on how I work, where I add value, and what kind of products I'm best suited for.
+              Pick a question or type your own. The answers are written in advance from the published
+              case studies, so what you get back is what I would actually say. Ask something they do
+              not cover and it will draft a reply from them, and tell you that is what it did.
             </p>
           </div>
           <a href="#contact" onClick={(event) => {
@@ -2430,109 +2577,70 @@ const FAQ = ({ scrollToSection }) => {
           </a>
         </div>
 
-        <div id="faq-questions-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
-          {visibleFaqItems.map(({ item, index }) => {
-            const isOpen = openIndex === index;
-            const answerId = `faq-answer-${index}`;
-            const buttonId = `faq-question-${index}`;
-            return (
-              <div key={item.question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'} style={{
-                borderRadius: 'var(--radius-comfort)',
-                boxShadow: isOpen ? 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' : 'var(--shadow-card-subtle)',
-                transition: prefersReducedMotion ? 'none' : 'box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease',
-              }}>
-                <button
-                  id={buttonId}
-                  type="button"
-                  aria-expanded={isOpen}
-                  aria-controls={answerId}
-                  onClick={() => {
-                    trackPortfolioEvent('faq_interaction', {
-                      faq_index: index,
-                      faq_question: item.question,
-                      action: isOpen ? 'close' : 'open',
-                    });
-                    setOpenIndex(isOpen ? -1 : index);
-                  }}
-                  style={{
-                    width: '100%',
-                    minHeight: 68,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 'var(--space-4)',
-                    padding: 'var(--space-5) var(--space-6)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--fg-primary)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <span style={{
-                    fontSize: 'var(--font-size-body-lg)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    lineHeight: 'var(--line-height-snug)',
-                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-secondary)',
-                    transition: 'color var(--duration-fast-mid) ease',
-                  }}>
-                    {item.question}
-                  </span>
-                  <AppIcon icon={ChevronDown} size={18} style={{
-                    flexShrink: 0,
-                    color: isOpen ? 'var(--fg-primary)' : 'var(--fg-tertiary)',
-                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform var(--duration-fast-mid) ease, color var(--duration-fast-mid) ease',
-                  }} />
-                </button>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateRows: isOpen ? '1fr' : '0fr',
-                  transition: prefersReducedMotion ? 'none' : 'grid-template-rows var(--duration-base-plus) ease',
-                }}>
-                  <div
-                    id={answerId}
-                    role="region"
-                    aria-labelledby={buttonId}
-                    className="faq-answer"
-                    style={{
-                      overflow: 'hidden',
-                      opacity: isOpen ? 1 : 0,
-                      transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast-mid) ease',
-                    }}
-                  >
-                    <p style={{
-                      margin: 0,
-                      padding: '0 var(--space-6) var(--space-6)',
-                      fontSize: 'var(--font-size-body-lg)',
-                      lineHeight: 'var(--line-height-loose)',
-                      color: 'var(--fg-secondary)',
-                      maxWidth: 720,
-                    }}>
-                      <FAQAnswer item={item} />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          <button
-            type="button"
-            aria-expanded={showAllQuestions}
-            className="text-link faq-view-all-link"
-            onClick={() => toggleQuestionVisibility()}
-          >
-            {showAllQuestions ? 'Show fewer questions' : 'View all questions'}
-            <AppIcon icon={ChevronDown} size={14} style={{
-              transform: showAllQuestions ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform var(--duration-fast-mid) ease',
-            }} />
-          </button>
+        <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           <Ask prefersReducedMotion={prefersReducedMotion} />
+          <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'faq_section' })} className="text-link" style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            minHeight: 44,
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            color: 'var(--fg-secondary)',
+          }}>
+            See every answer
+            <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
         </div>
       </Reveal>
     </section>
+  );
+};
+
+/**
+ * The same panel as a page of its own.
+ *
+ * Two things the homepage section cannot do. An answer here has a URL, so a
+ * recruiter can send one to a hiring manager instead of describing it. And it
+ * is somewhere to link back to: every citation in the panel leads out to a
+ * case study, and until this existed, taking one left the reader with no way
+ * back to asking.
+ */
+const AskPage = () => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  return (
+    <article style={{ maxWidth: 880, margin: '0 auto', padding: '40px 24px 96px' }}>
+      <a href="/" onClick={(e) => { e.preventDefault(); history.pushState(null, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+        fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
+        marginBottom: 40, transition: 'color var(--duration-fast)',
+      }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
+      >
+        <AppIcon icon={ArrowLeft} size={12} />
+        Back to home
+      </a>
+
+      <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-5)' }}>
+        Ask about the work.
+      </h1>
+      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 720 }}>
+        Pick a question or type your own. The answers are written in advance from the published case
+        studies, so what you get back is what I would actually say. Ask something they do not cover
+        and it will draft a reply from them, and tell you that is what it did.
+      </p>
+      <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', margin: 0, maxWidth: 720 }}>
+        Every answer here has its own link, so you can send one on.
+      </p>
+
+      <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
+        <Ask prefersReducedMotion={prefersReducedMotion} linkable />
+      </div>
+    </article>
   );
 };
 
@@ -2823,13 +2931,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is also sent to Groq to draft a reply</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is normally also sent to Groq so a reply can be drafted</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the FAQ section are written in advance and reviewed by hand. When your question matches one of them, it is answered in your browser and nothing you type leaves this site.</p>
-        <p style={{ margin: 0 }}>When no written answer covers your question, two things happen. The wording of the question is recorded in an analytics event, which is the only way I can see which answers are missing and write them. And the question is sent, along with excerpts of the published answers closest to it, to Groq, who run the model that drafts a reply. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through.</p>
+        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing one word for word, is answered in your browser: nothing is sent and nothing leaves this site.</p>
+        <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, or the free daily allowance is spent, nothing is passed on and the closest written answer is used instead.</p>
+        <p style={{ margin: 0 }}>If none of them fits, the question is sent to Groq again with excerpts of the closest published answers so a reply can be drafted from them. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
@@ -2889,8 +2998,7 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const onChange = (event) => setPrefersReducedMotion(event.matches);
-    mediaQuery.addEventListener?.('change', onChange);
-    return () => mediaQuery.removeEventListener?.('change', onChange);
+    return onMediaChange(mediaQuery, onChange);
   }, []);
 
   const baseButtonStyle = {
@@ -2988,6 +3096,9 @@ const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
+const ASK_TITLE = 'Ask about the work — Omar Tavarez';
+const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
+const ASK_URL = `${SITE_ORIGIN}/ask`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
 const toAbsoluteUrl = (pathOrUrl) => {
@@ -3034,17 +3145,6 @@ const buildHomeStructuredData = () => ({
       description: 'Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
     },
     personSchema,
-    {
-      '@type': 'FAQPage',
-      mainEntity: FAQ_ITEMS.map(item => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer,
-        },
-      })),
-    },
   ],
 });
 
@@ -3056,6 +3156,24 @@ const buildWorkStructuredData = () => ({
       name: WORK_TITLE,
       url: WORK_URL,
       description: WORK_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+    },
+    personSchema,
+  ],
+});
+
+const buildAskStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: ASK_TITLE,
+      url: ASK_URL,
+      description: ASK_DESCRIPTION,
       isPartOf: {
         '@type': 'WebSite',
         name: 'designedbyomar',
@@ -3121,6 +3239,10 @@ const buildRouteStructuredData = (route, currentCase) => {
     return buildWorkStructuredData();
   }
 
+  if (route.type === 'ask') {
+    return buildAskStructuredData();
+  }
+
   return buildHomeStructuredData();
 };
 
@@ -3136,6 +3258,17 @@ const syncStructuredData = (route, currentCase) => {
 };
 
 const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'ask') {
+    return {
+      title: ASK_TITLE,
+      description: ASK_DESCRIPTION,
+      url: ASK_URL,
+      robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
+    };
+  }
+
   if (route.type === 'work') {
     return {
       title: WORK_TITLE,
@@ -3593,6 +3726,8 @@ const App = () => {
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
+          ) : route.type === 'ask' ? (
+            <AskPage />
           ) : route.type === 'work' ? (
             <WorkIndexPage />
           ) : currentCase ? (
@@ -3603,7 +3738,7 @@ const App = () => {
               <About onOpenDrawer={() => openAboutDrawer('about_section')} />
               <Work />
               <KeyFacts />
-              <FAQ scrollToSection={scrollToSection} />
+              <AskSection scrollToSection={scrollToSection} />
               <Contact />
             </>
           )}

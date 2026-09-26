@@ -12,7 +12,8 @@
         "design systems at scale",
         "design system work",
         "does he do design systems",
-        "design tokens experience"
+        "design tokens experience",
+        "design system approach"
       ],
       "answer": "Yes — four, and he treats them as infrastructure for a team rather than a personal artifact.\n\nAthena Design System 2.0 at Plastiq is the deepest. He co-led it, audited every product to find where nomenclature and patterns had diverged, then ran workshops to align product, design and engineering on principles and KPIs before producing a single asset. He partnered with engineering on the Storybook implementation, and it became the foundation for Plastiq's IPO-era brand.\n\nHe built Wisdom's system from scratch as founding designer, rebuilt the one at Welcome Lend, and the fourth runs this portfolio and is published at /design-system. Earlier, at Disney, he and engineering started an ad-sales system — documentation and React components — and handed the foundation on.",
       "sources": [
@@ -31,7 +32,9 @@
         "has he worked in fintech",
         "financial services background",
         "PCI compliance experience",
-        "embedded payments"
+        "embedded payments",
+        "embedded payments experience",
+        "fintech and embedded payments"
       ],
       "answer": "Two years at Plastiq, 2021 to 2023, as Product Design Lead — 0→1 on a regulated product.\n\nPlastiq Connect is an embedded payments product: a partner puts card and bank payments inside their own platform, under their own brand, and Plastiq carries the compliance and the disbursement. Benchmarking against Stripe Connect settled what it competed on — not feature breadth, but letting a partner hand PCI scope and risk operations over rather than build and certify them.\n\nCompliance is visible in the design: masked stored cards, the encryption notice at the card-block boundary, beneficial-owner collection in the payer form, and a Texas step that fires on the payer's billing address.\n\n$20M+ monthly volume in month one, three pre-launch partnerships, eight weeks signed to live.",
       "sources": [
@@ -50,7 +53,8 @@
         "LLM product design",
         "machine learning work",
         "AI workflow design",
-        "what AI has he built"
+        "what AI has he built",
+        "AI product work"
       ],
       "answer": "Two products at Wisdom, both designed so the model assists rather than decides.\n\nPosting Assistant handles insurance payment posting. OCR and LLMs pull data out of scanned documents and surface it in a structured review interface, but specialists keep the judgment calls. He chose the assistive path over full automation deliberately, to preserve specialist trust. It cut manual posting time by about 40%.\n\nManagement Portal includes an LLM-powered Office Watchlist that flags offices when A/R aging crosses thresholds — over-60 and over-90 balances, week-over-week spikes — and explains what changed rather than just reporting that a rule fired. Its outcome metrics are projected rather than measured.",
       "sources": [
@@ -70,7 +74,8 @@
         "leadership experience",
         "is he hands on",
         "team lead or IC",
-        "has he managed people"
+        "has he managed people",
+        "leader or IC"
       ],
       "answer": "Both, and the roles track it.\n\nHe was the founding and sole design lead at Wisdom for two years, owning design across Management Portal, Reporting, Insurance Verification and Posting Assistant. At Plastiq he co-led the Athena design system and ran the cross-functional workshops that set its principles. On Disney's Unified Ad Platform he led two designers and mentored others on the wider design team.\n\nHe has stayed hands-on throughout, describing his current engagements as equal parts consulting and building — as likely to be rebuilding a design system as shipping a feature to production.",
       "sources": [
@@ -344,7 +349,9 @@
         "medical software",
         "health tech experience",
         "dental",
-        "HIPAA"
+        "HIPAA",
+        "healthcare SaaS experience",
+        "dental operations experience"
       ],
       "answer": "Two years of it, as founding designer at Wisdom — an AI-powered dental operations platform — from February 2024 to February 2026.\n\nHe was the sole design lead across four products: Management Portal, Reporting, Insurance Verification and Posting Assistant. The work was revenue-cycle operations rather than clinical: insurance payment posting, A/R aging, claims, and the ops layer running hundreds of dental offices.\n\nThat means real exposure to regulated healthcare workflows and the people doing them — 200+ interviews at Wisdom — rather than consumer health.",
       "sources": [
@@ -363,7 +370,8 @@
         "large company",
         "big org",
         "fortune 500",
-        "corporate"
+        "corporate",
+        "enterprise scale experience"
       ],
       "answer": "Yes — two years at Disney, 2019 to 2021.\n\nHe led UX on the Critical Communication Tool, adopted by 1,600+ users and used to coordinate 250 critical incidents. On the Unified Ad Platform he brought seven Disney ad-sales brands onto AdVisor — the platform ESPN already ran on — without regressing the workflow ESPN depended on every day.\n\nEnterprise there meant the real version: eight brand perspectives to align, each with its own tooling and vocabulary, a single decision crossing seven business functions, and workflows where the product failing has consequences measured in bookings.",
       "sources": [
@@ -457,7 +465,9 @@
         "engineering collaboration",
         "working with developers",
         "handoff process",
-        "dev partnership"
+        "dev partnership",
+        "working with founders",
+        "founders and engineers"
       ],
       "answer": "Close, and usually in the same artifacts rather than across a handoff.\n\nOn Athena he partnered with engineering on the Storybook implementation instead of shipping specs. On Page Builder 2.0 he worked with the Lead Engineer to ship a full rebuild in two months. On Plastiq Connect the specification went past screens — spacing called out per breakpoint, the mobile button block annotated as pinned, and the fee popover specified separately for desktop hover and mobile tap, because a finger has no hover state.\n\nOn the Unified Ad Platform he aligned the front-end to the backend architecture rather than designing around it.\n\nHe writes React and HTML/CSS/JS, which changes the conversation.",
       "sources": [
@@ -686,7 +696,7 @@
         "chatbot or human",
         "who am I talking to"
       ],
-      "answer": "Neither, exactly. These answers were drafted from the case studies published on this site and then reviewed by Omar before going live — so they're pre-written rather than generated live, and nothing here is improvised.\n\nThat's deliberate. On a hiring site an assistant that invents a detail is worse than one that admits it doesn't know, so this one can only tell you things he has actually approved.\n\nIf a question isn't covered, it'll say so and point you at him rather than guess.",
+      "answer": "Neither, exactly. Most of what you get back was drafted from the case studies published on this site and then reviewed by Omar before going live — so the words are pre-written rather than improvised.\n\nA model usually picks which of them answers you, because matching on shared words alone got it wrong too often. It chooses from the written set and cannot edit what it picks. When none of them fits, a model drafts a reply from the closest reviewed answers, and that reply is labelled “drafted, not reviewed” wherever it appears — reviewed and drafted are never presented as the same thing.\n\nOn a hiring site, an assistant that quietly invents a detail is worse than one that flags what has not been checked. For anything that matters, email him.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -701,7 +711,7 @@
         "is this tracked",
         "data collection"
       ],
-      "answer": "Nothing is sent anywhere when you ask a question — the answers are a static file already loaded in your browser, so there's no server call and no external service involved.\n\nIf you accepted analytics, the site records that a question was asked, which helps Omar see which answers are missing. If you declined, it doesn't.\n\nThe full picture is in the privacy policy, linked in the footer.",
+      "answer": "Clicking a suggested question, or typing one word for word, is answered in your browser from a static file — nothing is sent.\n\nAnything else goes to this site's own endpoint, because word overlap alone got it wrong too often. From there it is usually passed to Groq, with the list of written questions and nothing else, so a model can say which one you mean. If Groq cannot be reached, or the daily limit is spent, nothing leaves this site and the closest written answer is used. Only a question none of them covers is sent again for a reply to be drafted, labelled unreviewed.\n\nIf you accepted analytics, the wording of a question nothing covers is recorded, so Omar can see which answers are missing. If you declined, it isn't.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -787,6 +797,79 @@
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
+    },
+    {
+      "id": "kind-of-designer",
+      "topic": "hiring",
+      "question": "What kind of product designer is Omar?",
+      "aliases": [
+        "kind of product designer",
+        "type of designer",
+        "what he specialises in",
+        "designer focus"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "athena-ds"
+      ],
+      "answer": "A principal product designer working on complex B2B products — AI workflows, enterprise platforms, fintech, healthcare SaaS and design systems.\n\nThe range is deliberate rather than scattered: he works across strategy, research, UX architecture, prototyping, UI systems and launch execution, because in the products he takes on those are rarely separable. A workflow tool with messy data cannot be researched and then handed off; the architecture and the interface decide each other.\n\nIf a role expects someone to pick one of those and stop, it is probably not the right fit.",
+      "status": "approved",
+      "sourcesFingerprint": "3afa0e22789d"
+    },
+    {
+      "id": "company-fit",
+      "topic": "hiring",
+      "question": "What types of companies is Omar best suited for?",
+      "aliases": [
+        "company fit",
+        "what stage company",
+        "startup or enterprise",
+        "right kind of team"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "connect-api"
+      ],
+      "answer": "Startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products or internal operational systems.\n\nThe common thread is a product where the hard part is the domain rather than the surface — payment rails and compliance at Plastiq, dental operations at Wisdom, cross-brand ad sales at Disney. He was the founding designer at Wisdom and the lead on a 0→1 payments product at Plastiq, so a team without an established design practice is familiar ground rather than a risk.",
+      "status": "approved",
+      "sourcesFingerprint": "032f4aa0673d"
+    },
+    {
+      "id": "problems-to-solve",
+      "topic": "hiring",
+      "question": "What kinds of problems should a team bring Omar in to solve?",
+      "aliases": [
+        "problems he solves",
+        "when to bring him in",
+        "what he is good at",
+        "best use of him"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "disney-uap"
+      ],
+      "answer": "When the workflow is messy, the product needs clearer direction, adoption is being slowed by UX, or the business needs stronger product foundations.\n\nThe work is most useful where a team needs senior design judgement and hands-on execution at the same time — someone who will map the decision flow before drawing screens, and then draw the screens. On the Disney Unified Ad Platform that meant tracing how one decision moved through seven business functions before any interface existed.\n\nIt is a poor fit for work that is already well defined and only needs producing.",
+      "status": "approved",
+      "sourcesFingerprint": "4f2c8b6d9ade"
+    },
+    {
+      "id": "business-outcomes",
+      "topic": "hiring",
+      "question": "What business outcomes has Omar influenced?",
+      "aliases": [
+        "business impact",
+        "measurable results",
+        "outcomes delivered",
+        "results he influenced"
+      ],
+      "sources": [
+        "posting-asst",
+        "connect-api",
+        "disney-cct"
+      ],
+      "answer": "The ones that are measured, with their scope attached.\n\nPosting Assistant cut manual posting time by about 40%. Connect API Payments cleared $20M+ in monthly payment volume in its first month, with three partnerships secured pre-launch. Disney's Critical Communication Tool reached 1,600+ users and carried 200,000+ communications across 250 critical incidents. He ran 200+ interviews and discovery sessions across the Wisdom products.\n\nOther numbers on the site are targets a design was built to hit rather than results, and are labelled that way.",
+      "status": "approved",
+      "sourcesFingerprint": "a76253ebe779"
     }
   ]
 }

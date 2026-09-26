@@ -9,6 +9,7 @@ Book a call: [20-minute intro call](https://calendar.app.google/4NcXLDoniazZ5VT7
 ## Primary pages
 - [Homepage](https://www.designedbyomar.com/) : background, selected work, contact
 - [Selected work](https://www.designedbyomar.com/work) : case-study index
+- [Ask](https://www.designedbyomar.com/ask) : questions and answers about Omar's work, background, and how he works — each answer has its own anchor
 - [Design system](https://www.designedbyomar.com/design-system) : public brand, token, component, pattern, motion, content, and accessibility reference
 - [Privacy policy](https://www.designedbyomar.com/privacy) : data collection and analytics consent details
 
