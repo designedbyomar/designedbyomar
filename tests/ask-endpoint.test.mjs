@@ -30,6 +30,7 @@ const loadHandler = ({
   // path it was written for.
   routeReturns = 'NONE',
   routeThrows = false,
+  generateStalls = false,
 } = {}) => {
   const calls = [];
   const routeCalls = [];
@@ -49,6 +50,9 @@ const loadHandler = ({
       if (generateThrows) throw new Error('provider unavailable');
       if (generateStreamError) return new ReadableStream({ start(c) { c.error(new Error('provider unavailable')); } });
       if (generateEmpty) return new ReadableStream({ start(c) { c.close(); } });
+      // Opens, then never yields and never closes — the case a provider-side
+      // abort signal is supposed to catch, and which must be bounded here too.
+      if (generateStalls) return new ReadableStream({ start() {}, cancel() {} });
       return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
     },
   });
@@ -306,4 +310,20 @@ test('a question sharing no vocabulary is never sent to the model', async () => 
 
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(calls.length, 0, 'the model must not be asked to speak from an empty context');
+});
+
+// Bounded explicitly: `node --test` has no default timeout, so a regression
+// here would hang CI indefinitely instead of reporting a failure.
+test('a stream that never yields is abandoned rather than hung on', { timeout: 15000 }, async (t) => {
+  // The failure this guards is a hang, so the assertion is as much about
+  // finishing as about the result. The endpoint's own first-chunk timeout has
+  // to fire; nothing in this test aborts for it.
+  t.diagnostic('waiting on the endpoint first-chunk timeout');
+  const started = Date.now();
+  const { handler } = loadHandler({ generateStalls: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.ok(Date.now() - started < 15000, 'and it gives up long before an edge function would');
 });

@@ -21,6 +21,7 @@ import {
 } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
+import { onMediaChange } from './media-query.js';
 import {
   Button,
   CopyButton,
@@ -265,8 +266,7 @@ const usePrefersReducedMotion = () => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setReduced(query.matches);
     sync();
-    query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
+    return onMediaChange(query, sync);
   }, []);
 
   return reduced;
@@ -615,7 +615,7 @@ const PixelOrbitIcons = ({ theme = 'dark' }) => {
     };
 
     const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
-    motionMQ.addEventListener('change', onMotionChange);
+    const stopWatchingMotion = onMediaChange(motionMQ, onMotionChange);
     resize();
     window.addEventListener('resize', resize);
     const observer = typeof IntersectionObserver === 'undefined' ? null
@@ -628,7 +628,7 @@ const PixelOrbitIcons = ({ theme = 'dark' }) => {
       cancelAnimationFrame(rafRef.current);
       observer?.disconnect();
       document.removeEventListener('visibilitychange', onVis);
-      motionMQ.removeEventListener('change', onMotionChange);
+      stopWatchingMotion();
       window.removeEventListener('resize', resize);
     };
   }, [theme]);
@@ -1491,8 +1491,7 @@ const DesignSystem = () => {
   React.useEffect(() => {
     const mq = window.matchMedia('(max-width: 1054px)');
     const handler = (e) => setNavOpen(!e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    return onMediaChange(mq, handler);
   }, []);
 
   React.useLayoutEffect(() => {

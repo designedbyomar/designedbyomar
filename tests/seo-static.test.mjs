@@ -6,7 +6,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const { injectRootContent, escapeAttr } = require('../postbuild.js');
+const { injectRootContent, escapeAttr, escapeText } = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const PRINCIPAL_TITLE = 'Principal Product Designer';
@@ -190,12 +190,9 @@ test('llms.txt follows agent discovery recommendations', () => {
   });
 });
 
-// Mirrors escapeAttr in postbuild.js — injected prose is escaped on the way in.
-const escapeHtml = (value) => String(value)
-  .replace(/&/g, '&amp;')
-  .replace(/"/g, '&quot;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;');
+// Injected prose is escaped on the way in. The real function is imported rather
+// than mirrored here: a copy of it drifted the moment postbuild's changed.
+const escapeHtml = escapeText;
 
 test('case-study routes ship their prose in the static HTML', () => {
   caseStudySource().forEach((caseStudy) => {
@@ -271,7 +268,7 @@ test('the Ask route ships every approved answer to non-JS consumers', () => {
   // reading without JavaScript sees only what is injected here.
   for (const answer of approved) {
     assert.ok(
-      html.includes(`<h2>${escapeAttr(answer.question)}</h2>`),
+      html.includes(`<h2>${escapeText(answer.question)}</h2>`),
       `/ask is missing the question for "${answer.id}"`,
     );
   }
@@ -317,7 +314,8 @@ test('migrated case-study bodies ship images and prose in the static HTML', () =
     images.forEach((img) => {
       assert.ok(html.includes(`src="${img.src}"`), `${caseStudy.id}: ${img.src} missing from static HTML`);
       assert.ok(img.alt && img.alt.trim().length > 20, `${caseStudy.id}: ${img.src} needs descriptive alt text`);
-      assert.ok(html.includes(escapeHtml(img.alt)), `${caseStudy.id}: alt text for ${img.src} missing from static HTML`);
+      // alt is an attribute, so it is escaped as one — not as text.
+      assert.ok(html.includes(escapeAttr(img.alt)), `${caseStudy.id}: alt text for ${img.src} missing from static HTML`);
     });
 
     // Pull quotes keep their attribution.
@@ -475,4 +473,36 @@ test('gallery blocks ship every image in the static HTML', () => {
       });
     });
   });
+});
+
+test('injected text cannot create markup, in text nodes or attributes', () => {
+  // Pins the property, not the escape sequence, so it survives a change of
+  // helper. The answers are authored JSON rather than user input, so this is
+  // defence in depth — but the injection is the one place a stray angle
+  // bracket in content would become an element in the served page.
+  const hostile = `</p><script>alert(1)</script><p x="y" z='w'> & < > "quoted" 'single'`;
+
+  const asText = escapeText(hostile);
+  assert.ok(!/[<>]/.test(asText), 'escaped text contains no angle brackets');
+  assert.ok(!asText.includes('<script'), 'no element can be opened from text');
+  assert.equal(
+    asText.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'),
+    hostile,
+    'and it round-trips, so nothing is silently dropped',
+  );
+
+  // An attribute value additionally cannot close its own quoting.
+  const asAttr = escapeAttr(hostile);
+  assert.ok(!/["'<>]/.test(asAttr), 'escaped attribute cannot break out of either quote style');
+  assert.equal(
+    asAttr
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'),
+    hostile,
+    'and round-trips too',
+  );
+
+  // The ampersand must be escaped first, or the entities escape each other.
+  assert.equal(escapeText('&lt;'), '&amp;lt;');
+  assert.equal(escapeAttr('&quot;'), '&amp;quot;');
 });

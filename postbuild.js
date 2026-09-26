@@ -45,9 +45,26 @@ const imageType = (imageUrl) => {
   return 'image/png';
 };
 
+/**
+ * For a double-quoted attribute value. `'` is escaped too, though nothing here
+ * writes a single-quoted attribute — it costs a replace and removes the trap
+ * for whoever writes the first one.
+ */
 const escapeAttr = (value) => String(value)
   .replace(/&/g, '&amp;')
   .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+/**
+ * For text between tags. Quotes need no escaping there, so this is the minimal
+ * correct set and reads as what it is: `escapeAttr` was doing this job in a
+ * dozen places, and a function named for attributes doing it invites the
+ * reasonable suspicion that the text was unescaped.
+ */
+const escapeText = (value) => String(value)
+  .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;');
 
@@ -271,7 +288,7 @@ function injectRootContent(html, innerHtml, label) {
 }
 
 function injectH1(html, text) {
-  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeAttr(text)}</h1>`, text);
+  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeText(text)}</h1>`, text);
 }
 
 // The full case-study record as static HTML. The rendered React view labels these
@@ -283,25 +300,31 @@ function injectH1(html, text) {
 function caseStudyBodyHtml(rawBody) {
   const body = normalizeBlocks(rawBody);
   if (!body.length) return '';
-  const esc = escapeAttr;
-  const li = (items) => items.map((i) => `<li>${esc(i)}</li>`).join('');
+  // Text between tags and values inside attributes are escaped differently.
+  // This used to alias one helper for both, which is what made the helper look
+  // wrong at every text-node call site.
+  const txt = escapeText;
+  const attr = escapeAttr;
+  const li = (items) => items.map((i) => `<li>${txt(i)}</li>`).join('');
+  const figure = (src, alt, caption) =>
+    `<figure><img src="${attr(src)}" alt="${attr(alt || '')}">${caption ? `<figcaption>${txt(caption)}</figcaption>` : ''}</figure>`;
 
   return body.map((b) => {
     switch (b.type) {
       case 'heading':
-        return `<h${b.level}>${esc(b.text)}</h${b.level}>`;
+        return `<h${b.level}>${txt(b.text)}</h${b.level}>`;
       case 'paragraph':
-        return `<p>${esc(b.text)}</p>`;
+        return `<p>${txt(b.text)}</p>`;
       case 'list':
         return `<ul>${li(b.items)}</ul>`;
       case 'quote':
-        return `<blockquote><p>${esc(b.text)}</p>${b.attribution ? `<cite>${esc(b.attribution)}</cite>` : ''}</blockquote>`;
+        return `<blockquote><p>${txt(b.text)}</p>${b.attribution ? `<cite>${txt(b.attribution)}</cite>` : ''}</blockquote>`;
       case 'callout':
-        return `<aside><h3>${esc(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
+        return `<aside><h3>${txt(b.title)}</h3><ul>${li(b.items)}</ul></aside>`;
       case 'gallery':
-        return `<div class="cs-gallery">${(b.images || []).map((img) => `<figure><img src="${esc(img.src)}" alt="${esc(img.alt || '')}">${img.caption ? `<figcaption>${esc(img.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`;
+        return `<div class="cs-gallery">${(b.images || []).map((img) => figure(img.src, img.alt, img.caption)).join('')}</div>`;
       case 'image':
-        return `<figure><img src="${esc(b.src)}" alt="${esc(b.alt || '')}">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ''}</figure>`;
+        return figure(b.src, b.alt, b.caption);
       default:
         return '';
     }
@@ -310,14 +333,14 @@ function caseStudyBodyHtml(rawBody) {
 function caseStudyContentHtml(c) {
   const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeAttr).join(' · ');
   const list = (items) => (items && items.length ? `<ul>${items.join('')}</ul>` : '');
-  const tags = list((c.tags || []).map((t) => `<li>${escapeAttr(t)}</li>`));
-  const metrics = list((c.metrics || []).map((m) => `<li>${escapeAttr(m.value)} — ${escapeAttr(m.label)}${m.qualifier ? ` (${escapeAttr(m.qualifier)})` : ''}</li>`));
-  const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeAttr(body)}</p>` : '');
+  const tags = list((c.tags || []).map((t) => `<li>${escapeText(t)}</li>`));
+  const metrics = list((c.metrics || []).map((m) => `<li>${escapeText(m.value)} — ${escapeText(m.label)}${m.qualifier ? ` (${escapeText(m.qualifier)})` : ''}</li>`));
+  const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeText(body)}</p>` : '');
 
   return [
     `<article style="${HIDDEN_STYLE}">`,
-    `<h1>${escapeAttr(c.title)}</h1>`,
-    c.subtitle ? `<p>${escapeAttr(c.subtitle)}</p>` : '',
+    `<h1>${escapeText(c.title)}</h1>`,
+    c.subtitle ? `<p>${escapeText(c.subtitle)}</p>` : '',
     meta ? `<p>${meta}</p>` : '',
     tags,
     metrics,
@@ -357,7 +380,7 @@ function generateAskAnswers(distDir, indexHtml) {
   fs.mkdirSync(askDir, { recursive: true });
   const answersHtml = approved.length ? [
     `<article style="${HIDDEN_STYLE}">`,
-    ...approved.map((a) => `<h2>${escapeAttr(a.question)}</h2><p>${escapeAttr(a.answer)}</p>`),
+    ...approved.map((a) => `<h2>${escapeText(a.question)}</h2><p>${escapeText(a.answer)}</p>`),
     '</article>',
   ].join('') : '';
   const askHtml = injectRootContent(
@@ -370,7 +393,7 @@ function generateAskAnswers(distDir, indexHtml) {
       }),
       askStructuredData(),
     ),
-    `<h1 style="${HIDDEN_STYLE}">${escapeAttr(ASK_TITLE)}</h1>${answersHtml}`,
+    `<h1 style="${HIDDEN_STYLE}">${escapeText(ASK_TITLE)}</h1>${answersHtml}`,
     ASK_TITLE,
   );
   fs.writeFileSync(`${askDir}/index.html`, askHtml);
@@ -462,4 +485,4 @@ if (require.main === module) (async () => {
   generateRoutes();
 })();
 
-module.exports = { injectRootContent, escapeAttr };
+module.exports = { injectRootContent, escapeAttr, escapeText };

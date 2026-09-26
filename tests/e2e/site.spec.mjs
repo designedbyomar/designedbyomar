@@ -887,6 +887,61 @@ test('the input ring never spins for a visitor who asked for less motion', async
   expect(ring.animation, 'but nothing rotates').toBe('none');
 });
 
+test('the site works on a browser with only the legacy matchMedia listener API', async ({ page }) => {
+  // MediaQueryList.addEventListener arrived in Safari 14. Four listeners here
+  // guarded it with `?.` and would silently stop tracking the preference; a
+  // fifth called it outright and threw, taking a render path with it.
+  await page.addInitScript(() => {
+    const real = window.matchMedia.bind(window);
+    window.matchMedia = (query) => {
+      const mq = real(query);
+      const legacy = {
+        media: mq.media,
+        get matches() { return mq.matches; },
+        addListener: (fn) => mq.addEventListener('change', fn),
+        removeListener: (fn) => mq.removeEventListener('change', fn),
+      };
+      return legacy;
+    };
+  });
+
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await openAsk(page);
+  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expect(askLive(page).locator('p').first()).toBeVisible();
+
+  expect(errors, 'no listener call may throw').toEqual([]);
+});
+
+test('a refused clipboard write says so, and points at the address bar', async ({ page, context }) => {
+  await page.goto('/ask');
+  await page.locator('#ask-panel button[type="button"]').filter({ hasText: /fintech and payments/i }).first().click();
+  await expect(page).toHaveURL(/#fintech-depth$/);
+
+  // Clipboard writes are refused routinely — insecure origin, denied
+  // permission, no user gesture. Silence made a press look like a no-op.
+  await context.grantPermissions([]);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: () => Promise.reject(new Error('denied')) },
+    });
+  });
+
+  await page.locator('[data-ask-share="true"]').click();
+  await expect(page.getByText('Use the address bar')).toBeVisible();
+
+  // Which is only useful advice because the URL really is the link.
+  expect(new URL(page.url()).hash).toBe('#fintech-depth');
+
+  // And it reverts, so the control is usable again.
+  await expect(page.getByText('Copy link')).toBeVisible({ timeout: 4000 });
+});
+
 test('the submit button is disabled until something is typed', async ({ page }) => {
   await page.goto('/');
   await openAsk(page);

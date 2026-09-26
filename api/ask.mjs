@@ -69,6 +69,10 @@ const TIMEOUT_MS = 8000;
 // budget than drafting: past this the visitor is better served by the local
 // match than by waiting.
 const ROUTER_TIMEOUT_MS = 3000;
+// How long to wait for a draft's first chunk before giving up on it. Inside
+// TIMEOUT_MS, since a provider that has sent nothing by now is not going to
+// finish in time either.
+const FIRST_CHUNK_TIMEOUT_MS = 6000;
 
 /** Per-visitor ceiling, so one person cannot drain the daily free quota. */
 const RATE_LIMIT = 6;
@@ -130,19 +134,39 @@ const hasText = (chunk) => typeof chunk === 'string'
   ? chunk.length > 0
   : chunk instanceof Uint8Array && chunk.byteLength > 0;
 
+/**
+ * Waiting for the first chunk is bounded here rather than relying on the
+ * provider.
+ *
+ * `generateFromGroq` already passes an AbortSignal, so a stalled stream does
+ * abort in production — but `generate` is injectable, and that guarantee also
+ * assumes the SDK propagates the abort into the text stream rather than only
+ * into the upstream fetch. This depends on neither. It bounds time-to-first-
+ * chunk only: once text is flowing the timer is cleared, so a long reply is
+ * never cut off mid-sentence.
+ */
 const readUntilText = async (stream) => {
   const reader = stream.getReader();
   const buffered = [];
 
+  let expired = false;
+  const timer = setTimeout(() => {
+    expired = true;
+    reader.cancel().catch(() => {});
+  }, FIRST_CHUNK_TIMEOUT_MS);
+
   try {
     while (true) {
       const result = await reader.read();
+      if (expired) return null;
       if (result.done) return null;
       buffered.push(result.value);
       if (hasText(result.value)) break;
     }
   } catch {
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 
   return new ReadableStream({

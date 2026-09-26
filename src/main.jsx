@@ -10,6 +10,7 @@ import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
+import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -208,8 +209,7 @@ const Portrait = ({ galaxy, theme }) => {
     const mediaQuery = window.matchMedia('(hover: none), (pointer: coarse)');
     const sync = () => setIsTouchLayout(mediaQuery.matches);
     sync();
-    mediaQuery.addEventListener?.('change', sync);
-    return () => mediaQuery.removeEventListener?.('change', sync);
+    return onMediaChange(mediaQuery, sync);
   }, []);
 
   React.useEffect(() => {
@@ -217,8 +217,7 @@ const Portrait = ({ galaxy, theme }) => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setPrefersReducedMotion(mediaQuery.matches);
     sync();
-    mediaQuery.addEventListener?.('change', sync);
-    return () => mediaQuery.removeEventListener?.('change', sync);
+    return onMediaChange(mediaQuery, sync);
   }, []);
 
   React.useEffect(() => {
@@ -1729,10 +1728,10 @@ const KeyFacts = () => {
       if (e.matches) cancelAnimationFrame(animRef.current);
       else animRef.current = requestAnimationFrame(loop);
     };
-    mq.addEventListener('change', onMotionChange);
+    const stopWatching = onMediaChange(mq, onMotionChange);
     return () => {
       cancelAnimationFrame(animRef.current);
-      mq.removeEventListener('change', onMotionChange);
+      stopWatching();
     };
   }, []);
 
@@ -1893,8 +1892,7 @@ const usePrefersReducedMotion = () => {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setReduced(mq.matches);
-    mq.addEventListener?.('change', sync);
-    return () => mq.removeEventListener?.('change', sync);
+    return onMediaChange(mq, sync);
   }, []);
   return reduced;
 };
@@ -1926,24 +1924,32 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const requestRef = React.useRef(0);
   const abortRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
-  const [copiedLink, setCopiedLink] = React.useState(false);
+  // 'idle' | 'copied' | 'failed'. A rejected clipboard write used to look
+  // identical to never having pressed the button, and clipboard writes are
+  // rejected routinely — insecure origin, denied permission, no gesture.
+  const [copyState, setCopyState] = React.useState('idle');
   const copyResetRef = React.useRef(null);
 
   React.useEffect(() => () => {
     if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
   }, []);
 
+  const settle = (state) => {
+    setCopyState(state);
+    if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+    copyResetRef.current = window.setTimeout(() => setCopyState('idle'), 1200);
+  };
+
   const copyLink = async (answer) => {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/ask#${answer.id}`);
-      setCopiedLink(true);
       trackPortfolioEvent('ask_share_click', { answer_id: answer.id });
-      if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
-      copyResetRef.current = window.setTimeout(() => setCopiedLink(false), 1200);
+      settle('copied');
     } catch {
-      // No clipboard permission, or an insecure origin. The URL already points
-      // at this answer, so the address bar is still a working fallback.
-      setCopiedLink(false);
+      // No clipboard permission, or an insecure origin. show() has already put
+      // this answer's id in the hash, so the address bar is the link — say so
+      // rather than leaving the press looking like it did nothing.
+      settle('failed');
     }
   };
 
@@ -2044,7 +2050,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setNearest(null);
     setDrafted(null);
     setPhase(null);
-    setCopiedLink(false);
+    setCopyState('idle');
   };
 
   const show = (answer) => {
@@ -2332,7 +2338,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
                   type="button"
                   data-ask-share="true"
                   onClick={() => copyLink(result)}
-                  aria-label={copiedLink ? 'Link copied' : 'Copy a link to this answer'}
+                  aria-label={{
+                    copied: 'Link copied',
+                    failed: 'Copying failed — the link is in the address bar',
+                  }[copyState] ?? 'Copy a link to this answer'}
                   style={{
                     flexShrink: 0,
                     display: 'inline-flex',
@@ -2344,7 +2353,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
                     fontSize: 'var(--font-size-body-sm)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
-                    color: copiedLink ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
+                    color: copyState === 'copied' ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
                     background: 'transparent',
                     border: 'none',
                     boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
@@ -2353,8 +2362,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
                     transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
                   }}
                 >
-                  <AppIcon icon={copiedLink ? Check : Copy} size={13} />
-                  {copiedLink ? 'Copied' : 'Copy link'}
+                  <AppIcon icon={copyState === 'copied' ? Check : Copy} size={13} />
+                  {{ copied: 'Copied', failed: 'Use the address bar' }[copyState] ?? 'Copy link'}
                 </button>
               )}
             </div>
@@ -2989,8 +2998,7 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const onChange = (event) => setPrefersReducedMotion(event.matches);
-    mediaQuery.addEventListener?.('change', onChange);
-    return () => mediaQuery.removeEventListener?.('change', onChange);
+    return onMediaChange(mediaQuery, onChange);
   }, []);
 
   const baseButtonStyle = {
