@@ -696,7 +696,7 @@
         "chatbot or human",
         "who am I talking to"
       ],
-      "answer": "Neither, exactly. Most of what you get back was drafted from the case studies published on this site and then reviewed by Omar before going live — so the words are pre-written rather than improvised.\n\nA model does pick which of them answers you, because matching on shared words alone got it wrong too often. It chooses from the written set and cannot edit what it picks. When none of them fits, a model drafts a reply from the closest reviewed answers, and that reply is labelled “drafted, not reviewed” wherever it appears — reviewed and drafted are never presented as the same thing.\n\nOn a hiring site, an assistant that quietly invents a detail is worse than one that flags what has not been checked. For anything that matters, email him.",
+      "answer": "Neither, exactly. Most of what you get back was drafted from the case studies published on this site and then reviewed by Omar before going live — so the words are pre-written rather than improvised.\n\nA model usually picks which of them answers you, because matching on shared words alone got it wrong too often. It chooses from the written set and cannot edit what it picks. When none of them fits, a model drafts a reply from the closest reviewed answers, and that reply is labelled “drafted, not reviewed” wherever it appears — reviewed and drafted are never presented as the same thing.\n\nOn a hiring site, an assistant that quietly invents a detail is worse than one that flags what has not been checked. For anything that matters, email him.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -711,7 +711,7 @@
         "is this tracked",
         "data collection"
       ],
-      "answer": "Clicking a suggested question, or typing one word for word, is answered in your browser from a static file — nothing is sent.\n\nAnything else you type is sent to Groq with the list of written questions so a model can say which one you are asking for, because matching on word overlap alone got it wrong too often. That list is questions only. If none of them fits, the question goes again with excerpts of the closest answers so a reply can be drafted, and that reply is labelled as unreviewed.\n\nIf you accepted analytics, the wording of an unmatched question is recorded so Omar can see which answers are missing. If you declined, it isn't. The full picture is in the privacy policy, linked in the footer.",
+      "answer": "Clicking a suggested question, or typing one word for word, is answered in your browser from a static file — nothing is sent.\n\nAnything else goes to this site's own endpoint, because word overlap alone got it wrong too often. From there it is usually passed to Groq, with the list of written questions and nothing else, so a model can say which one you mean. If Groq cannot be reached, or the daily limit is spent, nothing leaves this site and the closest written answer is used. Only a question none of them covers is sent again for a reply to be drafted, labelled unreviewed.\n\nIf you accepted analytics, the wording of a question nothing covers is recorded, so Omar can see which answers are missing. If you declined, it isn't.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"

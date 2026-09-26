@@ -1971,23 +1971,6 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     return () => { cancelled = true; observer.disconnect(); };
   }, [linkable]);
 
-  // Resolve /ask#<answer-id> once the set is in. Sets state directly rather
-  // than going through show(), which would rewrite the hash it just read.
-  React.useEffect(() => {
-    if (!linkable || !answers?.length) return;
-
-    const resolveHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (!id) return;
-      const answer = answers.find(a => a.id === id);
-      if (answer) setResult(answer);
-    };
-
-    resolveHash();
-    window.addEventListener('hashchange', resolveHash);
-    return () => window.removeEventListener('hashchange', resolveHash);
-  }, [linkable, answers]);
-
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
 
   const openingSuggestions = React.useMemo(() => {
@@ -2045,7 +2028,16 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     return requestRef.current;
   };
 
-  const show = (answer) => {
+  /**
+   * Take over the answer region for `answer`, cancelling whatever held it.
+   *
+   * Kept separate from show() for the one caller that must not touch the URL:
+   * the hash listener is reacting to the URL, so writing it back would be
+   * circular. Everything else about taking over is identical, and has to be —
+   * without the claim, an in-flight request resolves over the top of a
+   * deep-linked answer, which is how this went wrong.
+   */
+  const take = (answer) => {
     claim();
     setResult(answer);
     setMissed(false);
@@ -2053,8 +2045,38 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setDrafted(null);
     setPhase(null);
     setCopiedLink(false);
+  };
+
+  const show = (answer) => {
+    take(answer);
     if (linkable) history.replaceState(null, '', `#${answer.id}`);
   };
+
+  /**
+   * Resolve /ask#<answer-id>, on arrival and on every later hash change.
+   *
+   * Goes through take(), not a bare setResult: following a link to another
+   * answer while a request is in flight has to cancel that request, or it
+   * resolves over the top and the page stops showing the answer its URL names.
+   * The listener is registered after `take` exists so it uses the real one.
+   */
+  React.useEffect(() => {
+    if (!linkable || !answers?.length) return undefined;
+
+    const resolveHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+      const answer = answers.find(a => a.id === id);
+      if (answer) take(answer);
+    };
+
+    resolveHash();
+    window.addEventListener('hashchange', resolveHash);
+    return () => window.removeEventListener('hashchange', resolveHash);
+    // `take` is stable in everything that matters — refs and setters — so it is
+    // deliberately not a dependency; including it would re-register per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkable, answers]);
 
   const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
 
@@ -2091,7 +2113,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         const reviewed = answers.find(a => a.id === id);
         // 'exact' cannot reach here — the client answers those itself — so this
         // is the router's pick, or the endpoint's own local fallback.
-        if (reviewed) { show(reviewed); return response.headers.get('X-Ask-Matched-By') || 'router'; }
+        const matchedBy = response.headers.get('X-Ask-Matched-By') || 'router';
+        if (reviewed) {
+          show(reviewed);
+          // A written answer was served, so this is not a missing answer and the
+          // wording is not recorded. Only the id, which is not personal and is
+          // what says whether routing is picking sensibly.
+          trackPortfolioEvent('ask_routed', { answer_id: reviewed.id, matched_by: matchedBy });
+          return matchedBy;
+        }
       }
 
       if (kind === 'generated' && response.body) {
@@ -2121,7 +2151,11 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     // The endpoint could not help. A local match is still better than telling
     // the visitor there is nothing, so routing never makes the site worse than
     // it was before routing existed.
-    if (localHit) { show(localHit.answer); return 'local'; }
+    if (localHit) {
+      show(localHit.answer);
+      trackPortfolioEvent('ask_routed', { answer_id: localHit.answer.id, matched_by: 'local' });
+      return 'local';
+    }
 
     fallBack(near);
     return 'fallback';
@@ -2159,11 +2193,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setNearest(near);
     ask(asked, near, hit).then(answered => {
       if (answered === 'superseded') return;
+      // A written answer was served — by the router or by the local fallback —
+      // so `ask_routed` has already reported it, without the wording. Recording
+      // it here too would put covered questions into the missing-answer count,
+      // which is the one signal that decides what gets written next, and would
+      // send their wording against what the privacy policy says.
+      if (answered === 'router' || answered === 'local') return;
       trackPortfolioEvent('ask_no_match', {
         question: asked,
         nearest_id: near?.id ?? 'none',
-        // 'router' and 'local' both mean a written answer was served; they are
-        // kept apart so the routing can be judged against the matcher it replaced.
         answered_by: answered,
         local_score: hit ? Math.round(hit.score * 100) / 100 : 0,
       });
@@ -2884,14 +2922,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is also sent to Groq to draft a reply</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is normally also sent to Groq so a reply can be drafted</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
         <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing one word for word, is answered in your browser: nothing is sent and nothing leaves this site.</p>
-        <p style={{ margin: 0 }}>Anything else you type is sent to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question goes to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you.</p>
-        <p style={{ margin: 0 }}>If none of them fits, the question is sent again with excerpts of the closest published answers so a reply can be drafted from them. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of the question is also recorded in an analytics event, which is the only way I can see which answers are missing and write them.</p>
+        <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, or the free daily allowance is spent, nothing is passed on and the closest written answer is used instead.</p>
+        <p style={{ margin: 0 }}>If none of them fits, the question is sent to Groq again with excerpts of the closest published answers so a reply can be drafted from them. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>

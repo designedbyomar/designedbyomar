@@ -117,16 +117,54 @@ test('the reported bug: a hiring question no longer returns a refusal', async ()
 });
 
 test('an id the router invented is never served', async () => {
-  const { handler, calls } = loadHandler({ routeReturns: 'leadership-and-vision' });
+  const { handler } = loadHandler({ routeReturns: 'leadership-and-vision' });
   const response = await handler(post('is he a manager'));
 
-  // Unrecognisable means the router did not choose one of them, so drafting is
-  // next — it must not 500, and must not echo the invented id back.
+  // It must not 500, and must not echo the invented id back.
   assert.equal(response.status, 200);
   assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'leadership-and-vision');
-  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
-  assert.equal(calls.length, 1);
 });
+
+/**
+ * An answer the router did not give is not the same as an answer it declined to
+ * give, and only the second should outrank the local match.
+ *
+ * Treating them alike meant a truncated or empty response discarded an answer
+ * the site already had, turning a question it could answer into an unreviewed
+ * draft. Both halves are asserted, because fixing one direction by breaking the
+ * other would pass a looser test.
+ */
+for (const [label, routeReturns] of [
+  ['an empty response', ''],
+  ['whitespace only', '   \n  '],
+  ['a truncated id', 'leadership-or'],
+  ['an id that does not exist', 'leadership-and-vision'],
+  ['a refusal to answer', 'I cannot help with that'],
+]) {
+  test(`${label} from the router serves the local match, not a draft`, async () => {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'reviewed', `${label} must not reach drafting`);
+    assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
+    assert.equal(calls.length, 0);
+  });
+}
+
+for (const [label, routeReturns] of [
+  ['NONE', 'NONE'],
+  ['lower-case none', 'none'],
+  ['NONE with punctuation', 'NONE.'],
+  ['a sentence declining', 'None of these answer that.'],
+]) {
+  test(`${label} is a decision, so it drafts rather than using the local match`, async () => {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must be read as a decline`);
+    assert.equal(calls.length, 1);
+  });
+}
 
 test('NONE means draft, even when token overlap thought it had a match', async () => {
   const { handler, calls } = loadHandler({ routeReturns: 'NONE' });

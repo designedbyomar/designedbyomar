@@ -1261,10 +1261,14 @@ const ComponentsSection = () => (
           panel, and the reader needs a way back to asking.
         </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
-          Matching is inverse-document-frequency weighted token overlap over each answer&rsquo;s question
-          and aliases. Below threshold, or when too little of the question is in vocabulary, the
-          component declines and offers the nearest case study plus email. A confident wrong answer
-          costs more than no answer.
+          A confident wrong answer costs more than no answer. Deciding which written answer a question
+          wants is the model&rsquo;s job, and it may decline; when it does, or when it picks nothing
+          recognisable, the component drafts a labelled reply or offers the nearest case study plus
+          email. Inverse-document-frequency weighted overlap over each answer&rsquo;s question and
+          aliases still runs in the browser, but only to catch a verbatim question and to answer at all
+          when the model cannot be reached. Its threshold and vocabulary floor govern that path alone
+          &mdash; relying on them for everything is what produced the wrong answers routing exists to
+          fix.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">
           Answers carry a review status and a fingerprint of the case studies they cite. Only approved

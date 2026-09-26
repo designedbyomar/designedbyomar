@@ -709,9 +709,13 @@ test('the privacy policy discloses what the Ask box records and where it goes', 
   // All three cases have to be stated, because they differ in what leaves the
   // browser: a verbatim question, a routed one, and one nothing covers.
   await expect(page.getByText(/answered in your browser: nothing is sent/i)).toBeVisible();
-  await expect(page.getByText(/Anything else you type is sent to be matched/i)).toBeVisible();
+  await expect(page.getByText(/Anything else you type is sent to this site to be matched/i)).toBeVisible();
   await expect(page.getByText(/excerpts of the closest published answers/i)).toBeVisible();
-  await expect(page.getByText(/wording of the question is also recorded in an analytics event/i)).toBeVisible();
+  // Groq is not always called, and an answered question's wording is not
+  // recorded — both were overstated, and both are load-bearing claims.
+  await expect(page.getByText(/If Groq cannot be reached, or the free daily allowance is spent/i)).toBeVisible();
+  await expect(page.getByText(/wording of a question nothing covers is also recorded/i)).toBeVisible();
+  await expect(page.getByText(/does get a written answer is not recorded that way/i)).toBeVisible();
   // Claims that were true before the endpoint existed and must not come back.
   await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
   await expect(page.getByText(/nothing you type leaves this site/i)).toHaveCount(0);
@@ -988,6 +992,97 @@ test('the design system documents the Ask component', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Ask', exact: true })).toBeVisible();
   await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
   await expect(page.getByText(/Only approved/i)).toBeVisible();
+
+  // The governing-rule card and the section intro have to agree about what
+  // decides a match. They did not: the intro said a model, the card still
+  // described below-threshold overlap as the thing that declines.
+  const ask = page.locator('#ask');
+  await expect(ask.getByText(/Deciding which written answer a question wants is the model/i)).toBeVisible();
+  await expect(ask.getByText(/only to catch a verbatim question/i)).toBeVisible();
+});
+
+test('a routed answer is not reported as a missing one', async ({ page }) => {
+  // The wording of a covered question must not reach analytics, and a covered
+  // question must not land in the missing-answer count — it is the only signal
+  // that decides which answers get written next.
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'accepted');
+    window.__omarAnalyticsConsent = 'accepted';
+    window.__omarGaReady = true;
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+  });
+  await page.route('**/api/ask', route => route.fulfill({
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Ask-Source': 'reviewed',
+      'X-Ask-Sources': 'athena-ds',
+      'X-Ask-Answer-Id': 'design-systems',
+      'X-Ask-Matched-By': 'router',
+    },
+    body: 'routed',
+  }));
+
+  await page.goto('/');
+  await openAsk(page);
+  await askInput(page).fill('is he a manager');
+  await page.locator('#faq button[type="submit"]').click();
+  await expect(askLive(page).getByText(/Has Omar built design systems at scale/i)).toBeVisible();
+
+  const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
+  const routed = events.find(e => e.eventName === 'ask_routed');
+  expect(routed, 'ask_routed reports the outcome').toBeTruthy();
+  expect(routed.params).toMatchObject({ answer_id: 'design-systems', matched_by: 'router' });
+  expect(routed.params.question, 'and carries no wording').toBeUndefined();
+
+  expect(events.find(e => e.eventName === 'ask_no_match'), 'an answered question is not a miss').toBeFalsy();
+  const leaked = events.filter(e => JSON.stringify(e.params ?? {}).includes('is he a manager'));
+  expect(leaked, 'no event carries the wording of an answered question').toHaveLength(0);
+});
+
+test('following a hash mid-request cancels it, so the URL and the answer agree', async ({ page }) => {
+  // The page has to show the answer its URL names. A request still in flight
+  // when the hash changes would otherwise resolve over the top of it.
+  let released;
+  const gate = new Promise(resolve => { released = resolve; });
+  await page.route('**/api/ask', async route => {
+    await gate;
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Ask-Source': 'generated',
+        'X-Ask-Sources': 'connect-api',
+        'X-Ask-Answer-Id': '',
+      },
+      body: 'A draft that belongs to the abandoned question.',
+    });
+  });
+
+  await page.goto('/ask');
+  await expect(page.locator('#ask-panel input[type="text"]')).toBeVisible();
+
+  await page.locator('#ask-panel input[type="text"]').fill('is he a manager');
+  await page.locator('#ask-panel button[type="submit"]').click();
+  await expect(page.getByText(/Looking for a written answer/i)).toBeVisible();
+
+  // Follow a link to a specific answer while that request is outstanding.
+  await page.evaluate(() => { window.location.hash = 'fintech-depth'; });
+  await expect(page.getByText(/Two years at Plastiq/i).first()).toBeVisible();
+
+  released();
+  await page.waitForTimeout(600);
+
+  // The linked answer still stands, and nothing from the abandoned request
+  // appears beside it or in place of it.
+  await expect(page.getByText(/Two years at Plastiq/i).first()).toBeVisible();
+  await expect(page.getByText(/belongs to the abandoned question/i)).toHaveCount(0);
+  await expect(page.getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+  await expect(page.getByText(/Looking for a written answer/i)).toHaveCount(0);
+  expect(new URL(page.url()).hash).toBe('#fintech-depth');
 });
 
 test('picking a suggestion mid-stream does not resurrect the draft', async ({ page }) => {

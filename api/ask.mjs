@@ -257,13 +257,18 @@ export const createHandler = ({
       });
       // Validated against the set rather than trusted: a model can return an id
       // that does not exist, and that must not become a 500 or an empty answer.
-      const id = String(raw ?? '').trim().replace(/[^A-Za-z0-9-]/g, '');
-      const picked = approved.find(a => a.id === id);
+      const text = String(raw ?? '').trim();
+      const picked = approved.find(a => a.id === text.replace(/[^A-Za-z0-9-]/g, ''));
       if (picked) return reviewed(picked, 'router');
-      // NONE, or anything unrecognisable, means the router looked at all of them
-      // and found nothing. That judgement beats the local overlap, so drafting
-      // is the next step rather than the held local hit.
-      declined = true;
+
+      // Only an explicit NONE is a decision. The router saw all of them and
+      // judged, which outranks token overlap, so drafting is next.
+      //
+      // Everything else — empty, truncated, a stray token — decided nothing,
+      // and must not be read as a decision. Treating those as NONE threw away
+      // an answer the site already had, turning a question it could answer into
+      // an unreviewed draft on a malformed response.
+      if (/\bnone\b/i.test(text)) declined = true;
     } catch {
       // Timed out, rate limited upstream, provider down. Nothing was decided,
       // so the local hit is still the best available answer.
