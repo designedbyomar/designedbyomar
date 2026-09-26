@@ -556,12 +556,18 @@ button:focus-visible, a:focus-visible {
   );
   z-index: 0;
 }
+/*
+  Punches the centre out, leaving only the 1.5px edge. It has to be opaque:
+  with a transparent cover the gradient fills the whole field instead of
+  ringing it. --bg-page, the same token .contact-card::after uses, because it
+  is the colour actually behind this.
+*/
 .ask-field::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: var(--radius-standard);
-  background: var(--bg-base);
+  background: var(--bg-page);
   z-index: 1;
 }
 .ask-field > input {

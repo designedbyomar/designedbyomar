@@ -842,6 +842,18 @@ test('the input ring is visible at rest, still until hovered, and leaves focus a
   expect(rest.image).toContain('conic-gradient');
   expect(rest.animation, 'but still, so it does not compete with the answer text').toBe('none');
 
+  // It has to be a ring, not a fill. The cover punches the centre out, and if it
+  // is transparent — as it was when it referenced an undefined token — the
+  // gradient floods the whole field behind the text.
+  const cover = await field.evaluate(n => getComputedStyle(n, '::after').backgroundColor);
+  expect(cover, 'the cover must be opaque, or the gradient is a fill').not.toBe('rgba(0, 0, 0, 0)');
+  expect(cover).not.toBe('transparent');
+
+  // And the gradient must not be painting the input itself.
+  const inputBg = await page.locator('#ask-panel input[type="text"]')
+    .evaluate(n => getComputedStyle(n).backgroundImage);
+  expect(inputBg, 'the input carries no gradient of its own').toBe('none');
+
   await field.hover();
   expect((await ring()).animation, 'it spins on hover').toBe('contact-border-spin');
 
