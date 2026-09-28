@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, RETIRED_MODELS } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -947,4 +947,27 @@ test('the reasons a visitor can act on survive production', async () => {
   } finally {
     process.env.ASK_DETAILED_REASONS = '1';
   }
+});
+
+/**
+ * A model id that Groq has retired fails permanently and silently: the request
+ * does not error, it degrades, so the feature switches itself off and looks
+ * like a quiet day. It took logging in production to see it, twice.
+ */
+test('neither model is one Groq has retired', () => {
+  for (const [role, id] of [['drafting', MODEL], ['routing', ROUTER_MODEL]]) {
+    assert.ok(
+      !RETIRED_MODELS.has(id),
+      `the ${role} model is "${id}", which Groq has retired — a 404 here degrades silently`,
+    );
+    assert.ok(id && typeof id === 'string', `${role} model is set`);
+  }
+});
+
+test('the models can be changed without a deploy', () => {
+  // A retirement should not need a code change and a release to survive. These
+  // read the environment first, so the dashboard is enough.
+  const source = readFileSync(new URL('../api/ask.mjs', import.meta.url), 'utf8');
+  assert.match(source, /process\.env\.GROQ_MODEL/);
+  assert.match(source, /process\.env\.GROQ_ROUTER_MODEL/);
 });

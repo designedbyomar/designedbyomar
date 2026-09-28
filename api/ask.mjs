@@ -61,8 +61,34 @@ const routeWithGroq = async ({ system, prompt }) => {
   return text;
 };
 
-const MODEL = 'llama-3.3-70b-versatile';
-const ROUTER_MODEL = 'llama-3.1-8b-instant';
+/*
+  Both previous models returned 404 from Groq in production —
+  "does not exist or you do not have access to it" — which is a permanent,
+  silent failure: the request never errors, it just degrades, so the feature
+  switched itself off and looked like a quiet day. The runtime logs named it
+  once the logging landed.
+
+  `llama-3.1-8b-instant` was announced for deprecation in June and shut down on
+  16 August 2026, with `openai/gpt-oss-20b` given as its replacement.
+  `llama-3.3-70b-versatile` is not listed as deprecated, but returns the same
+  404 for this account, so it is not something this can depend on either.
+
+  Overridable by environment variable, because this is the second time a model
+  id has expired underneath the site and a retirement should not need a code
+  change and a deploy to survive. Defaults are the current production models.
+*/
+export const MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+export const ROUTER_MODEL = process.env.GROQ_ROUTER_MODEL || 'openai/gpt-oss-20b';
+
+// Models Groq has retired. Naming them keeps a decommissioned id from being
+// reintroduced by a copy-paste from an old example or an old commit.
+export const RETIRED_MODELS = new Set([
+  'llama-3.1-8b-instant',
+  'llama-3.1-70b-versatile',
+  'llama-3.3-70b-specdec',
+  'mixtral-8x7b-32768',
+  'gemma-7b-it',
+]);
 const CONTEXT_ANSWERS = 3;
 // Four excerpts of at most 180 words each, so the material stays well inside
 // one request's budget even when the router names two studies.
