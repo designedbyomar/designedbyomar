@@ -3402,6 +3402,9 @@ const getRouteMeta = (route, currentCase) => {
       robots: 'index,follow,max-image-preview:large',
       image: DEFAULT_OG_IMAGE,
       imageType: imageType(DEFAULT_OG_IMAGE),
+      imageWidth: 1200,
+      imageHeight: 630,
+      imageAlt: ASK_TITLE,
     };
   }
 
@@ -3413,6 +3416,9 @@ const getRouteMeta = (route, currentCase) => {
       robots: 'index,follow,max-image-preview:large',
       image: DEFAULT_OG_IMAGE,
       imageType: imageType(DEFAULT_OG_IMAGE),
+      imageWidth: 1200,
+      imageHeight: 630,
+      imageAlt: WORK_TITLE,
     };
   }
 
@@ -3424,6 +3430,9 @@ const getRouteMeta = (route, currentCase) => {
       robots: 'index,follow,max-image-preview:large',
       image: DEFAULT_OG_IMAGE,
       imageType: imageType(DEFAULT_OG_IMAGE),
+      imageWidth: 1200,
+      imageHeight: 630,
+      imageAlt: 'Privacy Policy — Omar Tavarez',
     };
   }
 
@@ -3435,6 +3444,9 @@ const getRouteMeta = (route, currentCase) => {
       robots: 'index,follow,max-image-preview:large',
       image: toAbsoluteUrl(currentCase.ogImage),
       imageType: imageType(toAbsoluteUrl(currentCase.ogImage)),
+      imageWidth: 1200,
+      imageHeight: 627,
+      imageAlt: currentCase.title,
     };
   }
 
@@ -3445,6 +3457,9 @@ const getRouteMeta = (route, currentCase) => {
     robots: 'index,follow,max-image-preview:large',
     image: DEFAULT_OG_IMAGE,
     imageType: imageType(DEFAULT_OG_IMAGE),
+    imageWidth: 1200,
+    imageHeight: 630,
+    imageAlt: 'designedbyomar — Omar Tavarez',
   };
 };
 
@@ -3458,6 +3473,9 @@ const syncRouteHead = (meta) => {
   setHeadValue('meta[property="og:url"]', 'content', meta.url);
   setHeadValue('meta[property="og:image"]', 'content', meta.image);
   setHeadValue('meta[property="og:image:type"]', 'content', meta.imageType);
+  setHeadValue('meta[property="og:image:width"]', 'content', meta.imageWidth);
+  setHeadValue('meta[property="og:image:height"]', 'content', meta.imageHeight);
+  setHeadValue('meta[property="og:image:alt"]', 'content', meta.imageAlt);
   setHeadValue('meta[name="twitter:title"]', 'content', meta.title);
   setHeadValue('meta[name="twitter:description"]', 'content', meta.description);
   setHeadValue('meta[name="twitter:image"]', 'content', meta.image);
