@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import sharp from 'sharp';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -164,6 +165,34 @@ test('all sitemap pages have indexable metadata and matching structured data', (
       assert.equal(url.endsWith('/'), true, `${url} case-study canonical keeps trailing slash`);
     }
   });
+});
+
+test('case-study social previews use share-safe JPEG metadata and assets', async () => {
+  const caseStudies = caseStudySource();
+  assert.equal(caseStudies.length, 8, 'the portfolio has eight case-study previews');
+
+  for (const caseStudy of caseStudies) {
+    const expectedImage = `${SITE_ORIGIN}${caseStudy.ogImage}`;
+    const imagePath = path.join(DIST, caseStudy.ogImage.replace(/^\//, ''));
+    const html = readDist('work', caseStudy.id, 'index.html');
+    const structuredData = getStructuredData(html);
+    const webPage = structuredData['@graph']?.find((node) => node?.['@type'] === 'WebPage');
+    const metadata = await sharp(imagePath).metadata();
+    const { size } = fs.statSync(imagePath);
+
+    assert.match(caseStudy.ogImage, /\/cover-og\.jpg$/, `${caseStudy.id} uses its generated JPEG`);
+    assert.equal(metadata.format, 'jpeg', `${caseStudy.id} social image is JPEG`);
+    assert.equal(metadata.width, 1200, `${caseStudy.id} social image is 1200px wide`);
+    assert.equal(metadata.height, 627, `${caseStudy.id} social image is 627px tall`);
+    assert.ok(size < 1_000_000, `${caseStudy.id} social image stays under 1 MB`);
+    assert.equal(getMetaByProperty(html, 'og:image'), expectedImage, `${caseStudy.id} Open Graph image is absolute`);
+    assert.equal(getMetaByProperty(html, 'og:image:type'), 'image/jpeg', `${caseStudy.id} declares JPEG`);
+    assert.equal(getMetaByProperty(html, 'og:image:width'), '1200', `${caseStudy.id} declares image width`);
+    assert.equal(getMetaByProperty(html, 'og:image:height'), '627', `${caseStudy.id} declares image height`);
+    assert.equal(getMetaByProperty(html, 'og:image:alt'), caseStudy.title, `${caseStudy.id} uses its title as image alt text`);
+    assert.equal(getMetaByName(html, 'twitter:image'), expectedImage, `${caseStudy.id} Twitter image matches Open Graph`);
+    assert.equal(webPage?.image, expectedImage, `${caseStudy.id} JSON-LD image matches Open Graph`);
+  }
 });
 
 test('robots discovery points to the canonical sitemap', () => {
