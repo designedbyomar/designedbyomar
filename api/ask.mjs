@@ -45,7 +45,7 @@ const generateFromGroq = ({ system, prompt }) => streamText({
  * Routing is a different job from writing, on a different model.
  *
  * It returns an id, so it wants determinism and speed, not prose — hence
- * temperature 0, a 20-token ceiling and a much shorter timeout. Groq meters
+ * temperature 0, a 20-token ceiling and a shorter timeout. Groq meters
  * per model, so routing does not draw down the budget the drafting model
  * needs, and a routing outage cannot take drafting with it.
  */
@@ -72,9 +72,15 @@ const TIMEOUT_MS = 8000;
 // Routing sits in front of every typed question, so it stays tighter than
 // drafting — but three seconds was too tight. It has to cover a cold edge
 // instance reaching Groq, and when it expired the whole request fell through to
-// "no written answer". Routing and drafting now run serially inside one
-// request, so the ceiling is this plus TIMEOUT_MS, which stays inside Vercel's
-// streaming budget.
+// "no written answer".
+//
+// Each stage has its own timer, not a shared deadline: routing and drafting run
+// serially, and drafting's clock only starts once routing has returned. The
+// worst case is therefore additive, before the answer and source fetches:
+// response headers wait at most ROUTER_TIMEOUT_MS + FIRST_CHUNK_TIMEOUT_MS
+// (12s), and the stream ends by ROUTER_TIMEOUT_MS + TIMEOUT_MS (14s). Both sit
+// inside the 25 seconds Vercel's edge runtime allows before a response must
+// begin. Raising any of these three means re-checking that sum.
 const ROUTER_TIMEOUT_MS = 6000;
 // How long to wait for a draft's first chunk before giving up on it. Inside
 // TIMEOUT_MS, since a provider that has sent nothing by now is not going to
@@ -104,6 +110,27 @@ const rateLimited = (ip) => {
   hits.set(ip, recent);
   if (hits.size > 5000) hits.clear();
   return recent.length > RATE_LIMIT;
+};
+
+// Loose on purpose: it only has to reject junk, not prove an address routable.
+const IP_SHAPE = /^[0-9a-f.:]{2,45}$/i;
+
+/*
+  The key the rate limit counts against. The leftmost `x-forwarded-for` entry is
+  whatever the client typed, so reading it let one visitor rotate through
+  unlimited buckets. Vercel's edge sets `x-vercel-forwarded-for` and `x-real-ip`
+  itself, so those win. Failing both, the rightmost forwarded entry is the one
+  the nearest proxy appended, which the client cannot choose. Anything that is
+  not shaped like an address shares one bucket rather than minting a new one.
+*/
+const clientKey = (request) => {
+  const { headers } = request;
+  const platform = (headers.get('x-vercel-forwarded-for') ?? headers.get('x-real-ip'))
+    ?.split(',')[0]?.trim();
+  const forwarded = headers.get('x-forwarded-for')
+    ?.split(',').map(part => part.trim()).filter(Boolean).at(-1);
+  const ip = platform || forwarded;
+  return ip && IP_SHAPE.test(ip) ? ip.toLowerCase() : 'unknown';
 };
 
 /**
@@ -412,10 +439,14 @@ export const createHandler = ({
   // right: "is he a manager" scored 1.00 against a refusal answer. It would
   // arrive labelled as reviewed, which a draft never does.
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip = clientKey(request);
   // Counted once per request, before any model is touched, so a question that
-  // routes and then drafts still costs the visitor one of their six.
-  const unavailable = !hasApiKey() || rateLimited(ip);
+  // routes and then drafts still costs the visitor one of their six. Which
+  // check failed is kept, not re-derived later: reading the key a second time
+  // could name the wrong cause. Without a key the visitor is not counted.
+  const missingKey = !hasApiKey();
+  const limited = !missingKey && rateLimited(ip);
+  const unavailable = missingKey || limited;
 
   // 2. Ask the router what this question needs. It sees every written question,
   // because the right answer often shares no vocabulary with how the visitor
@@ -566,7 +597,7 @@ export const createHandler = ({
   // debugging somewhere else entirely.
   if (unavailable) {
     return textResponse('', 'fallback', sources, '', '',
-      hasApiKey() ? 'rate-limited' : 'no-key');
+      missingKey ? 'no-key' : 'rate-limited');
   }
 
   // Now it means what it says: we looked, and nothing shares any vocabulary

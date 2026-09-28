@@ -61,7 +61,7 @@ const loadHandler = ({
   const calls = [];
   const routeCalls = [];
   const handler = createHandler({
-    hasApiKey: () => hasApiKey,
+    hasApiKey: typeof hasApiKey === 'function' ? hasApiKey : () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
       return { answers, index: buildIndex(answers), studies: STUDIES };
@@ -396,6 +396,43 @@ test('one visitor cannot drain the daily quota', async () => {
   assert.ok(sources.includes('generated'), 'early requests are answered');
   assert.equal(sources.at(-1), 'fallback', 'later requests from the same visitor are capped');
   assert.equal(attempts.at(-1), 'rate-limited', 'and say so, rather than looking broken');
+});
+
+test('a spoofed forwarding header cannot mint a fresh rate-limit bucket', async () => {
+  // The leftmost x-forwarded-for entry is client-controlled. Rotating it on
+  // every request must not reset the count, or the ceiling means nothing.
+  const { handler } = loadHandler();
+  const reasons = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': `192.0.2.${i}, 198.51.100.200`,
+      },
+      body: JSON.stringify({ question: MISS_WITH_CONTEXT }),
+    }));
+    reasons.push(response.headers.get('X-Ask-Reason'));
+  }
+  assert.equal(reasons.at(-1), 'rate-limited');
+});
+
+test('the platform client-IP header outranks x-forwarded-for', async () => {
+  const { handler } = loadHandler();
+  const reasons = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-vercel-forwarded-for': '198.51.100.201',
+        'x-forwarded-for': `192.0.2.${i}`,
+      },
+      body: JSON.stringify({ question: MISS_WITH_CONTEXT }),
+    }));
+    reasons.push(response.headers.get('X-Ask-Reason'));
+  }
+  assert.equal(reasons.at(-1), 'rate-limited');
 });
 
 test('a malformed or empty request never errors', async () => {
@@ -764,6 +801,24 @@ test('an unanswerable question from a rate-limited visitor blames the limit', as
 
   let reason = null;
   for (let i = 0; i < 40; i += 1) reason = (await handler(drain())).headers.get('X-Ask-Reason');
+  assert.equal(reason, 'rate-limited');
+});
+
+test('the reason names the check that actually failed, not a second read of the key', async () => {
+  // The reason used to re-read the key after the fact and infer which side of
+  // `!key || limited` had fired. A key that reads differently the second time
+  // turned a spent rate limit into `no-key`. Each request here sees the key on
+  // its first read and loses it afterwards.
+  let reads = 0;
+  const { handler } = loadHandler({ hasApiKey: () => (reads++ % 2 === 0) });
+  const drain = () => new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.45' },
+    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+  });
+
+  let reason = null;
+  for (let i = 0; i < 40; i += 1) { reads = 0; reason = (await handler(drain())).headers.get('X-Ask-Reason'); }
   assert.equal(reason, 'rate-limited');
 });
 
