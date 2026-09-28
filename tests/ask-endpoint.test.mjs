@@ -14,6 +14,14 @@ import { createHandler } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
+/**
+ * The detailed reason header is opt-in, because production ships buckets rather
+ * than naming which dependency is down. These tests assert the detailed
+ * contract — what a preview deploy or a local run sees — so the file turns it
+ * on, and the production default gets its own test that turns it back off.
+ */
+process.env.ASK_DETAILED_REASONS = '1';
+
 const SUMMARY = new Set(['Challenge', 'Approach', 'Outcome']);
 
 // The real published sections, so retrieval is exercised against the corpus the
@@ -69,7 +77,7 @@ const loadHandler = ({
     },
     generate: (options) => {
       calls.push(options);
-      if (generateThrows) throw new Error('provider unavailable');
+      if (generateThrows) throw generateThrows instanceof Error ? generateThrows : new Error('provider unavailable');
       if (generateStreamError) return new ReadableStream({ start(c) { c.error(new Error('provider unavailable')); } });
       if (generateEmpty) return new ReadableStream({ start(c) { c.close(); } });
       // Opens, then never yields and never closes — the case a provider-side
@@ -777,4 +785,111 @@ test('a router problem survives a drafting failure that follows it', async () =>
   const clean = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
     .handler(post('what fintech work has he done'));
   assert.equal(clean.headers.get('X-Ask-Reason'), 'provider-error');
+});
+
+test('failure logs name the error without repeating what it said', async () => {
+  // Provider messages carry request IDs and can quote the prompt back, and
+  // router output can echo the question. The log needs the class and status,
+  // not the text, so neither may reach it.
+  const question = 'what fintech work has he done for acme-private-client';
+  const upstream = Object.assign(
+    new Error(`req_abc123: invalid request for prompt "${question}"`),
+    { name: 'AI_APICallError', statusCode: 429 },
+  );
+
+  const logged = [];
+  const original = console.error;
+  console.error = (...args) => logged.push(args.map(String).join(' '));
+  try {
+    await (loadHandler({ routeReturns: `Sure — ${question}`, generateThrows: upstream }))
+      .handler(post(question));
+  } finally {
+    console.error = original;
+  }
+
+  const output = logged.join('\n');
+  assert.match(output, /routing failed — unreadable response \(\d+ chars\)/);
+  assert.match(output, /drafting failed — AI_APICallError, status 429/);
+  assert.doesNotMatch(output, /acme-private-client|req_abc123/);
+});
+
+/**
+ * A reason is for whoever is debugging, and an anonymous caller is not that.
+ *
+ * `provider-error` and `answers-unavailable` name which dependency this
+ * endpoint has and whether it is currently up, which anyone could poll for.
+ * Production reports a bucket, and the detail goes to the runtime logs.
+ */
+test('production reports a bucket rather than naming the failure', async () => {
+  delete process.env.ASK_DETAILED_REASONS;
+  try {
+    const down = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(down.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(down.headers.get('X-Ask-Reason'), 'unavailable');
+
+    const noKey = await (loadHandler({ hasApiKey: false })).handler(post('what fintech work has he done'));
+    assert.equal(noKey.headers.get('X-Ask-Reason'), 'unavailable', 'a missing key is our problem, not the caller\'s to know');
+
+    const answersDown = await (loadHandler({ answersFail: true })).handler(post('what fintech work has he done'));
+    assert.equal(answersDown.headers.get('X-Ask-Reason'), 'unavailable');
+
+    // A reply was still drafted, so reporting it as unavailable would be a lie
+    // about a request that succeeded. Different bucket, still no cause.
+    const drafted = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
+    assert.equal(drafted.headers.get('X-Ask-Source'), 'generated');
+    assert.equal(drafted.headers.get('X-Ask-Reason'), 'degraded');
+
+    const composed = await (loadHandler({ routeReturns: 'I cannot help with that', generateThrows: true }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(composed.headers.get('X-Ask-Reason'), 'unavailable',
+      'a composed reason must not leak either of its halves');
+  } finally {
+    process.env.ASK_DETAILED_REASONS = '1';
+  }
+});
+
+test('the reasons a visitor can act on survive production', async () => {
+  // These describe the caller's own situation — a malformed request, a spent
+  // allowance, a subject nothing is written about — or where a drafted reply
+  // got its material. None of them says whether a dependency is up, and
+  // coarsening them would cost the only signal that says which answers to
+  // write next without protecting anything.
+  delete process.env.ASK_DETAILED_REASONS;
+  try {
+    const bad = await (loadHandler()).handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '198.51.100.9' },
+      body: 'not json',
+    }));
+    assert.equal(bad.headers.get('X-Ask-Reason'), 'bad-request');
+
+    const { handler } = loadHandler();
+    const nothing = await handler(post('how do penguins pay for parking in antarctica'));
+    assert.equal(nothing.headers.get('X-Ask-Reason'), 'no-material');
+
+    const sourced = await (loadHandler({ routeReturns: 'SOURCES: connect-api' }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
+
+    const declined = await (loadHandler()).handler(post('what fintech work has he done'));
+    assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+
+    const limited = loadHandler().handler;
+    const drain = () => new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.77' },
+      body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+    });
+    let reason = null;
+    for (let i = 0; i < 40; i += 1) reason = (await limited(drain())).headers.get('X-Ask-Reason');
+    assert.equal(reason, 'rate-limited');
+
+    // And a reviewed answer still carries no reason at all.
+    const exact = await (loadHandler()).handler(post(answerFor('work-history').question));
+    assert.equal(exact.headers.get('X-Ask-Source'), 'reviewed');
+    assert.equal(exact.headers.get('X-Ask-Reason'), '');
+  } finally {
+    process.env.ASK_DETAILED_REASONS = '1';
+  }
 });

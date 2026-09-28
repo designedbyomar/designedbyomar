@@ -190,7 +190,8 @@ const PUBLIC_REASONS = new Set([
  *
  * Detail is opt-in, so the default is the safe one wherever this runs: set
  * `ASK_DETAILED_REASONS=1`, which a preview deploy or a local `vercel dev` can
- * carry and production does not.
+ * carry and production does not. A reason added later is coarse in production
+ * until someone puts it in the set above, which is the right way round.
  */
 const detailedReasons = () => process.env.ASK_DETAILED_REASONS === '1';
 
