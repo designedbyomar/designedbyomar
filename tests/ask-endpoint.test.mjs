@@ -14,6 +14,14 @@ import { createHandler } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
+/**
+ * The detailed reason header is opt-in, because production ships buckets rather
+ * than naming which dependency is down. These tests assert the detailed
+ * contract — what a preview deploy or a local run sees — so the file turns it
+ * on, and the production default gets its own test that turns it back off.
+ */
+process.env.ASK_DETAILED_REASONS = '1';
+
 const SUMMARY = new Set(['Challenge', 'Approach', 'Outcome']);
 
 // The real published sections, so retrieval is exercised against the corpus the
@@ -53,7 +61,7 @@ const loadHandler = ({
   const calls = [];
   const routeCalls = [];
   const handler = createHandler({
-    hasApiKey: () => hasApiKey,
+    hasApiKey: typeof hasApiKey === 'function' ? hasApiKey : () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
       return { answers, index: buildIndex(answers), studies: STUDIES };
@@ -69,7 +77,7 @@ const loadHandler = ({
     },
     generate: (options) => {
       calls.push(options);
-      if (generateThrows) throw new Error('provider unavailable');
+      if (generateThrows) throw generateThrows instanceof Error ? generateThrows : new Error('provider unavailable');
       if (generateStreamError) return new ReadableStream({ start(c) { c.error(new Error('provider unavailable')); } });
       if (generateEmpty) return new ReadableStream({ start(c) { c.close(); } });
       // Opens, then never yields and never closes — the case a provider-side
@@ -107,6 +115,9 @@ const SECTIONS = [
     title: 'Connect API Payments',
     heading: 'Challenge',
     text: 'Plastiq Connect let a partner put card and bank payments inside its own product, under its own brand, with Plastiq carrying the compliance and the disbursement.',
+    // The build puts the tags on every section. Without them here the fixture
+    // would not exercise the path that makes an unscoped search work at all.
+    labels: 'Fintech API Developer Experience B2B Plastiq Lead Product Designer',
   },
   {
     id: 'connect-api#1',
@@ -114,6 +125,7 @@ const SECTIONS = [
     title: 'Connect API Payments',
     heading: 'Approach',
     text: 'Benchmarking against Stripe Connect settled what the product competed on: letting a partner hand over PCI scope and risk operations rather than build and certify them.',
+    labels: 'Fintech API Developer Experience B2B Plastiq Lead Product Designer',
   },
   {
     id: 'athena-ds#0',
@@ -121,6 +133,7 @@ const SECTIONS = [
     title: 'Athena Design System 2.0',
     heading: 'Challenge',
     text: 'Nomenclature and patterns had diverged across every product, so an audit came before a single asset was produced.',
+    labels: 'Design System Enterprise Cross-functional Plastiq',
   },
 ];
 
@@ -202,14 +215,17 @@ test('an id the router invented is never served', async () => {
  * other would pass a looser test.
  */
 /**
- * Nothing decided this question, so nothing may be served loosely.
+ * A router that decided nothing must not stop a draft.
  *
- * This reverses an earlier call. Serving the local overlap match whenever the
- * model could not run was meant to keep the feature "no worse than before
- * routing existed" — but before routing existed was the broken state, and that
- * path is where it kept surfacing: "what is the strongest fintech case study he
- * has" scores 0.56 against the Wisdom Management Portal, which is healthcare.
- * An exact hit is still served; anything looser gets the written miss.
+ * This reverses the previous behaviour, where an unreadable or failed routing
+ * response returned the written miss and never reached the model. The reasoning
+ * was that without the router we do not know which studies are relevant. What
+ * it cost in practice was that one routing timeout produced "no written answer"
+ * for every typed question on the site — which is what was reported.
+ *
+ * A loose overlap match is still never served: it would arrive labelled as
+ * reviewed. A draft is labelled as a draft, which is why one is acceptable here
+ * and the other is not.
  */
 for (const [label, routeReturns] of [
   ['an empty response', ''],
@@ -218,14 +234,36 @@ for (const [label, routeReturns] of [
   ['an id that does not exist', 'leadership-and-vision'],
   ['a refusal to answer', 'I cannot help with that'],
 ]) {
-  test(`${label} from the router serves no answer at all, loose or drafted`, async () => {
+  test(`${label} from the router still reaches a draft`, async () => {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${label} must not be acted on`);
-    assert.equal(calls.length, 0, 'and must not reach drafting either');
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must still draft`);
+    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Reason'), 'router-unreadable');
+
+    // Never the loose match, which here is a refusal answer scoring 1.00.
+    assert.notEqual(response.headers.get('X-Ask-Matched-By'), 'local');
   });
 }
+
+test('a router that throws still reaches a draft, and says why', async () => {
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'router-error');
+  assert.equal(calls.length, 1, 'drafting does not need the router, only material');
+});
+
+test('without the router, sections are retrieved across the whole corpus', async () => {
+  // The scoped search is more accurate, but an unscoped one is what makes
+  // drafting survive a routing failure at all.
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  await handler(post('what fintech work has he done'));
+
+  assert.match(calls[0].system, /CASE STUDY EXCERPTS:/, 'material still reaches the model');
+});
 
 test('an exact hit is still served when the router cannot run', async () => {
   // The carve-out: a verbatim question is the one result overlap cannot get
@@ -263,14 +301,15 @@ test('NONE means draft, even when token overlap thought it had a match', async (
   assert.equal(calls.length, 1);
 });
 
-test('a router failure serves the written miss, not the loose local match', async () => {
-  const { handler, calls } = loadHandler({ routeThrows: true });
-  const response = await handler(post('is he a manager'));
-
-  // The local match here is a refusal answer at 1.00 — the original bug. When
-  // nothing has judged the question, it is not served.
-  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
-  assert.equal(calls.length, 0, 'and drafting is not attempted blind either');
+test('a loose overlap match is never served, on any path', async () => {
+  // "is he a manager" scores 1.00 against a refusal answer. Whatever else
+  // happens, that must not come back looking like a reviewed answer.
+  for (const options of [{ routeThrows: true }, { routeReturns: 'NONE' }, { routeReturns: '' }]) {
+    const { handler } = loadHandler(options);
+    const response = await handler(post('is he a manager'));
+    assert.notEqual(response.headers.get('X-Ask-Matched-By'), 'local', JSON.stringify(options));
+    assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'refuse-employer-opinions');
+  }
 });
 
 test('with no key nothing loose is served', async () => {
@@ -345,10 +384,55 @@ test('one visitor cannot drain the daily quota', async () => {
   const sources = [];
   // Comfortably past the per-visitor ceiling, so the test does not have to be
   // edited every time that number moves.
-  for (let i = 0; i < 20; i += 1) sources.push((await handler(sameVisitor())).headers.get('X-Ask-Source'));
+  // Past the ceiling whatever it is set to, so moving that number does not
+  // silently turn this test into one that never reaches the limit.
+  const attempts = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(sameVisitor());
+    sources.push(response.headers.get('X-Ask-Source'));
+    attempts.push(response.headers.get('X-Ask-Reason'));
+  }
 
   assert.ok(sources.includes('generated'), 'early requests are answered');
   assert.equal(sources.at(-1), 'fallback', 'later requests from the same visitor are capped');
+  assert.equal(attempts.at(-1), 'rate-limited', 'and say so, rather than looking broken');
+});
+
+test('a spoofed forwarding header cannot mint a fresh rate-limit bucket', async () => {
+  // The leftmost x-forwarded-for entry is client-controlled. Rotating it on
+  // every request must not reset the count, or the ceiling means nothing.
+  const { handler } = loadHandler();
+  const reasons = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': `192.0.2.${i}, 198.51.100.200`,
+      },
+      body: JSON.stringify({ question: MISS_WITH_CONTEXT }),
+    }));
+    reasons.push(response.headers.get('X-Ask-Reason'));
+  }
+  assert.equal(reasons.at(-1), 'rate-limited');
+});
+
+test('the platform client-IP header outranks x-forwarded-for', async () => {
+  const { handler } = loadHandler();
+  const reasons = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-vercel-forwarded-for': '198.51.100.201',
+        'x-forwarded-for': `192.0.2.${i}`,
+      },
+      body: JSON.stringify({ question: MISS_WITH_CONTEXT }),
+    }));
+    reasons.push(response.headers.get('X-Ask-Reason'));
+  }
+  assert.equal(reasons.at(-1), 'rate-limited');
 });
 
 test('a malformed or empty request never errors', async () => {
@@ -591,5 +675,276 @@ test('citations name only the studies the draft was given', async () => {
   assert.ok(cited.includes('connect-api'));
   for (const id of threeStudies.sources.filter(s => s !== 'connect-api')) {
     assert.ok(!cited.includes(id), `cited ${id}, which was never named or retrieved`);
+  }
+});
+
+/**
+ * Every failure used to return byte-identical bytes.
+ *
+ * A routing timeout, a missing key, a spent rate limit and "the model looked
+ * and found nothing" were indistinguishable from outside, and the catches threw
+ * the exception away — so diagnosing a live problem meant guessing at it from a
+ * screenshot. Each cause now names itself.
+ */
+test('a missing key says so', async () => {
+  const { handler } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-key');
+});
+
+test('a question nothing covers at all says so', async () => {
+  const { handler, calls } = loadHandler();
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-material');
+  assert.equal(calls.length, 0, 'and the model is not asked to speak from nothing');
+});
+
+test('a provider failure while drafting says so', async () => {
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'provider-error');
+});
+
+test('an unreadable request says so', async () => {
+  const { handler } = loadHandler();
+  const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '198.51.100.7' },
+    body: 'not json',
+  }));
+
+  assert.equal(response.headers.get('X-Ask-Reason'), 'bad-request');
+});
+
+test('a successful draft records whether the router chose or failed', async () => {
+  // Naming studies and declining both mean "no written answer fits", but only
+  // one of them located material, so they are reported apart.
+  const sourced = await (loadHandler({ routeReturns: 'SOURCES: connect-api' })).handler(post('what fintech work has he done'));
+  assert.equal(sourced.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
+
+  const declined = await (loadHandler({ routeReturns: 'NONE' })).handler(post('what fintech work has he done'));
+  assert.equal(declined.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+
+  const failed = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
+  assert.equal(failed.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(failed.headers.get('X-Ask-Reason'), 'router-error');
+});
+
+test('an ANSWER naming an id that does not exist still drafts, and says so', async () => {
+  for (const routeReturns of ['ANSWER: leadership-and-vision', 'ANSWER: none-of-these-fit']) {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${routeReturns} must still draft`);
+    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Reason'), 'router-picked-invalid', `${routeReturns} is not a decline`);
+  }
+
+  // ANSWER: NONE is still the router declining, just in the wrong form.
+  const declined = await (loadHandler({ routeReturns: 'ANSWER: NONE' })).handler(post('is he a manager'));
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+});
+
+test('every generated draft names a routing outcome', async () => {
+  for (const routeReturns of ['', 'NONE', 'SOURCES: connect-api', 'ANSWER: made-up', 'leadership-or', 'SOURCES: not-a-real-study']) {
+    const response = await (loadHandler({ routeReturns })).handler(post('what fintech work has he done'));
+    if (response.headers.get('X-Ask-Source') !== 'generated') continue;
+    assert.ok(response.headers.get('X-Ask-Reason'), `${JSON.stringify(routeReturns)} drafted with no reason`);
+  }
+});
+
+test('every fallback names a cause', async () => {
+  // A reason of '' would put this back where it started.
+  for (const [label, options, question] of [
+    ['no key', { hasApiKey: false }, 'what fintech work has he done'],
+    ['nothing relevant', {}, 'how do penguins pay for parking in antarctica'],
+    ['provider down', { routeReturns: 'SOURCES: connect-api', generateThrows: true }, 'what fintech work has he done'],
+  ]) {
+    const { handler } = loadHandler(options);
+    const response = await handler(post(question));
+    if (response.headers.get('X-Ask-Source') !== 'fallback') continue;
+    assert.ok(response.headers.get('X-Ask-Reason'), `${label} returned a fallback with no reason`);
+  }
+});
+
+/**
+ * A reason that names the wrong cause is worse than no reason, because it sends
+ * whoever is debugging somewhere else. These two cases both misreported.
+ */
+test('an unanswerable question with no key blames the key, not the material', async () => {
+  // Retrieval is skipped when the key is missing, so `sections` is empty for a
+  // reason that has nothing to do with the corpus. If nothing is near the
+  // question either, the no-material guard fired first and reported that the
+  // site had nothing to say — when the truth is that it never looked.
+  const { handler } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-key');
+});
+
+test('an unanswerable question from a rate-limited visitor blames the limit', async () => {
+  const { handler } = loadHandler();
+  const drain = () => new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.44' },
+    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+  });
+
+  let reason = null;
+  for (let i = 0; i < 40; i += 1) reason = (await handler(drain())).headers.get('X-Ask-Reason');
+  assert.equal(reason, 'rate-limited');
+});
+
+test('the reason names the check that actually failed, not a second read of the key', async () => {
+  // The reason used to re-read the key after the fact and infer which side of
+  // `!key || limited` had fired. A key that reads differently the second time
+  // turned a spent rate limit into `no-key`. Each request here sees the key on
+  // its first read and loses it afterwards.
+  let reads = 0;
+  const { handler } = loadHandler({ hasApiKey: () => (reads++ % 2 === 0) });
+  const drain = () => new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.45' },
+    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+  });
+
+  let reason = null;
+  for (let i = 0; i < 40; i += 1) { reads = 0; reason = (await handler(drain())).headers.get('X-Ask-Reason'); }
+  assert.equal(reason, 'rate-limited');
+});
+
+test('a router problem survives a drafting failure that follows it', async () => {
+  // Both facts matter: the router returned something unusable *and* drafting
+  // then failed. Reporting only the second leaves no trace of the first, and
+  // the two together are a different problem from either alone.
+  const unreadable = await (loadHandler({
+    routeReturns: 'I cannot help with that',
+    generateThrows: true,
+  })).handler(post('what fintech work has he done'));
+  assert.equal(unreadable.headers.get('X-Ask-Reason'), 'router-unreadable+provider-error');
+
+  const threw = await (loadHandler({ routeThrows: true, generateEmpty: true }))
+    .handler(post('what fintech work has he done'));
+  assert.equal(threw.headers.get('X-Ask-Reason'), 'router-error+empty-draft');
+
+  // And a drafting failure on its own still reads plainly.
+  const clean = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
+    .handler(post('what fintech work has he done'));
+  assert.equal(clean.headers.get('X-Ask-Reason'), 'provider-error');
+});
+
+test('failure logs name the error without repeating what it said', async () => {
+  // Provider messages carry request IDs and can quote the prompt back, and
+  // router output can echo the question. The log needs the class and status,
+  // not the text, so neither may reach it.
+  const question = 'what fintech work has he done for acme-private-client';
+  const upstream = Object.assign(
+    new Error(`req_abc123: invalid request for prompt "${question}"`),
+    { name: 'AI_APICallError', statusCode: 429 },
+  );
+
+  const logged = [];
+  const original = console.error;
+  console.error = (...args) => logged.push(args.map(String).join(' '));
+  try {
+    await (loadHandler({ routeReturns: `Sure — ${question}`, generateThrows: upstream }))
+      .handler(post(question));
+  } finally {
+    console.error = original;
+  }
+
+  const output = logged.join('\n');
+  assert.match(output, /routing failed — unreadable response \(\d+ chars\)/);
+  assert.match(output, /drafting failed — AI_APICallError, status 429/);
+  assert.doesNotMatch(output, /acme-private-client|req_abc123/);
+});
+
+/**
+ * A reason is for whoever is debugging, and an anonymous caller is not that.
+ *
+ * `provider-error` and `answers-unavailable` name which dependency this
+ * endpoint has and whether it is currently up, which anyone could poll for.
+ * Production reports a bucket, and the detail goes to the runtime logs.
+ */
+test('production reports a bucket rather than naming the failure', async () => {
+  delete process.env.ASK_DETAILED_REASONS;
+  try {
+    const down = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(down.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(down.headers.get('X-Ask-Reason'), 'unavailable');
+
+    const noKey = await (loadHandler({ hasApiKey: false })).handler(post('what fintech work has he done'));
+    assert.equal(noKey.headers.get('X-Ask-Reason'), 'unavailable', 'a missing key is our problem, not the caller\'s to know');
+
+    const answersDown = await (loadHandler({ answersFail: true })).handler(post('what fintech work has he done'));
+    assert.equal(answersDown.headers.get('X-Ask-Reason'), 'unavailable');
+
+    // A reply was still drafted, so reporting it as unavailable would be a lie
+    // about a request that succeeded. Different bucket, still no cause.
+    const drafted = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
+    assert.equal(drafted.headers.get('X-Ask-Source'), 'generated');
+    assert.equal(drafted.headers.get('X-Ask-Reason'), 'degraded');
+
+    const composed = await (loadHandler({ routeReturns: 'I cannot help with that', generateThrows: true }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(composed.headers.get('X-Ask-Reason'), 'unavailable',
+      'a composed reason must not leak either of its halves');
+  } finally {
+    process.env.ASK_DETAILED_REASONS = '1';
+  }
+});
+
+test('the reasons a visitor can act on survive production', async () => {
+  // These describe the caller's own situation — a malformed request, a spent
+  // allowance, a subject nothing is written about — or where a drafted reply
+  // got its material. None of them says whether a dependency is up, and
+  // coarsening them would cost the only signal that says which answers to
+  // write next without protecting anything.
+  delete process.env.ASK_DETAILED_REASONS;
+  try {
+    const bad = await (loadHandler()).handler(new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '198.51.100.9' },
+      body: 'not json',
+    }));
+    assert.equal(bad.headers.get('X-Ask-Reason'), 'bad-request');
+
+    const { handler } = loadHandler();
+    const nothing = await handler(post('how do penguins pay for parking in antarctica'));
+    assert.equal(nothing.headers.get('X-Ask-Reason'), 'no-material');
+
+    const sourced = await (loadHandler({ routeReturns: 'SOURCES: connect-api' }))
+      .handler(post('what fintech work has he done'));
+    assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
+
+    const declined = await (loadHandler()).handler(post('what fintech work has he done'));
+    assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+
+    const limited = loadHandler().handler;
+    const drain = () => new Request('https://designedbyomar.com/api/ask', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.77' },
+      body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+    });
+    let reason = null;
+    for (let i = 0; i < 40; i += 1) reason = (await limited(drain())).headers.get('X-Ask-Reason');
+    assert.equal(reason, 'rate-limited');
+
+    // And a reviewed answer still carries no reason at all.
+    const exact = await (loadHandler()).handler(post(answerFor('work-history').question));
+    assert.equal(exact.headers.get('X-Ask-Source'), 'reviewed');
+    assert.equal(exact.headers.get('X-Ask-Reason'), '');
+  } finally {
+    process.env.ASK_DETAILED_REASONS = '1';
   }
 });

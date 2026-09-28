@@ -45,7 +45,7 @@ const generateFromGroq = ({ system, prompt }) => streamText({
  * Routing is a different job from writing, on a different model.
  *
  * It returns an id, so it wants determinism and speed, not prose — hence
- * temperature 0, a 20-token ceiling and a much shorter timeout. Groq meters
+ * temperature 0, a 20-token ceiling and a shorter timeout. Groq meters
  * per model, so routing does not draw down the budget the drafting model
  * needs, and a routing outage cannot take drafting with it.
  */
@@ -69,17 +69,33 @@ const CONTEXT_ANSWERS = 3;
 const SOURCE_SECTIONS = 4;
 const MAX_QUESTION_CHARS = 400;
 const TIMEOUT_MS = 8000;
-// Routing sits in front of every typed question, so it gets a much tighter
-// budget than drafting: past this the visitor is better served by the local
-// match than by waiting.
-const ROUTER_TIMEOUT_MS = 3000;
+// Routing sits in front of every typed question, so it stays tighter than
+// drafting — but three seconds was too tight. It has to cover a cold edge
+// instance reaching Groq, and when it expired the whole request fell through to
+// "no written answer".
+//
+// Each stage has its own timer, not a shared deadline: routing and drafting run
+// serially, and drafting's clock only starts once routing has returned. The
+// worst case is therefore additive, before the answer and source fetches:
+// response headers wait at most ROUTER_TIMEOUT_MS + FIRST_CHUNK_TIMEOUT_MS
+// (12s), and the stream ends by ROUTER_TIMEOUT_MS + TIMEOUT_MS (14s). Both sit
+// inside the 25 seconds Vercel's edge runtime allows before a response must
+// begin. Raising any of these three means re-checking that sum.
+const ROUTER_TIMEOUT_MS = 6000;
 // How long to wait for a draft's first chunk before giving up on it. Inside
 // TIMEOUT_MS, since a provider that has sent nothing by now is not going to
 // finish in time either.
 const FIRST_CHUNK_TIMEOUT_MS = 6000;
 
-/** Per-visitor ceiling, so one person cannot drain the daily free quota. */
-const RATE_LIMIT = 10;
+/**
+ * Per-visitor ceiling, so one person cannot drain the daily free quota.
+ *
+ * Generous enough that reading the page and trying a handful of questions does
+ * not hit it. Exhausting it is now reported as `rate-limited` rather than
+ * looking identical to the feature being broken, which is how ten went unnoticed
+ * as being too few.
+ */
+const RATE_LIMIT = 25;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 // Best-effort only: edge instances are ephemeral and regional, so this caps a
@@ -94,6 +110,27 @@ const rateLimited = (ip) => {
   hits.set(ip, recent);
   if (hits.size > 5000) hits.clear();
   return recent.length > RATE_LIMIT;
+};
+
+// Loose on purpose: it only has to reject junk, not prove an address routable.
+const IP_SHAPE = /^[0-9a-f.:]{2,45}$/i;
+
+/*
+  The key the rate limit counts against. The leftmost `x-forwarded-for` entry is
+  whatever the client typed, so reading it let one visitor rotate through
+  unlimited buckets. Vercel's edge sets `x-vercel-forwarded-for` and `x-real-ip`
+  itself, so those win. Failing both, the rightmost forwarded entry is the one
+  the nearest proxy appended, which the client cannot choose. Anything that is
+  not shaped like an address shares one bucket rather than minting a new one.
+*/
+const clientKey = (request) => {
+  const { headers } = request;
+  const platform = (headers.get('x-vercel-forwarded-for') ?? headers.get('x-real-ip'))
+    ?.split(',')[0]?.trim();
+  const forwarded = headers.get('x-forwarded-for')
+    ?.split(',').map(part => part.trim()).filter(Boolean).at(-1);
+  const ip = platform || forwarded;
+  return ip && IP_SHAPE.test(ip) ? ip.toLowerCase() : 'unknown';
 };
 
 /**
@@ -143,20 +180,111 @@ const fetchSources = async (origin) => {
   return sourceCache;
 };
 
+/**
+ * Not every reason belongs in a reply to an anonymous caller.
+ *
+ * Three of these describe the visitor's own situation rather than this
+ * endpoint's internals, and are worth keeping precise everywhere: what they
+ * asked for was malformed, they have spent their allowance, or the site
+ * genuinely has nothing written on the subject. The two routing outcomes are
+ * the same kind of thing — they say where the material for a reply that was
+ * successfully drafted came from, not whether a dependency is up.
+ */
+const PUBLIC_REASONS = new Set([
+  '',
+  'bad-request',
+  'rate-limited',
+  'no-material',
+  'router-sourced',
+  'router-declined',
+]);
+
+/**
+ * The rest — `no-key`, `answers-unavailable`, `router-error`, `provider-error`
+ * — say which dependency this endpoint has and whether it is currently up. The
+ * code is public, so the architecture is not the secret; the live health of it
+ * is, and a header anyone can poll for it is a free availability monitor, one
+ * that `no-store` does not stop an intermediary from reading.
+ *
+ * So production ships a bucket instead: `unavailable` when the request fell
+ * back, `degraded` when a reply was drafted anyway despite something failing —
+ * two states that are worth telling apart and neither of which names a cause.
+ *
+ * The detail is not dropped, only moved to where whoever is debugging already
+ * looks. It is logged here rather than at each return, so no path can report a
+ * cause to the browser that the runtime logs do not have — several of these
+ * reasons are not exceptions and had nothing logged at all.
+ *
+ * Detail is opt-in, so the default is the safe one wherever this runs: set
+ * `ASK_DETAILED_REASONS=1`, which a preview deploy or a local `vercel dev` can
+ * carry and production does not. A reason added later is coarse in production
+ * until someone puts it in the set above, which is the right way round.
+ */
+const detailedReasons = () => process.env.ASK_DETAILED_REASONS === '1';
+
+const publicReason = (source, reason) => {
+  if (PUBLIC_REASONS.has(reason) || detailedReasons()) return reason;
+  const bucket = source === 'generated' ? 'degraded' : 'unavailable';
+  console.error(`ask: reported ${bucket} —`, reason);
+  return bucket;
+};
+
 // `matchedBy` records which mechanism chose a reviewed answer — exact, router
 // or the local overlap fallback. Without it the three are indistinguishable at
 // the client, and whether routing is actually an improvement is unanswerable.
-const headers = (source, sources, answerId = '', matchedBy = '') => ({
+/**
+ * `reason` says why a fallback was a fallback.
+ *
+ * Every failure used to return byte-identical bytes: a routing timeout, a
+ * missing key, a spent rate limit and "the model looked and found nothing" were
+ * indistinguishable from outside, and the catch blocks threw the exception
+ * away. Diagnosing a live problem meant guessing. It is reported on the client's
+ * analytics event too, so the shape of the failure is visible without needing
+ * to reproduce it.
+ *
+ * What the browser is told is coarser than what is logged — see
+ * `publicReason`, which is the only place the header's value is decided.
+ */
+const headers = (source, sources, answerId = '', matchedBy = '', reason = '') => ({
   'Content-Type': 'text/plain; charset=utf-8',
   'Cache-Control': 'no-store',
   'X-Ask-Source': source,
   'X-Ask-Sources': sources.join(','),
   'X-Ask-Answer-Id': answerId,
   'X-Ask-Matched-By': matchedBy,
+  'X-Ask-Reason': publicReason(source, reason),
 });
 
-const textResponse = (body, source, sources = [], answerId = '', matchedBy = '') =>
-  new Response(body, { status: 200, headers: headers(source, sources, answerId, matchedBy) });
+const textResponse = (body, source, sources = [], answerId = '', matchedBy = '', reason = '') =>
+  new Response(body, { status: 200, headers: headers(source, sources, answerId, matchedBy, reason) });
+
+/**
+ * The endpoint degrades rather than erroring, which means a broken dependency
+ * looks exactly like a quiet day unless it is written down. These land in the
+ * Vercel runtime logs.
+ *
+ * Only the error's class and its machine-readable fields are written, never
+ * its message. Provider messages carry request IDs and account details, and
+ * some SDKs quote the prompt back — which here is a visitor's question. The
+ * class and status say which dependency broke and how, which is what the log
+ * is for. `detail` is for facts this file composes itself, never for text that
+ * came from a visitor or a model.
+ */
+const SAFE_CODE = /^[A-Za-z0-9_.-]{1,64}$/;
+
+const describe = (error) => {
+  if (!(error instanceof Error)) return `non-error thrown (${typeof error})`;
+  const parts = [SAFE_CODE.test(error.name) ? error.name : 'Error'];
+  const status = error.statusCode ?? error.status;
+  if (Number.isInteger(status)) parts.push(`status ${status}`);
+  const code = error.code ?? error.cause?.code;
+  if (typeof code === 'string' && SAFE_CODE.test(code)) parts.push(`code ${code}`);
+  return parts.join(', ');
+};
+
+const note = (stage, error, detail = '') => {
+  console.error(`ask: ${stage} failed —`, detail || describe(error));
+};
 
 const hasText = (chunk) => typeof chunk === 'string'
   ? chunk.length > 0
@@ -284,18 +412,19 @@ export const createHandler = ({
   try {
     body = await request.json();
   } catch {
-    return textResponse('', 'fallback');
+    return textResponse('', 'fallback', [], '', '', 'bad-request');
   }
   const question = String(body?.question ?? '').trim().slice(0, MAX_QUESTION_CHARS);
-  if (!question) return textResponse('', 'fallback');
+  if (!question) return textResponse('', 'fallback', [], '', '', 'bad-request');
 
   let approved, index, studies;
   try {
     ({ answers: approved, index, studies = [] } = await loadAnswers(request.url));
-  } catch {
-    return textResponse('', 'fallback');
+  } catch (error) {
+    note('loading the answers', error);
+    return textResponse('', 'fallback', [], '', '', 'answers-unavailable');
   }
-  if (!approved.length) return textResponse('', 'fallback');
+  if (!approved.length) return textResponse('', 'fallback', [], '', '', 'answers-unavailable');
 
   const reviewed = (answer, matchedBy) =>
     textResponse(answer.answer, 'reviewed', answer.sources ?? [], answer.id, matchedBy);
@@ -305,15 +434,19 @@ export const createHandler = ({
   const hit = matchQuestion(question, index);
   if (hit?.exact) return reviewed(hit.answer, 'exact');
 
-  // A non-exact hit is held, not returned. Token overlap is confidently wrong
-  // often enough that it is the fallback for a routing failure, not the answer:
-  // "is he a manager" scored 1.00 against a refusal answer.
-  const local = hit ? () => reviewed(hit.answer, 'local') : null;
+  // A non-exact hit is deliberately not held for later either. Token overlap is
+  // confidently wrong often enough that there is no path on which serving it is
+  // right: "is he a manager" scored 1.00 against a refusal answer. It would
+  // arrive labelled as reviewed, which a draft never does.
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip = clientKey(request);
   // Counted once per request, before any model is touched, so a question that
-  // routes and then drafts still costs the visitor one of their six.
-  const unavailable = !hasApiKey() || rateLimited(ip);
+  // routes and then drafts still costs the visitor one of their six. Which
+  // check failed is kept, not re-derived later: reading the key a second time
+  // could name the wrong cause. Without a key the visitor is not counted.
+  const missingKey = !hasApiKey();
+  const limited = !missingKey && rateLimited(ip);
+  const unavailable = missingKey || limited;
 
   // 2. Ask the router what this question needs. It sees every written question,
   // because the right answer often shares no vocabulary with how the visitor
@@ -321,6 +454,14 @@ export const createHandler = ({
   // visitor's vocabulary either — "fintech" appears in none of them.
   let declined = false;
   let named = [];
+  let routerFailed = null;
+  /*
+    A routing problem followed by a drafting problem is a different situation
+    from either alone, and the reason is one string. Reporting only the later
+    stage erased the earlier one, so "the router returned nonsense and then the
+    provider fell over" was indistinguishable from a clean provider outage.
+  */
+  const because = (stage) => (routerFailed ? `${routerFailed}+${stage}` : stage);
   if (!unavailable) {
     try {
       const raw = await route({
@@ -335,7 +476,8 @@ export const createHandler = ({
       // answer.
       const text = String(raw ?? '').trim();
 
-      const answerId = /^ANSWER:\s*(.+)$/im.exec(text)?.[1] ?? text;
+      const answerLine = /^ANSWER:\s*(.+)$/im.exec(text)?.[1];
+      const answerId = answerLine ?? text;
       const picked = approved.find(a => a.id === answerId.trim().replace(/[^A-Za-z0-9-]/g, ''));
       if (picked) return reviewed(picked, 'router');
 
@@ -356,33 +498,49 @@ export const createHandler = ({
       // Everything else — empty, truncated, a stray token — decided nothing,
       // and must not be read as a decision. Treating those as NONE threw away
       // an answer the site already had.
-      if (named.length || /\bnone\b/i.test(text)) declined = true;
-    } catch {
-      // Timed out, rate limited upstream, provider down. Nothing was decided.
+      //
+      // An ANSWER line whose id matched nothing is its own failure. It chose,
+      // and chose something that does not exist — and an id like
+      // `none-of-the-above` would otherwise have been read as a decline.
+      if (named.length) {
+        declined = true;
+      } else if (answerLine !== undefined && !/^none\W*$/i.test(answerLine.trim())) {
+        note('routing', `picked an id that does not exist: ${JSON.stringify(answerLine.slice(0, 120))}`);
+        routerFailed = 'router-picked-invalid';
+      } else if (/\bnone\b/i.test(text)) {
+        declined = true;
+      } else {
+        // Logged like any other routing failure; it was marked and never
+        // recorded. Only its shape is logged, not its text: it is model
+        // output, and can echo the visitor's question.
+        note('routing', null, `unreadable response (${text.trim() ? `${text.length} chars` : 'empty'})`);
+        routerFailed = 'router-unreadable';
+      }
+    } catch (error) {
+      // Timed out, rate limited upstream, provider down. Nothing was decided —
+      // but it is recorded now rather than swallowed, because this catch is
+      // where a working feature turned into "no answer" with no way to tell.
+      note('routing', error);
+      routerFailed = 'router-error';
     }
   }
 
-  // 3. Nothing judged this question — the router could not run, or answered
-  // with something unreadable.
+  // 3. The router did not choose. That is not a reason to answer nothing.
   //
-  // Neither serve a loose overlap match nor draft. A loose match is exactly
-  // what this endpoint exists to stop serving: "what is the strongest fintech
-  // case study he has" scores 0.56 against the Wisdom Management Portal, which
-  // is healthcare. And drafting without the router means drafting without
-  // knowing which case studies are relevant, since the studies do not use a
-  // visitor's vocabulary — so it would be guessing too, at more cost.
+  // A loose overlap match is still never served — it would masquerade as a
+  // reviewed answer, and "what is the strongest fintech case study he has"
+  // scores 0.56 against the Wisdom Management Portal, which is healthcare.
   //
-  // An exact hit was already served at step 1 and never reaches here. The
-  // written miss, with the nearest case study and an email route, is what is
-  // left, and it is the honest answer.
+  // But drafting is a different matter, and this reverses the call I made last
+  // round. I skipped it here on the grounds that without the router we do not
+  // know which studies are relevant. Since then the case-study tags are indexed,
+  // so a plain search finds Connect API for every phrasing of a fintech
+  // question I tried; and the cost of the old behaviour turned out to be that
+  // one routing timeout produced "no written answer" for every typed question
+  // on the site. A labelled draft built from published prose beats that.
   //
-  // This reverses an earlier decision to always fall back to the local match.
-  // That was meant to keep the feature no worse than before routing existed —
-  // but before routing existed was the broken state, and this is the path where
-  // it kept resurfacing.
-  if (!declined && !named.length) {
-    return textResponse('', 'fallback', local ? hit.answer.sources ?? [] : []);
-  }
+  // So a routing failure falls through to drafting with no hint, rather than
+  // stopping here.
 
   // 4. Draft. Grounded in the reviewed answers nearest the question, plus
   // excerpts from the case studies the router named — without those the model
@@ -396,14 +554,23 @@ export const createHandler = ({
   const context = named.length
     ? nearest.filter(a => (a.sources ?? []).some(id => named.includes(id)))
     : nearest;
+  // Sections are retrieved whether or not the router named studies. With a name
+  // the search is scoped to it, which is far more accurate; without one it runs
+  // across the corpus, which the indexed tags made viable. Unscoped retrieval is
+  // imprecise, but it is published prose either way, the model is told to say
+  // when the material does not cover the question, and the reply is labelled.
   let sections = [];
-  if (named.length) {
+  if (!unavailable) {
     try {
       const { index: sourceIndex } = await loadSources(request.url);
-      sections = retrieveSections(question, sourceIndex, { limit: SOURCE_SECTIONS, caseStudies: named });
-    } catch {
-      // The sources file is unreachable. Drafting still works from the reviewed
-      // answers alone, which is what it did before retrieval existed.
+      sections = retrieveSections(question, sourceIndex, {
+        limit: SOURCE_SECTIONS,
+        caseStudies: named.length ? named : null,
+      });
+    } catch (error) {
+      // Drafting still works from the reviewed answers alone, which is what it
+      // did before retrieval existed.
+      note('loading the case studies', error);
     }
   }
 
@@ -420,12 +587,26 @@ export const createHandler = ({
     ...(named.length ? answerSources.filter(id => named.includes(id)) : answerSources),
   ])];
 
-  // Nothing shares any vocabulary with the question and the router named
-  // nothing, so there is nothing to ground a reply in. Asking the model anyway
-  // would mean asking it to speak from an empty context, which is the one thing
-  // this design exists to prevent.
-  if (!context.length && !sections.length) return textResponse('', 'fallback');
-  if (unavailable) return textResponse('', 'fallback', sources);
+  // Whether we could look comes before whether we found anything.
+  //
+  // Retrieval is skipped entirely when there is no key or the visitor is out of
+  // requests, so `sections` is empty for a reason that has nothing to do with
+  // the corpus. Testing for material first reported `no-material` — that the
+  // site had nothing to say — when the truth was that it never looked. A reason
+  // naming the wrong cause is worse than none, since it sends whoever is
+  // debugging somewhere else entirely.
+  if (unavailable) {
+    return textResponse('', 'fallback', sources, '', '',
+      missingKey ? 'no-key' : 'rate-limited');
+  }
+
+  // Now it means what it says: we looked, and nothing shares any vocabulary
+  // with the question. Asking the model anyway would mean asking it to speak
+  // from an empty context, which is the one thing this design exists to
+  // prevent.
+  if (!context.length && !sections.length) {
+    return textResponse('', 'fallback', [], '', '', 'no-material');
+  }
 
   const material = [
     context.length
@@ -442,10 +623,21 @@ export const createHandler = ({
       prompt: question,
     });
     const responseStream = await readUntilText(stream);
-    if (!responseStream) return textResponse('', 'fallback', sources);
-    return new Response(responseStream, { status: 200, headers: headers('generated', sources) });
-  } catch {
-    return textResponse('', 'fallback', sources);
+    if (!responseStream) return textResponse('', 'fallback', sources, '', '', because('empty-draft'));
+    return new Response(responseStream, {
+      status: 200,
+      // Naming studies and declining are both "no written answer fits", but
+      // they are different routing outcomes and only one of them found
+      // material. Reporting both as declined hid which had happened.
+      //
+      // Every branch above sets one of these, but an empty reason is what this
+      // header exists to prevent, so a routing outcome nobody classified says so.
+      headers: headers('generated', sources, '', '',
+        routerFailed ?? (named.length ? 'router-sourced' : declined ? 'router-declined' : 'router-unclassified')),
+    });
+  } catch (error) {
+    note('drafting', error);
+    return textResponse('', 'fallback', sources, '', '', because('provider-error'));
   }
 };
 
