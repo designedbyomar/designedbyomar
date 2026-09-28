@@ -32,22 +32,52 @@ export const config = { runtime: 'edge' };
  * be tested without a key, a network, or module mocking — and so swapping
  * provider is a change to this function alone.
  */
+/*
+  Both models reason before answering, and the previous ones did not.
+
+  gpt-oss emits chain-of-thought first, and those tokens come out of the same
+  allowance as the answer. Every ceiling in this file was sized for a model that
+  returns nothing but the answer, so carrying them over would have spent the
+  budget on thinking and truncated or emptied what followed — the router's line
+  never written, the draft cut off. Silent degradation again, of exactly the
+  kind that took production logging to find.
+
+  `reasoningFormat: 'hidden'` keeps the thinking out of `text`, so the parser
+  and the visitor both see only the answer. `reasoningEffort: 'low'` keeps it
+  brief without switching it off: choosing among 55 written questions and 8 case
+  studies is the judgement this endpoint exists for, and that judgement has been
+  the recurring problem.
+*/
+export const REASONING = { groq: { reasoningFormat: 'hidden', reasoningEffort: 'low' } };
+
+/**
+ * The only place the provider is touched. Injectable so the routing logic can
+ * be tested without a key, a network, or module mocking — and so swapping
+ * provider is a change to this function alone.
+ */
 const generateFromGroq = ({ system, prompt }) => streamText({
   model: groq(MODEL),
   system,
   prompt,
   temperature: 0.2,
-  maxOutputTokens: 200,
+  // 60–110 words of prose is about 150 tokens, so 200 left almost no headroom
+  // even before reasoning had to fit alongside it.
+  maxOutputTokens: DRAFT_TOKENS,
+  providerOptions: REASONING,
   abortSignal: AbortSignal.timeout(TIMEOUT_MS),
 }).textStream;
 
 /**
  * Routing is a different job from writing, on a different model.
  *
- * It returns an id, so it wants determinism and speed, not prose — hence
- * temperature 0, a 20-token ceiling and a shorter timeout. Groq meters
- * per model, so routing does not draw down the budget the drafting model
- * needs, and a routing outage cannot take drafting with it.
+ * It returns one line, so it wants determinism and speed, not prose — hence
+ * temperature 0 and a shorter timeout. Groq meters per model, so routing does
+ * not draw down the budget drafting needs, and a routing outage cannot take
+ * drafting with it.
+ *
+ * The ceiling is far above what one line costs. Nothing is charged for tokens
+ * that are not generated, and the alternative failure — truncating before the
+ * answer — is invisible.
  */
 const routeWithGroq = async ({ system, prompt }) => {
   const { text } = await generateText({
@@ -55,14 +85,57 @@ const routeWithGroq = async ({ system, prompt }) => {
     system,
     prompt,
     temperature: 0,
-    maxOutputTokens: 20,
+    maxOutputTokens: ROUTE_TOKENS,
+    providerOptions: REASONING,
     abortSignal: AbortSignal.timeout(ROUTER_TIMEOUT_MS),
   });
   return text;
 };
 
-const MODEL = 'llama-3.3-70b-versatile';
-const ROUTER_MODEL = 'llama-3.1-8b-instant';
+/*
+  Both previous models returned 404 from Groq in production —
+  "does not exist or you do not have access to it" — which is a permanent,
+  silent failure: the request never errors, it just degrades, so the feature
+  switched itself off and looked like a quiet day. The runtime logs named it
+  once the logging landed.
+
+  `llama-3.1-8b-instant` was announced for deprecation in June and shut down on
+  16 August 2026, with `openai/gpt-oss-20b` given as its replacement.
+  `llama-3.3-70b-versatile` is not listed as deprecated, but returns the same
+  404 for this account, so it is not something this can depend on either.
+
+  Overridable by environment variable, because this is the second time a model
+  id has expired underneath the site and a retirement should not need a code
+  change and a deploy to survive. Defaults are the current production models.
+*/
+export const MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+export const ROUTER_MODEL = process.env.GROQ_ROUTER_MODEL || 'openai/gpt-oss-20b';
+
+// Output ceilings, exported so a test can check them rather than read the file.
+export const DRAFT_TOKENS = 700;
+export const ROUTE_TOKENS = 256;
+
+/*
+  Model ids known not to work here — which is not the same as "retired", and the
+  difference is worth keeping straight for whoever reads this next.
+
+  Most of these Groq has decommissioned outright. `llama-3.3-70b-versatile` has
+  not been: it is still listed as current, still in the provider's own model
+  union, and still returns 404 for this account. Someone going looking for its
+  deprecation notice will not find one.
+
+  Either way it must not come back. The list existed without it, which meant
+  restoring the id that actually caused the outage would have passed the guard
+  built to prevent it.
+*/
+export const UNUSABLE_MODELS = new Set([
+  'llama-3.1-8b-instant',
+  'llama-3.1-70b-versatile',
+  'llama-3.3-70b-versatile',
+  'llama-3.3-70b-specdec',
+  'mixtral-8x7b-32768',
+  'gemma-7b-it',
+]);
 const CONTEXT_ANSWERS = 3;
 // Four excerpts of at most 180 words each, so the material stays well inside
 // one request's budget even when the router names two studies.
@@ -507,7 +580,16 @@ export const createHandler = ({
       } else if (answerLine !== undefined && !/^none\W*$/i.test(answerLine.trim())) {
         note('routing', `picked an id that does not exist: ${JSON.stringify(answerLine.slice(0, 120))}`);
         routerFailed = 'router-picked-invalid';
-      } else if (/\bnone\b/i.test(text)) {
+      // A decline, in either form it arrives in: `ANSWER: NONE`, which the
+      // branch above has already singled out, or NONE on a line of its own.
+      //
+      // It has to be a whole line, not a word anywhere in the body. Loose
+      // matching was safe against a model that replied with one word; a
+      // reasoning model writes prose, and a stray "none of these mention…"
+      // would read as a considered decline and skip a written answer the site
+      // had. `reasoningFormat: 'hidden'` should keep that prose out of `text`
+      // — this is what holds if a provider ever ignores the hint.
+      } else if (answerLine !== undefined || /^\s*none\W*$/im.test(text)) {
         declined = true;
       } else {
         // Logged like any other routing failure; it was marked and never
