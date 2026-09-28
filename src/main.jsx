@@ -2460,7 +2460,16 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           </p>
         )}
 
-        {drafted && (
+        {drafted && (() => {
+          // The chips and the inline links must cite the same studies. The chips
+          // show at most three, so the inline linker is given exactly that set —
+          // otherwise a fourth cited study could be linked in the prose with no
+          // matching chip beneath it.
+          const citedStudies = (drafted.sources ?? [])
+            .map(id => CASE_STUDIES.find(c => c.id === id))
+            .filter(Boolean)
+            .slice(0, 3);
+          return (
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -2478,16 +2487,13 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
             }}>
               Drafted, not reviewed
             </div>
-            <AnswerBody text={drafted.text} citedIds={drafted.sources ?? []} answerId="drafted" />
+            <AnswerBody text={drafted.text} citedIds={citedStudies.map(c => c.id)} answerId="drafted" />
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
               There is no written answer to that question, so this was drafted from the published
               answers below and has not been reviewed. For anything that matters, email Omar.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              {drafted.sources
-                .map(id => CASE_STUDIES.find(c => c.id === id))
-                .filter(Boolean)
-                .slice(0, 3)
+              {citedStudies
                 .map(caseStudy => (
                   <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'drafted', case_study_id: caseStudy.id })} style={{
                     display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
@@ -2510,7 +2516,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
               </a>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {missed && (
           <div style={{
