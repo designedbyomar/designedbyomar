@@ -121,3 +121,17 @@ test('a backslash before a pipe cannot break a cell open', () => {
   const row = render(misses, [], { days: 30 }).split('\n').find((l) => l.includes('really'));
   assert.deepEqual(cellsOf(row), ['1', 'what about C:\\|really', 'no-material', 'work-history']);
 });
+
+// What a Markdown renderer would still act on in a rendered row: the syntax
+// characters left unescaped. Structural pipes are excluded — those are the table.
+const activeSyntax = (row) => row.replace(/\\[\s\S]/g, '').match(/[`*_[\]<>~]/g) ?? [];
+
+test('a question is shown as typed, not read as Markdown syntax', () => {
+  // Escaping the backslash left the character after it live, so a question
+  // containing `\*sprints\*` rendered the word emphasised instead of as entered.
+  const asked = 'why \\*sprints\\* and not `retainers`_ever_';
+  const misses = aggregateMisses([missRow(asked, 'no-material', 'work-history', 'draft', 1)]);
+  const row = render(misses, [], { days: 30 }).split('\n').find((l) => l.includes('sprints'));
+  assert.deepEqual(activeSyntax(row), []);
+  assert.equal(cellsOf(row)[1], asked);
+});

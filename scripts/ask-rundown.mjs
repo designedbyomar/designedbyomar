@@ -71,7 +71,10 @@ export const isRealValue = (value) => {
 
 const norm = (s) => (s ?? '').trim().replace(/\s+/g, ' ');
 const clean = (v) => (isRealValue(v) ? norm(v) : '');
-const escapeCell = (s) => String(s).replace(/[\\|]/g, '\\$&');
+// A question is shown verbatim, so every character Markdown could read as syntax
+// inside a table cell is escaped — the backslash among them and in the same pass,
+// or a value ending in one would consume the escape meant for what follows it.
+const escapeCell = (s) => String(s).replace(/[\\`*_[\]<>~|]/g, '\\$&');
 const topOf = (map) => [...map.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
 
 /**
