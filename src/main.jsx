@@ -143,7 +143,7 @@ const HERO_STATS = [
     motion: { phase: 0.2, radiusX: 7, radiusY: 4, boostX: 8, boostY: 5, parallaxX: -0.34, parallaxY: -0.14, rotate: 1.2, rotateBoost: 0.8, rotateDir: -1 },
   },
   {
-    value: '500+ interviews',
+    value: '500+ research interviews',
     label: 'Career-wide · customers, operators, teams',
     desktop: { top: '72%', left: '-10%', maxWidth: 180 },
     mobile: { top: '63%', left: '-2%', maxWidth: 150 },
