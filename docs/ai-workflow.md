@@ -15,6 +15,7 @@ The point of this artifact is to be honest about that boundary.
 | Figma | Source of truth for visual design, component specs, and design tokens before they land in code |
 | CodeRabbit / Greptile | External PR review passes for code quality, repo-specific risks, and missed regressions |
 | Sharp | Image optimization (`scripts/optimize-image.mjs`) |
+| Ask rundown | Local authoring aid (`scripts/ask-rundown.mjs`, `npm run ask:rundown`) — ranks visitor questions with no written answer, from the GA4 events the site already sends, so recurring gaps get written up as reviewed answers |
 | Google Analytics 4 / Vercel Analytics / Speed Insights / Sentry | Production feedback — what real users hit, what's useful, what's slow, what errors fire |
 
 ---
@@ -43,6 +44,7 @@ The point of this artifact is to be honest about that boundary.
 5. **Production telemetry.** GA4 and Vercel Analytics show which pages and interactions are useful. Speed Insights flags real-user performance regressions before they show up in Lighthouse. Sentry catches what made it through.
 6. **Postbuild SEO verification.** After each build, `dist/work/*/index.html` is spot-checked to confirm canonical, OG, and JSON-LD are correctly templated per case study.
 7. **Reduced-motion + responsive checks.** The canvas / motion components honor `prefers-reduced-motion`; layout is reviewed at mobile, tablet, layout, and desktop breakpoints (see `LAYOUT` constants in [`src/constants.js`](../src/constants.js)).
+8. **Ask answers written from real gaps.** `npm run ask:rundown` pulls the `ask_no_match` questions GA4 already records and ranks the ones with no written answer, so the reviewed set grows toward what visitors actually ask — and every answer written this way is one fewer a model has to draft. Requires one-time GA4 setup (event-scoped custom dimensions for the `question`, `reason`, `nearest_id` and `answered_by` params, a read-only service account, and the numeric property id); see the script header for details.
 
 ### Automatic commit and PR handoff
 
