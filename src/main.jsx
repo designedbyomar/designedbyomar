@@ -143,7 +143,7 @@ const HERO_STATS = [
     motion: { phase: 0.2, radiusX: 7, radiusY: 4, boostX: 8, boostY: 5, parallaxX: -0.34, parallaxY: -0.14, rotate: 1.2, rotateBoost: 0.8, rotateDir: -1 },
   },
   {
-    value: '500+ interviews',
+    value: '500+ research interviews',
     label: 'Career-wide · customers, operators, teams',
     desktop: { top: '72%', left: '-10%', maxWidth: 180 },
     mobile: { top: '63%', left: '-2%', maxWidth: 150 },
@@ -1938,6 +1938,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const [copyState, setCopyState] = React.useState('idle');
   const [suggestionsExpanded, setSuggestionsExpanded] = React.useState(false);
   const suggestionListRef = React.useRef(null);
+  const reasonRef = React.useRef('');
   // Set only by the expand control, so focus is never taken on mount, on
   // collapse, or when the row switches to follow-ups.
   const focusRevealedRef = React.useRef(false);
@@ -2136,6 +2137,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
    * shipped before any of this existed.
    */
   const ask = async (asked, near) => {
+    reasonRef.current = '';
     const token = requestRef.current;
     const controller = new AbortController();
     abortRef.current = controller;
@@ -2153,6 +2155,9 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
       const kind = response.headers.get('X-Ask-Source');
       const sourceIds = (response.headers.get('X-Ask-Sources') ?? '').split(',').filter(Boolean);
+      // Why the endpoint did what it did. Reported so a failure shows up as a
+      // pattern in analytics rather than needing to be reproduced live.
+      reasonRef.current = response.headers.get('X-Ask-Reason') || '';
 
       if (kind === 'reviewed') {
         const id = response.headers.get('X-Ask-Answer-Id');
@@ -2246,6 +2251,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         question: asked,
         nearest_id: near?.id ?? 'none',
         answered_by: answered,
+        reason: reasonRef.current || 'none',
         local_score: hit ? Math.round(hit.score * 100) / 100 : 0,
       });
     });

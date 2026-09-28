@@ -107,6 +107,9 @@ const SECTIONS = [
     title: 'Connect API Payments',
     heading: 'Challenge',
     text: 'Plastiq Connect let a partner put card and bank payments inside its own product, under its own brand, with Plastiq carrying the compliance and the disbursement.',
+    // The build puts the tags on every section. Without them here the fixture
+    // would not exercise the path that makes an unscoped search work at all.
+    labels: 'Fintech API Developer Experience B2B Plastiq Lead Product Designer',
   },
   {
     id: 'connect-api#1',
@@ -114,6 +117,7 @@ const SECTIONS = [
     title: 'Connect API Payments',
     heading: 'Approach',
     text: 'Benchmarking against Stripe Connect settled what the product competed on: letting a partner hand over PCI scope and risk operations rather than build and certify them.',
+    labels: 'Fintech API Developer Experience B2B Plastiq Lead Product Designer',
   },
   {
     id: 'athena-ds#0',
@@ -121,6 +125,7 @@ const SECTIONS = [
     title: 'Athena Design System 2.0',
     heading: 'Challenge',
     text: 'Nomenclature and patterns had diverged across every product, so an audit came before a single asset was produced.',
+    labels: 'Design System Enterprise Cross-functional Plastiq',
   },
 ];
 
@@ -202,14 +207,17 @@ test('an id the router invented is never served', async () => {
  * other would pass a looser test.
  */
 /**
- * Nothing decided this question, so nothing may be served loosely.
+ * A router that decided nothing must not stop a draft.
  *
- * This reverses an earlier call. Serving the local overlap match whenever the
- * model could not run was meant to keep the feature "no worse than before
- * routing existed" — but before routing existed was the broken state, and that
- * path is where it kept surfacing: "what is the strongest fintech case study he
- * has" scores 0.56 against the Wisdom Management Portal, which is healthcare.
- * An exact hit is still served; anything looser gets the written miss.
+ * This reverses the previous behaviour, where an unreadable or failed routing
+ * response returned the written miss and never reached the model. The reasoning
+ * was that without the router we do not know which studies are relevant. What
+ * it cost in practice was that one routing timeout produced "no written answer"
+ * for every typed question on the site — which is what was reported.
+ *
+ * A loose overlap match is still never served: it would arrive labelled as
+ * reviewed. A draft is labelled as a draft, which is why one is acceptable here
+ * and the other is not.
  */
 for (const [label, routeReturns] of [
   ['an empty response', ''],
@@ -218,14 +226,36 @@ for (const [label, routeReturns] of [
   ['an id that does not exist', 'leadership-and-vision'],
   ['a refusal to answer', 'I cannot help with that'],
 ]) {
-  test(`${label} from the router serves no answer at all, loose or drafted`, async () => {
+  test(`${label} from the router still reaches a draft`, async () => {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${label} must not be acted on`);
-    assert.equal(calls.length, 0, 'and must not reach drafting either');
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must still draft`);
+    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Reason'), 'router-unreadable');
+
+    // Never the loose match, which here is a refusal answer scoring 1.00.
+    assert.notEqual(response.headers.get('X-Ask-Matched-By'), 'local');
   });
 }
+
+test('a router that throws still reaches a draft, and says why', async () => {
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  const response = await handler(post('is he a manager'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'router-error');
+  assert.equal(calls.length, 1, 'drafting does not need the router, only material');
+});
+
+test('without the router, sections are retrieved across the whole corpus', async () => {
+  // The scoped search is more accurate, but an unscoped one is what makes
+  // drafting survive a routing failure at all.
+  const { handler, calls } = loadHandler({ routeThrows: true });
+  await handler(post('what fintech work has he done'));
+
+  assert.match(calls[0].system, /CASE STUDY EXCERPTS:/, 'material still reaches the model');
+});
 
 test('an exact hit is still served when the router cannot run', async () => {
   // The carve-out: a verbatim question is the one result overlap cannot get
@@ -263,14 +293,15 @@ test('NONE means draft, even when token overlap thought it had a match', async (
   assert.equal(calls.length, 1);
 });
 
-test('a router failure serves the written miss, not the loose local match', async () => {
-  const { handler, calls } = loadHandler({ routeThrows: true });
-  const response = await handler(post('is he a manager'));
-
-  // The local match here is a refusal answer at 1.00 — the original bug. When
-  // nothing has judged the question, it is not served.
-  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
-  assert.equal(calls.length, 0, 'and drafting is not attempted blind either');
+test('a loose overlap match is never served, on any path', async () => {
+  // "is he a manager" scores 1.00 against a refusal answer. Whatever else
+  // happens, that must not come back looking like a reviewed answer.
+  for (const options of [{ routeThrows: true }, { routeReturns: 'NONE' }, { routeReturns: '' }]) {
+    const { handler } = loadHandler(options);
+    const response = await handler(post('is he a manager'));
+    assert.notEqual(response.headers.get('X-Ask-Matched-By'), 'local', JSON.stringify(options));
+    assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'refuse-employer-opinions');
+  }
 });
 
 test('with no key nothing loose is served', async () => {
@@ -345,10 +376,18 @@ test('one visitor cannot drain the daily quota', async () => {
   const sources = [];
   // Comfortably past the per-visitor ceiling, so the test does not have to be
   // edited every time that number moves.
-  for (let i = 0; i < 20; i += 1) sources.push((await handler(sameVisitor())).headers.get('X-Ask-Source'));
+  // Past the ceiling whatever it is set to, so moving that number does not
+  // silently turn this test into one that never reaches the limit.
+  const attempts = [];
+  for (let i = 0; i < 40; i += 1) {
+    const response = await handler(sameVisitor());
+    sources.push(response.headers.get('X-Ask-Source'));
+    attempts.push(response.headers.get('X-Ask-Reason'));
+  }
 
   assert.ok(sources.includes('generated'), 'early requests are answered');
   assert.equal(sources.at(-1), 'fallback', 'later requests from the same visitor are capped');
+  assert.equal(attempts.at(-1), 'rate-limited', 'and say so, rather than looking broken');
 });
 
 test('a malformed or empty request never errors', async () => {
@@ -591,5 +630,73 @@ test('citations name only the studies the draft was given', async () => {
   assert.ok(cited.includes('connect-api'));
   for (const id of threeStudies.sources.filter(s => s !== 'connect-api')) {
     assert.ok(!cited.includes(id), `cited ${id}, which was never named or retrieved`);
+  }
+});
+
+/**
+ * Every failure used to return byte-identical bytes.
+ *
+ * A routing timeout, a missing key, a spent rate limit and "the model looked
+ * and found nothing" were indistinguishable from outside, and the catches threw
+ * the exception away — so diagnosing a live problem meant guessing at it from a
+ * screenshot. Each cause now names itself.
+ */
+test('a missing key says so', async () => {
+  const { handler } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-key');
+});
+
+test('a question nothing covers at all says so', async () => {
+  const { handler, calls } = loadHandler();
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-material');
+  assert.equal(calls.length, 0, 'and the model is not asked to speak from nothing');
+});
+
+test('a provider failure while drafting says so', async () => {
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'provider-error');
+});
+
+test('an unreadable request says so', async () => {
+  const { handler } = loadHandler();
+  const response = await handler(new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '198.51.100.7' },
+    body: 'not json',
+  }));
+
+  assert.equal(response.headers.get('X-Ask-Reason'), 'bad-request');
+});
+
+test('a successful draft records whether the router chose or failed', async () => {
+  const declined = await (loadHandler({ routeReturns: 'NONE' })).handler(post('what fintech work has he done'));
+  assert.equal(declined.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+
+  const failed = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
+  assert.equal(failed.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(failed.headers.get('X-Ask-Reason'), 'router-error');
+});
+
+test('every fallback names a cause', async () => {
+  // A reason of '' would put this back where it started.
+  for (const [label, options, question] of [
+    ['no key', { hasApiKey: false }, 'what fintech work has he done'],
+    ['nothing relevant', {}, 'how do penguins pay for parking in antarctica'],
+    ['provider down', { routeReturns: 'SOURCES: connect-api', generateThrows: true }, 'what fintech work has he done'],
+  ]) {
+    const { handler } = loadHandler(options);
+    const response = await handler(post(question));
+    if (response.headers.get('X-Ask-Source') !== 'fallback') continue;
+    assert.ok(response.headers.get('X-Ask-Reason'), `${label} returned a fallback with no reason`);
   }
 });
