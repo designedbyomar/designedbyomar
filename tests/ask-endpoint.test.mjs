@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, DRAFT_REASONING } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -57,6 +57,7 @@ const loadHandler = ({
   routeThrows = false,
   generateStalls = false,
   sourcesFail = false,
+  streamText = null,
 } = {}) => {
   const calls = [];
   const routeCalls = [];
@@ -83,7 +84,7 @@ const loadHandler = ({
       // Opens, then never yields and never closes — the case a provider-side
       // abort signal is supposed to catch, and which must be bounded here too.
       if (generateStalls) return new ReadableStream({ start() {}, cancel() {} });
-      return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
+      return new ReadableStream({ start(c) { c.enqueue(streamText ?? 'generated reply'); c.close(); } });
     },
   });
   return { handler, calls, routeCalls };
@@ -1014,8 +1015,17 @@ test('the models can be changed without a deploy', async () => {
  * the test this replaces claimed more than it checked.
  */
 test('reasoning is hidden from the text and kept brief', () => {
-  assert.equal(REASONING.groq.reasoningFormat, 'hidden', 'thinking must not reach the parser or the reader');
-  assert.ok(['none', 'low'].includes(REASONING.groq.reasoningEffort), 'and must not be lengthy');
+  for (const [role, options] of [['routing', REASONING], ['drafting', DRAFT_REASONING]]) {
+    assert.equal(options.groq.reasoningFormat, 'hidden', `${role} thinking must not reach the parser or the reader`);
+    assert.ok(['none', 'low'].includes(options.groq.reasoningEffort), `${role} must not deliberate at length`);
+  }
+
+  // Hiding the reasoning means nothing is emitted until it finishes, so the
+  // thinking time *is* the time to first token. Drafting is summarising
+  // material it was handed under rules it was given, so it does not deliberate
+  // at all — production timed out repeatedly waiting for it to.
+  assert.equal(DRAFT_REASONING.groq.reasoningEffort, 'none');
+  assert.equal(REASONING.groq.reasoningEffort, 'low', 'routing is the judgement call, and keeps its');
 });
 
 test('the output ceilings leave room for reasoning and the answer', () => {
@@ -1024,4 +1034,63 @@ test('the output ceilings leave room for reasoning and the answer', () => {
   assert.ok(DRAFT_TOKENS > 200, `drafting ceiling is ${DRAFT_TOKENS}; 200 barely fit the prose alone`);
   // A 60–110 word answer is roughly 150 tokens before any reasoning.
   assert.ok(DRAFT_TOKENS >= 400, 'drafting needs room for reasoning and the prose after it');
+});
+
+/**
+ * `textStream` yields strings; an edge Response body must yield Uint8Array.
+ *
+ * Passing the strings straight through was rejected — "This ReadableStream did
+ * not return bytes" — *after* the generated headers had been committed, so the
+ * response arrived announcing a draft with nothing in it and the panel rendered
+ * an empty "Drafted, not reviewed" card. The client decodes with
+ * TextDecoderStream, which needs bytes as well.
+ *
+ * It survived every test here because the stubs enqueue strings and nothing
+ * asserted what came back out. It survived production because the models were
+ * 404ing, so no draft ever reached the encoder.
+ */
+test('a drafted reply is streamed as bytes, and arrives intact', async () => {
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api' });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    assert.ok(
+      value instanceof Uint8Array,
+      `streamed a ${typeof value}; an edge Response body must yield Uint8Array`,
+    );
+    chunks.push(value);
+  }
+
+  assert.ok(chunks.length > 0, 'the body is not empty');
+  const text = new TextDecoder().decode(
+    chunks.reduce((all, chunk) => {
+      const merged = new Uint8Array(all.length + chunk.length);
+      merged.set(all);
+      merged.set(chunk, all.length);
+      return merged;
+    }, new Uint8Array()),
+  );
+  assert.equal(text, 'generated reply', 'and decodes back to what the provider sent');
+});
+
+test('a multi-byte character survives the encoding', async () => {
+  // Naive chunking splits a character across two chunks and corrupts it. The
+  // answers use em dashes and curly quotes throughout.
+  const { handler } = loadHandler({ streamText: 'Omar — “embedded payments” — Plastiq' });
+  const response = await handler(post('what fintech work has he done'));
+
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let text = '';
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    text += value;
+  }
+  assert.equal(text, 'Omar — “embedded payments” — Plastiq');
 });
