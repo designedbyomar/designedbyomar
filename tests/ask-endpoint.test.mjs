@@ -37,6 +37,7 @@ const approvedAnswers = doc.answers.filter(answer => answer.status === 'approved
  * routing without a key, a provider or a published file.
  */
 const loadHandler = ({
+  answers = approvedAnswers,
   generateThrows = false,
   generateStreamError = false,
   generateEmpty = false,
@@ -55,7 +56,7 @@ const loadHandler = ({
     hasApiKey: () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
-      return { answers: approvedAnswers, index: buildIndex(approvedAnswers), studies: STUDIES };
+      return { answers, index: buildIndex(answers), studies: STUDIES };
     },
     loadSources: async () => {
       if (sourcesFail) throw new Error('sources unavailable');
@@ -478,7 +479,12 @@ test('with the sources gone and no answer about the named study, it declines', a
   // The alternative would be drafting from whichever answers happened to rank
   // near the question — the prose the router had just rejected. Better to say
   // there is no answer than to write one from the wrong material.
-  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api', sourcesFail: true });
+  const answersWithoutConnect = approvedAnswers.filter(answer => !answer.sources?.includes('connect-api'));
+  const { handler, calls } = loadHandler({
+    answers: answersWithoutConnect,
+    routeReturns: 'SOURCES: connect-api',
+    sourcesFail: true,
+  });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');

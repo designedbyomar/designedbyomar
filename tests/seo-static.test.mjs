@@ -285,16 +285,24 @@ test('the Ask route ships every approved answer to non-JS consumers', () => {
   assert.ok(!types.includes('FAQPage'), '/ask does not claim FAQPage');
 });
 
-test('the Ask build withholds every draft from JSON and static HTML', () => {
+test('the Ask build publishes exactly the approved answer set', () => {
   const html = readDist('ask', 'index.html');
   const sourceAnswers = JSON.parse(readText('src', 'content', 'ask-answers.json')).answers;
+  const approvedIds = sourceAnswers
+    .filter((answer) => answer.status === 'approved')
+    .map((answer) => answer.id);
   const drafts = sourceAnswers.filter((answer) => answer.status === 'draft');
   const published = JSON.parse(readDist('ask-answers.json')).answers;
-  const publishedIds = new Set(published.map((answer) => answer.id));
+  const publishedIds = published.map((answer) => answer.id);
 
-  assert.ok(drafts.length > 0, 'the source has a draft to exercise the publication boundary');
+  assert.deepEqual(publishedIds, approvedIds, 'published answers match the approved source set');
+  for (const answer of published) {
+    assert.equal('status' in answer, false, `${answer.id} must not publish review status`);
+    assert.equal('review' in answer, false, `${answer.id} must not publish review metadata`);
+  }
+
   for (const answer of drafts) {
-    assert.equal(publishedIds.has(answer.id), false, `${answer.id} must not ship in ask-answers.json`);
+    assert.equal(publishedIds.includes(answer.id), false, `${answer.id} must not ship in ask-answers.json`);
     assert.equal(
       html.includes(`<h2>${escapeText(answer.question)}</h2>`),
       false,
