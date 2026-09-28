@@ -1268,15 +1268,23 @@ const ComponentsSection = () => (
           page also gives a case study somewhere to link back to — every citation leads out of the
           panel, and the reader needs a way back to asking.
         </DocCard>
+        <DocCard title="Draft, do not redirect" meta="When nothing is written">
+          A question the written set does not cover is not answered by whichever answer shares the
+          most words — that is how &ldquo;the strongest fintech case study&rdquo; returned a
+          healthcare one. The router names the case studies instead, excerpts of those are retrieved,
+          and a reply is drafted from them and labelled. The studies do not use a visitor&rsquo;s
+          vocabulary, which is why the model names them rather than a text search: the word
+          &ldquo;fintech&rdquo; appears in none of the 153 sections.
+        </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
           A confident wrong answer costs more than no answer. Deciding which written answer a question
           wants is the model&rsquo;s job, and it may decline; when it does, or when it picks nothing
           recognisable, the component drafts a labelled reply or offers the nearest case study plus
           email. Inverse-document-frequency weighted overlap over each answer&rsquo;s question and
-          aliases still runs in the browser, but only to catch a verbatim question and to answer at all
-          when the model cannot be reached. Its threshold and vocabulary floor govern that path alone
-          &mdash; relying on them for everything is what produced the wrong answers routing exists to
-          fix.
+          aliases still runs in the browser, but only to catch a verbatim question. A loose overlap
+          match is never served on its own — not even when the model cannot be reached, which is
+          the path where wrong answers kept resurfacing. Without a judgement, the panel says there is
+          no written answer and offers the nearest published work.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">
           Answers carry a review status and a fingerprint of the case studies they cite. Only approved

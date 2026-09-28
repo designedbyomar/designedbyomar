@@ -360,13 +360,112 @@ function caseStudyContentHtml(c) {
  * filtering at runtime still ships the text — and the answer set has no
  * business in the critical path when most visitors never open it.
  */
+/**
+ * The case studies, chunked into retrievable sections.
+ *
+ * The drafting model previously saw only the two or three nearest pre-written
+ * answers — roughly 270 words of summary — and never the case studies those
+ * answers summarise. So it could only ever restate an answer that already
+ * existed, which is exactly what a visitor asking something new does not want.
+ *
+ * The whole corpus is about 14,000 words, far past what belongs in one request,
+ * so it ships as sections and the endpoint retrieves the few that match. A
+ * section is a heading plus the prose under it; the standing challenge,
+ * approach and outcome fields become sections of their own.
+ *
+ * Published rather than imported for the same reasons as the answers: the
+ * function bundler rejects JSON import attributes, and a published file is the
+ * one the allowlist has already filtered.
+ */
+function generateAskSources(distDir) {
+  const WORTH_RETRIEVING = 24;
+  const MAX_SECTION_WORDS = 180;
+  const sections = [];
+
+  for (const c of CASE_STUDIES) {
+    const push = (heading, parts) => {
+      const cleaned = parts.filter(Boolean).map(t => String(t).replace(/\s+/g, ' ').trim()).filter(Boolean);
+      if (!cleaned.length) return;
+
+      // Split at paragraph boundaries rather than truncating. One section ran to
+      // 663 words, which on its own would be most of a request's budget — and
+      // truncating would cut the outcome off the end of the argument.
+      const chunks = [];
+      let current = [];
+      let words = 0;
+      for (const part of cleaned) {
+        const length = part.split(' ').length;
+        if (words && words + length > MAX_SECTION_WORDS) {
+          chunks.push(current.join(' '));
+          current = [];
+          words = 0;
+        }
+        current.push(part);
+        words += length;
+      }
+      if (current.length) chunks.push(current.join(' '));
+
+      for (const text of chunks) {
+        // Below this a section is a stub — a lone subheading or a one-line
+        // caption — and is noise in retrieval rather than material to draft from.
+        if (text.split(' ').length < WORTH_RETRIEVING) continue;
+        sections.push({
+          id: `${c.id}#${sections.filter(s => s.caseStudy === c.id).length}`,
+          caseStudy: c.id,
+          title: c.title,
+          heading,
+          text,
+        });
+      }
+    };
+
+    push('Challenge', [c.challenge]);
+    push('Approach', [c.approach]);
+    push('Outcome', [c.outcome]);
+
+    // Body blocks group under the heading that precedes them.
+    let heading = 'Overview';
+    let buffer = [];
+    for (const b of normalizeBlocks(c.body || [])) {
+      if (b.type === 'heading') {
+        push(heading, buffer);
+        heading = b.text;
+        buffer = [];
+      } else if (b.type === 'paragraph') {
+        buffer.push(b.text);
+      } else if (b.type === 'list') {
+        buffer.push((b.items || []).join('. '));
+      } else if (b.type === 'quote') {
+        buffer.push(b.attribution ? `"${b.text}" — ${b.attribution}` : b.text);
+      } else if (b.type === 'callout') {
+        buffer.push([b.title, ...(b.items || [])].filter(Boolean).join('. '));
+      }
+    }
+    push(heading, buffer);
+  }
+
+  fs.writeFileSync(`${distDir}/ask-sources.json`, JSON.stringify({ sections }));
+  const words = sections.reduce((n, s) => n + s.text.split(' ').length, 0);
+  console.log(`\u2705 Ask: ${sections.length} case-study section(s) available to draft from, ${words} words.`);
+}
+
 function generateAskAnswers(distDir, indexHtml) {
   const doc = require('./src/content/ask-answers.json');
   const approved = doc.answers
     .filter(answer => answer.status === 'approved')
     .map(({ id, question, aliases, answer, sources, topic }) => ({ id, question, aliases, answer, sources, topic }));
 
-  fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved }));
+  // The case-study list travels with the answers rather than with the sections.
+  // The router needs it to name sources, and it runs before anything decides a
+  // draft is needed — so the big sections file stays lazy, fetched only when a
+  // draft actually happens.
+  const studies = CASE_STUDIES.map(c => ({
+    id: c.id,
+    title: c.title,
+    summary: c.subtitle || c.metaDescription || '',
+  }));
+
+  fs.writeFileSync(`${distDir}/ask-answers.json`, JSON.stringify({ answers: approved, studies }));
 
   // The Ask panel is client-rendered, so none of its text reaches a crawler, an
   // ATS scraper or an assistant reading the page without JavaScript. The answers
@@ -476,6 +575,7 @@ function generateRoutes() {
   }
 
   generateAskAnswers(distDir, indexHtml);
+  generateAskSources(distDir);
   generateSitemap(distDir);
   console.log('✅ Generated static routes with unique SEO metadata.');
 }

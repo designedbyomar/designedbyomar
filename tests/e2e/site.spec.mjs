@@ -760,10 +760,24 @@ test('Ask returns a written answer with a citation into the case study', async (
   await expect(page).toHaveURL(/\/work\/athena-ds\/?$/);
 });
 
-test('Ask matches a typed question', async ({ page }) => {
+test('a typed question is routed, and the routed answer is shown', async ({ page }) => {
+  // Typed questions are not answered by word overlap any more, so this needs
+  // the endpoint — which `vite preview` does not run. Stubbed to the reply
+  // production would give.
+  await page.route('**/api/ask', route => route.fulfill({
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Ask-Source': 'reviewed',
+      'X-Ask-Sources': 'connect-api',
+      'X-Ask-Answer-Id': 'fintech-depth',
+      'X-Ask-Matched-By': 'router',
+    },
+    body: 'routed',
+  }));
+
   await page.goto('/');
   await openAsk(page);
-
   await askInput(page).fill('what fintech work has he done');
   await page.locator('#faq button[type="submit"]').click();
   await expect(askLive(page).getByText(/Two years at Plastiq/i)).toBeVisible();
@@ -841,7 +855,12 @@ test('the privacy policy discloses what the Ask box records and where it goes', 
   // browser: a verbatim question, a routed one, and one nothing covers.
   await expect(page.getByText(/answered in your browser: nothing is sent/i)).toBeVisible();
   await expect(page.getByText(/Anything else you type is sent to this site to be matched/i)).toBeVisible();
-  await expect(page.getByText(/excerpts of the closest published answers/i)).toBeVisible();
+  // Drafting now reads the case studies, not only the written answers, so the
+  // policy has to say that is what gets sent.
+  // Stated twice on purpose — in the narrative and in the collected-data list.
+  await expect(page.getByText(/excerpts of the published case studies/i).first()).toBeVisible();
+  await expect(page.getByText(/excerpts of the published case studies/i)).toHaveCount(2);
+  await expect(page.getByText(/Only published material is ever sent/i)).toBeVisible();
   // Groq is not always called, and an answered question's wording is not
   // recorded — both were overstated, and both are load-bearing claims.
   await expect(page.getByText(/If Groq cannot be reached, or the free daily allowance is spent/i)).toBeVisible();
@@ -889,10 +908,14 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
 
-test('with the endpoint down, a local match still answers', async ({ page }) => {
-  // Routing must never make the site worse than it was before routing existed.
-  // "has he worked with react" is a non-exact match, so it would previously have
-  // been answered locally — with the endpoint unreachable it still must be.
+test('with the endpoint down, a loose word match is not served in its place', async ({ page }) => {
+  // This reverses an earlier decision. Falling back to the local overlap match
+  // whenever the endpoint could not answer was meant to keep the feature no
+  // worse than before routing existed — but that is the state this exists to
+  // fix, and the fallback is where it kept resurfacing.
+  //
+  // "has he worked with react" scores 0.56 against `technical-depth`. It might
+  // be right; nothing here can tell. So it is not presented as the answer.
   await page.route('**/api/ask', route => route.abort('failed'));
 
   await page.goto('/');
@@ -900,9 +923,9 @@ test('with the endpoint down, a local match still answers', async ({ page }) => 
   await askInput(page).fill('has he worked with react');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/no written answer/i)).toBeVisible();
+  await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
-  await expect(askLive(page).locator('p').first()).toBeVisible();
 });
 
 test('a verbatim question is answered without touching the network', async ({ page }) => {

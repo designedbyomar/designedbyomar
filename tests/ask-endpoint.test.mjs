@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
+import { buildSourceIndex } from '../src/ask-sources.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
@@ -31,6 +32,7 @@ const loadHandler = ({
   routeReturns = 'NONE',
   routeThrows = false,
   generateStalls = false,
+  sourcesFail = false,
 } = {}) => {
   const calls = [];
   const routeCalls = [];
@@ -38,7 +40,11 @@ const loadHandler = ({
     hasApiKey: () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
-      return { answers: doc.answers, index: buildIndex(doc.answers) };
+      return { answers: doc.answers, index: buildIndex(doc.answers), studies: STUDIES };
+    },
+    loadSources: async () => {
+      if (sourcesFail) throw new Error('sources unavailable');
+      return { sections: SECTIONS, index: buildSourceIndex(SECTIONS) };
     },
     route: async (options) => {
       routeCalls.push(options);
@@ -60,6 +66,37 @@ const loadHandler = ({
 };
 
 const answerFor = (id) => doc.answers.find(a => a.id === id);
+
+// A couple of real sections, so the drafting prompt is asserted against the
+// shape the build actually produces.
+const STUDIES = [
+  { id: 'connect-api', title: 'Connect API Payments', summary: 'Embedded payments a partner ships under their own brand.' },
+  { id: 'athena-ds', title: 'Athena Design System 2.0', summary: 'Enterprise design system behind an IPO-era brand.' },
+];
+
+const SECTIONS = [
+  {
+    id: 'connect-api#0',
+    caseStudy: 'connect-api',
+    title: 'Connect API Payments',
+    heading: 'Challenge',
+    text: 'Plastiq Connect let a partner put card and bank payments inside its own product, under its own brand, with Plastiq carrying the compliance and the disbursement.',
+  },
+  {
+    id: 'connect-api#1',
+    caseStudy: 'connect-api',
+    title: 'Connect API Payments',
+    heading: 'Approach',
+    text: 'Benchmarking against Stripe Connect settled what the product competed on: letting a partner hand over PCI scope and risk operations rather than build and certify them.',
+  },
+  {
+    id: 'athena-ds#0',
+    caseStudy: 'athena-ds',
+    title: 'Athena Design System 2.0',
+    heading: 'Challenge',
+    text: 'Nomenclature and patterns had diverged across every product, so an audit came before a single asset was produced.',
+  },
+];
 
 // A question the written set does not answer but which still shares
 // vocabulary with it — so there is something to ground a reply in. The
@@ -138,6 +175,16 @@ test('an id the router invented is never served', async () => {
  * draft. Both halves are asserted, because fixing one direction by breaking the
  * other would pass a looser test.
  */
+/**
+ * Nothing decided this question, so nothing may be served loosely.
+ *
+ * This reverses an earlier call. Serving the local overlap match whenever the
+ * model could not run was meant to keep the feature "no worse than before
+ * routing existed" — but before routing existed was the broken state, and that
+ * path is where it kept surfacing: "what is the strongest fintech case study he
+ * has" scores 0.56 against the Wisdom Management Portal, which is healthcare.
+ * An exact hit is still served; anything looser gets the written miss.
+ */
 for (const [label, routeReturns] of [
   ['an empty response', ''],
   ['whitespace only', '   \n  '],
@@ -145,15 +192,25 @@ for (const [label, routeReturns] of [
   ['an id that does not exist', 'leadership-and-vision'],
   ['a refusal to answer', 'I cannot help with that'],
 ]) {
-  test(`${label} from the router serves the local match, not a draft`, async () => {
+  test(`${label} from the router serves no answer at all, loose or drafted`, async () => {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'reviewed', `${label} must not reach drafting`);
-    assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
-    assert.equal(calls.length, 0);
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${label} must not be acted on`);
+    assert.equal(calls.length, 0, 'and must not reach drafting either');
   });
 }
+
+test('an exact hit is still served when the router cannot run', async () => {
+  // The carve-out: a verbatim question is the one result overlap cannot get
+  // wrong, so it does not need a model to vouch for it.
+  const { handler, routeCalls } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('fintech experience'));
+
+  assert.equal(routeCalls.length, 0);
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'exact');
+});
 
 for (const [label, routeReturns] of [
   ['NONE', 'NONE'],
@@ -180,24 +237,23 @@ test('NONE means draft, even when token overlap thought it had a match', async (
   assert.equal(calls.length, 1);
 });
 
-test('a router failure falls back to the local match rather than nothing', async () => {
+test('a router failure serves the written miss, not the loose local match', async () => {
   const { handler, calls } = loadHandler({ routeThrows: true });
   const response = await handler(post('is he a manager'));
 
-  // Nothing was decided, so the site must be no worse than it was before
-  // routing existed — which is to say, it serves the local match.
-  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
-  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
-  assert.equal(calls.length, 0);
+  // The local match here is a refusal answer at 1.00 — the original bug. When
+  // nothing has judged the question, it is not served.
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0, 'and drafting is not attempted blind either');
 });
 
-test('with no key the local match is still served', async () => {
-  const { handler, routeCalls } = loadHandler({ hasApiKey: false });
+test('with no key nothing loose is served', async () => {
+  const { handler, routeCalls, calls } = loadHandler({ hasApiKey: false });
   const response = await handler(post('is he a manager'));
 
   assert.equal(routeCalls.length, 0, 'no key means no routing call is attempted');
-  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
-  assert.equal(response.headers.get('X-Ask-Matched-By'), 'local');
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0);
 });
 
 test('a question with no written answer is grounded in reviewed answers only', async () => {
@@ -208,7 +264,7 @@ test('a question with no written answer is grounded in reviewed answers only', a
   assert.equal(calls.length, 1, 'the model is called exactly once on a miss');
 
   const { system } = calls[0];
-  assert.match(system, /ONLY the reviewed answers/i);
+  assert.match(system, /ONLY the material provided/i);
   assert.match(system, /third person/i);
   // Everything in the prompt must be text Omar approved.
   const quoted = system.split('REVIEWED ANSWERS:')[1];
@@ -261,7 +317,9 @@ test('one visitor cannot drain the daily quota', async () => {
   });
 
   const sources = [];
-  for (let i = 0; i < 9; i += 1) sources.push((await handler(sameVisitor())).headers.get('X-Ask-Source'));
+  // Comfortably past the per-visitor ceiling, so the test does not have to be
+  // edited every time that number moves.
+  for (let i = 0; i < 20; i += 1) sources.push((await handler(sameVisitor())).headers.get('X-Ask-Source'));
 
   assert.ok(sources.includes('generated'), 'early requests are answered');
   assert.equal(sources.at(-1), 'fallback', 'later requests from the same visitor are capped');
@@ -326,4 +384,88 @@ test('a stream that never yields is abandoned rather than hung on', { timeout: 1
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.ok(Date.now() - started < 15000, 'and it gives up long before an edge function would');
+});
+
+/**
+ * The reported problem: a question the written answers do not cover was being
+ * routed to whichever one shared the most words, and the reply read as a
+ * non-sequitur. "What is the strongest fintech case study he has" returned the
+ * Wisdom Management Portal, which is healthcare.
+ *
+ * The fix is not a better match — no written answer makes that judgement — it
+ * is drafting one from the case study itself.
+ */
+test('the router can name case studies, and the draft is written from them', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api' });
+  const response = await handler(post('What is the strongest fintech case study he has'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(calls.length, 1);
+
+  const { system } = calls[0];
+  assert.match(system, /CASE STUDY EXCERPTS:/, 'the draft is given case-study prose');
+  assert.match(system, /Connect API Payments — Challenge/, 'labelled by study and section');
+  assert.match(system, /card and bank payments inside its own product/, 'and carries the actual text');
+
+  // Citations follow what it drew on, so the chips point at the right study.
+  assert.match(response.headers.get('X-Ask-Sources'), /connect-api/);
+  assert.ok(!/athena-ds/.test(response.headers.get('X-Ask-Sources')), 'and not at a study it never saw');
+});
+
+test('a named study the site does not have is ignored rather than trusted', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api,not-a-real-study' });
+  const response = await handler(post('What is the strongest fintech case study he has'));
+
+  assert.equal(response.status, 200);
+  assert.equal(calls.length, 1);
+  assert.ok(!/not-a-real-study/.test(calls[0].system), 'an invented id must not reach the prompt');
+  assert.ok(!/not-a-real-study/.test(response.headers.get('X-Ask-Sources')));
+});
+
+test('the case studies are only fetched when a draft actually needs them', async () => {
+  // They are the largest file the endpoint can pull. A question a written
+  // answer covers must never pay for it.
+  let fetched = 0;
+  const { handler } = loadHandler({ routeReturns: 'fintech-depth' });
+  const wrapped = createHandler({
+    hasApiKey: () => true,
+    loadAnswers: async () => ({ answers: doc.answers, index: buildIndex(doc.answers), studies: STUDIES }),
+    loadSources: async () => { fetched += 1; return { sections: SECTIONS, index: buildSourceIndex(SECTIONS) }; },
+    route: async () => 'ANSWER: fintech-depth',
+    generate: () => new ReadableStream({ start(c) { c.enqueue('x'); c.close(); } }),
+  });
+
+  await wrapped(post('has he worked in fintech'));
+  assert.equal(fetched, 0, 'a routed answer must not fetch the case studies');
+  assert.ok(handler);
+});
+
+test('an unreachable sources file still drafts, from the answers about that study', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api', sourcesFail: true });
+  const response = await handler(post('has he worked on compliance'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.match(calls[0].system, /REVIEWED ANSWERS:/);
+  assert.ok(!/CASE STUDY EXCERPTS:/.test(calls[0].system));
+});
+
+test('with the sources gone and no answer about the named study, it declines', async () => {
+  // The alternative would be drafting from whichever answers happened to rank
+  // near the question — the prose the router had just rejected. Better to say
+  // there is no answer than to write one from the wrong material.
+  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api', sourcesFail: true });
+  const response = await handler(post(MISS_WITH_CONTEXT));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(calls.length, 0);
+});
+
+test('the router is shown the case studies, not just the questions', async () => {
+  const { handler, routeCalls } = loadHandler({ routeReturns: 'NONE' });
+  await handler(post('What is the strongest fintech case study he has'));
+
+  const { system } = routeCalls[0];
+  assert.match(system, /CASE STUDIES:/);
+  assert.match(system, /connect-api: /, 'by id, so what it returns can be validated');
+  assert.match(system, /SOURCES: /, 'and told it may name them');
 });

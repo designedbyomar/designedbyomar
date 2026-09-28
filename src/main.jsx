@@ -2112,7 +2112,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
    * local match if there was one, and otherwise on the fallback the site
    * shipped before any of this existed.
    */
-  const ask = async (asked, near, localHit) => {
+  const ask = async (asked, near) => {
     const token = requestRef.current;
     const controller = new AbortController();
     abortRef.current = controller;
@@ -2171,15 +2171,12 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
     if (!current()) return 'superseded';
 
-    // The endpoint could not help. A local match is still better than telling
-    // the visitor there is nothing, so routing never makes the site worse than
-    // it was before routing existed.
-    if (localHit) {
-      show(localHit.answer);
-      trackPortfolioEvent('ask_routed', { answer_id: localHit.answer.id, matched_by: 'local' });
-      return 'local';
-    }
-
+    // The endpoint could not help, and the loose local match is deliberately not
+    // used in its place — the same call the endpoint makes, for the same reason.
+    // Word overlap put "what is the strongest fintech case study he has" against
+    // the Wisdom Management Portal, which is healthcare. The miss below already
+    // offers the nearest published work and an email route, which is the honest
+    // version of "here is the closest thing".
     fallBack(near);
     return 'fallback';
   };
@@ -2214,7 +2211,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setMissed(false);
     setDrafted(null);
     setNearest(near);
-    ask(asked, near, hit).then(answered => {
+    ask(asked, near).then(answered => {
       if (answered === 'superseded') return;
       // A written answer was served — by the router or by the local fallback —
       // so `ask_routed` has already reported it, without the wording. Recording
@@ -2242,9 +2239,6 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       display: 'flex',
       flexDirection: 'column',
       gap: 'var(--space-4)',
-      paddingTop: 'var(--space-6)',
-      marginTop: 'var(--space-2)',
-      borderTop: '1px solid var(--color-gray-100)',
     }}>
       <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         {/*
@@ -2995,14 +2989,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is normally also sent to Groq so a reply can be drafted</li>
+          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is normally also sent to Groq alongside excerpts of the published case studies so a reply can be drafted</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
         <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing one word for word, is answered in your browser: nothing is sent and nothing leaves this site.</p>
         <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, or the free daily allowance is spent, nothing is passed on and the closest written answer is used instead.</p>
-        <p style={{ margin: 0 }}>If none of them fits, the question is sent to Groq again with excerpts of the closest published answers so a reply can be drafted from them. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
+        <p style={{ margin: 0 }}>If none of them fits, the question is sent to Groq again — this time with excerpts of the published case studies, and of the closest written answers — so a reply can be drafted from them. Only published material is ever sent. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
