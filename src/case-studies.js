@@ -13,7 +13,7 @@ export const CASE_ACCENTS = {
 const PUBLIC_FIELDS = [
   'id', 'num', 'year', 'client', 'title', 'subtitle', 'metaDescription',
   'coverImage', 'coverVideo', 'ogImage', 'role', 'tags', 'metrics',
-  'challenge', 'approach', 'outcome', 'body', 'relatedLink',
+  'challenge', 'approach', 'outcome', 'body', 'relatedLink', 'mentions',
 ];
 
 const toPublicRecord = (caseStudy) => {

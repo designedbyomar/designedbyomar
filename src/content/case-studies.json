@@ -5,6 +5,10 @@
     "year": "2025",
     "client": "Wisdom",
     "title": "Management Portal",
+    "mentions": [
+      "Wisdom Management Portal",
+      "Management Portal"
+    ],
     "subtitle": "Ops command center built to retire 200+ spreadsheets with real-time intelligence.",
     "metaDescription": "LLM-powered ops command center for Wisdom — built to retire 200+ spreadsheets with real-time A/R intelligence, designed to support a 260–900 office scale.",
     "coverImage": "/Images/case-studies/management-portal/team-lead-dashboard.webp",
@@ -473,6 +477,9 @@
     "year": "2025",
     "client": "Wisdom",
     "title": "Posting Assistant",
+    "mentions": [
+      "Posting Assistant"
+    ],
     "subtitle": "AI-assisted insurance payment posting workflow that kept specialists in control.",
     "metaDescription": "AI-assisted insurance payment posting workflow that cut manual time by 40%, keeping specialists in control while automating repetitive reconciliation.",
     "coverImage": "/Images/case-studies/posting-asst/cover.webp",
@@ -647,6 +654,10 @@
     "year": "2023",
     "client": "Simplero",
     "title": "Page Builder 2.0",
+    "mentions": [
+      "Page Builder 2.0",
+      "Page Builder"
+    ],
     "subtitle": "CRM page builder rebuilt from scratch in 2 months to stop churn from competitors.",
     "metaDescription": "Rebuilt Simplero's CRM page builder from scratch in 2 months — WYSIWYG editing and competitor import drove a 9% post-launch sales increase.",
     "coverVideo": "/Videos/case-studies/page-builder/cover.mp4",
@@ -821,6 +832,11 @@
     "year": "2021–22",
     "client": "Plastiq",
     "title": "Connect API Payments",
+    "mentions": [
+      "Plastiq Connect",
+      "Connect API Payments",
+      "Connect API"
+    ],
     "subtitle": "PCI Level 1 embedded payments widget shipped with $20M+ monthly volume in month one.",
     "metaDescription": "Plastiq Connect 0→1: an embedded payments widget partners ship under their own brand, plus the developer portal behind it. $20M+ monthly volume in month one.",
     "coverImage": "/Images/case-studies/connect-api/cover.webp",
@@ -1220,6 +1236,11 @@
     "year": "2021",
     "client": "Plastiq",
     "title": "Athena Design System 2.0",
+    "mentions": [
+      "Athena Design System 2.0",
+      "Athena Design System",
+      "Athena"
+    ],
     "subtitle": "Enterprise design system that became the foundation for Plastiq's IPO-era brand.",
     "metaDescription": "Built Plastiq's enterprise design system from scratch — unified brand and product across 3+ products, the foundation for the company's IPO-era growth.",
     "coverImage": "/Images/case-studies/athena-ds/cover.webp",
@@ -1399,6 +1420,9 @@
     "year": "2022",
     "client": "Plastiq",
     "title": "Plastiq Marketing Site",
+    "mentions": [
+      "Plastiq Marketing Site"
+    ],
     "subtitle": "Pre-IPO brand relaunch delivered WCAG-compliant in 3–4 weeks.",
     "metaDescription": "Led Plastiq's pre-IPO marketing site relaunch — WCAG-compliant redesign and custom design system delivered across an 8-person team in 3–4 weeks.",
     "coverImage": "/Images/case-studies/plastiq-mktg/cover.webp",
@@ -1668,6 +1692,9 @@
     "year": "2020",
     "client": "The Walt Disney Company",
     "title": "Critical Communication Tool",
+    "mentions": [
+      "Critical Communication Tool"
+    ],
     "subtitle": "Enterprise subscription manager used to coordinate 250 critical incidents.",
     "metaDescription": "Designed Disney's enterprise critical communication tool — 1,600+ users signed up, 250+ critical incidents covered, zero major bugs post-launch.",
     "coverImage": "/Images/case-studies/disney-cct/cover.webp",
@@ -2209,6 +2236,9 @@
     "year": "2019–21",
     "client": "Disney (DTCI)",
     "title": "Unified Ad Platform",
+    "mentions": [
+      "Unified Ad Platform"
+    ],
     "subtitle": "Seven Disney ad-sales brands brought onto one platform without breaking the workflow it already ran.",
     "metaDescription": "Brought seven Disney ad-sales brands onto AdVisor without regressing the ESPN workflow it already ran. Decision-flow mapping, eight-brand alignment, and reusable React patterns for Adapt.",
     "coverVideo": "/Videos/case-studies/disney-uap/cover.mp4",

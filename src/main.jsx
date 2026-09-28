@@ -10,6 +10,7 @@ import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
+import { tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
@@ -1905,6 +1906,38 @@ const usePrefersReducedMotion = () => {
   return reduced;
 };
 
+// Body paragraphs of an answer, with the first mention of each cited case study
+// turned into a link to its page. `citedIds` is the same set the citation chips
+// use, so nothing links that the answer was not grounded in, and each study
+// links once across the whole answer — `remaining` shrinks as studies are used,
+// so a later paragraph does not re-link one an earlier paragraph already did.
+const ANSWER_PARAGRAPH_STYLE = { margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 };
+const ANSWER_LINK_STYLE = { color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'color-mix(in srgb, var(--fg-primary) 40%, transparent)' };
+
+const AnswerBody = ({ text, citedIds = [], answerId }) => {
+  const remaining = new Set(citedIds);
+  return (text ?? '').split('\n\n').map((paragraph, i) => {
+    const tokens = tokenizeAnswer(paragraph, CASE_STUDIES, [...remaining]);
+    for (const token of tokens) if (token.type === 'link') remaining.delete(token.id);
+    return (
+      <p key={i} style={ANSWER_PARAGRAPH_STYLE}>
+        {tokens.map((token, j) => (token.type === 'link'
+          ? (
+            <a
+              key={j}
+              href={token.href}
+              onClick={() => trackPortfolioEvent('ask_inline_link_click', { answer_id: answerId, case_study_id: token.id })}
+              style={ANSWER_LINK_STYLE}
+            >
+              {token.value}
+            </a>
+          )
+          : <React.Fragment key={j}>{token.value}</React.Fragment>))}
+      </p>
+    );
+  });
+};
+
 /**
  * `linkable` is set when the panel is the page rather than a section of one.
  * It turns the answer on screen into part of the URL, so an answer can be sent
@@ -2389,11 +2422,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
                 </button>
               )}
             </div>
-            {result.answer.split('\n\n').map((paragraph, i) => (
-              <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
-                {paragraph}
-              </p>
-            ))}
+            <AnswerBody text={result.answer} citedIds={result.sources ?? []} answerId={result.id} />
             {sourcesFor(result).length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {sourcesFor(result).map(caseStudy => (
@@ -2449,11 +2478,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
             }}>
               Drafted, not reviewed
             </div>
-            {drafted.text.split('\n\n').map((paragraph, i) => (
-              <p key={i} style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
-                {paragraph}
-              </p>
-            ))}
+            <AnswerBody text={drafted.text} citedIds={drafted.sources ?? []} answerId="drafted" />
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
               There is no written answer to that question, so this was drafted from the published
               answers below and has not been reviewed. For anything that matters, email Omar.
