@@ -693,6 +693,29 @@ test('a successful draft records whether the router chose or failed', async () =
   assert.equal(failed.headers.get('X-Ask-Reason'), 'router-error');
 });
 
+test('an ANSWER naming an id that does not exist still drafts, and says so', async () => {
+  for (const routeReturns of ['ANSWER: leadership-and-vision', 'ANSWER: none-of-these-fit']) {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
+
+    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${routeReturns} must still draft`);
+    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Reason'), 'router-picked-invalid', `${routeReturns} is not a decline`);
+  }
+
+  // ANSWER: NONE is still the router declining, just in the wrong form.
+  const declined = await (loadHandler({ routeReturns: 'ANSWER: NONE' })).handler(post('is he a manager'));
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+});
+
+test('every generated draft names a routing outcome', async () => {
+  for (const routeReturns of ['', 'NONE', 'SOURCES: connect-api', 'ANSWER: made-up', 'leadership-or', 'SOURCES: not-a-real-study']) {
+    const response = await (loadHandler({ routeReturns })).handler(post('what fintech work has he done'));
+    if (response.headers.get('X-Ask-Source') !== 'generated') continue;
+    assert.ok(response.headers.get('X-Ask-Reason'), `${JSON.stringify(routeReturns)} drafted with no reason`);
+  }
+});
+
 test('every fallback names a cause', async () => {
   // A reason of '' would put this back where it started.
   for (const [label, options, question] of [

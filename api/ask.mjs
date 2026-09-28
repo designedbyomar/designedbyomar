@@ -153,6 +153,54 @@ const fetchSources = async (origin) => {
   return sourceCache;
 };
 
+/**
+ * Not every reason belongs in a reply to an anonymous caller.
+ *
+ * Three of these describe the visitor's own situation rather than this
+ * endpoint's internals, and are worth keeping precise everywhere: what they
+ * asked for was malformed, they have spent their allowance, or the site
+ * genuinely has nothing written on the subject. The two routing outcomes are
+ * the same kind of thing — they say where the material for a reply that was
+ * successfully drafted came from, not whether a dependency is up.
+ */
+const PUBLIC_REASONS = new Set([
+  '',
+  'bad-request',
+  'rate-limited',
+  'no-material',
+  'router-sourced',
+  'router-declined',
+]);
+
+/**
+ * The rest — `no-key`, `answers-unavailable`, `router-error`, `provider-error`
+ * — say which dependency this endpoint has and whether it is currently up. The
+ * code is public, so the architecture is not the secret; the live health of it
+ * is, and a header anyone can poll for it is a free availability monitor, one
+ * that `no-store` does not stop an intermediary from reading.
+ *
+ * So production ships a bucket instead: `unavailable` when the request fell
+ * back, `degraded` when a reply was drafted anyway despite something failing —
+ * two states that are worth telling apart and neither of which names a cause.
+ *
+ * The detail is not dropped, only moved to where whoever is debugging already
+ * looks. It is logged here rather than at each return, so no path can report a
+ * cause to the browser that the runtime logs do not have — several of these
+ * reasons are not exceptions and had nothing logged at all.
+ *
+ * Detail is opt-in, so the default is the safe one wherever this runs: set
+ * `ASK_DETAILED_REASONS=1`, which a preview deploy or a local `vercel dev` can
+ * carry and production does not.
+ */
+const detailedReasons = () => process.env.ASK_DETAILED_REASONS === '1';
+
+const publicReason = (source, reason) => {
+  if (PUBLIC_REASONS.has(reason) || detailedReasons()) return reason;
+  const bucket = source === 'generated' ? 'degraded' : 'unavailable';
+  console.error(`ask: reported ${bucket} —`, reason);
+  return bucket;
+};
+
 // `matchedBy` records which mechanism chose a reviewed answer — exact, router
 // or the local overlap fallback. Without it the three are indistinguishable at
 // the client, and whether routing is actually an improvement is unanswerable.
@@ -165,6 +213,9 @@ const fetchSources = async (origin) => {
  * away. Diagnosing a live problem meant guessing. It is reported on the client's
  * analytics event too, so the shape of the failure is visible without needing
  * to reproduce it.
+ *
+ * What the browser is told is coarser than what is logged — see
+ * `publicReason`, which is the only place the header's value is decided.
  */
 const headers = (source, sources, answerId = '', matchedBy = '', reason = '') => ({
   'Content-Type': 'text/plain; charset=utf-8',
@@ -173,7 +224,7 @@ const headers = (source, sources, answerId = '', matchedBy = '', reason = '') =>
   'X-Ask-Sources': sources.join(','),
   'X-Ask-Answer-Id': answerId,
   'X-Ask-Matched-By': matchedBy,
-  'X-Ask-Reason': reason,
+  'X-Ask-Reason': publicReason(source, reason),
 });
 
 const textResponse = (body, source, sources = [], answerId = '', matchedBy = '', reason = '') =>
@@ -183,9 +234,28 @@ const textResponse = (body, source, sources = [], answerId = '', matchedBy = '',
  * The endpoint degrades rather than erroring, which means a broken dependency
  * looks exactly like a quiet day unless it is written down. These land in the
  * Vercel runtime logs.
+ *
+ * Only the error's class and its machine-readable fields are written, never
+ * its message. Provider messages carry request IDs and account details, and
+ * some SDKs quote the prompt back — which here is a visitor's question. The
+ * class and status say which dependency broke and how, which is what the log
+ * is for. `detail` is for facts this file composes itself, never for text that
+ * came from a visitor or a model.
  */
-const note = (stage, error) => {
-  console.error(`ask: ${stage} failed —`, error instanceof Error ? error.message : String(error));
+const SAFE_CODE = /^[A-Za-z0-9_.-]{1,64}$/;
+
+const describe = (error) => {
+  if (!(error instanceof Error)) return `non-error thrown (${typeof error})`;
+  const parts = [SAFE_CODE.test(error.name) ? error.name : 'Error'];
+  const status = error.statusCode ?? error.status;
+  if (Number.isInteger(status)) parts.push(`status ${status}`);
+  const code = error.code ?? error.cause?.code;
+  if (typeof code === 'string' && SAFE_CODE.test(code)) parts.push(`code ${code}`);
+  return parts.join(', ');
+};
+
+const note = (stage, error, detail = '') => {
+  console.error(`ask: ${stage} failed —`, detail || describe(error));
 };
 
 const hasText = (chunk) => typeof chunk === 'string'
@@ -374,7 +444,8 @@ export const createHandler = ({
       // answer.
       const text = String(raw ?? '').trim();
 
-      const answerId = /^ANSWER:\s*(.+)$/im.exec(text)?.[1] ?? text;
+      const answerLine = /^ANSWER:\s*(.+)$/im.exec(text)?.[1];
+      const answerId = answerLine ?? text;
       const picked = approved.find(a => a.id === answerId.trim().replace(/[^A-Za-z0-9-]/g, ''));
       if (picked) return reviewed(picked, 'router');
 
@@ -395,14 +466,22 @@ export const createHandler = ({
       // Everything else — empty, truncated, a stray token — decided nothing,
       // and must not be read as a decision. Treating those as NONE threw away
       // an answer the site already had.
-      if (named.length || /\bnone\b/i.test(text)) {
+      //
+      // An ANSWER line whose id matched nothing is its own failure. It chose,
+      // and chose something that does not exist — and an id like
+      // `none-of-the-above` would otherwise have been read as a decline.
+      if (named.length) {
+        declined = true;
+      } else if (answerLine !== undefined && !/^none\W*$/i.test(answerLine.trim())) {
+        note('routing', `picked an id that does not exist: ${JSON.stringify(answerLine.slice(0, 120))}`);
+        routerFailed = 'router-picked-invalid';
+      } else if (/\bnone\b/i.test(text)) {
         declined = true;
       } else {
-        // Logged like any other routing failure. It was marked and not
-        // recorded, so the one thing that would explain it — what the model
-        // actually said — never reached the logs. Truncated: it is model
-        // output, and only its shape is diagnostic.
-        note('routing', `unreadable response: ${JSON.stringify(text.slice(0, 120))}`);
+        // Logged like any other routing failure; it was marked and never
+        // recorded. Only its shape is logged, not its text: it is model
+        // output, and can echo the visitor's question.
+        note('routing', null, `unreadable response (${text.trim() ? `${text.length} chars` : 'empty'})`);
         routerFailed = 'router-unreadable';
       }
     } catch (error) {
@@ -518,8 +597,11 @@ export const createHandler = ({
       // Naming studies and declining are both "no written answer fits", but
       // they are different routing outcomes and only one of them found
       // material. Reporting both as declined hid which had happened.
+      //
+      // Every branch above sets one of these, but an empty reason is what this
+      // header exists to prevent, so a routing outcome nobody classified says so.
       headers: headers('generated', sources, '', '',
-        routerFailed ?? (named.length ? 'router-sourced' : declined ? 'router-declined' : '')),
+        routerFailed ?? (named.length ? 'router-sourced' : declined ? 'router-declined' : 'router-unclassified')),
     });
   } catch (error) {
     note('drafting', error);
