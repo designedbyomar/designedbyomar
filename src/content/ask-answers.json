@@ -928,7 +928,7 @@
       ],
       "answer": "As leverage, not as the decision-maker.\n\nThe public workflow for this site separates the boundary clearly. ChatGPT helps with strategy framing, copy direction and critique; Claude, Codex and similar tools help scaffold components, refactor code and automate mechanical work. Figma remains the source of truth for visual design, and Omar owns hierarchy, typography, motion, product judgment and what gets cut.\n\nGenerated copy is edited line by line, code is built and tested, visual changes are reviewed in the browser, and meaningful changes get an external review pass. The goal is to compress the repetitive parts of the loop without outsourcing taste or accountability.",
       "status": "approved",
-      "sourcesFingerprint": "1356c70c9c35"
+      "sourcesFingerprint": "8bab5f89f75f"
     },
     {
       "id": "iteration-when-wrong",
