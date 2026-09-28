@@ -71,7 +71,7 @@ export const isRealValue = (value) => {
 
 const norm = (s) => (s ?? '').trim().replace(/\s+/g, ' ');
 const clean = (v) => (isRealValue(v) ? norm(v) : '');
-const escapeCell = (s) => String(s).replace(/\|/g, '\\|');
+const escapeCell = (s) => String(s).replace(/[\\|]/g, '\\$&');
 const topOf = (map) => [...map.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
 
 /**

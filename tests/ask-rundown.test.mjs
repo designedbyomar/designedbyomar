@@ -101,3 +101,23 @@ test('an empty window renders cleanly', () => {
   assert.match(out, /## Missed questions \(0\)/);
   assert.match(out, /None recorded in this window\./);
 });
+
+// A Markdown renderer's view of a table row: `\x` is a literal x, a bare `|` ends a cell.
+const cellsOf = (row) => {
+  const cells = [''];
+  for (let i = 0; i < row.length; i += 1) {
+    const c = row[i];
+    if (c === '\\' && i + 1 < row.length) { cells[cells.length - 1] += row[i + 1]; i += 1; }
+    else if (c === '|') cells.push('');
+    else cells[cells.length - 1] += c;
+  }
+  return cells.slice(1, -1).map((s) => s.trim());
+};
+
+test('a backslash before a pipe cannot break a cell open', () => {
+  // The exact bug: escaping `|` but not `\` turned `C:\|` into `C:\\|` — a literal
+  // backslash followed by a live column break, splitting one question across two cells.
+  const misses = aggregateMisses([missRow('what about C:\\|really', 'no-material', 'work-history', 'draft', 1)]);
+  const row = render(misses, [], { days: 30 }).split('\n').find((l) => l.includes('really'));
+  assert.deepEqual(cellsOf(row), ['1', 'what about C:\\|really', 'no-material', 'work-history']);
+});
