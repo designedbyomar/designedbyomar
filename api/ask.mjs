@@ -353,6 +353,13 @@ export const createHandler = ({
   let declined = false;
   let named = [];
   let routerFailed = null;
+  /*
+    A routing problem followed by a drafting problem is a different situation
+    from either alone, and the reason is one string. Reporting only the later
+    stage erased the earlier one, so "the router returned nonsense and then the
+    provider fell over" was indistinguishable from a clean provider outage.
+  */
+  const because = (stage) => (routerFailed ? `${routerFailed}+${stage}` : stage);
   if (!unavailable) {
     try {
       const raw = await route({
@@ -388,8 +395,16 @@ export const createHandler = ({
       // Everything else — empty, truncated, a stray token — decided nothing,
       // and must not be read as a decision. Treating those as NONE threw away
       // an answer the site already had.
-      if (named.length || /\bnone\b/i.test(text)) declined = true;
-      else routerFailed = 'router-unreadable';
+      if (named.length || /\bnone\b/i.test(text)) {
+        declined = true;
+      } else {
+        // Logged like any other routing failure. It was marked and not
+        // recorded, so the one thing that would explain it — what the model
+        // actually said — never reached the logs. Truncated: it is model
+        // output, and only its shape is diagnostic.
+        note('routing', `unreadable response: ${JSON.stringify(text.slice(0, 120))}`);
+        routerFailed = 'router-unreadable';
+      }
     } catch (error) {
       // Timed out, rate limited upstream, provider down. Nothing was decided —
       // but it is recorded now rather than swallowed, because this catch is
@@ -461,16 +476,25 @@ export const createHandler = ({
     ...(named.length ? answerSources.filter(id => named.includes(id)) : answerSources),
   ])];
 
-  // Nothing shares any vocabulary with the question and the router named
-  // nothing, so there is nothing to ground a reply in. Asking the model anyway
-  // would mean asking it to speak from an empty context, which is the one thing
-  // this design exists to prevent.
-  if (!context.length && !sections.length) {
-    return textResponse('', 'fallback', [], '', '', 'no-material');
-  }
+  // Whether we could look comes before whether we found anything.
+  //
+  // Retrieval is skipped entirely when there is no key or the visitor is out of
+  // requests, so `sections` is empty for a reason that has nothing to do with
+  // the corpus. Testing for material first reported `no-material` — that the
+  // site had nothing to say — when the truth was that it never looked. A reason
+  // naming the wrong cause is worse than none, since it sends whoever is
+  // debugging somewhere else entirely.
   if (unavailable) {
     return textResponse('', 'fallback', sources, '', '',
       hasApiKey() ? 'rate-limited' : 'no-key');
+  }
+
+  // Now it means what it says: we looked, and nothing shares any vocabulary
+  // with the question. Asking the model anyway would mean asking it to speak
+  // from an empty context, which is the one thing this design exists to
+  // prevent.
+  if (!context.length && !sections.length) {
+    return textResponse('', 'fallback', [], '', '', 'no-material');
   }
 
   const material = [
@@ -488,14 +512,18 @@ export const createHandler = ({
       prompt: question,
     });
     const responseStream = await readUntilText(stream);
-    if (!responseStream) return textResponse('', 'fallback', sources, '', '', 'empty-draft');
+    if (!responseStream) return textResponse('', 'fallback', sources, '', '', because('empty-draft'));
     return new Response(responseStream, {
       status: 200,
-      headers: headers('generated', sources, '', '', routerFailed ?? (declined ? 'router-declined' : '')),
+      // Naming studies and declining are both "no written answer fits", but
+      // they are different routing outcomes and only one of them found
+      // material. Reporting both as declined hid which had happened.
+      headers: headers('generated', sources, '', '',
+        routerFailed ?? (named.length ? 'router-sourced' : declined ? 'router-declined' : '')),
     });
   } catch (error) {
     note('drafting', error);
-    return textResponse('', 'fallback', sources, '', '', 'provider-error');
+    return textResponse('', 'fallback', sources, '', '', because('provider-error'));
   }
 };
 

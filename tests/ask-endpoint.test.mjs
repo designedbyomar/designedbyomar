@@ -678,6 +678,12 @@ test('an unreadable request says so', async () => {
 });
 
 test('a successful draft records whether the router chose or failed', async () => {
+  // Naming studies and declining both mean "no written answer fits", but only
+  // one of them located material, so they are reported apart.
+  const sourced = await (loadHandler({ routeReturns: 'SOURCES: connect-api' })).handler(post('what fintech work has he done'));
+  assert.equal(sourced.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
+
   const declined = await (loadHandler({ routeReturns: 'NONE' })).handler(post('what fintech work has he done'));
   assert.equal(declined.headers.get('X-Ask-Source'), 'generated');
   assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
@@ -699,4 +705,53 @@ test('every fallback names a cause', async () => {
     if (response.headers.get('X-Ask-Source') !== 'fallback') continue;
     assert.ok(response.headers.get('X-Ask-Reason'), `${label} returned a fallback with no reason`);
   }
+});
+
+/**
+ * A reason that names the wrong cause is worse than no reason, because it sends
+ * whoever is debugging somewhere else. These two cases both misreported.
+ */
+test('an unanswerable question with no key blames the key, not the material', async () => {
+  // Retrieval is skipped when the key is missing, so `sections` is empty for a
+  // reason that has nothing to do with the corpus. If nothing is near the
+  // question either, the no-material guard fired first and reported that the
+  // site had nothing to say — when the truth is that it never looked.
+  const { handler } = loadHandler({ hasApiKey: false });
+  const response = await handler(post('how do penguins pay for parking in antarctica'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'no-key');
+});
+
+test('an unanswerable question from a rate-limited visitor blames the limit', async () => {
+  const { handler } = loadHandler();
+  const drain = () => new Request('https://designedbyomar.com/api/ask', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.44' },
+    body: JSON.stringify({ question: 'how do penguins pay for parking in antarctica' }),
+  });
+
+  let reason = null;
+  for (let i = 0; i < 40; i += 1) reason = (await handler(drain())).headers.get('X-Ask-Reason');
+  assert.equal(reason, 'rate-limited');
+});
+
+test('a router problem survives a drafting failure that follows it', async () => {
+  // Both facts matter: the router returned something unusable *and* drafting
+  // then failed. Reporting only the second leaves no trace of the first, and
+  // the two together are a different problem from either alone.
+  const unreadable = await (loadHandler({
+    routeReturns: 'I cannot help with that',
+    generateThrows: true,
+  })).handler(post('what fintech work has he done'));
+  assert.equal(unreadable.headers.get('X-Ask-Reason'), 'router-unreadable+provider-error');
+
+  const threw = await (loadHandler({ routeThrows: true, generateEmpty: true }))
+    .handler(post('what fintech work has he done'));
+  assert.equal(threw.headers.get('X-Ask-Reason'), 'router-error+empty-draft');
+
+  // And a drafting failure on its own still reads plainly.
+  const clean = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
+    .handler(post('what fintech work has he done'));
+  assert.equal(clean.headers.get('X-Ask-Reason'), 'provider-error');
 });
