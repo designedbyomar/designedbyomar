@@ -2144,6 +2144,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     const current = () => requestRef.current === token;
 
     setPhase('looking');
+    // Set once headers arrive, so a failure can say which side of them it fell on.
+    let received = false;
     try {
       const response = await fetch('/api/ask', {
         method: 'POST',
@@ -2158,6 +2160,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       // Why the endpoint did what it did. Reported so a failure shows up as a
       // pattern in analytics rather than needing to be reproduced live.
       reasonRef.current = response.headers.get('X-Ask-Reason') || '';
+      received = true;
 
       if (kind === 'reviewed') {
         const id = response.headers.get('X-Ask-Answer-Id');
@@ -2191,8 +2194,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         if (text.trim()) return 'generated';
       }
     } catch {
-      // Aborted, offline, or the provider failed — handled below unless
-      // something newer has taken over.
+      // Aborted, offline, or the stream broke — handled below unless something
+      // newer has taken over. The endpoint never answered a request that failed
+      // before its headers, so without this the event would report `none` and
+      // a dropped connection would read as a server fallback with no cause.
+      if (current()) {
+        reasonRef.current = controller.signal.aborted ? 'client-abort'
+          : received ? 'client-stream-error'
+          : 'client-network-error';
+      }
     } finally {
       if (current()) setPhase(null);
     }
