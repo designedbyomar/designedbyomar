@@ -27,40 +27,33 @@ import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
 export const config = { runtime: 'edge' };
 
-/**
- * The only place the provider is touched. Injectable so the routing logic can
- * be tested without a key, a network, or module mocking — and so swapping
- * provider is a change to this function alone.
- */
 /*
-  Both models reason before answering, and the previous ones did not.
+  Reasoning is hidden from the text, and kept to the shortest the model allows.
 
-  gpt-oss emits chain-of-thought first, and those tokens come out of the same
-  allowance as the answer. Every ceiling in this file was sized for a model that
-  returns nothing but the answer, so carrying them over would have spent the
-  budget on thinking and truncated or emptied what followed — the router's line
-  never written, the draft cut off. Silent degradation again, of exactly the
-  kind that took production logging to find.
+  Both models reason before answering and the previous ones did not, so those
+  tokens come out of the same allowance as the answer — which is why the
+  ceilings below are far above what the output alone costs.
 
-  `reasoningFormat: 'hidden'` keeps the thinking out of `text`, so the parser
-  and the visitor both see only the answer. `reasoningEffort: 'low'` keeps it
-  brief without switching it off: choosing among 55 written questions and 8 case
-  studies is the judgement this endpoint exists for, and that judgement has been
-  the recurring problem.
+  `hidden` keeps the thinking out of `text`, so neither the parser nor the
+  reader sees it. The cost is that nothing is emitted until the thinking
+  finishes: time-to-first-token becomes the whole reasoning phase, which is why
+  the first-chunk budget is as large as it is.
+
+  `low` is the floor here, not a preference. GPT-OSS accepts only low, medium
+  and high — `none` and `default` are Qwen-only, and sending `none` is rejected
+  outright. The provider's own type union lists all five because it spans every
+  Groq model; reading that union instead of the model's constraints is what
+  suggested otherwise, the same mistake as reading the published model list and
+  assuming this account could reach everything on it.
 */
 export const REASONING = { groq: { reasoningFormat: 'hidden', reasoningEffort: 'low' } };
 
-/*
-  Drafting does not deliberate.
-
-  Hiding the reasoning means no text is emitted until the thinking is finished,
-  so time-to-first-token becomes the whole reasoning phase — and production
-  timed out repeatedly waiting for it. Routing keeps `low`, because choosing
-  among 55 questions and 8 studies is a judgement. Drafting is summarising
-  material it has already been handed, under rules it has been given, so the
-  deliberation buys little and costs the visitor the entire wait.
-*/
-export const DRAFT_REASONING = { groq: { reasoningFormat: 'hidden', reasoningEffort: 'none' } };
+// What each model family actually accepts, as distinct from what the provider's
+// type union will let you write.
+export const SUPPORTED_EFFORT = {
+  'openai/gpt-oss': ['low', 'medium', 'high'],
+  qwen: ['none', 'default', 'low', 'medium', 'high'],
+};
 
 /**
  * The only place the provider is touched. Injectable so the routing logic can
@@ -75,7 +68,7 @@ const generateFromGroq = ({ system, prompt }) => streamText({
   // 60–110 words of prose is about 150 tokens, so 200 left almost no headroom
   // even before reasoning had to fit alongside it.
   maxOutputTokens: DRAFT_TOKENS,
-  providerOptions: DRAFT_REASONING,
+  providerOptions: REASONING,
   // One retry, not the SDK's default of two. Each retry costs another full
   // timeout, and production logged eight in a single request.
   maxRetries: 1,

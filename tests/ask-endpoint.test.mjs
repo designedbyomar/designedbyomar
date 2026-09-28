@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, DRAFT_REASONING } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, SUPPORTED_EFFORT } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -58,6 +58,7 @@ const loadHandler = ({
   generateStalls = false,
   sourcesFail = false,
   streamText = null,
+  streamChunks = null,
 } = {}) => {
   const calls = [];
   const routeCalls = [];
@@ -84,7 +85,8 @@ const loadHandler = ({
       // Opens, then never yields and never closes — the case a provider-side
       // abort signal is supposed to catch, and which must be bounded here too.
       if (generateStalls) return new ReadableStream({ start() {}, cancel() {} });
-      return new ReadableStream({ start(c) { c.enqueue(streamText ?? 'generated reply'); c.close(); } });
+      const parts = streamChunks ?? [streamText ?? 'generated reply'];
+      return new ReadableStream({ start(c) { for (const part of parts) c.enqueue(part); c.close(); } });
     },
   });
   return { handler, calls, routeCalls };
@@ -1014,18 +1016,34 @@ test('the models can be changed without a deploy', async () => {
  * carrying these options — are never reached from here. Said plainly because
  * the test this replaces claimed more than it checked.
  */
-test('reasoning is hidden from the text and kept brief', () => {
-  for (const [role, options] of [['routing', REASONING], ['drafting', DRAFT_REASONING]]) {
-    assert.equal(options.groq.reasoningFormat, 'hidden', `${role} thinking must not reach the parser or the reader`);
-    assert.ok(['none', 'low'].includes(options.groq.reasoningEffort), `${role} must not deliberate at length`);
-  }
+test('the reasoning effort is one the chosen model actually accepts', () => {
+  /*
+    `none` was set here, on the strength of the provider's type union listing
+    it. That union spans every Groq model; GPT-OSS accepts only low, medium and
+    high, and `none` is rejected — so every draft request would have failed, in
+    the change meant to make drafting work again.
 
-  // Hiding the reasoning means nothing is emitted until it finishes, so the
-  // thinking time *is* the time to first token. Drafting is summarising
-  // material it was handed under rules it was given, so it does not deliberate
-  // at all — production timed out repeatedly waiting for it to.
-  assert.equal(DRAFT_REASONING.groq.reasoningEffort, 'none');
-  assert.equal(REASONING.groq.reasoningEffort, 'low', 'routing is the judgement call, and keeps its');
+    This asserts against the model in use rather than against the union, which
+    is the distinction that was missed.
+  */
+  const family = Object.keys(SUPPORTED_EFFORT).find(prefix => MODEL.startsWith(prefix));
+  assert.ok(family, `no supported-effort list for "${MODEL}" — add one before changing the model`);
+  assert.ok(
+    SUPPORTED_EFFORT[family].includes(REASONING.groq.reasoningEffort),
+    `"${REASONING.groq.reasoningEffort}" is not accepted by ${MODEL}; it takes ${SUPPORTED_EFFORT[family].join(', ')}`,
+  );
+
+  // And the thinking must not reach the parser or the reader either way.
+  assert.equal(REASONING.groq.reasoningFormat, 'hidden');
+});
+
+test('gpt-oss does not accept the efforts that are Qwen-only', () => {
+  // Pins the constraint itself, so the list cannot quietly grow to include the
+  // value that would break drafting.
+  for (const qwenOnly of ['none', 'default']) {
+    assert.ok(!SUPPORTED_EFFORT['openai/gpt-oss'].includes(qwenOnly));
+    assert.ok(SUPPORTED_EFFORT.qwen.includes(qwenOnly));
+  }
 });
 
 test('the output ceilings leave room for reasoning and the answer', () => {
@@ -1077,6 +1095,55 @@ test('a drafted reply is streamed as bytes, and arrives intact', async () => {
     }, new Uint8Array()),
   );
   assert.equal(text, 'generated reply', 'and decodes back to what the provider sent');
+});
+
+/** Reads a response body the way the browser does. */
+const readBody = async (response, { requireBytes = false } = {}) => {
+  const reader = response.body.getReader();
+  const chunks = [];
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    if (requireBytes) {
+      assert.ok(value instanceof Uint8Array, `streamed a ${typeof value}; an edge body must yield Uint8Array`);
+    }
+    chunks.push(value);
+  }
+  const merged = chunks.reduce((all, chunk) => {
+    const next = new Uint8Array(all.length + chunk.length);
+    next.set(all);
+    next.set(chunk, all.length);
+    return next;
+  }, new Uint8Array());
+  return { text: new TextDecoder().decode(merged), count: chunks.length };
+};
+
+test('every chunk is encoded, not just the first', async () => {
+  /*
+    `readUntilText` buffers until the first chunk with text, then replays the
+    buffer and pumps the rest — two separate places that enqueue, and the stub
+    emitted one chunk and closed, so only the replay was ever exercised. A
+    regression in the pump would have passed and reproduced the empty draft in
+    production, which is the bug this whole change is about.
+  */
+  const parts = ['Omar ', '— “embedded ', 'payments” — ', 'Plastiq Connect.'];
+  const { handler } = loadHandler({ streamChunks: parts });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  const { text, count } = await readBody(response, { requireBytes: true });
+  assert.ok(count > 1, `only ${count} chunk reached the client; the pump path went untested`);
+  assert.equal(text, parts.join(''));
+});
+
+test('a leading empty chunk does not lose the text that follows', async () => {
+  // The buffer exists because providers open with empty chunks. Those are held
+  // and replayed, so they must be encoded too.
+  const { handler } = loadHandler({ streamChunks: ['', '', 'Plastiq — “Connect”.'] });
+  const response = await handler(post('what fintech work has he done'));
+
+  const { text } = await readBody(response, { requireBytes: true });
+  assert.equal(text, 'Plastiq — “Connect”.');
 });
 
 test('a multi-byte character survives the encoding', async () => {
