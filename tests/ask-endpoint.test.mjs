@@ -26,6 +26,10 @@ const realSources = async () => {
 };
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
+// Production publishes approved answers only. Keep the injected catalogue on
+// that same boundary so adding a draft cannot make the endpoint appear to use
+// content the build deliberately withholds.
+const approvedAnswers = doc.answers.filter(answer => answer.status === 'approved');
 
 /**
  * A handler wired to stubs instead of the network. The answers are injected
@@ -51,7 +55,7 @@ const loadHandler = ({
     hasApiKey: () => hasApiKey,
     loadAnswers: async () => {
       if (answersFail) throw new Error('answers unavailable');
-      return { answers: doc.answers, index: buildIndex(doc.answers), studies: STUDIES };
+      return { answers: approvedAnswers, index: buildIndex(approvedAnswers), studies: STUDIES };
     },
     loadSources: async () => {
       if (sourcesFail) throw new Error('sources unavailable');
@@ -76,7 +80,7 @@ const loadHandler = ({
   return { handler, calls, routeCalls };
 };
 
-const answerFor = (id) => doc.answers.find(a => a.id === id);
+const answerFor = (id) => approvedAnswers.find(a => a.id === id);
 
 // A couple of real sections, so the drafting prompt is asserted against the
 // shape the build actually produces.
@@ -158,8 +162,8 @@ test('the router decides a non-exact question, and its pick is returned verbatim
   // vocabulary with the question, so a shortlist by overlap would not contain it.
   assert.match(routeCalls[0].system, /leadership-or-ic: /);
   assert.equal(
-    doc.answers.filter(a => routeCalls[0].system.includes(`${a.id}: `)).length,
-    doc.answers.length,
+    approvedAnswers.filter(a => routeCalls[0].system.includes(`${a.id}: `)).length,
+    approvedAnswers.length,
     'the router must see every written question, not a shortlist',
   );
 });
@@ -167,7 +171,7 @@ test('the router decides a non-exact question, and its pick is returned verbatim
 test('the reported bug: a hiring question no longer returns a refusal', async () => {
   // "is he a manager" scored 1.00 against refuse-employer-opinions — a
   // legitimate hiring question answered with "I will not discuss that".
-  const local = matchQuestion('is he a manager', buildIndex(doc.answers));
+  const local = matchQuestion('is he a manager', buildIndex(approvedAnswers));
   assert.equal(local.answer.topic, 'refusal', 'the local matcher still picks a refusal here');
   assert.equal(local.exact, false, 'and not as an exact hit, so it is routable');
 
@@ -289,7 +293,7 @@ test('a question with no written answer is grounded in reviewed answers only', a
   assert.match(system, /third person/i);
   // Everything in the prompt must be text Omar approved.
   const quoted = system.split('REVIEWED ANSWERS:')[1];
-  const approvedText = doc.answers.map(a => a.answer).join('\n');
+  const approvedText = approvedAnswers.map(a => a.answer).join('\n');
   for (const line of quoted.split('\nA: ').slice(1)) {
     const snippet = line.split('\n')[0].slice(0, 60);
     assert.ok(approvedText.includes(snippet), `prompt contains text not from an approved answer: ${snippet}`);
@@ -370,14 +374,14 @@ test('grounding context is ranked, not padded from the top of the array', () => 
   // Regression. Only the nearest answer was chosen by relevance; the rest came
   // from the start of the approved array, so a payments question was grounded
   // in design-systems and ai-llm-work.
-  const index = buildIndex(doc.answers);
+  const index = buildIndex(approvedAnswers);
   const ranked = rankNearest('what compliance work has he done on payments', index, 3);
 
   assert.ok(ranked.length > 1, 'expected several grounding answers');
   assert.equal(ranked[0].id, 'fintech-depth');
 
   const ids = ranked.map(a => a.id);
-  const arrayOrder = doc.answers.filter(a => a.sources?.length).slice(0, 3).map(a => a.id);
+  const arrayOrder = approvedAnswers.filter(a => a.sources?.length).slice(0, 3).map(a => a.id);
   assert.notDeepEqual(ids, arrayOrder, 'context must not be the first entries of the array');
 });
 
@@ -450,7 +454,7 @@ test('the case studies are only fetched when a draft actually needs them', async
   const { handler } = loadHandler({ routeReturns: 'fintech-depth' });
   const wrapped = createHandler({
     hasApiKey: () => true,
-    loadAnswers: async () => ({ answers: doc.answers, index: buildIndex(doc.answers), studies: STUDIES }),
+    loadAnswers: async () => ({ answers: approvedAnswers, index: buildIndex(approvedAnswers), studies: STUDIES }),
     loadSources: async () => { fetched += 1; return { sections: SECTIONS, index: buildSourceIndex(SECTIONS) }; },
     route: async () => 'ANSWER: fintech-depth',
     generate: () => new ReadableStream({ start(c) { c.enqueue('x'); c.close(); } }),
