@@ -279,7 +279,7 @@
         "incident communication",
         "subscription manager"
       ],
-      "answer": "In 2019 a fire in Italy disrupted Disney network coverage and the right people were never notified. The existing tool either missed stakeholders entirely or flooded them.\n\nHe led all UX solo across a large cross-functional team, designing a self-service subscription manager that was scalable — brands and tags addable without architecture changes. The work ran through interviews with the Support Center, affinity mapping, journey maps, MoSCoW prioritisation and usability testing, with two versions of the subscription manager scrapped and rebuilt.\n\n1,600+ users, 200,000+ emails sent, 250 critical incidents covered. It's the deepest case study on the site.",
+      "answer": "In 2019 a fire in Italy disrupted Disney network coverage and the right people were never notified. The existing tool either missed stakeholders entirely or flooded them.\n\nHe led all UX solo across a large cross-functional team, designing a self-service subscription manager that was scalable — brands and tags addable without architecture changes. The work ran through interviews with the Support Center, affinity mapping, journey maps, MoSCoW prioritisation and usability testing. The first version was scrapped after testing, and the next iteration established the direction the team built.\n\n1,600+ users, 200,000+ emails sent, 250 critical incidents covered. It's the deepest case study on the site.",
       "sources": [
         "disney-cct"
       ],
@@ -728,7 +728,7 @@
         "design challenge",
         "sample project"
       ],
-      "answer": "Not something the site answers on his behalf, because it depends entirely on what's being asked and at what stage.\n\nWhat is worth saying: there are eight case studies here covering the real thing — the research, the tradeoffs, the versions that got scrapped — and the site itself is production work he wrote and shipped. That's usually a better read on how he thinks than a weekend exercise.\n\nIf you need to see something specific, ask him directly. Booking link is in the contact section.",
+      "answer": "Not something the site answers on his behalf, because it depends entirely on what's being asked and at what stage.\n\nWhat is worth saying: there are eight case studies here covering the real thing — the research, the tradeoffs, an early version that got scrapped — and the site itself is production work he wrote and shipped. That's usually a better read on how he thinks than a weekend exercise.\n\nIf you need to see something specific, ask him directly. Booking link is in the contact section.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -870,6 +870,143 @@
       "answer": "The ones that are measured, with their scope attached.\n\nPosting Assistant cut manual posting time by about 40%. Connect API Payments cleared $20M+ in monthly payment volume in its first month, with three partnerships secured pre-launch. Disney's Critical Communication Tool reached 1,600+ users and carried 200,000+ communications across 250 critical incidents. He ran 200+ interviews and discovery sessions across the Wisdom products.\n\nOther numbers on the site are targets a design was built to hit rather than results, and are labelled that way.",
       "status": "approved",
       "sourcesFingerprint": "a76253ebe779"
+    },
+    {
+      "id": "operating-without-structure",
+      "topic": "hiring",
+      "question": "Can Omar lead design without a lot of structure?",
+      "aliases": [
+        "can he work without a design team",
+        "has he been a founding designer",
+        "can he operate without much structure",
+        "can he work without a PM",
+        "first designer experience"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "page-builder",
+        "disney-cct"
+      ],
+      "answer": "Yes. At Wisdom he was the founding and sole design lead, defining product vision, mapping operational workflows and building the design foundation while partnering directly with Operations, Finance and Engineering leadership.\n\nOn Page Builder 2.0 there was no product manager, so he owned the requirements as well as the product design and worked directly with the lead engineer to ship the rebuild in two months. At Disney he led the Critical Communication Tool's UX work with minimal supervision across a large cross-functional team.\n\nThe pattern is not working alone for its own sake; it is creating enough structure for the team to make decisions and ship.",
+      "status": "approved",
+      "sourcesFingerprint": "6be2d8910a16"
+    },
+    {
+      "id": "prioritization-under-constraints",
+      "topic": "process",
+      "question": "How does Omar prioritize when time and scope are tight?",
+      "aliases": [
+        "how does he prioritize",
+        "how does he scope an MVP",
+        "working under tight deadlines",
+        "speed versus quality",
+        "how does he handle constraints"
+      ],
+      "sources": [
+        "disney-cct",
+        "plastiq-mktg",
+        "page-builder"
+      ],
+      "answer": "He starts with the outcome that cannot fail, then makes the constraints explicit.\n\nOn Disney's Critical Communication Tool, he worked with product and engineering on the technical limits, used a MoSCoW analysis to define the MVP, and kept lower-priority improvements out until the core workflow was sound. The team finished ahead of schedule and brought some of that work back in.\n\nFor Plastiq's marketing relaunch, the deadline was three to four weeks. He divided work around the team's strengths, protected the launch requirements, and put what could not fit into the backlog. Page Builder 2.0 used the same bias toward a focused, shippable rebuild over an open-ended redesign.",
+      "status": "approved",
+      "sourcesFingerprint": "8b66612e95a6"
+    },
+    {
+      "id": "ai-assisted-workflow",
+      "topic": "process",
+      "question": "How does Omar use AI in his design and development process?",
+      "aliases": [
+        "AI assisted design workflow",
+        "how does he use AI",
+        "AI in his design process",
+        "Claude Code workflow",
+        "AI development process"
+      ],
+      "sources": [],
+      "reviewFiles": [
+        "docs/ai-workflow.md"
+      ],
+      "answer": "As leverage, not as the decision-maker.\n\nThe public workflow for this site separates the boundary clearly. ChatGPT helps with strategy framing, copy direction and critique; Claude, Codex and similar tools help scaffold components, refactor code and automate mechanical work. Figma remains the source of truth for visual design, and Omar owns hierarchy, typography, motion, product judgment and what gets cut.\n\nGenerated copy is edited line by line, code is built and tested, visual changes are reviewed in the browser, and meaningful changes get an external review pass. The goal is to compress the repetitive parts of the loop without outsourcing taste or accountability.",
+      "status": "approved",
+      "sourcesFingerprint": "1356c70c9c35"
+    },
+    {
+      "id": "iteration-when-wrong",
+      "topic": "process",
+      "question": "What does Omar do when the first design direction is wrong?",
+      "aliases": [
+        "how does he handle failed ideas",
+        "what if the first design is wrong",
+        "does he iterate",
+        "how does he respond to feedback",
+        "when a prototype fails"
+      ],
+      "sources": [
+        "disney-cct"
+      ],
+      "answer": "He changes it. The clearest example is Disney's Critical Communication Tool, where the first version of the subscription manager was scrapped after testing and the next iteration established the direction the team built.\n\nThe work moved through interviews, wireframes, prototypes, usability testing and expert review rather than being defended because time had already been spent on it. Late in the project, stakeholders questioned whether the notification labels were understandable, so he ran a preference test and used the qualitative results to settle the language. He also ran a full accessibility audit before launch.\n\nThat project still finished ahead of schedule and launched without major bugs. Iteration was part of delivery, not evidence that delivery had gone off track.",
+      "status": "approved",
+      "sourcesFingerprint": "f10c47c2e8b7"
+    },
+    {
+      "id": "complex-internal-tools",
+      "topic": "domain",
+      "question": "Has Omar designed complex internal tools and data-heavy workflows?",
+      "aliases": [
+        "internal tools experience",
+        "data heavy product design",
+        "operational workflow design",
+        "complex enterprise workflows",
+        "admin tools"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "disney-uap",
+        "disney-cct"
+      ],
+      "answer": "Yes — much of the portfolio is internal or operational software where the interface has to support real decisions, not just display information.\n\nWisdom's in-development Management Portal is designed to turn data spread across 200+ spreadsheets into risk, capacity and performance views for teams running 260+ offices. Disney's Unified Ad Platform had to make a few hundred deals scannable while preserving validation, exceptions and the workflow ESPN already depended on. The Critical Communication Tool handled subscription rules for the people coordinating high-stakes network incidents.\n\nHis pattern is to map the decision flow first, keep expert control visible, and use progressive disclosure to manage timing rather than strip away information users need.",
+      "status": "approved",
+      "sourcesFingerprint": "f58399f23c3a"
+    },
+    {
+      "id": "stakeholder-alignment",
+      "topic": "process",
+      "question": "How does Omar align stakeholders with competing priorities?",
+      "aliases": [
+        "how does he align stakeholders",
+        "handling stakeholder disagreement",
+        "competing priorities",
+        "executive alignment",
+        "cross functional alignment"
+      ],
+      "sources": [
+        "disney-uap",
+        "athena-ds",
+        "plastiq-mktg"
+      ],
+      "answer": "He gives the disagreement something concrete to organize around.\n\nOn Disney's Unified Ad Platform, eight brand perspectives and seven business functions had different language, tools and operating needs. He mapped the current decision flow so stakeholders could point to the same handoffs and risks, then used prototypes to make tradeoffs visible without flattening the differences that mattered.\n\nFor Athena, the team aligned product, design and engineering on principles and KPIs before producing components. On Plastiq's marketing relaunch, he ran workshops across design, copy, marketing and engineering against a three-to-four-week deadline. The artifacts change with the project; the goal is a shared decision, not a ceremonial workshop.",
+      "status": "approved",
+      "sourcesFingerprint": "d2badc208362"
+    },
+    {
+      "id": "end-to-end-ownership",
+      "topic": "hiring",
+      "question": "Can Omar take a product from discovery through launch?",
+      "aliases": [
+        "end to end product design",
+        "discovery to launch",
+        "can he own the full product process",
+        "has he shipped products",
+        "full lifecycle design"
+      ],
+      "sources": [
+        "connect-api",
+        "page-builder",
+        "disney-cct"
+      ],
+      "answer": "Yes, across both new products and rebuilds.\n\nOn Plastiq Connect he helped set the product vision from nothing, researched the partner and internal teams, designed both the embedded payment widget and developer portal, specified the responsive and compliance behavior, and supported a launch that cleared $20M+ in monthly volume in its first month.\n\nOn Page Builder 2.0 he owned interviews, competitive analysis, product requirements and design in the absence of a PM, then partnered with the lead engineer to ship in two months. At Disney he carried the Critical Communication Tool from discovery and journey mapping through prototyping, usability testing, accessibility review, regression testing and launch.",
+      "status": "approved",
+      "sourcesFingerprint": "ce41b852c36e"
     }
   ]
 }

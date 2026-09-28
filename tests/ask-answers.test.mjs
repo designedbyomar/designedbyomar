@@ -152,6 +152,16 @@ test('every answer is fingerprinted against its sources', () => {
   }
 });
 
+test('non-case-study review files contribute to their answer fingerprint', () => {
+  for (const a of answers.filter(answer => answer.reviewFiles?.length)) {
+    assert.notEqual(
+      fingerprintSources(caseStudies, a.sources ?? [], a.reviewFiles),
+      fingerprintSources(caseStudies, a.sources ?? []),
+      `${a.id}: reviewFiles must change the fingerprint used for re-review`,
+    );
+  }
+});
+
 test('approved answers still match the case studies they cite', () => {
   // The staleness guard. An approved answer is approved *against a specific
   // version* of its sources; if those change, approval lapses and the answer
@@ -160,7 +170,7 @@ test('approved answers still match the case studies they cite', () => {
     if (a.status !== 'approved') continue;
     assert.equal(
       a.sourcesFingerprint,
-      fingerprintSources(caseStudies, a.sources ?? []),
+      fingerprintSources(caseStudies, a.sources ?? [], a.reviewFiles ?? []),
       `${a.id}: its sources changed since this answer was approved. Re-read it against ${a.sources.join(', ')}, then re-stamp with "node scripts/ask-fingerprint.mjs --write".`,
     );
   }

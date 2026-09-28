@@ -26,6 +26,14 @@ import { createHash } from 'node:crypto';
  * which change without changing what is true.
  */
 const CLAIM_FIELDS = ['subtitle', 'year', 'role', 'metrics', 'challenge', 'approach', 'outcome', 'body'];
+const REVIEW_ROOT = new URL('../', import.meta.url);
+
+// Answers normally cite case studies, but a small number describe other public
+// artifacts. Keep that list explicit: an authored path should never turn this
+// build-time check into an arbitrary file reader.
+const ALLOWED_REVIEW_FILES = new Set([
+  'docs/ai-workflow.md',
+]);
 
 /** Flatten a case study's claim-bearing fields to a stable text blob. */
 const claimText = (caseStudy) => {
@@ -41,11 +49,16 @@ const claimText = (caseStudy) => {
   return parts.join('\u0000');
 };
 
-/** Short, stable hash of the claim text of every case study an answer cites. */
-export const fingerprintSources = (caseStudies, sourceIds) => {
+/** Short, stable hash of every claim-bearing source an answer cites. */
+export const fingerprintSources = (caseStudies, sourceIds, reviewFiles = []) => {
   const byId = new Map(caseStudies.map(c => [c.id, c]));
-  const blob = [...sourceIds].sort()
-    .map(id => `${id}:${claimText(byId.get(id) ?? {})}`)
+  const caseStudyClaims = [...sourceIds].sort()
+    .map(id => `${id}:${claimText(byId.get(id) ?? {})}`);
+  const fileClaims = [...reviewFiles].sort().map((file) => {
+    if (!ALLOWED_REVIEW_FILES.has(file)) throw new Error(`Unsupported Ask review file: ${file}`);
+    return `${file}:${readFileSync(new URL(file, REVIEW_ROOT), 'utf8')}`;
+  });
+  const blob = [...caseStudyClaims, ...fileClaims]
     .join('\u0001');
   return createHash('sha256').update(blob).digest('hex').slice(0, 12);
 };
@@ -57,7 +70,7 @@ if (process.argv.includes('--write')) {
 
   let changed = 0;
   for (const answer of doc.answers) {
-    const next = fingerprintSources(caseStudies, answer.sources ?? []);
+    const next = fingerprintSources(caseStudies, answer.sources ?? [], answer.reviewFiles ?? []);
     if (answer.sourcesFingerprint !== next) {
       if (answer.status === 'approved') {
         console.warn(`  ${answer.id}: approved answer re-stamped — confirm it still matches its sources`);
