@@ -34,7 +34,7 @@ If you're a hiring manager or founder, the things to look at are:
 - **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, generated `sitemap.xml`, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
-- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization.
+- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization, plus automatic 1200×627 JPEG social previews for every case study during production builds.
 
 ## Stack
 
@@ -63,6 +63,8 @@ npm run dev
 npm run build      # vite build → dist/, then postbuild.js generates routes and sitemap.xml
 npm run preview    # preview the built dist/ locally
 ```
+
+The build first runs `scripts/generate-social-images.mjs`, which center-crops each case-study cover into a share-safe `cover-og.jpg` without changing the on-page WebP.
 
 ## Automated tests
 

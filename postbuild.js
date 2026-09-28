@@ -70,12 +70,21 @@ const escapeText = (value) => String(value)
 
 const replaceTag = (html, pattern, replacement) => html.replace(pattern, replacement);
 
-const setMeta = (html, { title, description, url, image }) => {
+const setMeta = (html, {
+  title,
+  description,
+  url,
+  image,
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageAlt = title,
+}) => {
   const ogImage = toAbsoluteUrl(image);
   const escapedTitle = escapeAttr(title);
   const escapedDescription = escapeAttr(description);
   const escapedUrl = escapeAttr(url);
   const escapedImage = escapeAttr(ogImage);
+  const escapedImageAlt = escapeAttr(imageAlt);
 
   let next = html;
   next = replaceTag(next, /<title>.*?<\/title>/, `<title>${escapedTitle}</title>`);
@@ -85,6 +94,9 @@ const setMeta = (html, { title, description, url, image }) => {
   next = replaceTag(next, /<meta property="og:url" content=".*?">/, `<meta property="og:url" content="${escapedUrl}">`);
   next = replaceTag(next, /<meta property="og:image" content=".*?">/, `<meta property="og:image" content="${escapedImage}">`);
   next = replaceTag(next, /<meta property="og:image:type" content=".*?">/, `<meta property="og:image:type" content="${imageType(ogImage)}">`);
+  next = replaceTag(next, /<meta property="og:image:width" content=".*?">/, `<meta property="og:image:width" content="${imageWidth}">`);
+  next = replaceTag(next, /<meta property="og:image:height" content=".*?">/, `<meta property="og:image:height" content="${imageHeight}">`);
+  next = replaceTag(next, /<meta property="og:image:alt" content=".*?">/, `<meta property="og:image:alt" content="${escapedImageAlt}">`);
   next = replaceTag(next, /<meta name="twitter:title" content=".*?">/, `<meta name="twitter:title" content="${escapedTitle}">`);
   next = replaceTag(next, /<meta name="twitter:description" content=".*?">/, `<meta name="twitter:description" content="${escapedDescription}">`);
   next = replaceTag(next, /<meta name="twitter:image" content=".*?">/, `<meta name="twitter:image" content="${escapedImage}">`);
@@ -550,15 +562,10 @@ function generateRoutes() {
       description: c.metaDescription || c.subtitle,
       url: `${SITE_ORIGIN}/work/${c.id}/`,
       image: c.ogImage,
+      imageWidth: 1200,
+      imageHeight: 627,
+      imageAlt: c.title,
     });
-    // Strip width/height only for case studies — WebP dimensions differ from the home PNG.
-    const withoutWidth = html.replace(/<meta property="og:image:width" content="[^"]*"\s*\/?>\r?\n?/, '');
-    if (withoutWidth === html) throw new Error('og:image:width tag not found in index.html template — check template and rerun build');
-    html = withoutWidth;
-
-    const withoutHeight = html.replace(/<meta property="og:image:height" content="[^"]*"\s*\/?>\r?\n?/, '');
-    if (withoutHeight === html) throw new Error('og:image:height tag not found in index.html template — check template and rerun build');
-    html = withoutHeight;
     html = setStructuredData(html, caseStudyStructuredData(c));
     html = injectRootContent(html, caseStudyContentHtml(c), c.title);
 
