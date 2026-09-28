@@ -1248,10 +1248,18 @@ const ComponentsSection = () => (
       </ExampleFrame>
       <div className="ds-card-grid">
         <DocCard title="Prompts follow the reader" meta="Suggestions">
-          The opening prompts cover the breadth of the set. Once an answer is on screen they are
-          replaced by follow-ups ranked against the question just answered, because the opening six
-          are the six the reader has already passed over. Refusals are never offered as a prompt:
-          they answer honestly when asked, but suggesting one invites it.
+          Three prompts open the panel, with five more behind one control and the whole set behind the
+          link to <code>/ask</code>. Eight at once was most of what made the section read as a wall.
+          Once an answer is on screen they are replaced by follow-ups ranked against the question just
+          answered, because the opening three are the three the reader has already passed over. Those
+          are never collapsed: there are at most four and they are a next step, not a menu. Refusals
+          are never offered as a prompt — they answer honestly when asked, but suggesting one
+          invites it.
+        </DocCard>
+        <DocCard title="Input first" meta="Order">
+          The panel reads input, then the one-line note on where answers come from, then the answer,
+          then the prompts. It used to open with a label and eight buttons, which put its own input
+          fourth and left the note stranded at the bottom, furthest from the moment it matters.
         </DocCard>
         <DocCard title="One panel, two placements" meta="Composition">
           The same component renders as a section of the homepage and as the <code>/ask</code> page.

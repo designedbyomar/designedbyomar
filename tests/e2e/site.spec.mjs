@@ -86,12 +86,143 @@ test('the Ask section offers suggested questions instead of an accordion', async
   await expect(page.getByRole('button', { name: /View all questions/i })).toHaveCount(0);
 
   await expect(faq.getByRole('heading', { name: /Ask about the work/i })).toBeVisible();
-  await expect(page.getByText('Ask something else')).toBeVisible();
-  await expect(page.locator('#ask-panel button[type="button"]')).toHaveCount(6);
+  await expect(page.getByText('Try one of these')).toBeVisible();
+
+  // Three to start, the rest behind one control — a wall of eight buttons was
+  // most of what made the section feel wordy.
+  const prompts = page.locator('#ask-panel [data-ask-suggestion="true"]');
+  await expect(prompts).toHaveCount(3);
+  const more = page.locator('[data-ask-expand="true"]');
+  await expect(more).toHaveAttribute('aria-expanded', 'false');
+
+  await more.click();
+  await expect(prompts).toHaveCount(8);
+  await expect(more).toHaveAttribute('aria-expanded', 'true');
+
+  await more.click();
+  await expect(prompts).toHaveCount(3);
 
   // Nav points here under its new label, via the anchor that already existed.
   const navLink = page.getByRole('banner').getByRole('link', { name: 'Ask' });
   await expect(navLink).toHaveAttribute('href', '#faq');
+});
+
+test('on a phone the contact CTA does not sit on top of the Ask panel', async ({ page }) => {
+  // This shipped. `top: 96` was set unconditionally while `position` flipped to
+  // relative when stacked, and `top` on a relative element shifts it without
+  // reflowing — so the left column slid 96px down over the panel and the CTA
+  // landed on its first row. Asserted geometrically, not by eye.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+  await openAsk(page);
+
+  // Pinned on the declaration, not the symptom. `top: 96` was applied whatever
+  // the position, and on a relative element that shifts it without reflowing —
+  // which slid this column over the panel. The shorter copy now absorbs 96px,
+  // so geometry alone would pass against the bug; the offset itself is the
+  // thing that must not come back.
+  const column = page.locator('#faq h2').locator('xpath=ancestor::div[contains(@style,"position")][1]');
+  const offset = await column.evaluate(el => {
+    const s = getComputedStyle(el);
+    return { position: s.position, top: s.top };
+  });
+  expect(offset.position, 'stacked, the column must not be sticky').toBe('relative');
+  // `top: auto` on a relative element resolves to a used value of 0px, so the
+  // assertion is "no offset" rather than a particular keyword.
+  expect(parseFloat(offset.top) || 0, 'no offset, or the column slides over the panel').toBe(0);
+
+  const heading = page.locator('#faq h2');
+  const panel = page.locator('#ask-panel');
+  const [headBox, panelBox] = [await heading.boundingBox(), await panel.boundingBox()];
+  expect(headBox.y + headBox.height, 'the heading column overlaps the panel')
+    .toBeLessThanOrEqual(panelBox.y + 1);
+
+  const cta = page.getByRole('link', { name: /Start a conversation/i });
+  await expect(cta).toBeVisible();
+  const ctaBox = await cta.boundingBox();
+
+  // It must sit clear of everything it used to land on, and below the input —
+  // the point of moving it is that the input is met first.
+  for (const [name, locator] of [
+    ['the input', page.locator('#faq form')],
+    ['the prompts', page.locator('#ask-panel [data-ask-suggestion="true"]').first()],
+  ]) {
+    const box = await locator.boundingBox();
+    expect(ctaBox.y, `the CTA overlaps ${name}`).toBeGreaterThanOrEqual(box.y + box.height - 1);
+  }
+
+  // Nothing is painted over it either. elementFromPoint takes viewport
+  // coordinates, so the control has to be on screen before asking.
+  await cta.scrollIntoViewIfNeeded();
+  const inView = await cta.boundingBox();
+  const owns = await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y);
+    return Boolean(el && el.closest('a')?.textContent?.includes('Start a conversation'));
+  }, { x: inView.x + inView.width / 2, y: inView.y + inView.height / 2 });
+  expect(owns, 'something is covering the CTA').toBe(true);
+
+  // Scoped to this section. The homepage as a whole does overflow at 375 by
+  // design — the hero galaxy is a full-bleed canvas wider than the viewport —
+  // so asserting on the document would fail for something unrelated.
+  const bleed = await page.locator('#faq').evaluate((section) => {
+    const vw = document.documentElement.clientWidth;
+    return [...section.querySelectorAll('*')]
+      .map(el => el.getBoundingClientRect())
+      .filter(r => r.width > 0 && (r.right > vw + 1 || r.left < -1)).length;
+  });
+  expect(bleed, 'nothing in the Ask section may bleed past 375').toBe(0);
+});
+
+test('on a wide viewport the CTA stays in the sticky column', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await openAsk(page);
+
+  const cta = page.getByRole('link', { name: /Start a conversation/i });
+  const panel = page.locator('#ask-panel');
+  const [ctaBox, panelBox] = [await cta.boundingBox(), await panel.boundingBox()];
+
+  // Left of the panel, not beneath it — the two-column layout is unchanged.
+  expect(ctaBox.x + ctaBox.width).toBeLessThanOrEqual(panelBox.x + 1);
+});
+
+test('the panel reads input first, then the disclaimer, then the answer', async ({ page }) => {
+  // The section used to open with a label and eight buttons, putting its own
+  // input fourth. Asserted on rendered order so a reshuffle is caught rather
+  // than merely looking different.
+  await page.goto('/');
+  await openAsk(page);
+
+  const order = await page.locator('#ask-panel').evaluate((panel) => {
+    const seen = [];
+    const walk = (node) => {
+      for (const child of node.children) {
+        if (child.tagName === 'FORM') seen.push('input');
+        else if (child.matches('[aria-live]')) seen.push('answer');
+        else if (child.matches('[data-ask-suggestion="true"]')) seen.push('suggestions');
+        else if (child.tagName === 'P' && /Written and reviewed in advance/.test(child.textContent)) seen.push('disclaimer');
+        walk(child);
+      }
+    };
+    walk(panel);
+    return seen;
+  });
+
+  expect(order.indexOf('input')).toBeLessThan(order.indexOf('disclaimer'));
+  expect(order.indexOf('disclaimer')).toBeLessThan(order.indexOf('answer'));
+  expect(order.indexOf('answer')).toBeLessThan(order.indexOf('suggestions'));
+});
+
+test('follow-ups after an answer are never hidden behind the expand control', async ({ page }) => {
+  // At most four, and they are the next step from something already on screen.
+  await page.goto('/');
+  await openAsk(page);
+
+  await page.locator('#ask-panel [data-ask-suggestion="true"]')
+    .filter({ hasText: /fintech and payments/i }).first().click();
+
+  await expect(page.getByText('Related')).toBeVisible();
+  await expect(page.locator('[data-ask-expand="true"]')).toHaveCount(0);
 });
 
 test('the approved answers are in the served HTML for non-JS consumers', async ({ page }) => {
@@ -219,8 +350,8 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
 
   await page.locator('#faq').scrollIntoViewIfNeeded();
-  await expect(page.getByText('Ask something else')).toBeVisible();
-  await page.locator('#ask-panel button[type="button"]').first().click();
+  await expect(page.getByText('Try one of these')).toBeVisible();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expectLatestAnalyticsEvent(page, 'ask_suggested_click', { answer_id: 'kind-of-designer' });
 
   await page.locator('#contact').scrollIntoViewIfNeeded();
@@ -567,7 +698,7 @@ test('Athena case study points to the live design system', async ({ page }) => {
 /** Scroll the FAQ section into view and wait for the Ask panel to load. */
 const openAsk = async (page) => {
   await page.locator('#faq').scrollIntoViewIfNeeded();
-  await expect(page.getByText('Ask something else')).toBeVisible();
+  await expect(page.getByText('Try one of these')).toBeVisible();
 };
 
 const askInput = (page) => page.locator('#faq input[type="text"]');
@@ -589,16 +720,16 @@ test('the suggestion row becomes related follow-ups once an answer is showing', 
   await page.goto('/');
   await openAsk(page);
 
-  const prompts = page.locator('#ask-panel button[type="button"]');
+  const prompts = page.locator('#ask-panel [data-ask-suggestion="true"]');
   const opening = await prompts.allInnerTexts();
-  expect(opening).toHaveLength(6);
+  expect(opening, 'collapsed to three until asked to show more').toHaveLength(3);
 
   await prompts.filter({ hasText: /fintech and payments/i }).first().click();
 
   // The row retitles and re-ranks against the question just answered, rather
-  // than leaving the same six the visitor has already passed over.
+  // than leaving the same prompts the visitor has already passed over.
   await expect(page.getByText('Related')).toBeVisible();
-  await expect(page.getByText('Ask something else')).toHaveCount(0);
+  await expect(page.getByText('Try one of these')).toHaveCount(0);
 
   const related = await prompts.allInnerTexts();
   expect(related.length).toBeGreaterThan(0);
@@ -783,7 +914,7 @@ test('a verbatim question is answered without touching the network', async ({ pa
   await page.goto('/');
   await openAsk(page);
 
-  await page.locator('#ask-panel button[type="button"]').first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expect(askLive(page).locator('p').first()).toBeVisible();
   expect(requests, 'a suggested prompt must not be routed').toHaveLength(0);
 
@@ -911,7 +1042,7 @@ test('the site works on a browser with only the legacy matchMedia listener API',
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await openAsk(page);
-  await page.locator('#ask-panel button[type="button"]').first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expect(askLive(page).locator('p').first()).toBeVisible();
 
   expect(errors, 'no listener call may throw').toEqual([]);
@@ -919,7 +1050,7 @@ test('the site works on a browser with only the legacy matchMedia listener API',
 
 test('a refused clipboard write says so, and points at the address bar', async ({ page, context }) => {
   await page.goto('/ask');
-  await page.locator('#ask-panel button[type="button"]').filter({ hasText: /fintech and payments/i }).first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').filter({ hasText: /fintech and payments/i }).first().click();
   await expect(page).toHaveURL(/#fintech-depth$/);
 
   // Clipboard writes are refused routinely — insecure origin, denied
@@ -982,13 +1113,13 @@ test('the /ask route stands on its own', async ({ page }) => {
   });
 
   // It is the page, so it must not wait to be scrolled to.
-  await expect(page.locator('#ask-panel button[type="button"]').first()).toBeVisible();
+  await expect(page.locator('#ask-panel [data-ask-suggestion="true"]').first()).toBeVisible();
   await expect(page.locator('#ask-panel input[type="text"]')).toBeVisible();
 });
 
 test('changing the hash on /ask selects the matching answer', async ({ page }) => {
   await page.goto('/ask');
-  await expect(page.locator('#ask-panel button[type="button"]').first()).toBeVisible();
+  await expect(page.locator('#ask-panel [data-ask-suggestion="true"]').first()).toBeVisible();
 
   await page.evaluate(() => { window.location.hash = 'fintech-depth'; });
   await expect(page.getByText(/Two years at Plastiq/i).first()).toBeVisible();
@@ -997,7 +1128,7 @@ test('changing the hash on /ask selects the matching answer', async ({ page }) =
 test('an answer on /ask has a link of its own that reopens it', async ({ page, context }) => {
   await page.goto('/ask');
 
-  await page.locator('#ask-panel button[type="button"]').filter({ hasText: /fintech and payments/i }).first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').filter({ hasText: /fintech and payments/i }).first().click();
   await expect(page).toHaveURL(/#fintech-depth$/);
 
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -1016,7 +1147,7 @@ test('an answer on /ask has a link of its own that reopens it', async ({ page, c
 test('a miss on /ask stops the URL pointing at the previous answer', async ({ page }) => {
   await page.goto('/ask');
 
-  await page.locator('#ask-panel button[type="button"]').first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expect(page).toHaveURL(/#.+$/);
 
   await page.locator('#ask-panel input[type="text"]').fill('how do penguins pay for parking in antarctica');
@@ -1048,7 +1179,7 @@ test('the homepage panel leaves the URL alone', async ({ page }) => {
   // Writing a hash here would fight the #faq anchor the nav still uses.
   await page.goto('/');
   await openAsk(page);
-  await page.locator('#ask-panel button[type="button"]').first().click();
+  await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expect(askLive(page).locator('p').first()).toBeVisible();
   expect(new URL(page.url()).hash).toBe('');
 });

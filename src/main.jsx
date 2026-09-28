@@ -1840,9 +1840,8 @@ const KeyFacts = () => {
 // ============================================================
 
 /**
- * Suggested prompts, in preference order. With the FAQ accordion gone these
- * carry the section on their own, so they cover the breadth it used to show
- * rather than only the top few. Ids that are not approved are skipped.
+ * Suggested prompts, in preference order. The first three carry the section on
+ * their own; the rest are a tap away. Ids that are not approved are skipped.
  */
 const ASK_SUGGESTED_IDS = [
   'kind-of-designer',
@@ -1851,14 +1850,23 @@ const ASK_SUGGESTED_IDS = [
   'ai-llm-work',
   'leadership-or-ic',
   'technical-depth',
+  'looking-for',
+  'business-outcomes',
 ];
 
-const ASK_MAX_SUGGESTIONS = 6;
+const ASK_MAX_SUGGESTIONS = 8;
+
+/**
+ * Three is enough to show what the box is for without becoming a wall of
+ * buttons above the answer. The rest are behind one control, and all 48 are
+ * behind the link to /ask.
+ */
+const ASK_COLLAPSED_SUGGESTIONS = 3;
 
 /**
  * Follow-ups shown once an answer is on screen. Fewer than the opening set:
- * they sit above an answer the reader is still reading, and the point is a
- * next step, not a second menu.
+ * they are a next step from something the reader is already looking at, not a
+ * second menu — which is also why they are never collapsed.
  */
 const ASK_MAX_FOLLOW_UPS = 4;
 
@@ -1928,6 +1936,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // identical to never having pressed the button, and clipboard writes are
   // rejected routinely — insecure origin, denied permission, no gesture.
   const [copyState, setCopyState] = React.useState('idle');
+  const [suggestionsExpanded, setSuggestionsExpanded] = React.useState(false);
   const copyResetRef = React.useRef(null);
 
   React.useEffect(() => () => {
@@ -2010,7 +2019,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     ).slice(0, ASK_MAX_FOLLOW_UPS);
   }, [index, answered, result]);
 
-  const suggestions = followUps.length ? followUps : openingSuggestions;
+  // Follow-ups are never collapsed: there are at most four of them and they are
+  // the next step from an answer already on screen. Only the opening set, which
+  // a visitor meets before they have asked anything, is worth hiding.
+  const showingFollowUps = followUps.length > 0;
+  const fullSet = showingFollowUps ? followUps : openingSuggestions;
+  const collapsible = !showingFollowUps && fullSet.length > ASK_COLLAPSED_SUGGESTIONS;
+  const suggestions = collapsible && !suggestionsExpanded
+    ? fullSet.slice(0, ASK_COLLAPSED_SUGGESTIONS)
+    : fullSet;
 
   // Drives both the submit guard and the button's disabled styling, so the two
   // cannot disagree — a button that looks pressable and does nothing is worse
@@ -2229,53 +2246,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       marginTop: 'var(--space-2)',
       borderTop: '1px solid var(--color-gray-100)',
     }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        {followUps.length ? 'Related' : 'Ask something else'}
-      </div>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-        {suggestions.map(answer => (
-          <button
-            key={answer.id}
-            type="button"
-            onClick={() => {
-              trackPortfolioEvent('ask_suggested_click', {
-                answer_id: answer.id,
-                context: followUps.length ? 'related' : 'opening',
-              });
-              setQuery('');
-              show(answer);
-            }}
-            style={{
-              minHeight: 44,
-              padding: '10px 14px',
-              fontFamily: 'inherit',
-              fontSize: 'var(--font-size-body-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              color: 'var(--fg-secondary)',
-              background: 'transparent',
-              border: 'none',
-              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              borderRadius: 'var(--radius-standard)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: prefersReducedMotion ? 'none' : 'background var(--duration-fast), color var(--duration-fast)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--fg-secondary)'; }}
-          >
-            {answer.question}
-          </button>
-        ))}
-      </div>
-
       <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         {/*
           The wrapper carries the gradient ring. An input is a replaced element
           and cannot host ::before/::after, so the ring has nowhere to live
           without it — see .ask-field in index.html.
         */}
-        <div className="ask-field" style={{ flex: '1 1 260px', minWidth: 0, display: 'flex' }}>
+        {/* 200px, not 260: at 375 the wider basis pushed the Ask button onto
+            its own line, where it sat orphaned under a full-width field. */}
+        <div className="ask-field" style={{ flex: '1 1 200px', minWidth: 0, display: 'flex' }}>
           <input
             type="text"
             aria-label="Ask a question about Omar's work"
@@ -2318,6 +2297,16 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           Ask
         </button>
       </form>
+
+      {/*
+        Directly under the input, because this is what a visitor wants to know
+        at the moment they are about to type — not after scrolling past an
+        answer. Both tiers still stated: written and reviewed, or drafted and
+        labelled.
+      */}
+      <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
+        Written and reviewed in advance. Anything they don&rsquo;t cover is drafted from them, and labelled.
+      </p>
 
       <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         {result && (
@@ -2505,10 +2494,78 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         )}
       </div>
 
-      <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-        These answers are written in advance from the published case studies and reviewed by hand.
-        When nothing written covers a question, a reply is drafted from them and labelled as drafted.
-      </p>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        {showingFollowUps ? 'Related' : 'Try one of these'}
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        {suggestions.map(answer => (
+          <button
+            key={answer.id}
+            type="button"
+            data-ask-suggestion="true"
+            onClick={() => {
+              trackPortfolioEvent('ask_suggested_click', {
+                answer_id: answer.id,
+                context: showingFollowUps ? 'related' : 'opening',
+              });
+              setQuery('');
+              show(answer);
+            }}
+            style={{
+              minHeight: 44,
+              padding: '10px 14px',
+              fontFamily: 'inherit',
+              fontSize: 'var(--font-size-body-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              color: 'var(--fg-secondary)',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              borderRadius: 'var(--radius-standard)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: prefersReducedMotion ? 'none' : 'background var(--duration-fast), color var(--duration-fast)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--fg-secondary)'; }}
+          >
+            {answer.question}
+          </button>
+        ))}
+      </div>
+
+      {collapsible && (
+        <button
+          type="button"
+          data-ask-expand="true"
+          aria-expanded={suggestionsExpanded}
+          onClick={() => {
+            setSuggestionsExpanded(open => !open);
+            if (!suggestionsExpanded) trackPortfolioEvent('ask_suggestions_expand', { shown: fullSet.length });
+          }}
+          style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            minHeight: 44,
+            padding: '10px 4px',
+            fontFamily: 'inherit',
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            color: 'var(--fg-tertiary)',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
+        >
+          {suggestionsExpanded ? 'Fewer questions' : `More questions (${fullSet.length - ASK_COLLAPSED_SUGGESTIONS})`}
+        </button>
+      )}
     </div>
   );
 };
@@ -2518,6 +2575,34 @@ const AskSection = ({ scrollToSection }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const isStacked = viewportWidth <= TABLET_BREAKPOINT;
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
+
+  const contactCta = (
+    <a href="#contact" onClick={(event) => {
+      event.preventDefault();
+      scrollToSection('contact', 'faq_cta');
+    }} style={{
+      alignSelf: 'flex-start',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 'var(--space-2)',
+      minHeight: 44,
+      fontSize: 'var(--font-size-body-md)',
+      fontWeight: 'var(--font-weight-medium)',
+      color: 'var(--fg-primary)',
+      padding: '10px 16px',
+      borderRadius: 'var(--radius-standard)',
+      background: 'transparent',
+      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+      textDecoration: 'none',
+      transition: 'background var(--duration-fast)',
+    }}
+      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+    >
+      Start a conversation
+      <AppIcon icon={ArrowUpRight} size={12} />
+    </a>
+  );
 
   return (
     <section id="faq" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6)' }}>
@@ -2531,7 +2616,10 @@ const AskSection = ({ scrollToSection }) => {
       }}>
         <div style={{
           position: isStacked ? 'relative' : 'sticky',
-          top: 96,
+          // Only while sticky. On a relative element `top` shifts it visually
+          // without reflowing, so setting it unconditionally slid this whole
+          // column 96px down over the panel beneath it on every phone.
+          top: isStacked ? undefined : 96,
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-6)',
@@ -2545,40 +2633,21 @@ const AskSection = ({ scrollToSection }) => {
               Ask about the work.
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              Pick a question or type your own. The answers are written in advance from the published
-              case studies, so what you get back is what I would actually say. Ask something they do
-              not cover and it will draft a reply from them, and tell you that is what it did.
+              Pick a question or type your own.
             </p>
           </div>
-          <a href="#contact" onClick={(event) => {
-            event.preventDefault();
-            scrollToSection('contact', 'faq_cta');
-          }} style={{
-            alignSelf: 'flex-start',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            minHeight: 44,
-            fontSize: 'var(--font-size-body-md)',
-            fontWeight: 'var(--font-weight-medium)',
-            color: 'var(--fg-primary)',
-            padding: '10px 16px',
-            borderRadius: 'var(--radius-standard)',
-            background: 'transparent',
-            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            textDecoration: 'none',
-            transition: 'background var(--duration-fast)',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            Start a conversation
-            <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
+          {!isStacked && contactCta}
         </div>
 
         <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
           <Ask prefersReducedMotion={prefersReducedMotion} />
+          {/*
+            Stacked, the left column sits above the panel, which put a competing
+            CTA between the heading and the input. Here it follows the panel, so
+            the input is the first thing met. Desktop keeps it in the sticky
+            column, where it does not compete.
+          */}
+          {isStacked && contactCta}
           <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'faq_section' })} className="text-link" style={{
             alignSelf: 'flex-start',
             display: 'inline-flex',
@@ -2629,12 +2698,7 @@ const AskPage = () => {
         Ask about the work.
       </h1>
       <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 720 }}>
-        Pick a question or type your own. The answers are written in advance from the published case
-        studies, so what you get back is what I would actually say. Ask something they do not cover
-        and it will draft a reply from them, and tell you that is what it did.
-      </p>
-      <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', margin: 0, maxWidth: 720 }}>
-        Every answer here has its own link, so you can send one on.
+        Pick a question or type your own. Every answer here has its own link, so you can send one on.
       </p>
 
       <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
