@@ -12,7 +12,18 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHandler } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
-import { buildSourceIndex } from '../src/ask-sources.mjs';
+import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
+
+const SUMMARY = new Set(['Challenge', 'Approach', 'Outcome']);
+
+// The real published sections, so retrieval is exercised against the corpus the
+// build actually produces rather than a fixture shaped to pass.
+const realSources = async () => {
+  const { sections } = JSON.parse(
+    readFileSync(new URL('../dist/ask-sources.json', import.meta.url), 'utf8'),
+  );
+  return { sections, index: buildSourceIndex(sections) };
+};
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 
@@ -468,4 +479,65 @@ test('the router is shown the case studies, not just the questions', async () =>
   assert.match(system, /CASE STUDIES:/);
   assert.match(system, /connect-api: /, 'by id, so what it returns can be validated');
   assert.match(system, /SOURCES: /, 'and told it may name them');
+});
+
+/**
+ * Retrieval has to serve two kinds of question at once, and an earlier fix for
+ * one broke the other.
+ *
+ * Ranking every summary above every detail was added because relevance inside a
+ * single study is largely noise — "strongest fintech case study" matched a
+ * section on API key rotation, on the word "study", from "deserve its own
+ * study". Written as an absolute it meant a question *about* key rotation got
+ * four overviews and not the section holding its answer.
+ *
+ * Both directions are asserted, because satisfying either one alone is easy.
+ */
+test('a question about a detail reaches the section holding it', async () => {
+  const { sections, index } = await realSources();
+  const picked = retrieveSections(
+    'how did he handle manual API key rotation in the partner portal',
+    index,
+    { caseStudies: ['connect-api', 'athena-ds'] },
+  );
+
+  assert.ok(
+    picked.some(s => /key rotation/i.test(s.text)),
+    'the section that discusses key rotation must be in the material',
+  );
+  for (const study of ['connect-api', 'athena-ds']) {
+    assert.ok(
+      picked.some(s => s.caseStudy === study && SUMMARY.has(s.heading)),
+      `${study} must still contribute its framing`,
+    );
+  }
+  assert.ok(sections.length > picked.length);
+});
+
+test('a question about a study as a whole still leads with its framing', async () => {
+  const { index } = await realSources();
+  const picked = retrieveSections('What is the strongest fintech case study he has', index, {
+    caseStudies: ['connect-api'],
+  });
+
+  assert.ok(SUMMARY.has(picked[0].heading), `led with "${picked[0].heading}" instead of the summary`);
+  const summaries = picked.filter(s => SUMMARY.has(s.heading)).length;
+  assert.ok(summaries >= 2, 'a vague question should be mostly framing, not detail');
+});
+
+test('citations name only the studies the draft was given', async () => {
+  // An answer is kept when it cites any named study, but 19 of the 48 cite more
+  // than one — `work-history` cites three. Taking all of their sources linked
+  // the visitor to projects the router never chose.
+  const threeStudies = answerFor('work-history');
+  assert.equal(threeStudies.sources.length, 3, 'fixture still cites three studies');
+
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api' });
+  const response = await handler(post('what has he worked on over his career'));
+
+  const cited = (response.headers.get('X-Ask-Sources') ?? '').split(',').filter(Boolean);
+  assert.ok(cited.includes('connect-api'));
+  for (const id of threeStudies.sources.filter(s => s !== 'connect-api')) {
+    assert.ok(!cited.includes(id), `cited ${id}, which was never named or retrieved`);
+  }
 });

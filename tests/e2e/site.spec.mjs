@@ -186,6 +186,51 @@ test('on a wide viewport the CTA stays in the sticky column', async ({ page }) =
   expect(ctaBox.x + ctaBox.width).toBeLessThanOrEqual(panelBox.x + 1);
 });
 
+test('expanding the prompts moves focus to what it revealed', async ({ page }) => {
+  // The control sits after the list, so expanding inserts five buttons *before*
+  // the focused element. Without moving focus the next Tab goes past all of
+  // them, and reaching them means shift-Tabbing back through controls already
+  // passed.
+  await page.goto('/');
+  await openAsk(page);
+
+  const more = page.locator('[data-ask-expand="true"]');
+  await expect(more).toHaveAttribute('aria-controls', 'ask-suggestions');
+  await more.focus();
+  await page.keyboard.press('Enter');
+
+  const prompts = page.locator('#ask-panel [data-ask-suggestion="true"]');
+  await expect(prompts).toHaveCount(8);
+
+  const focused = await page.evaluate(() => {
+    const el = document.activeElement;
+    const all = [...document.querySelectorAll('#ask-suggestions [data-ask-suggestion="true"]')];
+    return { index: all.indexOf(el), text: el?.textContent?.trim() ?? null };
+  });
+  expect(focused.index, 'focus is on the first newly revealed prompt').toBe(3);
+  expect(focused.text).toBeTruthy();
+
+  // And Tab from there continues through the new prompts rather than leaving.
+  await page.keyboard.press('Tab');
+  const next = await page.evaluate(() => {
+    const all = [...document.querySelectorAll('#ask-suggestions [data-ask-suggestion="true"]')];
+    return all.indexOf(document.activeElement);
+  });
+  expect(next, 'Tab stays within the revealed prompts').toBe(4);
+});
+
+test('collapsing the prompts does not steal focus', async ({ page }) => {
+  await page.goto('/');
+  await openAsk(page);
+
+  const more = page.locator('[data-ask-expand="true"]');
+  await more.click();
+  await more.click();
+
+  const onControl = await page.evaluate(() => document.activeElement?.dataset?.askExpand === 'true');
+  expect(onControl, 'focus stays on the control the visitor pressed').toBe(true);
+});
+
 test('the panel reads input first, then the disclaimer, then the answer', async ({ page }) => {
   // The section used to open with a label and eight buttons, putting its own
   // input fourth. Asserted on rendered order so a reshuffle is caught rather
@@ -1069,6 +1114,51 @@ test('the site works on a browser with only the legacy matchMedia listener API',
   await expect(askLive(page).locator('p').first()).toBeVisible();
 
   expect(errors, 'no listener call may throw').toEqual([]);
+});
+
+test('a clipboard write that lands late does not mark the wrong answer copied', async ({ page }) => {
+  // The write is async. Choosing another answer while it is in flight used to
+  // put "Copied" on the new answer's button while the clipboard still held the
+  // previous link — so the visitor sends the wrong one, with nothing on screen
+  // to suggest it.
+  await page.goto('/ask');
+  await page.evaluate(() => {
+    window.__written = [];
+    window.__release = null;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: (text) => new Promise(resolve => {
+          window.__written.push(text);
+          window.__release = () => resolve();
+        }),
+      },
+    });
+  });
+
+  const prompts = page.locator('#ask-panel [data-ask-suggestion="true"]');
+  await prompts.filter({ hasText: /fintech and payments/i }).first().click();
+  await expect(page).toHaveURL(/#fintech-depth$/);
+  await page.locator('[data-ask-share="true"]').click();
+
+  // Switch answers while that write is still pending, then let it land.
+  await prompts.filter({ hasText: /design systems at scale/i }).first().click();
+  await expect(page).toHaveURL(/#design-systems$/);
+  await page.evaluate(() => window.__release());
+  await page.waitForTimeout(300);
+
+  const written = await page.evaluate(() => window.__written);
+  expect(written, 'the clipboard holds the first answer').toEqual([
+    expect.stringContaining('/ask#fintech-depth'),
+  ]);
+
+  // Read the rendered label and the aria-label rather than matching text: the
+  // control is uppercased in CSS, so getByText('Copied') never matches and an
+  // assertion written that way passes whether or not the bug is present.
+  const share = page.locator('[data-ask-share="true"]');
+  expect((await share.innerText()).toLowerCase(), 'the second answer must not claim the copy')
+    .toBe('copy link');
+  await expect(share).toHaveAttribute('aria-label', /Copy a link to this answer/i);
 });
 
 test('a refused clipboard write says so, and points at the address bar', async ({ page, context }) => {

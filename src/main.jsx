@@ -1937,6 +1937,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // rejected routinely — insecure origin, denied permission, no gesture.
   const [copyState, setCopyState] = React.useState('idle');
   const [suggestionsExpanded, setSuggestionsExpanded] = React.useState(false);
+  const suggestionListRef = React.useRef(null);
+  // Set only by the expand control, so focus is never taken on mount, on
+  // collapse, or when the row switches to follow-ups.
+  const focusRevealedRef = React.useRef(false);
   const copyResetRef = React.useRef(null);
 
   React.useEffect(() => () => {
@@ -1949,16 +1953,35 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     copyResetRef.current = window.setTimeout(() => setCopyState('idle'), 1200);
   };
 
+  // Moves focus to the first prompt the expansion revealed. Anything else would
+  // strand a keyboard user behind the control they just pressed.
+  React.useEffect(() => {
+    if (!focusRevealedRef.current) return;
+    focusRevealedRef.current = false;
+    const revealed = suggestionListRef.current
+      ?.querySelectorAll('[data-ask-suggestion="true"]')[ASK_COLLAPSED_SUGGESTIONS];
+    revealed?.focus();
+  }, [suggestionsExpanded]);
+
   const copyLink = async (answer) => {
+    // A clipboard write is async, and selecting another answer while it is in
+    // flight used to land its result on the new answer's button: it would read
+    // "Copied" while the clipboard held the previous answer's link, and the
+    // visitor would send the wrong one. Same token every other late arrival is
+    // checked against — `claim()` bumps it on each answer change.
+    const token = requestRef.current;
+    const current = () => requestRef.current === token;
+
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/ask#${answer.id}`);
+      if (!current()) return;
       trackPortfolioEvent('ask_share_click', { answer_id: answer.id });
       settle('copied');
     } catch {
       // No clipboard permission, or an insecure origin. show() has already put
       // this answer's id in the hash, so the address bar is the link — say so
       // rather than leaving the press looking like it did nothing.
-      settle('failed');
+      if (current()) settle('failed');
     }
   };
 
@@ -2492,7 +2515,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         {showingFollowUps ? 'Related' : 'Try one of these'}
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+      <div id="ask-suggestions" ref={suggestionListRef} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
         {suggestions.map(answer => (
           <button
             key={answer.id}
@@ -2534,9 +2557,16 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           type="button"
           data-ask-expand="true"
           aria-expanded={suggestionsExpanded}
+          aria-controls="ask-suggestions"
           onClick={() => {
+            // The revealed prompts are inserted *before* this control, so a
+            // keyboard user's next Tab would move past everything they just
+            // asked for. Focus follows the disclosure instead.
+            if (!suggestionsExpanded) {
+              focusRevealedRef.current = true;
+              trackPortfolioEvent('ask_suggestions_expand', { shown: fullSet.length });
+            }
             setSuggestionsExpanded(open => !open);
-            if (!suggestionsExpanded) trackPortfolioEvent('ask_suggestions_expand', { shown: fullSet.length });
           }}
           style={{
             alignSelf: 'flex-start',

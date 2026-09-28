@@ -407,12 +407,17 @@ export const createHandler = ({
     }
   }
 
-  // Citations follow what the draft actually drew on, which is why `context` is
-  // already filtered — otherwise a fintech question cited two healthcare studies
-  // because their answers ranked near it on shared words.
+  // Citations follow what the draft actually drew on.
+  //
+  // An answer is kept as context when it cites *any* named study, but 19 of the
+  // 48 cite more than one — `work-history` cites three — so taking all of their
+  // sources put links in front of the visitor to studies the router never chose
+  // and retrieval never opened. Intersected with what was named, since that is
+  // the material the draft actually saw.
+  const answerSources = context.flatMap(a => a.sources ?? []);
   const sources = [...new Set([
     ...sections.map(section => section.caseStudy),
-    ...context.flatMap(a => a.sources ?? []),
+    ...(named.length ? answerSources.filter(id => named.includes(id)) : answerSources),
   ])];
 
   // Nothing shares any vocabulary with the question and the router named

@@ -51,9 +51,10 @@ export const buildSourceIndex = (sections) => {
  * pure noise. The router does know that Plastiq Connect is the fintech one, so
  * it names the studies and this ranks within them.
  *
- * Sections that match nothing are still eligible, ordered as written: Challenge,
- * Approach and Outcome come first in a case study and are its summary, which is
- * a far better default than whichever paragraph happened to share a word.
+ * Each named study contributes its best summary section first — Challenge,
+ * Approach or Outcome — so the model always has that study's framing. Every
+ * remaining slot goes to whatever matches the question best, so a question
+ * about a specific published detail can still reach the section holding it.
  *
  * At most two per study, so one project cannot fill the whole context.
  */
@@ -72,29 +73,47 @@ export const retrieveSections = (query, index, { limit = 4, caseStudies = null, 
       return { section: doc.section, matched, order };
     });
 
-  // A study's Challenge, Approach and Outcome are its summary, and they are
-  // what a question about the study as a whole needs. They rank first when the
-  // study was named, because lexical relevance inside one study is mostly noise
-  // — "what is the strongest fintech case study" matched a section on API key
-  // rotation, on the word "study", from "deserve its own study".
   const isSummary = (section) => SUMMARY_HEADINGS.has(section.heading);
-  scored.sort((a, b) => {
-    if (wanted) {
-      const summary = Number(isSummary(b.section)) - Number(isSummary(a.section));
-      if (summary) return summary;
-    }
-    return (b.matched - a.matched) || (a.order - b.order);
-  });
+  const byRelevance = [...scored].sort((a, b) => (b.matched - a.matched) || (a.order - b.order));
 
   const taken = new Map();
   const picked = [];
-  for (const entry of scored) {
-    if (!wanted && entry.matched <= 0) continue;
+  const take = (entry) => {
     const seen = taken.get(entry.section.caseStudy) ?? 0;
-    if (seen >= cap) continue;
+    if (seen >= cap || picked.length >= limit || picked.includes(entry)) return false;
     taken.set(entry.section.caseStudy, seen + 1);
-    picked.push(entry.section);
+    picked.push(entry);
+    return true;
+  };
+
+  /*
+    A study's Challenge, Approach and Outcome are its summary, and a question
+    about the study as a whole needs them — relevance inside a single study is
+    largely noise, which is how "what is the strongest fintech case study"
+    matched a section on API key rotation, on the word "study", from "deserve
+    its own study".
+
+    But that was a floor, and it was written as an absolute. Ranking every
+    summary above every detail meant a question about a published detail got
+    four overviews and not the section containing its answer. So each named
+    study contributes its best summary first, and everything after that is
+    ranked purely on relevance.
+  */
+  if (wanted) {
+    for (const study of wanted) {
+      const summary = byRelevance.find(e => e.section.caseStudy === study && isSummary(e.section));
+      if (summary) take(summary);
+    }
+  }
+
+  for (const entry of byRelevance) {
+    if (!wanted && entry.matched <= 0) continue;
+    take(entry);
     if (picked.length >= limit) break;
   }
-  return picked;
+
+  // Back into document order within each study, so the model reads a study's
+  // framing before its details rather than in score order.
+  picked.sort((a, b) => a.order - b.order);
+  return picked.map(entry => entry.section);
 };
