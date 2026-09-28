@@ -524,6 +524,61 @@ button:focus-visible, a:focus-visible {
 }
 .contact-card:hover::before { opacity: 1; }
 
+/*
+  The Ask input's gradient ring.
+  Same construction as .contact-card — a conic-gradient layer punched out by a
+  solid cover, so only the 1.5px edge shows — with two differences. It is
+  visible at rest rather than on hover, because the input is the one thing in
+  the section a visitor has to find. And it holds still until hovered or
+  focused: this sits beside an answer the reader is reading, and a ring
+  rotating in their periphery the whole time competes with the text.
+
+  The ring lives on a wrapper because an input is a replaced element and cannot
+  host ::before or ::after. It does not touch outline, so the focus-visible
+  ring at the top of this file still renders outside it, unchanged.
+*/
+.ask-field {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius-standard);
+}
+.ask-field::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: calc(var(--radius-standard) + 1.5px);
+  background: conic-gradient(
+    from var(--contact-angle),
+    var(--color-ship-red),
+    var(--color-preview-pink),
+    var(--color-develop-blue),
+    var(--color-ship-red)
+  );
+  z-index: 0;
+}
+/*
+  Punches the centre out, leaving only the 1.5px edge. It has to be opaque:
+  with a transparent cover the gradient fills the whole field instead of
+  ringing it. --bg-page, the same token .contact-card::after uses, because it
+  is the colour actually behind this.
+*/
+.ask-field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-standard);
+  background: var(--bg-page);
+  z-index: 1;
+}
+.ask-field > input {
+  position: relative;
+  z-index: 2;
+}
+.ask-field:hover::before,
+.ask-field:focus-within::before {
+  animation: contact-border-spin 3s linear infinite;
+}
+
 .faq-item {
   position: relative;
   isolation: isolate;
@@ -641,6 +696,8 @@ button:focus-visible, a:focus-visible {
   .logo-track { animation: none; transform: translateX(0); }
   .case-card, .case-card-screen, .case-card-line, .case-card-tag, .case-card-sheen, .hero-stat-card, .faq-item, .faq-answer, .faq-item svg, .text-link, .reveal { transition: none !important; }
   .contact-card::before { animation: none !important; }
+  .ask-field:hover::before,
+  .ask-field:focus-within::before { animation: none !important; }
   .case-card:hover,
   .case-card:hover .case-card-screen,
   .case-card:hover .case-card-line,

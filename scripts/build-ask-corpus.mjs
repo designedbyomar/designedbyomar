@@ -126,14 +126,14 @@ for (const raw of caseStudies) {
   ].filter(Boolean).join('\n'));
 }
 
-// 2. FAQ, About drawer and hero stats — all live in main.jsx.
+// 2. About drawer and hero stats — both live in main.jsx.
+//
+// The FAQ accordion used to be a source here. It was removed when the section
+// became the Ask assistant, and its ten questions were folded into
+// src/content/ask-answers.json — four as new answers, six as aliases on
+// answers that already existed. Re-adding it as a source would feed the answer
+// set back into its own corpus.
 const mainSrc = read('src/main.jsx');
-
-const faqRaw = extractConst(mainSrc, 'FAQ_ITEMS', { kind: 'array' });
-const faqPairs = [...faqRaw.matchAll(/question:\s*'((?:[^'\\]|\\.)*)'[\s\S]*?answer:\s*[`']((?:[^`'\\]|\\.)*)[`']/g)]
-  .map(m => `Q: ${m[1].replace(/\\'/g, "'")}\nA: ${m[2].replace(/\\'/g, "'").replace(/\s+/g, ' ')}`);
-if (!faqPairs.length) fail('FAQ_ITEMS matched zero question/answer pairs — the shape changed');
-add('faq', 'Frequently asked questions', faqPairs.join('\n\n'));
 
 for (const name of ['ABOUT_HEADER', 'ABOUT_SUBHEAD', 'ABOUT_SHORT']) {
   if (mainSrc.includes(`const ${name} = \``)) {

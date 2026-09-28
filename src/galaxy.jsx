@@ -1,4 +1,5 @@
 import React from 'react';
+import { onMediaChange } from './media-query.js';
 
 const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', theme = 'dark' }) => {
   const canvasRef = React.useRef(null);
@@ -88,7 +89,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
       }
     };
     const onMotionChange = (e) => { reducedMotion = e.matches; updateRunning(); };
-    motionMQ.addEventListener('change', onMotionChange);
+    const stopWatchingMotion = onMediaChange(motionMQ, onMotionChange);
     resize();
     window.addEventListener('resize', resize);
     const observer = typeof IntersectionObserver === 'undefined'
@@ -125,7 +126,7 @@ const Galaxy = ({ density = 1, speed = 1, style = 'pixel', accent = 'mono', them
       cancelAnimationFrame(rafRef.current);
       observer?.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      motionMQ.removeEventListener('change', onMotionChange);
+      stopWatchingMotion();
       window.removeEventListener('resize', resize);
     };
   }, [density, speed, style, accent, theme]);
