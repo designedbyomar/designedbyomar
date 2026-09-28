@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, RETIRED_MODELS } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -954,20 +954,74 @@ test('the reasons a visitor can act on survive production', async () => {
  * does not error, it degrades, so the feature switches itself off and looks
  * like a quiet day. It took logging in production to see it, twice.
  */
-test('neither model is one Groq has retired', () => {
+test('neither model is one that does not work here', () => {
   for (const [role, id] of [['drafting', MODEL], ['routing', ROUTER_MODEL]]) {
     assert.ok(
-      !RETIRED_MODELS.has(id),
-      `the ${role} model is "${id}", which Groq has retired — a 404 here degrades silently`,
+      !UNUSABLE_MODELS.has(id),
+      `the ${role} model is "${id}", which 404s for this account — and a 404 degrades silently`,
     );
     assert.ok(id && typeof id === 'string', `${role} model is set`);
   }
+  // The id that actually caused the outage has to be in the list, or restoring
+  // it would pass the guard built to stop exactly that.
+  assert.ok(UNUSABLE_MODELS.has('llama-3.3-70b-versatile'));
+  assert.ok(UNUSABLE_MODELS.has('llama-3.1-8b-instant'));
 });
 
-test('the models can be changed without a deploy', () => {
-  // A retirement should not need a code change and a release to survive. These
-  // read the environment first, so the dashboard is enough.
-  const source = readFileSync(new URL('../api/ask.mjs', import.meta.url), 'utf8');
-  assert.match(source, /process\.env\.GROQ_MODEL/);
-  assert.match(source, /process\.env\.GROQ_ROUTER_MODEL/);
+test('the models can be changed without a deploy', async () => {
+  /*
+    This replaces a test that searched the source for `process.env.GROQ_MODEL`
+    and asserted nothing about what it selected — it would have passed if both
+    variables were read into constants nobody used. Second time this session I
+    wrote an assertion about the shape of the code instead of its behaviour.
+
+    Node caches ES modules by URL, so a query string gives a fresh instance and
+    the module-level constants are evaluated again against the environment.
+  */
+  const before = [process.env.GROQ_MODEL, process.env.GROQ_ROUTER_MODEL];
+  try {
+    process.env.GROQ_MODEL = 'vendor/drafting-override';
+    process.env.GROQ_ROUTER_MODEL = 'vendor/routing-override';
+    const overridden = await import('../api/ask.mjs?models=override');
+    assert.equal(overridden.MODEL, 'vendor/drafting-override');
+    assert.equal(overridden.ROUTER_MODEL, 'vendor/routing-override');
+
+    // And the other half of the `||`: without them, the defaults stand.
+    delete process.env.GROQ_MODEL;
+    delete process.env.GROQ_ROUTER_MODEL;
+    const defaults = await import('../api/ask.mjs?models=default');
+    assert.match(defaults.MODEL, /^openai\/gpt-oss-/);
+    assert.match(defaults.ROUTER_MODEL, /^openai\/gpt-oss-/);
+    assert.ok(!UNUSABLE_MODELS.has(defaults.MODEL));
+    assert.ok(!UNUSABLE_MODELS.has(defaults.ROUTER_MODEL));
+  } finally {
+    const [model, router] = before;
+    if (model === undefined) delete process.env.GROQ_MODEL; else process.env.GROQ_MODEL = model;
+    if (router === undefined) delete process.env.GROQ_ROUTER_MODEL; else process.env.GROQ_ROUTER_MODEL = router;
+  }
+});
+
+/**
+ * Both models reason before answering and the previous ones did not, so every
+ * ceiling in the file was sized for output that arrives alone. Carrying them
+ * over would have spent the allowance on thinking: the router's line never
+ * written, the draft truncated or empty. The same silent degradation that took
+ * production logging to find.
+ *
+ * This pins the configuration, not a live call. The test seam replaces
+ * `generate` and `route` wholesale, so the real provider functions — the ones
+ * carrying these options — are never reached from here. Said plainly because
+ * the test this replaces claimed more than it checked.
+ */
+test('reasoning is hidden from the text and kept brief', () => {
+  assert.equal(REASONING.groq.reasoningFormat, 'hidden', 'thinking must not reach the parser or the reader');
+  assert.ok(['none', 'low'].includes(REASONING.groq.reasoningEffort), 'and must not be lengthy');
+});
+
+test('the output ceilings leave room for reasoning and the answer', () => {
+  // The old values, sized for models that emitted only the answer.
+  assert.ok(ROUTE_TOKENS > 20, `routing ceiling is ${ROUTE_TOKENS}; 20 could not fit reasoning and a line`);
+  assert.ok(DRAFT_TOKENS > 200, `drafting ceiling is ${DRAFT_TOKENS}; 200 barely fit the prose alone`);
+  // A 60–110 word answer is roughly 150 tokens before any reasoning.
+  assert.ok(DRAFT_TOKENS >= 400, 'drafting needs room for reasoning and the prose after it');
 });
