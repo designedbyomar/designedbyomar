@@ -81,8 +81,18 @@ const answerFor = (id) => doc.answers.find(a => a.id === id);
 // A couple of real sections, so the drafting prompt is asserted against the
 // shape the build actually produces.
 const STUDIES = [
-  { id: 'connect-api', title: 'Connect API Payments', summary: 'Embedded payments a partner ships under their own brand.' },
-  { id: 'athena-ds', title: 'Athena Design System 2.0', summary: 'Enterprise design system behind an IPO-era brand.' },
+  {
+    id: 'connect-api',
+    title: 'Connect API Payments',
+    tags: ['Fintech', 'API', 'Developer Experience', 'B2B'],
+    summary: 'Embedded payments a partner ships under their own brand.',
+  },
+  {
+    id: 'athena-ds',
+    title: 'Athena Design System 2.0',
+    tags: ['Design System', 'Enterprise'],
+    summary: 'Enterprise design system behind an IPO-era brand.',
+  },
 ];
 
 const SECTIONS = [
@@ -479,6 +489,38 @@ test('the router is shown the case studies, not just the questions', async () =>
   assert.match(system, /CASE STUDIES:/);
   assert.match(system, /connect-api: /, 'by id, so what it returns can be validated');
   assert.match(system, /SOURCES: /, 'and told it may name them');
+
+  // The tags are how the site labels a study — they render as badges on the
+  // page — and they carry vocabulary the prose does not. Connect API is tagged
+  // Fintech and the word appears nowhere in its writing, so without them the
+  // router had to infer the category from a title and one line of summary.
+  assert.match(system, /Connect API Payments \[Fintech, API, Developer Experience, B2B\]/);
+});
+
+test('the published study list carries the tags the page shows', async () => {
+  // Guards the build, not the endpoint: the tags were dropped silently the
+  // first time, and nothing noticed because retrieval still returned sections.
+  const { studies } = JSON.parse(
+    readFileSync(new URL('../dist/ask-answers.json', import.meta.url), 'utf8'),
+  );
+  const connect = studies.find(c => c.id === 'connect-api');
+  assert.ok(connect, 'connect-api is published to the router');
+  assert.ok(connect.tags?.includes('Fintech'), 'and carries the Fintech tag shown on its page');
+  for (const study of studies) {
+    assert.ok(Array.isArray(study.tags), `${study.id} has tags`);
+    assert.ok(study.summary, `${study.id} has a summary`);
+  }
+});
+
+test('a study tag is findable in the sections it labels', async () => {
+  // "fintech" matched no section at all until the labels were indexed, which I
+  // reported as a fact about the writing rather than a gap in the chunker.
+  const { index } = await realSources();
+  const tagged = index.docs.filter(d => d.tokens.has('fintech'));
+  assert.ok(tagged.length > 0, 'the Fintech tag reaches the sections it labels');
+  for (const doc of tagged) {
+    assert.equal(doc.section.caseStudy, 'connect-api', 'and only the study it belongs to');
+  }
 });
 
 /**

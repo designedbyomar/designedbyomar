@@ -415,6 +415,22 @@ function generateAskSources(distDir) {
           title: c.title,
           heading,
           text,
+          // How the study is labelled, carried on every one of its sections.
+          //
+          // These were left out of the first version, and their absence was
+          // mistaken for a fact about the writing: "fintech" appears in no
+          // section body, because the prose says "payments" and "card and
+          // bank" — but it is right there as a tag on Connect API, and on the
+          // page as a badge. Indexing only the prose made a searchable label
+          // unsearchable. They belong on every section because they identify
+          // the study, not a passage within it.
+          labels: [
+            ...(c.tags || []),
+            c.client,
+            c.role,
+            String(c.year ?? ''),
+            c.subtitle,
+          ].filter(Boolean).join(' '),
         });
       }
     };
@@ -462,6 +478,11 @@ function generateAskAnswers(distDir, indexHtml) {
   const studies = CASE_STUDIES.map(c => ({
     id: c.id,
     title: c.title,
+    // The tags are how the site itself labels a study — they render as badges
+    // on the page — and they carry the vocabulary the prose does not. Connect
+    // API is tagged Fintech; the word appears nowhere in its writing. Without
+    // them the router had to infer the category from a title and one line.
+    tags: c.tags || [],
     summary: c.subtitle || c.metaDescription || '',
   }));
 

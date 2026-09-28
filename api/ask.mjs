@@ -326,7 +326,7 @@ export const createHandler = ({
       const raw = await route({
         system: buildRouterPrompt(
           approved.map(a => `${a.id}: ${a.question}`).join('\n'),
-          studies.map(c => `${c.id}: ${c.title} — ${c.summary}`).join('\n'),
+          studies.map(c => `${c.id}: ${c.title} [${(c.tags ?? []).join(', ')}] — ${c.summary}`).join('\n'),
         ),
         prompt: question,
       });

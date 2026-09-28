@@ -25,6 +25,10 @@ export const buildSourceIndex = (sections) => {
       ...tokenize(section.text),
       ...tokenize(section.heading ?? ''),
       ...tokenize(section.title ?? ''),
+      // Tags, client, role, year and subtitle. A visitor searches with the
+      // words on the page, and "Fintech" is a badge on Connect API even though
+      // the prose never uses it.
+      ...tokenize(section.labels ?? ''),
     ]),
   }));
 
@@ -68,8 +72,24 @@ export const retrieveSections = (query, index, { limit = 4, caseStudies = null, 
   const scored = index.docs
     .filter(doc => !wanted || wanted.has(doc.section.caseStudy))
     .map((doc, order) => {
-      let matched = 0;
-      for (const token of queryTokens) if (doc.tokens.has(token)) matched += index.idf(token);
+      let weight = 0;
+      let hits = 0;
+      for (const token of queryTokens) {
+        if (!doc.tokens.has(token)) continue;
+        weight += index.idf(token);
+        hits += 1;
+      }
+      /*
+        Scaled by how much of the question a section covers, not just by how
+        rare its matches are. A word occurring in one section of 153 carries a
+        huge weight whether it is a precise term or an accident, and on its own
+        that let "strongest" — which appears exactly once, in a Wisdom section —
+        outscore a Connect API section matching both "fintech" and "study".
+
+        Coordination is the signal that separates them: matching two of four
+        query terms means more than matching one rare one.
+      */
+      const matched = queryTokens.length ? weight * (hits / queryTokens.length) : 0;
       return { section: doc.section, matched, order };
     });
 
@@ -112,8 +132,15 @@ export const retrieveSections = (query, index, { limit = 4, caseStudies = null, 
     if (picked.length >= limit) break;
   }
 
-  // Back into document order within each study, so the model reads a study's
-  // framing before its details rather than in score order.
-  picked.sort((a, b) => a.order - b.order);
+  // Grouped by study, most relevant study first, and in document order within
+  // each — so the model reads one project's framing and then its details,
+  // rather than alternating between projects in score order.
+  const studyRank = new Map();
+  for (const entry of picked) {
+    if (!studyRank.has(entry.section.caseStudy)) studyRank.set(entry.section.caseStudy, studyRank.size);
+  }
+  picked.sort((a, b) =>
+    (studyRank.get(a.section.caseStudy) - studyRank.get(b.section.caseStudy))
+    || (a.order - b.order));
   return picked.map(entry => entry.section);
 };
