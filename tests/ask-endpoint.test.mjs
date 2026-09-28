@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, SUPPORTED_EFFORT } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -57,6 +57,8 @@ const loadHandler = ({
   routeThrows = false,
   generateStalls = false,
   sourcesFail = false,
+  streamText = null,
+  streamChunks = null,
 } = {}) => {
   const calls = [];
   const routeCalls = [];
@@ -83,7 +85,8 @@ const loadHandler = ({
       // Opens, then never yields and never closes — the case a provider-side
       // abort signal is supposed to catch, and which must be bounded here too.
       if (generateStalls) return new ReadableStream({ start() {}, cancel() {} });
-      return new ReadableStream({ start(c) { c.enqueue('generated reply'); c.close(); } });
+      const parts = streamChunks ?? [streamText ?? 'generated reply'];
+      return new ReadableStream({ start(c) { for (const part of parts) c.enqueue(part); c.close(); } });
     },
   });
   return { handler, calls, routeCalls };
@@ -1013,9 +1016,34 @@ test('the models can be changed without a deploy', async () => {
  * carrying these options — are never reached from here. Said plainly because
  * the test this replaces claimed more than it checked.
  */
-test('reasoning is hidden from the text and kept brief', () => {
-  assert.equal(REASONING.groq.reasoningFormat, 'hidden', 'thinking must not reach the parser or the reader');
-  assert.ok(['none', 'low'].includes(REASONING.groq.reasoningEffort), 'and must not be lengthy');
+test('the reasoning effort is one the chosen model actually accepts', () => {
+  /*
+    `none` was set here, on the strength of the provider's type union listing
+    it. That union spans every Groq model; GPT-OSS accepts only low, medium and
+    high, and `none` is rejected — so every draft request would have failed, in
+    the change meant to make drafting work again.
+
+    This asserts against the model in use rather than against the union, which
+    is the distinction that was missed.
+  */
+  const family = Object.keys(SUPPORTED_EFFORT).find(prefix => MODEL.startsWith(prefix));
+  assert.ok(family, `no supported-effort list for "${MODEL}" — add one before changing the model`);
+  assert.ok(
+    SUPPORTED_EFFORT[family].includes(REASONING.groq.reasoningEffort),
+    `"${REASONING.groq.reasoningEffort}" is not accepted by ${MODEL}; it takes ${SUPPORTED_EFFORT[family].join(', ')}`,
+  );
+
+  // And the thinking must not reach the parser or the reader either way.
+  assert.equal(REASONING.groq.reasoningFormat, 'hidden');
+});
+
+test('gpt-oss does not accept the efforts that are Qwen-only', () => {
+  // Pins the constraint itself, so the list cannot quietly grow to include the
+  // value that would break drafting.
+  for (const qwenOnly of ['none', 'default']) {
+    assert.ok(!SUPPORTED_EFFORT['openai/gpt-oss'].includes(qwenOnly));
+    assert.ok(SUPPORTED_EFFORT.qwen.includes(qwenOnly));
+  }
 });
 
 test('the output ceilings leave room for reasoning and the answer', () => {
@@ -1024,4 +1052,112 @@ test('the output ceilings leave room for reasoning and the answer', () => {
   assert.ok(DRAFT_TOKENS > 200, `drafting ceiling is ${DRAFT_TOKENS}; 200 barely fit the prose alone`);
   // A 60–110 word answer is roughly 150 tokens before any reasoning.
   assert.ok(DRAFT_TOKENS >= 400, 'drafting needs room for reasoning and the prose after it');
+});
+
+/**
+ * `textStream` yields strings; an edge Response body must yield Uint8Array.
+ *
+ * Passing the strings straight through was rejected — "This ReadableStream did
+ * not return bytes" — *after* the generated headers had been committed, so the
+ * response arrived announcing a draft with nothing in it and the panel rendered
+ * an empty "Drafted, not reviewed" card. The client decodes with
+ * TextDecoderStream, which needs bytes as well.
+ *
+ * It survived every test here because the stubs enqueue strings and nothing
+ * asserted what came back out. It survived production because the models were
+ * 404ing, so no draft ever reached the encoder.
+ */
+test('a drafted reply is streamed as bytes, and arrives intact', async () => {
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api' });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    assert.ok(
+      value instanceof Uint8Array,
+      `streamed a ${typeof value}; an edge Response body must yield Uint8Array`,
+    );
+    chunks.push(value);
+  }
+
+  assert.ok(chunks.length > 0, 'the body is not empty');
+  const text = new TextDecoder().decode(
+    chunks.reduce((all, chunk) => {
+      const merged = new Uint8Array(all.length + chunk.length);
+      merged.set(all);
+      merged.set(chunk, all.length);
+      return merged;
+    }, new Uint8Array()),
+  );
+  assert.equal(text, 'generated reply', 'and decodes back to what the provider sent');
+});
+
+/** Reads a response body the way the browser does. */
+const readBody = async (response, { requireBytes = false } = {}) => {
+  const reader = response.body.getReader();
+  const chunks = [];
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    if (requireBytes) {
+      assert.ok(value instanceof Uint8Array, `streamed a ${typeof value}; an edge body must yield Uint8Array`);
+    }
+    chunks.push(value);
+  }
+  const merged = chunks.reduce((all, chunk) => {
+    const next = new Uint8Array(all.length + chunk.length);
+    next.set(all);
+    next.set(chunk, all.length);
+    return next;
+  }, new Uint8Array());
+  return { text: new TextDecoder().decode(merged), count: chunks.length };
+};
+
+test('every chunk is encoded, not just the first', async () => {
+  /*
+    `readUntilText` buffers until the first chunk with text, then replays the
+    buffer and pumps the rest — two separate places that enqueue, and the stub
+    emitted one chunk and closed, so only the replay was ever exercised. A
+    regression in the pump would have passed and reproduced the empty draft in
+    production, which is the bug this whole change is about.
+  */
+  const parts = ['Omar ', '— “embedded ', 'payments” — ', 'Plastiq Connect.'];
+  const { handler } = loadHandler({ streamChunks: parts });
+  const response = await handler(post('what fintech work has he done'));
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  const { text, count } = await readBody(response, { requireBytes: true });
+  assert.ok(count > 1, `only ${count} chunk reached the client; the pump path went untested`);
+  assert.equal(text, parts.join(''));
+});
+
+test('a leading empty chunk does not lose the text that follows', async () => {
+  // The buffer exists because providers open with empty chunks. Those are held
+  // and replayed, so they must be encoded too.
+  const { handler } = loadHandler({ streamChunks: ['', '', 'Plastiq — “Connect”.'] });
+  const response = await handler(post('what fintech work has he done'));
+
+  const { text } = await readBody(response, { requireBytes: true });
+  assert.equal(text, 'Plastiq — “Connect”.');
+});
+
+test('a multi-byte character survives the encoding', async () => {
+  // Naive chunking splits a character across two chunks and corrupts it. The
+  // answers use em dashes and curly quotes throughout.
+  const { handler } = loadHandler({ streamText: 'Omar — “embedded payments” — Plastiq' });
+  const response = await handler(post('what fintech work has he done'));
+
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let text = '';
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    text += value;
+  }
+  assert.equal(text, 'Omar — “embedded payments” — Plastiq');
 });

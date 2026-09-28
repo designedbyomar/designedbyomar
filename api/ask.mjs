@@ -27,28 +27,33 @@ import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
 export const config = { runtime: 'edge' };
 
-/**
- * The only place the provider is touched. Injectable so the routing logic can
- * be tested without a key, a network, or module mocking — and so swapping
- * provider is a change to this function alone.
- */
 /*
-  Both models reason before answering, and the previous ones did not.
+  Reasoning is hidden from the text, and kept to the shortest the model allows.
 
-  gpt-oss emits chain-of-thought first, and those tokens come out of the same
-  allowance as the answer. Every ceiling in this file was sized for a model that
-  returns nothing but the answer, so carrying them over would have spent the
-  budget on thinking and truncated or emptied what followed — the router's line
-  never written, the draft cut off. Silent degradation again, of exactly the
-  kind that took production logging to find.
+  Both models reason before answering and the previous ones did not, so those
+  tokens come out of the same allowance as the answer — which is why the
+  ceilings below are far above what the output alone costs.
 
-  `reasoningFormat: 'hidden'` keeps the thinking out of `text`, so the parser
-  and the visitor both see only the answer. `reasoningEffort: 'low'` keeps it
-  brief without switching it off: choosing among 55 written questions and 8 case
-  studies is the judgement this endpoint exists for, and that judgement has been
-  the recurring problem.
+  `hidden` keeps the thinking out of `text`, so neither the parser nor the
+  reader sees it. The cost is that nothing is emitted until the thinking
+  finishes: time-to-first-token becomes the whole reasoning phase, which is why
+  the first-chunk budget is as large as it is.
+
+  `low` is the floor here, not a preference. GPT-OSS accepts only low, medium
+  and high — `none` and `default` are Qwen-only, and sending `none` is rejected
+  outright. The provider's own type union lists all five because it spans every
+  Groq model; reading that union instead of the model's constraints is what
+  suggested otherwise, the same mistake as reading the published model list and
+  assuming this account could reach everything on it.
 */
 export const REASONING = { groq: { reasoningFormat: 'hidden', reasoningEffort: 'low' } };
+
+// What each model family actually accepts, as distinct from what the provider's
+// type union will let you write.
+export const SUPPORTED_EFFORT = {
+  'openai/gpt-oss': ['low', 'medium', 'high'],
+  qwen: ['none', 'default', 'low', 'medium', 'high'],
+};
 
 /**
  * The only place the provider is touched. Injectable so the routing logic can
@@ -64,6 +69,9 @@ const generateFromGroq = ({ system, prompt }) => streamText({
   // even before reasoning had to fit alongside it.
   maxOutputTokens: DRAFT_TOKENS,
   providerOptions: REASONING,
+  // One retry, not the SDK's default of two. Each retry costs another full
+  // timeout, and production logged eight in a single request.
+  maxRetries: 1,
   abortSignal: AbortSignal.timeout(TIMEOUT_MS),
 }).textStream;
 
@@ -87,6 +95,7 @@ const routeWithGroq = async ({ system, prompt }) => {
     temperature: 0,
     maxOutputTokens: ROUTE_TOKENS,
     providerOptions: REASONING,
+    maxRetries: 1,
     abortSignal: AbortSignal.timeout(ROUTER_TIMEOUT_MS),
   });
   return text;
@@ -141,7 +150,7 @@ const CONTEXT_ANSWERS = 3;
 // one request's budget even when the router names two studies.
 const SOURCE_SECTIONS = 4;
 const MAX_QUESTION_CHARS = 400;
-const TIMEOUT_MS = 8000;
+const TIMEOUT_MS = 15000;
 // Routing sits in front of every typed question, so it stays tighter than
 // drafting — but three seconds was too tight. It has to cover a cold edge
 // instance reaching Groq, and when it expired the whole request fell through to
@@ -151,14 +160,17 @@ const TIMEOUT_MS = 8000;
 // serially, and drafting's clock only starts once routing has returned. The
 // worst case is therefore additive, before the answer and source fetches:
 // response headers wait at most ROUTER_TIMEOUT_MS + FIRST_CHUNK_TIMEOUT_MS
-// (12s), and the stream ends by ROUTER_TIMEOUT_MS + TIMEOUT_MS (14s). Both sit
+// (17s), and the stream ends by ROUTER_TIMEOUT_MS + TIMEOUT_MS (21s). Both sit
 // inside the 25 seconds Vercel's edge runtime allows before a response must
 // begin. Raising any of these three means re-checking that sum.
+//
+// Each signal bounds its whole call, retries included, so one retry does not
+// double the wait.
 const ROUTER_TIMEOUT_MS = 6000;
 // How long to wait for a draft's first chunk before giving up on it. Inside
 // TIMEOUT_MS, since a provider that has sent nothing by now is not going to
 // finish in time either.
-const FIRST_CHUNK_TIMEOUT_MS = 6000;
+const FIRST_CHUNK_TIMEOUT_MS = 11000;
 
 /**
  * Per-visitor ceiling, so one person cannot drain the daily free quota.
@@ -359,6 +371,21 @@ const note = (stage, error, detail = '') => {
   console.error(`ask: ${stage} failed —`, detail || describe(error));
 };
 
+/*
+  `textStream` yields strings; a Response body in the edge runtime must yield
+  Uint8Array. Passing the strings straight through was rejected with "This
+  ReadableStream did not return bytes" *after* the generated headers had been
+  committed — so the response arrived claiming a draft, with nothing in it, and
+  the panel rendered an empty "Drafted, not reviewed" card.
+
+  It went unseen because drafting never got this far: the models had been
+  404ing, so no draft ever reached the encoder.
+
+  The client pipes through TextDecoderStream, which needs bytes too.
+*/
+const encoder = new TextEncoder();
+const toBytes = (chunk) => (typeof chunk === 'string' ? encoder.encode(chunk) : chunk);
+
 const hasText = (chunk) => typeof chunk === 'string'
   ? chunk.length > 0
   : chunk instanceof Uint8Array && chunk.byteLength > 0;
@@ -400,7 +427,7 @@ const readUntilText = async (stream) => {
 
   return new ReadableStream({
     start(controller) {
-      for (const chunk of buffered) controller.enqueue(chunk);
+      for (const chunk of buffered) controller.enqueue(toBytes(chunk));
 
       const pump = async () => {
         try {
@@ -410,7 +437,7 @@ const readUntilText = async (stream) => {
               controller.close();
               return;
             }
-            controller.enqueue(result.value);
+            controller.enqueue(toBytes(result.value));
           }
         } catch (error) {
           controller.error(error);
