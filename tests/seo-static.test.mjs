@@ -260,8 +260,8 @@ test('static prose is scoped to case-study routes only', () => {
 
 test('the Ask route ships every approved answer to non-JS consumers', () => {
   const html = readDist('ask', 'index.html');
-  const approved = JSON.parse(readText('src', 'content', 'ask-answers.json'))
-    .answers.filter((a) => a.status === 'approved');
+  const sourceAnswers = JSON.parse(readText('src', 'content', 'ask-answers.json')).answers;
+  const approved = sourceAnswers.filter((a) => a.status === 'approved');
   assert.ok(approved.length > 0, 'there is at least one approved answer');
 
   // The panel is client-rendered, so a crawler, an ATS scraper or an assistant
@@ -283,6 +283,24 @@ test('the Ask route ships every approved answer to non-JS consumers', () => {
   const types = (structuredData['@graph'] ?? []).map((node) => node?.['@type']);
   assert.ok(types.includes('WebPage'), '/ask declares a WebPage');
   assert.ok(!types.includes('FAQPage'), '/ask does not claim FAQPage');
+});
+
+test('the Ask build withholds every draft from JSON and static HTML', () => {
+  const html = readDist('ask', 'index.html');
+  const sourceAnswers = JSON.parse(readText('src', 'content', 'ask-answers.json')).answers;
+  const drafts = sourceAnswers.filter((answer) => answer.status === 'draft');
+  const published = JSON.parse(readDist('ask-answers.json')).answers;
+  const publishedIds = new Set(published.map((answer) => answer.id));
+
+  assert.ok(drafts.length > 0, 'the source has a draft to exercise the publication boundary');
+  for (const answer of drafts) {
+    assert.equal(publishedIds.has(answer.id), false, `${answer.id} must not ship in ask-answers.json`);
+    assert.equal(
+      html.includes(`<h2>${escapeText(answer.question)}</h2>`),
+      false,
+      `/ask must not inject the draft question for "${answer.id}"`,
+    );
+  }
 });
 
 test('the answers live on one URL only', () => {
