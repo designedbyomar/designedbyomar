@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import caseStudies from '../src/content/case-studies.json' with { type: 'json' };
 
 const WIDTH = 1200;
 const HEIGHT = 627;
@@ -10,6 +9,9 @@ const QUALITY = 85;
 const MAX_BYTES = 1_000_000;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
+const caseStudies = JSON.parse(
+  await fs.readFile(path.join(ROOT, 'src/content/case-studies.json'), 'utf8'),
+);
 
 const toPublicFile = (urlPath) => {
   if (typeof urlPath !== 'string' || !urlPath.startsWith('/')) {
