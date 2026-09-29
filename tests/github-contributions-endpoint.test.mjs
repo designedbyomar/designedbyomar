@@ -347,3 +347,24 @@ test('a rate-limited refresh serves the snapshot instead of calling GitHub', asy
   assert.equal(limited.headers.get('X-Contributions-Cache'), 'stale');
   assert.equal(fetchCount, 1, 'the over-limit refresh is answered from the snapshot, not GitHub');
 });
+
+test('the rate-limit key uses the rightmost forwarded entry, not the spoofable leftmost', async () => {
+  // The leftmost x-forwarded-for entry is client-controlled; rotating it must not
+  // mint a fresh bucket. Also exercises the index-based read of the forwarded
+  // list (no Array.prototype.at).
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    rateLimit: 2,
+    fetchImpl: async () => json({ message: 'down' }, { status: 500 }),
+    reportFailure: (...failure) => failures.push(failure),
+  });
+  const req = (i) => new Request(ENDPOINT, { headers: { 'x-forwarded-for': `192.0.2.${i}, 198.51.100.9` } });
+
+  assert.equal((await handler(req(1))).status, 503);
+  assert.equal((await handler(req(2))).status, 503);
+  const limited = await handler(req(3));
+
+  assert.equal(limited.status, 429, 'a rotating leftmost entry must share the bucket keyed on the rightmost');
+  assert.ok(failures.some(([category]) => category === 'rate-limited'));
+});

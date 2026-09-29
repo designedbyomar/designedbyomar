@@ -192,8 +192,11 @@ const clientKey = (request) => {
   const { headers } = request;
   const platform = (headers.get('x-vercel-forwarded-for') ?? headers.get('x-real-ip'))
     ?.split(',')[0]?.trim();
-  const forwarded = headers.get('x-forwarded-for')
-    ?.split(',').map(part => part.trim()).filter(Boolean).at(-1);
+  // Index access rather than `.at(-1)`: this file already feature-detects for
+  // runtime variability, so it stays on the most broadly supported primitives.
+  const forwardedList = headers.get('x-forwarded-for')
+    ?.split(',').map(part => part.trim()).filter(Boolean);
+  const forwarded = forwardedList && forwardedList.length ? forwardedList[forwardedList.length - 1] : undefined;
   const ip = platform || forwarded;
   return ip && IP_SHAPE.test(ip) ? ip.toLowerCase() : 'unknown';
 };
