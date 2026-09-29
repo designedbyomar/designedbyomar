@@ -45,5 +45,9 @@ if (expectFallback) {
   if (!cacheControl.includes('max-age=300')) {
     fail('browser cache header is missing max-age=300');
   }
+  const cdnCacheControl = response.headers.get('cdn-cache-control') || '';
+  if (!cdnCacheControl.includes('s-maxage=21600') || !cdnCacheControl.includes('stale-while-revalidate=86400')) {
+    fail('CDN cache header is missing the six-hour TTL or 24-hour stale window');
+  }
   console.log(`GitHub contributions endpoint verified: ${body.totalContributions} contributions from ${body.range.from} to ${body.range.to}.`);
 }

@@ -4,6 +4,7 @@ const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_LOGIN}`;
 
 export const CACHE_HEADERS = {
   'Cache-Control': 'public, max-age=300',
+  'CDN-Cache-Control': 'public, s-maxage=21600, stale-while-revalidate=86400',
   'Vercel-CDN-Cache-Control': 'public, s-maxage=21600, stale-while-revalidate=86400',
 };
 
@@ -129,11 +130,35 @@ export const normalizeContributionData = (payload, updatedAt = new Date()) => {
   };
 };
 
+const REQUEST_TIMEOUT_MS = 8_000;
+
+// `AbortSignal.timeout` is not guaranteed in every Edge runtime build. Feature-detect
+// it and fall back to a controller + timer so an unsupported runtime cannot throw
+// before `fetch` and turn the endpoint into a permanent 502.
+const createRequestTimeout = (ms) => {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    try {
+      return { signal: AbortSignal.timeout(ms), cancel: () => {} };
+    } catch {
+      // Fall through to the manual controller below.
+    }
+  }
+
+  if (typeof AbortController !== 'function') {
+    return { signal: undefined, cancel: () => {} };
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return { signal: controller.signal, cancel: () => clearTimeout(timer) };
+};
+
 export const createHandler = ({
   fetchImpl = fetch,
   getToken = () => process.env.GITHUB_CONTRIBUTIONS_TOKEN,
   now = () => new Date(),
   reportFailure = logFailure,
+  timeoutMs = REQUEST_TIMEOUT_MS,
 } = {}) => async (request) => {
   if (request.method !== 'GET') {
     return jsonResponse(
@@ -149,46 +174,52 @@ export const createHandler = ({
     return unavailable(503);
   }
 
-  let response;
-  try {
-    response = await fetchImpl(GITHUB_GRAPHQL_URL, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'designedbyomar.com',
-      },
-      body: JSON.stringify({
-        query: CONTRIBUTION_QUERY,
-        variables: { login: GITHUB_LOGIN },
-      }),
-      signal: AbortSignal.timeout(8_000),
-    });
-  } catch {
-    reportFailure('request-failed');
-    return unavailable();
-  }
-
-  if (!response.ok) {
-    reportFailure('upstream-http', response.status);
-    return unavailable();
-  }
-
-  let payload;
-  try {
-    payload = await response.json();
-  } catch {
-    reportFailure('invalid-json');
-    return unavailable();
-  }
+  const { signal, cancel } = createRequestTimeout(timeoutMs);
 
   try {
-    const normalized = normalizeContributionData(payload, now());
-    return jsonResponse(normalized, 200, CACHE_HEADERS);
-  } catch {
-    reportFailure('invalid-payload');
-    return unavailable();
+    let response;
+    try {
+      response = await fetchImpl(GITHUB_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'designedbyomar.com',
+        },
+        body: JSON.stringify({
+          query: CONTRIBUTION_QUERY,
+          variables: { login: GITHUB_LOGIN },
+        }),
+        signal,
+      });
+    } catch {
+      reportFailure('request-failed');
+      return unavailable();
+    }
+
+    if (!response.ok) {
+      reportFailure('upstream-http', response.status);
+      return unavailable();
+    }
+
+    let payload;
+    try {
+      payload = await response.json();
+    } catch {
+      reportFailure('invalid-json');
+      return unavailable();
+    }
+
+    try {
+      const normalized = normalizeContributionData(payload, now());
+      return jsonResponse(normalized, 200, CACHE_HEADERS);
+    } catch {
+      reportFailure('invalid-payload');
+      return unavailable();
+    }
+  } finally {
+    cancel();
   }
 };
 

@@ -107,6 +107,8 @@ After deployment, smoke-test the real function and its cache contract:
 npm run smoke:github -- --url https://www.designedbyomar.com/api/github-contributions
 ```
 
+The smoke command verifies both the five-minute browser cache and the forwarded six-hour CDN cache policy. Vercel consumes its platform-specific cache header before the response reaches the browser, so the endpoint also sends the equivalent standards-based `CDN-Cache-Control` header for deployment verification.
+
 To verify the explicit missing-token fallback against an unprotected preview that intentionally omits the secret, add `--expect-fallback`.
 
 ## Branch workflow

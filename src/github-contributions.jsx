@@ -80,13 +80,13 @@ const ContributionCalendar = ({ data }) => {
         <div className="github-contributions-calendar">
           <div className="github-contributions-months" style={{ gridTemplateColumns: columnTemplate }} aria-hidden="true">
             <span />
-            {monthPlacements.map(month => (
+            {monthPlacements.filter(month => month.visible).map(month => (
               <span
                 key={`${month.firstDay}-${month.name}`}
                 data-month-first-day={month.firstDay}
                 style={{ gridColumn: `${month.startIndex + 2} / span ${month.span}` }}
               >
-                {month.visible ? month.name : ''}
+                {month.name}
               </span>
             ))}
           </div>

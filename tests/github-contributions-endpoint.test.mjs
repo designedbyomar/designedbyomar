@@ -94,6 +94,7 @@ test('GET queries GitHub with the server token and returns CDN-cacheable JSON', 
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Cache-Control'), CACHE_HEADERS['Cache-Control']);
+  assert.equal(response.headers.get('CDN-Cache-Control'), CACHE_HEADERS['CDN-Cache-Control']);
   assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), CACHE_HEADERS['Vercel-CDN-Cache-Control']);
   assert.equal(body.totalContributions, 321);
   assert.equal(calls.length, 1);
@@ -175,4 +176,78 @@ test('rejects malformed calendars instead of publishing partial data', () => {
     () => normalizeContributionData(payload),
     /invalid day data/i,
   );
+});
+
+test('still reaches GitHub when the runtime lacks AbortSignal.timeout', async (t) => {
+  const original = Object.getOwnPropertyDescriptor(AbortSignal, 'timeout');
+  t.after(() => {
+    if (original) Object.defineProperty(AbortSignal, 'timeout', original);
+  });
+
+  await t.test('missing entirely', async () => {
+    delete AbortSignal.timeout;
+
+    const calls = [];
+    const handler = createHandler({
+      getToken: () => 'token',
+      now: () => new Date('2026-09-28T12:00:00Z'),
+      fetchImpl: async (...args) => {
+        calls.push(args);
+        return json(githubPayload());
+      },
+    });
+
+    const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
+
+    assert.equal(response.status, 200);
+    assert.equal(calls.length, 1);
+    assert.ok(calls[0][1].signal instanceof AbortSignal);
+    assert.equal(calls[0][1].signal.aborted, false);
+  });
+
+  await t.test('present but throwing', async () => {
+    Object.defineProperty(AbortSignal, 'timeout', {
+      configurable: true,
+      writable: true,
+      value: () => { throw new TypeError('not implemented'); },
+    });
+
+    const calls = [];
+    const handler = createHandler({
+      getToken: () => 'token',
+      now: () => new Date('2026-09-28T12:00:00Z'),
+      fetchImpl: async (...args) => {
+        calls.push(args);
+        return json(githubPayload());
+      },
+    });
+
+    const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
+
+    assert.equal(response.status, 200);
+    assert.ok(calls[0][1].signal instanceof AbortSignal);
+  });
+});
+
+test('the fallback timeout still aborts a GitHub request that runs long', async (t) => {
+  const original = Object.getOwnPropertyDescriptor(AbortSignal, 'timeout');
+  t.after(() => {
+    if (original) Object.defineProperty(AbortSignal, 'timeout', original);
+  });
+  delete AbortSignal.timeout;
+
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    timeoutMs: 20,
+    fetchImpl: (_url, { signal }) => new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () => reject(signal.reason ?? new Error('aborted')));
+    }),
+    reportFailure: (...failure) => failures.push(failure),
+  });
+
+  const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
+
+  assert.equal(response.status, 502);
+  assert.deepEqual(failures, [['request-failed']]);
 });

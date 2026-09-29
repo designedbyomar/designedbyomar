@@ -107,6 +107,7 @@ test('At a glance shows the live rolling GitHub contribution calendar', async ({
   await expect(widget.locator('[role="cell"][tabindex]')).toHaveCount(0);
   await expect(widget.getByText('Oct', { exact: true })).toBeVisible();
   await expect(widget.getByText('Sep', { exact: true })).toHaveCount(1);
+  await expect(widget.locator('[data-month-first-day="2025-09-28"]')).toHaveCount(0);
   const octoberColumn = await widget.locator('[data-month-first-day="2025-10-01"]').evaluate(node => node.style.gridColumn);
   expect(octoberColumn).toBe('2 / span 4');
 
