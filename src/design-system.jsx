@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './design-system-page.css';
+import './github-contributions.css';
 import {
   AppIcon,
   ArrowUp,
@@ -67,6 +68,7 @@ const NAV_GROUPS = [
       { id: 'navigation-drawers', label: 'Navigation and drawers' },
       { id: 'cookie-banner', label: 'Cookie banner' },
       { id: 'ask', label: 'Ask' },
+      { id: 'github-activity', label: 'GitHub activity' },
     ],
   },
   {
@@ -162,17 +164,17 @@ const COLOR_GROUPS = [
 ];
 
 const TYPOGRAPHY_ROWS = [
-  ['Display hero', 'Geist Sans', 'clamp(44px, 7vw, 88px)', '600', '-0.04em', '0.96', 'Complex systems. Clear products.'],
-  ['Section heading', 'Geist Sans', 'clamp(32px, 4.2vw, 56px)', '600', '-0.04em', '1.05', 'Questions founders and hiring teams usually ask.'],
-  ['Sub-heading', 'Geist Sans', '32px', '600', '-0.04em', '1.25', 'A longer version, for the curious.'],
-  ['Card title', 'Geist Sans', '24px', '600', '-0.04em', '1.33', 'Management Portal'],
-  ['Body large', 'Geist Sans', '18px', '400', '0', '1.8', 'Lead with the product problem, the decision, and the impact.'],
-  ['Body', 'Geist Sans', '16px', '400', '0', '1.55', 'Use body copy for explanations, details, and section support.'],
-  ['Body small', 'Geist Sans', '14px', '400', '0', '1.5', 'Use small copy for compact supporting text.'],
-  ['Body semibold', 'Geist Sans', '16px', '600', '-0.02em', '1.5', 'Use semibold for emphasis inside compact panels.'],
-  ['Button / link', 'Geist Sans', '14px', '500', '0', '1.43', 'Get in touch'],
-  ['Caption', 'Geist Sans', '11px', '500', '0.04em', '1.33', 'Built across startups, scaleups, and enterprise teams.'],
-  ['Micro', 'Geist Sans', '10px', '500', '0.08em', '1.33', 'INDEXABLE ROUTE'],
+  ['Display hero', 'Geist','clamp(44px, 7vw, 88px)', '600', '-0.04em', '0.96', 'Complex systems. Clear products.'],
+  ['Section heading', 'Geist','clamp(32px, 4.2vw, 56px)', '600', '-0.04em', '1.05', 'Questions founders and hiring teams usually ask.'],
+  ['Sub-heading', 'Geist','32px', '600', '-0.04em', '1.25', 'A longer version, for the curious.'],
+  ['Card title', 'Geist','24px', '600', '-0.04em', '1.33', 'Management Portal'],
+  ['Body large', 'Geist','18px', '400', '0', '1.8', 'Lead with the product problem, the decision, and the impact.'],
+  ['Body', 'Geist','16px', '400', '0', '1.55', 'Use body copy for explanations, details, and section support.'],
+  ['Body small', 'Geist','14px', '400', '0', '1.5', 'Use small copy for compact supporting text.'],
+  ['Body semibold', 'Geist','16px', '600', '-0.02em', '1.5', 'Use semibold for emphasis inside compact panels.'],
+  ['Button / link', 'Geist','14px', '500', '0', '1.43', 'Get in touch'],
+  ['Caption', 'Geist','11px', '500', '0.04em', '1.33', 'Built across startups, scaleups, and enterprise teams.'],
+  ['Micro', 'Geist','10px', '500', '0.08em', '1.33', 'INDEXABLE ROUTE'],
   ['Mono body', 'Geist Mono', '14px', '400', '0', '1.5', 'src/design-tokens.css'],
   ['Mono label', 'Geist Mono', '12px', '500', '0.08em', '1', 'FOUNDATIONS'],
 ];
@@ -944,7 +946,7 @@ const HomeSection = ({ theme }) => (
     </section>
 
     <section id="what-it-powers" className="ds-section" aria-labelledby="what-it-powers-title">
-      <SectionHeader eyebrow="Home" title="What it powers">
+      <SectionHeader id="what-it-powers" eyebrow="Home" title="What it powers">
         A practical map of where the system shows up in production, from the homepage to route metadata and privacy surfaces.
       </SectionHeader>
       <div className="ds-power-strip">
@@ -961,7 +963,7 @@ const HomeSection = ({ theme }) => (
 const FoundationsSection = () => (
   <>
     <section id="foundations" className="ds-section" aria-labelledby="foundations-title">
-      <SectionHeader eyebrow="Foundations" title="Shared foundations">
+      <SectionHeader id="foundations" eyebrow="Foundations" title="Shared foundations">
         The portfolio and this documentation surface now share the same token source for theme, color, type, spacing, depth, opacity, motion, and responsive rhythm.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -978,7 +980,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="color" className="ds-section" aria-labelledby="color-title">
-      <SectionHeader eyebrow="Foundations" title="Color">
+      <SectionHeader id="color" eyebrow="Foundations" title="Color">
         Semantic neutrals carry most of the interface. Develop blue, preview pink, and ship red mark workflow states and signature motion.
       </SectionHeader>
       <div className="ds-token-stack">
@@ -996,7 +998,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="typography" className="ds-section" aria-labelledby="typography-title">
-      <SectionHeader eyebrow="Foundations" title="Typography">
+      <SectionHeader id="typography" eyebrow="Foundations" title="Typography">
         Geist Sans handles editorial hierarchy. Geist Mono handles labels, metadata, source references, and implementation-adjacent copy.
       </SectionHeader>
       <div className="ds-typography-map">
@@ -1007,7 +1009,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="spacing" className="ds-section" aria-labelledby="spacing-title">
-      <SectionHeader eyebrow="Foundations" title="Spacing">
+      <SectionHeader id="spacing" eyebrow="Foundations" title="Spacing">
         UI spacing uses compact steps. Layout spacing uses larger bands for page rhythm and section separation.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1029,7 +1031,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="radius-elevation" className="ds-section" aria-labelledby="radius-elevation-title">
-      <SectionHeader eyebrow="Foundations" title="Radius and elevation">
+      <SectionHeader id="radius-elevation" eyebrow="Foundations" title="Radius and elevation">
         Radius stays restrained. Shadow-as-border creates definition without heavy outlines or decorative framing.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1046,14 +1048,14 @@ const FoundationsSection = () => (
     </section>
 
     <section id="foundation-specimens" className="ds-section" aria-labelledby="foundation-specimens-title">
-      <SectionHeader eyebrow="Foundations" title="Visual specimens">
+      <SectionHeader id="foundation-specimens" eyebrow="Foundations" title="Visual specimens">
         Radius, opacity, layering, and breakpoint rules are shown as rendered objects so token behavior is easier to audit.
       </SectionHeader>
       <FoundationSpecimens />
     </section>
 
     <section id="blur" className="ds-section" aria-labelledby="blur-title">
-      <SectionHeader eyebrow="Foundations" title="Blur">
+      <SectionHeader id="blur" eyebrow="Foundations" title="Blur">
         Blur tokens are used for sticky headers, overlays, drawers, and polished glassy surfaces where the content underneath should remain implied.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1064,7 +1066,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="motion-tokens" className="ds-section" aria-labelledby="motion-tokens-title">
-      <SectionHeader eyebrow="Foundations" title="Motion tokens">
+      <SectionHeader id="motion-tokens" eyebrow="Foundations" title="Motion tokens">
         Durations and easing keep interactions crisp. Motion should orient the reader, not compete with the work.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1090,7 +1092,7 @@ cubic-bezier(0.4, 0, 0.2, 1)`}</pre>
 const ComponentsSection = () => (
   <>
     <section id="components" className="ds-section" aria-labelledby="components-title">
-      <SectionHeader eyebrow="Components" title="Core primitives">
+      <SectionHeader id="components" eyebrow="Components" title="Core primitives">
         V1 extracts documentation-ready primitives first. Larger production patterns remain documented here and can be pulled into a shared library later.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1103,7 +1105,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="buttons" className="ds-section" aria-labelledby="buttons-title">
-      <SectionHeader eyebrow="Components" title="Buttons">
+      <SectionHeader id="buttons" eyebrow="Components" title="Buttons">
         Buttons keep a stable 44px hit area, concise labels, visible focus, and clear hierarchy.
       </SectionHeader>
       <ExampleFrame label="Variants and states">
@@ -1116,7 +1118,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
-      <SectionHeader eyebrow="Components" title="Cards and accordions">
+      <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
         Cards frame repeated items. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1157,7 +1159,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="copy-actions" className="ds-section" aria-labelledby="copy-actions-title">
-      <SectionHeader eyebrow="Components" title="Copy actions">
+      <SectionHeader id="copy-actions" eyebrow="Components" title="Copy actions">
         Copy controls are used for tokens, source paths, and contact details. The copied state is temporary and does not resize the control.
       </SectionHeader>
       <ExampleFrame label="Copy controls">
@@ -1167,7 +1169,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="navigation-drawers" className="ds-section" aria-labelledby="navigation-drawers-title">
-      <SectionHeader eyebrow="Components" title="Navigation and drawers">
+      <SectionHeader id="navigation-drawers" eyebrow="Components" title="Navigation and drawers">
         Production navigation stays sparse. Drawers are reserved for dense work lists and long-form about content.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1185,7 +1187,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="cookie-banner" className="ds-section" aria-labelledby="cookie-banner-title">
-      <SectionHeader eyebrow="Components" title="Cookie banner">
+      <SectionHeader id="cookie-banner" eyebrow="Components" title="Cookie banner">
         Consent copy should be direct and calm. The banner must never block the core portfolio experience.
       </SectionHeader>
       <ExampleFrame label="Consent shell">
@@ -1202,7 +1204,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
-      <SectionHeader eyebrow="Components" title="Ask">
+      <SectionHeader id="ask" eyebrow="Components" title="Ask">
         Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or a
         verbatim question is matched in the browser; anything else is matched by a model, because word
         overlap answered “is he a manager” with a refusal. When nothing written covers a question, a
@@ -1301,13 +1303,48 @@ const ComponentsSection = () => (
         </DocCard>
       </div>
     </section>
+
+    <section id="github-activity" className="ds-section" aria-labelledby="github-activity-title">
+      <SectionHeader id="github-activity" eyebrow="Components" title="GitHub activity">
+        A rolling-year contribution calendar in At a Glance, backed by the official GitHub GraphQL API
+        through <code>/api/github-contributions</code>. It shows the public yearly total and daily
+        activity, scrolls horizontally on narrow screens, and links out to the profile. The endpoint
+        serves a six-hour snapshot &mdash; stale up to 24 hours if GitHub is down &mdash; and the panel
+        falls back to a quiet message rather than inventing data, so the section never shows numbers it
+        cannot source.
+      </SectionHeader>
+      <ExampleFrame label="Intensity scale">
+        <div className="github-contributions" style={{ marginTop: 0 }}>
+          <div className="github-contributions-meta">
+            <span>Rolling year</span>
+            <div className="github-contributions-legend" aria-label="Contribution intensity from less to more">
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map((level) => (
+                <span key={level} className="github-contributions-day" data-level={level} aria-hidden="true" />
+              ))}
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+      </ExampleFrame>
+      <ExampleFrame label="Profile link">
+        <a
+          className="github-contributions-link"
+          href="https://github.com/designedbyomar"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View GitHub profile <AppIcon icon={ArrowUpRight} size={15} />
+        </a>
+      </ExampleFrame>
+    </section>
   </>
 );
 
 const PatternsSection = () => (
   <>
     <section id="patterns" className="ds-section" aria-labelledby="patterns-title">
-      <SectionHeader eyebrow="Patterns" title="Production patterns">
+      <SectionHeader id="patterns" eyebrow="Patterns" title="Production patterns">
         Patterns document how primitives become recognizable portfolio surfaces.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1330,7 +1367,7 @@ const PatternsSection = () => (
       ['privacy-consent', 'Privacy and consent', 'Privacy surfaces use plain language and preserve the current analytics behavior.', 'privacy'],
     ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Patterns" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Patterns" title={title}>{body}</SectionHeader>
         <ExampleFrame label={`${title} specimen`}>
           <PatternPreview kind={kind} />
         </ExampleFrame>
@@ -1342,7 +1379,7 @@ const PatternsSection = () => (
 const MotionSection = ({ theme }) => (
   <>
     <section id="motion" className="ds-section" aria-labelledby="motion-title">
-      <SectionHeader eyebrow="Motion" title="Motion">
+      <SectionHeader id="motion" eyebrow="Motion" title="Motion">
         Motion is a signature layer for orientation, feedback, and personality. It must respect reduced-motion preferences across canvas, animation, and scroll behavior.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1355,7 +1392,7 @@ const MotionSection = ({ theme }) => (
     </section>
 
     <section id="alien-arrival" className="ds-section" aria-labelledby="alien-arrival-title">
-      <SectionHeader eyebrow="Motion" title="Alien arrival">
+      <SectionHeader id="alien-arrival" eyebrow="Motion" title="Alien arrival">
         The alien animation is the restrained signature moment: noticeable enough to be memorable, small enough to preserve the portfolio's seriousness.
       </SectionHeader>
       <ExampleFrame label="Signature animation">
@@ -1364,7 +1401,7 @@ const MotionSection = ({ theme }) => (
     </section>
 
     <section id="pixel-orbit" className="ds-section" aria-labelledby="pixel-orbit-title">
-      <SectionHeader eyebrow="Motion" title="Pixel orbit">
+      <SectionHeader id="pixel-orbit" eyebrow="Motion" title="Pixel orbit">
         The square-particle field supports the visual identity while remaining pointer-safe and reduced-motion aware.
       </SectionHeader>
       <ExampleFrame label="Canvas motif">
@@ -1382,7 +1419,7 @@ const MotionSection = ({ theme }) => (
       ['reduced-motion', 'Reduced motion', 'Every moving treatment needs a stable equivalent. Canvas pauses, translate effects are skipped, and the final state remains readable.'],
     ].map(([id, title, body]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Motion" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Motion" title={title}>{body}</SectionHeader>
         {id === 'reduced-motion' && (
           <ExampleFrame label="Stable fallback">
             <div className="ds-reduced-motion-preview" data-audit-example="reduced-motion-pattern">
@@ -1400,7 +1437,7 @@ const MotionSection = ({ theme }) => (
 const ContentAccessibilityResources = () => (
   <>
     <section id="content" className="ds-section" aria-labelledby="content-title">
-      <SectionHeader eyebrow="Content" title="Voice and tone">
+      <SectionHeader id="content" eyebrow="Content" title="Voice and tone">
         Copy should sound specific, senior, and human. Avoid inflated claims, generic AI phrasing, and unverifiable outcomes.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1422,12 +1459,12 @@ const ContentAccessibilityResources = () => (
       ['microcopy', 'Microcopy', 'Small copy should reduce doubt. Use exact labels for buttons, links, privacy actions, and copy controls.'],
     ].map(([id, title, body]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Content" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Content" title={title}>{body}</SectionHeader>
       </section>
     ))}
 
     <section id="accessibility" className="ds-section" aria-labelledby="accessibility-title">
-      <SectionHeader eyebrow="Accessibility" title="Accessibility">
+      <SectionHeader id="accessibility" eyebrow="Accessibility" title="Accessibility">
         WCAG AA is the floor. Focus states, keyboard flows, contrast, touch targets, and reduced motion are design-system requirements, not QA cleanup.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1448,7 +1485,7 @@ const ContentAccessibilityResources = () => (
       ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.', 'contrast'],
     ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Accessibility" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Accessibility" title={title}>{body}</SectionHeader>
         <ExampleFrame label={`${title} specimen`}>
           <AccessibilityPreview kind={kind} />
         </ExampleFrame>
@@ -1456,7 +1493,7 @@ const ContentAccessibilityResources = () => (
     ))}
 
     <section id="resources" className="ds-section" aria-labelledby="resources-title">
-      <SectionHeader eyebrow="Resources" title="Source files">
+      <SectionHeader id="resources" eyebrow="Resources" title="Source files">
         These files are the implementation source of truth for the system.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1476,7 +1513,7 @@ const ContentAccessibilityResources = () => (
     </section>
 
     <section id="audit-notes" className="ds-section" aria-labelledby="audit-notes-title">
-      <SectionHeader eyebrow="Resources" title="Audit notes">
+      <SectionHeader id="audit-notes" eyebrow="Resources" title="Audit notes">
         This audit cross-checks the documentation against src/design-tokens.css, src/main.jsx, src/footer-alien.jsx, and src/galaxy.jsx.
       </SectionHeader>
       <div className="ds-two-column">

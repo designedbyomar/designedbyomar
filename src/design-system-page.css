@@ -929,6 +929,55 @@
   letter-spacing: -0.04em;
 }
 
+.ds-section-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Copy-the-reference control: revealed on hover or keyboard focus, and always
+   shown where there is no hover (touch), so it stays reachable everywhere. */
+.ds-section-header__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-standard);
+  background: transparent;
+  color: var(--fg-tertiary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease, background var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.ds-section-header:hover .ds-section-header__copy,
+.ds-section-header__copy:focus-visible {
+  opacity: 1;
+}
+
+.ds-section-header__copy:hover {
+  background: var(--bg-subtle);
+  color: var(--fg-primary);
+  transform: translateY(-1px);
+}
+
+.ds-section-header__copy:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .ds-section-header__copy { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-section-header__copy { transition: opacity var(--duration-fast) ease; }
+  .ds-section-header__copy:hover { transform: none; }
+}
+
 .ds-section-header p {
   margin: var(--space-4) 0 0;
   color: var(--fg-secondary);
