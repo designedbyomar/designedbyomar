@@ -711,6 +711,52 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('#cards-accordions').getByText(/reduced motion keeps the ring static/i)).toBeVisible();
   await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Signal Gradient Icon' })).toBeVisible();
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
+  await expect(page.locator('#github-activity').getByRole('heading', { name: 'GitHub activity' })).toBeVisible();
+  await expect(page.locator('#github-activity').getByRole('link', { name: /View GitHub profile/i })).toBeVisible();
+});
+
+test('design system section titles resolve their aria label and copy a reference', async ({ page }) => {
+  // Installed before navigation so every script sees the stub, not the real API.
+  await page.addInitScript(() => {
+    window.__written = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (text) => { window.__written.push(text); } },
+    });
+  });
+  await page.goto('/design-system');
+
+  // The section's aria-labelledby now resolves to a real heading id.
+  const section = page.locator('#buttons');
+  await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
+  await expect(page.locator('#buttons-title')).toHaveText('Buttons');
+
+  // The labelled copy control writes the section reference and confirms the copy.
+  const copy = section.locator('.ds-section-header__copy');
+  await expect(copy).toHaveAttribute('aria-label', /Copy a reference to the "Buttons" section/);
+  await copy.click();
+
+  await expect(copy).toHaveAttribute('aria-label', /Copied reference to the "Buttons" section/);
+  const written = await page.evaluate(() => window.__written);
+  expect(written).toEqual(['Design System — "Buttons" (/design-system#buttons)']);
+});
+
+test('every design-system aria-labelledby points at an element that exists', async ({ page }) => {
+  // Guards the SectionHeader contract for the whole page at once: a section (or a
+  // future one) that declares aria-labelledby="<id>-title" but never renders that
+  // heading id — the exact bug this work fixes — fails here rather than shipping a
+  // label pointing at nothing. Covers the runtime-expanded mapped sections too.
+  await page.goto('/design-system');
+  const dangling = await page.evaluate(() => {
+    const missing = [];
+    for (const el of document.querySelectorAll('[aria-labelledby]')) {
+      for (const id of (el.getAttribute('aria-labelledby') || '').split(/\s+/).filter(Boolean)) {
+        if (!document.getElementById(id)) missing.push(id);
+      }
+    }
+    return missing;
+  });
+  expect(dangling, `aria-labelledby ids with no matching element: ${dangling.join(', ')}`).toEqual([]);
 });
 
 test('design system displays visual audit specimens for foundations, patterns, and accessibility', async ({ page }) => {

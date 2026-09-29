@@ -52,6 +52,8 @@
   line-height: var(--line-height-compact);
 }
 
+/* Matches the design-system secondary button (.ds-button--secondary): sans font
+   at body-md/medium, an inset ring rather than a border, and a bg-subtle hover. */
 .github-contributions-link {
   display: inline-flex;
   flex: none;
@@ -59,19 +61,23 @@
   gap: var(--space-2);
   min-height: 44px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-gray-100);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
   border-radius: var(--radius-standard);
   color: var(--fg-primary);
-  font-family: var(--font-mono);
-  font-size: var(--font-size-body-sm);
-  letter-spacing: 0.02em;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-medium);
   text-decoration: none;
-  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease;
+  transition: background var(--duration-fast) ease, box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
 }
 
+/* The button sits on a --bg-subtle card, so a --bg-subtle hover would be
+   invisible. A translucent foreground tint plus a darker inset ring reads on the
+   card and, unlike the lift, still gives feedback under reduced motion. */
 .github-contributions-link:hover {
-  border-color: color-mix(in oklab, var(--fg-primary) 32%, var(--color-gray-100));
-  background: color-mix(in oklab, var(--fg-primary) 5%, transparent);
+  background: color-mix(in oklab, var(--fg-primary) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fg-primary) 28%, var(--color-gray-100));
+  transform: translateY(-1px);
 }
 
 .github-contributions-link:focus-visible,
@@ -228,5 +234,9 @@
 @media (prefers-reduced-motion: reduce) {
   .github-contributions-link {
     transition: none;
+  }
+
+  .github-contributions-link:hover {
+    transform: none;
   }
 }
