@@ -11,11 +11,36 @@ if (!endpointUrl) {
   fail('pass the deployed endpoint with --url https://example.com/api/github-contributions');
 }
 
-const response = await fetch(endpointUrl, {
-  headers: { Accept: 'application/json' },
-  redirect: 'manual',
-  signal: AbortSignal.timeout(15_000),
-});
+// Mirror the endpoint's timeout: `AbortSignal.timeout` is not guaranteed in every
+// runtime, so feature-detect it and fall back to an AbortController + timer rather
+// than throwing before the request is even made.
+const createTimeout = (ms) => {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    try {
+      return { signal: AbortSignal.timeout(ms), cancel: () => {} };
+    } catch {
+      // Fall through to the manual controller below.
+    }
+  }
+  if (typeof AbortController !== 'function') {
+    return { signal: undefined, cancel: () => {} };
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return { signal: controller.signal, cancel: () => clearTimeout(timer) };
+};
+
+const { signal, cancel } = createTimeout(15_000);
+let response;
+try {
+  response = await fetch(endpointUrl, {
+    headers: { Accept: 'application/json' },
+    redirect: 'manual',
+    signal,
+  });
+} finally {
+  cancel();
+}
 
 if (response.status >= 300 && response.status < 400) {
   fail(`received redirect ${response.status}; authenticate to the preview or use an unprotected deployment`);

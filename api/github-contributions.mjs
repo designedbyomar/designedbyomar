@@ -52,7 +52,12 @@ const jsonResponse = (body, status, headers = {}) => new Response(JSON.stringify
   },
 });
 
-const unavailable = (status = 502) => jsonResponse(
+// One outward status for every "temporarily unavailable" cause — a missing token,
+// an upstream HTTP error, or a malformed payload all return 503 with the same
+// generic body, so an outside caller cannot tell a configuration problem from an
+// upstream outage. The specific cause is still written to the runtime logs (see
+// `logFailure`), which is internal, the same split api/ask.mjs uses.
+const unavailable = (status = 503) => jsonResponse(
   { error: 'GitHub activity is temporarily unavailable.' },
   status,
   { 'Cache-Control': 'no-store' },
@@ -238,7 +243,7 @@ export const createHandler = ({
   if (!token) {
     if (stale) return stale();
     reportFailure('missing-token');
-    return unavailable(503);
+    return unavailable();
   }
 
   // 2. Gate the upstream refresh per IP. Serving cache above never reaches here,

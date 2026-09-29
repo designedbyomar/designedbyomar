@@ -147,7 +147,7 @@ test('returns a generic uncached error for upstream HTTP and GraphQL failures', 
       reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
     assert.deepEqual(failures, [['upstream-http', 500]]);
@@ -161,7 +161,7 @@ test('returns a generic uncached error for upstream HTTP and GraphQL failures', 
       reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
     assert.deepEqual(failures, [['invalid-payload']]);
@@ -248,7 +248,7 @@ test('the fallback timeout still aborts a GitHub request that runs long', async 
 
   const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
 
-  assert.equal(response.status, 502);
+  assert.equal(response.status, 503);
   assert.deepEqual(failures, [['request-failed']]);
 });
 
@@ -289,8 +289,8 @@ test('rate-limits the refresh path per IP when there is no snapshot to serve', a
   });
   const req = () => new Request(ENDPOINT, { headers: { 'x-vercel-forwarded-for': '203.0.113.7' } });
 
-  assert.equal((await handler(req())).status, 502);
-  assert.equal((await handler(req())).status, 502);
+  assert.equal((await handler(req())).status, 503);
+  assert.equal((await handler(req())).status, 503);
   const limited = await handler(req());
 
   assert.equal(limited.status, 429);
