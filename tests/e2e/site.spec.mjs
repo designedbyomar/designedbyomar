@@ -711,6 +711,8 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('#cards-accordions').getByText(/reduced motion keeps the ring static/i)).toBeVisible();
   await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Signal Gradient Icon' })).toBeVisible();
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
+  await expect(page.locator('#github-activity').getByRole('heading', { name: 'GitHub activity' })).toBeVisible();
+  await expect(page.locator('#github-activity').getByRole('link', { name: /View GitHub profile/i })).toBeVisible();
 });
 
 test('design system section titles resolve their aria label and expose a copy control', async ({ page }) => {

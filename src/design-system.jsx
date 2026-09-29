@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './design-system-page.css';
+import './github-contributions.css';
 import {
   AppIcon,
   ArrowUp,
@@ -67,6 +68,7 @@ const NAV_GROUPS = [
       { id: 'navigation-drawers', label: 'Navigation and drawers' },
       { id: 'cookie-banner', label: 'Cookie banner' },
       { id: 'ask', label: 'Ask' },
+      { id: 'github-activity', label: 'GitHub activity' },
     ],
   },
   {
@@ -162,17 +164,17 @@ const COLOR_GROUPS = [
 ];
 
 const TYPOGRAPHY_ROWS = [
-  ['Display hero', 'Geist Sans', 'clamp(44px, 7vw, 88px)', '600', '-0.04em', '0.96', 'Complex systems. Clear products.'],
-  ['Section heading', 'Geist Sans', 'clamp(32px, 4.2vw, 56px)', '600', '-0.04em', '1.05', 'Questions founders and hiring teams usually ask.'],
-  ['Sub-heading', 'Geist Sans', '32px', '600', '-0.04em', '1.25', 'A longer version, for the curious.'],
-  ['Card title', 'Geist Sans', '24px', '600', '-0.04em', '1.33', 'Management Portal'],
-  ['Body large', 'Geist Sans', '18px', '400', '0', '1.8', 'Lead with the product problem, the decision, and the impact.'],
-  ['Body', 'Geist Sans', '16px', '400', '0', '1.55', 'Use body copy for explanations, details, and section support.'],
-  ['Body small', 'Geist Sans', '14px', '400', '0', '1.5', 'Use small copy for compact supporting text.'],
-  ['Body semibold', 'Geist Sans', '16px', '600', '-0.02em', '1.5', 'Use semibold for emphasis inside compact panels.'],
-  ['Button / link', 'Geist Sans', '14px', '500', '0', '1.43', 'Get in touch'],
-  ['Caption', 'Geist Sans', '11px', '500', '0.04em', '1.33', 'Built across startups, scaleups, and enterprise teams.'],
-  ['Micro', 'Geist Sans', '10px', '500', '0.08em', '1.33', 'INDEXABLE ROUTE'],
+  ['Display hero', 'Geist','clamp(44px, 7vw, 88px)', '600', '-0.04em', '0.96', 'Complex systems. Clear products.'],
+  ['Section heading', 'Geist','clamp(32px, 4.2vw, 56px)', '600', '-0.04em', '1.05', 'Questions founders and hiring teams usually ask.'],
+  ['Sub-heading', 'Geist','32px', '600', '-0.04em', '1.25', 'A longer version, for the curious.'],
+  ['Card title', 'Geist','24px', '600', '-0.04em', '1.33', 'Management Portal'],
+  ['Body large', 'Geist','18px', '400', '0', '1.8', 'Lead with the product problem, the decision, and the impact.'],
+  ['Body', 'Geist','16px', '400', '0', '1.55', 'Use body copy for explanations, details, and section support.'],
+  ['Body small', 'Geist','14px', '400', '0', '1.5', 'Use small copy for compact supporting text.'],
+  ['Body semibold', 'Geist','16px', '600', '-0.02em', '1.5', 'Use semibold for emphasis inside compact panels.'],
+  ['Button / link', 'Geist','14px', '500', '0', '1.43', 'Get in touch'],
+  ['Caption', 'Geist','11px', '500', '0.04em', '1.33', 'Built across startups, scaleups, and enterprise teams.'],
+  ['Micro', 'Geist','10px', '500', '0.08em', '1.33', 'INDEXABLE ROUTE'],
   ['Mono body', 'Geist Mono', '14px', '400', '0', '1.5', 'src/design-tokens.css'],
   ['Mono label', 'Geist Mono', '12px', '500', '0.08em', '1', 'FOUNDATIONS'],
 ];
@@ -1300,6 +1302,41 @@ const ComponentsSection = () => (
           focus. Every control clears 44px, the input is labelled, and no answer depends on motion.
         </DocCard>
       </div>
+    </section>
+
+    <section id="github-activity" className="ds-section" aria-labelledby="github-activity-title">
+      <SectionHeader id="github-activity" eyebrow="Components" title="GitHub activity">
+        A rolling-year contribution calendar in At a Glance, backed by the official GitHub GraphQL API
+        through <code>/api/github-contributions</code>. It shows the public yearly total and daily
+        activity, scrolls horizontally on narrow screens, and links out to the profile. The endpoint
+        serves a six-hour snapshot &mdash; stale up to 24 hours if GitHub is down &mdash; and the panel
+        falls back to a quiet message rather than inventing data, so the section never shows numbers it
+        cannot source.
+      </SectionHeader>
+      <ExampleFrame label="Intensity scale">
+        <div className="github-contributions" style={{ marginTop: 0 }}>
+          <div className="github-contributions-meta">
+            <span>Sep 2025 &ndash; Sep 2026</span>
+            <div className="github-contributions-legend" aria-label="Contribution intensity from less to more">
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map((level) => (
+                <span key={level} className="github-contributions-day" data-level={level} aria-hidden="true" />
+              ))}
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+      </ExampleFrame>
+      <ExampleFrame label="Profile link">
+        <a
+          className="github-contributions-link"
+          href="https://github.com/designedbyomar"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View GitHub profile <AppIcon icon={ArrowUpRight} size={15} />
+        </a>
+      </ExampleFrame>
     </section>
   </>
 );
