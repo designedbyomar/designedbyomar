@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { AppIcon, ArrowLeft, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
 import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
+import { GitHubContributions } from './github-contributions.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
@@ -1836,6 +1837,9 @@ const KeyFacts = () => {
               )}
             </div>
           ))}
+        </Reveal>
+        <Reveal variant="section">
+          <GitHubContributions profileUrl={GITHUB_URL} />
         </Reveal>
       </div>
     </section>
