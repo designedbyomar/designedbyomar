@@ -161,9 +161,8 @@ test('on a phone the contact CTA does not sit on top of the Ask panel', async ({
   }, { x: inView.x + inView.width / 2, y: inView.y + inView.height / 2 });
   expect(owns, 'something is covering the CTA').toBe(true);
 
-  // Scoped to this section. The homepage as a whole does overflow at 375 by
-  // design — the hero galaxy is a full-bleed canvas wider than the viewport —
-  // so asserting on the document would fail for something unrelated.
+  // Scoped to this section: it asserts elements are within the viewport, which
+  // the whole-document horizontal-overflow test below covers at the page level.
   const bleed = await page.locator('#faq').evaluate((section) => {
     const vw = document.documentElement.clientWidth;
     return [...section.querySelectorAll('*')]
@@ -171,6 +170,23 @@ test('on a phone the contact CTA does not sit on top of the Ask panel', async ({
       .filter(r => r.width > 0 && (r.right > vw + 1 || r.left < -1)).length;
   });
   expect(bleed, 'nothing in the Ask section may bleed past 375').toBe(0);
+});
+
+test('the homepage does not scroll horizontally at 375 in either theme', async ({ page }) => {
+  // This shipped: the hero galaxy wrapper sits at left/right -12%, so on a 375px
+  // phone it bled ~15px past the viewport and the page scrolled to 390px wide,
+  // in both themes. Fixed with `overflow-x: clip` on the root, which contains the
+  // decorative bleed without breaking vertical scroll or `position: sticky`.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+  for (const theme of ['dark', 'light']) {
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(scrollWidth, `homepage scrolls horizontally at 375 in ${theme} mode`).toBeLessThanOrEqual(clientWidth);
+  }
 });
 
 test('on a wide viewport the CTA stays in the sticky column', async ({ page }) => {

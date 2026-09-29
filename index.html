@@ -310,6 +310,12 @@ html, body {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   min-height: 100vh;
+  /* The hero galaxy bleeds ~15px past the viewport on narrow phones (its
+     wrapper sits at left/right -12%), which pushed the page to 390px in a 375px
+     viewport. `clip` contains that decorative overflow without creating a scroll
+     container, so vertical scrolling and `position: sticky` are unaffected —
+     same treatment the /design-system page already uses. */
+  overflow-x: clip;
 }
 body { transition: background 320ms ease, color 320ms ease; }
 a { color: inherit; }
