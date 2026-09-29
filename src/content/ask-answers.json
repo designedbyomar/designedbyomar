@@ -1030,7 +1030,7 @@
         "page-builder"
       ],
       "answer": "He helps define what the product should do before deciding what the interface should look like.\n\nFor Wisdom's Management Portal, that meant defining the product vision and problem space with Operations, Finance and Engineering leadership, then mapping where risk, capacity and performance decisions were breaking down. On Plastiq Connect, he set the product vision with the product manager from nothing. On Page Builder 2.0, there was no product manager, so he owned the requirements as well as the design.\n\nThe pattern is consistent: clarify the outcome, model the workflow and constraints, and use that foundation to decide what deserves to be built.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "ac3e3070baa9"
     },
     {
@@ -1049,7 +1049,7 @@
         "plastiq-mktg"
       ],
       "answer": "Directly, and usually through decisions and working artifacts rather than presentation theatre.\n\nHis current practice involves working directly with founders, product and engineering teams. At Simplero, a founder-led SaaS company, he owned the requirements for Page Builder 2.0 in the absence of a product manager and partnered with the lead engineer to ship it in two months. At Plastiq, he translated a COO-sponsored, three-to-four-week relaunch into a plan an eight-person team could execute.\n\nHe is most useful when leadership needs someone who can turn business context into a concrete product direction and then stay involved through delivery.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "e54c7a61d3e9"
     },
     {
@@ -1068,7 +1068,7 @@
         "athena-ds"
       ],
       "answer": "Yes — with an important distinction between design leadership and formal people management.\n\nOn Disney's Unified Ad Platform, he mentored the two designers assigned to the project as well as designers elsewhere on the team. On Athena, he co-led the design system, facilitated alignment workshops, and helped establish the governance and documentation other teams needed to contribute.\n\nThe published work supports mentorship, critique and leadership through shared standards. It does not establish that he has owned hiring, performance reviews or a formal team of direct reports; those should be discussed directly if the role requires them.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "bc8c1c86f5d6"
     },
     {
@@ -1088,7 +1088,7 @@
         "page-builder"
       ],
       "answer": "He treats all three as inputs to the product rather than resolving one at the expense of the others.\n\nPlastiq Connect had to support partner branding and a usable payment experience without weakening compliance requirements. Disney's Critical Communication Tool combined user research and usability testing with a constrained budget, engineering limits and a tightly defined MVP. Page Builder 2.0 had to address customer churn and migration barriers while remaining practical enough to ship in two months.\n\nHis approach is to identify the constraints early, make the tradeoffs visible, and preserve the parts of the experience that cannot fail.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "ce41b852c36e"
     },
     {
@@ -1108,7 +1108,7 @@
         "disney-uap"
       ],
       "answer": "He starts with the people doing the work and studies the decisions they make — not merely the screens they use.\n\nFor Posting Assistant at Wisdom, he conducted 40+ interviews for that product and used observational research to watch specialists work across multiple monitors. For Plastiq Connect, he interviewed prospective partners' engineering and product teams alongside internal sales, operations and compliance experts. At Disney, he mapped how a single decision moved through seven business functions.\n\nThat is how he has moved between healthcare, payments, ad sales and enterprise operations without pretending to be the domain expert on day one.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "b7716327ccfe"
     },
     {
@@ -1128,7 +1128,7 @@
         "athena-ds"
       ],
       "answer": "Yes. His strongest leadership examples come from creating clarity and momentum rather than relying on a reporting line.\n\nFor Plastiq's marketing relaunch, he stepped into the creative lead role while the Head of Design was occupied elsewhere, aligned an eight-person cross-functional team, and delivered in three to four weeks. On Disney's Unified Ad Platform, he led design across engineers, product, business analysis, brand directors, sales and operations while mentoring other designers. On Athena, he co-led an organizational system that required teams to adopt shared principles and governance.\n\nThose projects required influence, facilitation and hands-on execution — not direct reports.",
-      "status": "draft",
+      "status": "approved",
       "sourcesFingerprint": "d2badc208362"
     }
   ]
