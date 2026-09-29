@@ -95,4 +95,9 @@ test('a grounded draft can cite a case study by its verified product name', () =
     mentionedStudyIds('AdVisor unified the ad-sales workflow.', studies, ['disney-uap']),
     ['disney-uap'],
   );
+  assert.deepEqual(
+    mentionedStudyIds('An advisor helped with the workflow.', studies, ['disney-uap']),
+    [],
+    'the generic lowercase noun is not the branded product name',
+  );
 });

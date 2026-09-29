@@ -22,6 +22,10 @@
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// Preserve intentionally distinctive brand casing such as "AdVisor". Ordinary
+// aliases remain case-insensitive so sentence casing does not prevent a link.
+const aliasFlags = (alias) => (/[a-z][A-Z]/.test(alias) ? '' : 'i');
+
 /** The route every study page lives at — see vercel.json and postbuild.js. */
 export const hrefForStudy = (id) => `/work/${id}/`;
 
@@ -50,12 +54,12 @@ export const tokenizeAnswer = (text, studies = [], citedIds = []) => {
   if (!candidates.length) return [{ type: 'text', value: text }];
 
   // The earliest match of each alias, tagged with its study. `\b` on both sides
-  // so "Athena" never fires inside another word, and case-insensitive so a
-  // sentence-start mention still matches.
+  // so "Athena" never fires inside another word. Most aliases ignore case;
+  // deliberately mixed-case brand names require their authored casing.
   const matches = [];
   for (const study of candidates) {
     for (const alias of aliasesFor(study)) {
-      const found = new RegExp(`\\b${escapeRegExp(alias)}\\b`, 'i').exec(text);
+      const found = new RegExp(`\\b${escapeRegExp(alias)}\\b`, aliasFlags(alias)).exec(text);
       if (found) matches.push({ start: found.index, end: found.index + found[0].length, id: study.id, value: found[0] });
     }
   }
