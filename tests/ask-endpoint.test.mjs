@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, SUPPORTED_EFFORT } from '../api/ask.mjs';
+import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, ROUTER_TIMEOUT_MS, SUPPORTED_EFFORT } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -151,6 +151,20 @@ const post = (question) => new Request('https://designedbyomar.com/api/ask', {
   body: JSON.stringify({ question }),
 });
 
+test('the endpoint accepts only POST', async () => {
+  const { handler, calls, routeCalls } = loadHandler();
+  const response = await handler(new Request('https://designedbyomar.com/api/ask', { method: 'GET' }));
+  assert.equal(response.status, 405);
+  assert.equal(calls.length, 0);
+  assert.equal(routeCalls.length, 0);
+});
+
+test('the router and Vercel budgets keep a controlled first response inside 25 seconds', () => {
+  const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+  assert.equal(ROUTER_TIMEOUT_MS, 4000);
+  assert.equal(vercel.functions?.['api/ask.mjs']?.maxDuration, 25);
+});
+
 test('an exact hit is answered without calling any model', async () => {
   // Verbatim alias. The one result token overlap cannot get wrong, so it costs
   // nothing — not even a routing call.
@@ -165,8 +179,33 @@ test('an exact hit is answered without calling any model', async () => {
   assert.equal(await response.text(), answerFor('fintech-depth').answer, 'returned verbatim');
 });
 
+test('punctuation and casing variants of ship-fast stay local', async () => {
+  for (const question of ['Can Omar ship fast?', 'CAN OMAR SHIP FAST?!', '  can   omar ship fast  ']) {
+    const { handler, calls, routeCalls } = loadHandler();
+    const response = await handler(post(question));
+    assert.equal(response.headers.get('X-Ask-Answer-Id'), 'prioritization-under-constraints', question);
+    assert.equal(response.headers.get('X-Ask-Matched-By'), 'exact', question);
+    assert.equal(routeCalls.length, 0, question);
+    assert.equal(calls.length, 0, question);
+  }
+});
+
+test('formal-management questions use the verified one-report answer without a model', async () => {
+  const { handler, calls, routeCalls } = loadHandler();
+  const response = await handler(post('Has Omar formally managed 20 direct reports?'));
+  const text = await response.text();
+
+  assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
+  assert.equal(response.headers.get('X-Ask-Answer-Id'), 'formal-people-management');
+  assert.equal(response.headers.get('X-Ask-Matched-By'), 'guardrail');
+  assert.equal(routeCalls.length, 0);
+  assert.equal(calls.length, 0);
+  assert.match(text, /directly managed one designer/i);
+  assert.match(text, /not 20/i);
+});
+
 test('the router decides a non-exact question, and its pick is returned verbatim', async () => {
-  const { handler, calls, routeCalls } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const { handler, calls, routeCalls } = loadHandler({ routeReturns: 'ANSWER: leadership-or-ic' });
   const response = await handler(post('is he a manager'));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'reviewed');
@@ -192,7 +231,7 @@ test('the reported bug: a hiring question no longer returns a refusal', async ()
   assert.equal(local.answer.topic, 'refusal', 'the local matcher still picks a refusal here');
   assert.equal(local.exact, false, 'and not as an exact hit, so it is routable');
 
-  const { handler } = loadHandler({ routeReturns: 'leadership-or-ic' });
+  const { handler } = loadHandler({ routeReturns: 'ANSWER: leadership-or-ic' });
   const response = await handler(post('is he a manager'));
 
   assert.equal(response.headers.get('X-Ask-Answer-Id'), 'leadership-or-ic');
@@ -208,28 +247,7 @@ test('an id the router invented is never served', async () => {
   assert.notEqual(response.headers.get('X-Ask-Answer-Id'), 'leadership-and-vision');
 });
 
-/**
- * An answer the router did not give is not the same as an answer it declined to
- * give, and only the second should outrank the local match.
- *
- * Treating them alike meant a truncated or empty response discarded an answer
- * the site already had, turning a question it could answer into an unreviewed
- * draft. Both halves are asserted, because fixing one direction by breaking the
- * other would pass a looser test.
- */
-/**
- * A router that decided nothing must not stop a draft.
- *
- * This reverses the previous behaviour, where an unreadable or failed routing
- * response returned the written miss and never reached the model. The reasoning
- * was that without the router we do not know which studies are relevant. What
- * it cost in practice was that one routing timeout produced "no written answer"
- * for every typed question on the site — which is what was reported.
- *
- * A loose overlap match is still never served: it would arrive labelled as
- * reviewed. A draft is labelled as a draft, which is why one is acceptable here
- * and the other is not.
- */
+/** A missing source boundary must stop drafting, not broaden it. */
 for (const [label, routeReturns] of [
   ['an empty response', ''],
   ['whitespace only', '   \n  '],
@@ -237,35 +255,25 @@ for (const [label, routeReturns] of [
   ['an id that does not exist', 'leadership-and-vision'],
   ['a refusal to answer', 'I cannot help with that'],
 ]) {
-  test(`${label} from the router still reaches a draft`, async () => {
+  test(`${label} from the router fails closed`, async () => {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must still draft`);
-    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${label} must not draft`);
+    assert.equal(calls.length, 0);
+    assert.equal(response.headers.get('X-Ask-Sources'), '');
     assert.equal(response.headers.get('X-Ask-Reason'), 'router-unreadable');
-
-    // Never the loose match, which here is a refusal answer scoring 1.00.
-    assert.notEqual(response.headers.get('X-Ask-Matched-By'), 'local');
   });
 }
 
-test('a router that throws still reaches a draft, and says why', async () => {
+test('a router that throws fails closed, and says why', async () => {
   const { handler, calls } = loadHandler({ routeThrows: true });
   const response = await handler(post('is he a manager'));
 
-  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(response.headers.get('X-Ask-Reason'), 'router-error');
-  assert.equal(calls.length, 1, 'drafting does not need the router, only material');
-});
-
-test('without the router, sections are retrieved across the whole corpus', async () => {
-  // The scoped search is more accurate, but an unscoped one is what makes
-  // drafting survive a routing failure at all.
-  const { handler, calls } = loadHandler({ routeThrows: true });
-  await handler(post('what fintech work has he done'));
-
-  assert.match(calls[0].system, /CASE STUDY EXCERPTS:/, 'material still reaches the model');
+  assert.equal(response.headers.get('X-Ask-Sources'), '');
+  assert.equal(calls.length, 0, 'drafting requires router-named studies');
 });
 
 test('an exact hit is still served when the router cannot run', async () => {
@@ -282,27 +290,29 @@ test('an exact hit is still served when the router cannot run', async () => {
 for (const [label, routeReturns] of [
   ['NONE', 'NONE'],
   ['lower-case none', 'none'],
-  ['NONE with punctuation', 'NONE.'],
-  ['a sentence declining', 'None of these answer that.'],
 ]) {
-  test(`${label} is a decision, so it drafts rather than using the local match`, async () => {
+  test(`${label} is a no-material decision and never drafts`, async () => {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${label} must be read as a decline`);
-    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${label} must be read as a decline`);
+    assert.equal(response.headers.get('X-Ask-Reason'), 'no-material');
+    assert.equal(response.headers.get('X-Ask-Sources'), '');
+    assert.equal(calls.length, 0);
   });
 }
 
-test('NONE means draft, even when token overlap thought it had a match', async () => {
-  const { handler, calls } = loadHandler({ routeReturns: 'NONE' });
-  const response = await handler(post('is he a manager'));
+for (const routeReturns of ['NONE.', 'None of these answer that.']) {
+  test(`${routeReturns} is invalid router output and fails closed`, async () => {
+    const { handler, calls } = loadHandler({ routeReturns });
+    const response = await handler(post('is he a manager'));
 
-  // The router saw all 48 and declined. That beats an overlap score, so the
-  // held local hit is deliberately not used.
-  assert.equal(response.headers.get('X-Ask-Source'), 'generated');
-  assert.equal(calls.length, 1);
-});
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(response.headers.get('X-Ask-Reason'), 'router-unreadable');
+    assert.equal(response.headers.get('X-Ask-Sources'), '');
+    assert.equal(calls.length, 0);
+  });
+}
 
 test('a loose overlap match is never served, on any path', async () => {
   // "is he a manager" scores 1.00 against a refusal answer. Whatever else
@@ -324,8 +334,8 @@ test('with no key nothing loose is served', async () => {
   assert.equal(calls.length, 0);
 });
 
-test('a question with no written answer is grounded in reviewed answers only', async () => {
-  const { handler, calls } = loadHandler();
+test('a sourced draft receives only material inside the router-named studies', async () => {
+  const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: athena-ds' });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'generated');
@@ -334,13 +344,9 @@ test('a question with no written answer is grounded in reviewed answers only', a
   const { system } = calls[0];
   assert.match(system, /ONLY the material provided/i);
   assert.match(system, /third person/i);
-  // Everything in the prompt must be text Omar approved.
-  const quoted = system.split('REVIEWED ANSWERS:')[1];
-  const approvedText = approvedAnswers.map(a => a.answer).join('\n');
-  for (const line of quoted.split('\nA: ').slice(1)) {
-    const snippet = line.split('\n')[0].slice(0, 60);
-    assert.ok(approvedText.includes(snippet), `prompt contains text not from an approved answer: ${snippet}`);
-  }
+  assert.match(system, /Athena Design System 2\.0/);
+  assert.doesNotMatch(system, /Connect API Payments|card and bank payments/i);
+  assert.equal(response.headers.get('X-Ask-Sources'), 'athena-ds');
 });
 
 test('with no API key configured it degrades instead of failing', async () => {
@@ -353,7 +359,7 @@ test('with no API key configured it degrades instead of failing', async () => {
 });
 
 test('a provider failure degrades to the fallback the site already shipped', async () => {
-  const { handler } = loadHandler({ generateThrows: true });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: athena-ds', generateThrows: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
@@ -361,7 +367,7 @@ test('a provider failure degrades to the fallback the site already shipped', asy
 });
 
 test('a provider stream error before its first chunk degrades to the fallback', async () => {
-  const { handler } = loadHandler({ generateStreamError: true });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: athena-ds', generateStreamError: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
@@ -369,7 +375,7 @@ test('a provider stream error before its first chunk degrades to the fallback', 
 });
 
 test('an empty provider stream degrades to the fallback', async () => {
-  const { handler } = loadHandler({ generateEmpty: true });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: athena-ds', generateEmpty: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
@@ -377,7 +383,7 @@ test('an empty provider stream degrades to the fallback', async () => {
 });
 
 test('one visitor cannot drain the daily quota', async () => {
-  const { handler } = loadHandler();
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: athena-ds' });
   const sameVisitor = () => new Request('https://designedbyomar.com/api/ask', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.9' },
@@ -491,7 +497,7 @@ test('a stream that never yields is abandoned rather than hung on', { timeout: 1
   // to fire; nothing in this test aborts for it.
   t.diagnostic('waiting on the endpoint first-chunk timeout');
   const started = Date.now();
-  const { handler } = loadHandler({ generateStalls: true });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: athena-ds', generateStalls: true });
   const response = await handler(post(MISS_WITH_CONTEXT));
 
   assert.equal(response.status, 200);
@@ -525,21 +531,22 @@ test('the router can name case studies, and the draft is written from them', asy
   assert.ok(!/athena-ds/.test(response.headers.get('X-Ask-Sources')), 'and not at a study it never saw');
 });
 
-test('a named study the site does not have is ignored rather than trusted', async () => {
+test('a named study the site does not have makes the routing output invalid', async () => {
   const { handler, calls } = loadHandler({ routeReturns: 'SOURCES: connect-api,not-a-real-study' });
   const response = await handler(post('What is the strongest fintech case study he has'));
 
   assert.equal(response.status, 200);
-  assert.equal(calls.length, 1);
-  assert.ok(!/not-a-real-study/.test(calls[0].system), 'an invented id must not reach the prompt');
-  assert.ok(!/not-a-real-study/.test(response.headers.get('X-Ask-Sources')));
+  assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(response.headers.get('X-Ask-Reason'), 'router-picked-invalid');
+  assert.equal(response.headers.get('X-Ask-Sources'), '');
+  assert.equal(calls.length, 0, 'an invented id must stop drafting');
 });
 
 test('the case studies are only fetched when a draft actually needs them', async () => {
   // They are the largest file the endpoint can pull. A question a written
   // answer covers must never pay for it.
   let fetched = 0;
-  const { handler } = loadHandler({ routeReturns: 'fintech-depth' });
+  const { handler } = loadHandler({ routeReturns: 'ANSWER: fintech-depth' });
   const wrapped = createHandler({
     hasApiKey: () => true,
     loadAnswers: async () => ({ answers: approvedAnswers, index: buildIndex(approvedAnswers), studies: STUDIES }),
@@ -725,35 +732,36 @@ test('an unreadable request says so', async () => {
   assert.equal(response.headers.get('X-Ask-Reason'), 'bad-request');
 });
 
-test('a successful draft records whether the router chose or failed', async () => {
-  // Naming studies and declining both mean "no written answer fits", but only
-  // one of them located material, so they are reported apart.
+test('only a successful SOURCES decision produces a draft', async () => {
   const sourced = await (loadHandler({ routeReturns: 'SOURCES: connect-api' })).handler(post('what fintech work has he done'));
   assert.equal(sourced.headers.get('X-Ask-Source'), 'generated');
   assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
 
   const declined = await (loadHandler({ routeReturns: 'NONE' })).handler(post('what fintech work has he done'));
-  assert.equal(declined.headers.get('X-Ask-Source'), 'generated');
-  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+  assert.equal(declined.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'no-material');
+  assert.equal(declined.headers.get('X-Ask-Sources'), '');
 
   const failed = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
-  assert.equal(failed.headers.get('X-Ask-Source'), 'generated');
+  assert.equal(failed.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(failed.headers.get('X-Ask-Reason'), 'router-error');
+  assert.equal(failed.headers.get('X-Ask-Sources'), '');
 });
 
-test('an ANSWER naming an id that does not exist still drafts, and says so', async () => {
-  for (const routeReturns of ['ANSWER: leadership-and-vision', 'ANSWER: none-of-these-fit']) {
+test('an ANSWER naming an id that does not exist fails closed, and says so', async () => {
+  for (const routeReturns of ['ANSWER: leadership-and-vision', 'ANSWER: made-up-answer']) {
     const { handler, calls } = loadHandler({ routeReturns });
     const response = await handler(post('is he a manager'));
 
-    assert.equal(response.headers.get('X-Ask-Source'), 'generated', `${routeReturns} must still draft`);
-    assert.equal(calls.length, 1);
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback', `${routeReturns} must not draft`);
+    assert.equal(calls.length, 0);
+    assert.equal(response.headers.get('X-Ask-Sources'), '');
     assert.equal(response.headers.get('X-Ask-Reason'), 'router-picked-invalid', `${routeReturns} is not a decline`);
   }
 
-  // ANSWER: NONE is still the router declining, just in the wrong form.
+  // ANSWER: NONE is invalid because the router used the wrong form.
   const declined = await (loadHandler({ routeReturns: 'ANSWER: NONE' })).handler(post('is he a manager'));
-  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+  assert.equal(declined.headers.get('X-Ask-Reason'), 'router-picked-invalid');
 });
 
 test('every generated draft names a routing outcome', async () => {
@@ -825,24 +833,17 @@ test('the reason names the check that actually failed, not a second read of the 
   assert.equal(reason, 'rate-limited');
 });
 
-test('a router problem survives a drafting failure that follows it', async () => {
-  // Both facts matter: the router returned something unusable *and* drafting
-  // then failed. Reporting only the second leaves no trace of the first, and
-  // the two together are a different problem from either alone.
-  const unreadable = await (loadHandler({
-    routeReturns: 'I cannot help with that',
-    generateThrows: true,
-  })).handler(post('what fintech work has he done'));
-  assert.equal(unreadable.headers.get('X-Ask-Reason'), 'router-unreadable+provider-error');
-
-  const threw = await (loadHandler({ routeThrows: true, generateEmpty: true }))
-    .handler(post('what fintech work has he done'));
-  assert.equal(threw.headers.get('X-Ask-Reason'), 'router-error+empty-draft');
-
-  // And a drafting failure on its own still reads plainly.
-  const clean = await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: true }))
-    .handler(post('what fintech work has he done'));
-  assert.equal(clean.headers.get('X-Ask-Reason'), 'provider-error');
+test('router failures never cascade into a drafting call', async () => {
+  for (const options of [
+    { routeReturns: 'I cannot help with that', generateThrows: true },
+    { routeThrows: true, generateEmpty: true },
+  ]) {
+    const { handler, calls } = loadHandler(options);
+    const response = await handler(post('what fintech work has he done'));
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(response.headers.get('X-Ask-Sources'), '');
+    assert.equal(calls.length, 0);
+  }
 });
 
 test('failure logs name the error without repeating what it said', async () => {
@@ -859,8 +860,9 @@ test('failure logs name the error without repeating what it said', async () => {
   const original = console.error;
   console.error = (...args) => logged.push(args.map(String).join(' '));
   try {
-    await (loadHandler({ routeReturns: `Sure — ${question}`, generateThrows: upstream }))
-      .handler(post(question));
+    await (loadHandler({ routeReturns: `Sure — ${question}` })).handler(post(question));
+    await (loadHandler({ routeReturns: 'SOURCES: connect-api', generateThrows: upstream }))
+      .handler(post('what fintech work has he done'));
   } finally {
     console.error = original;
   }
@@ -892,16 +894,13 @@ test('production reports a bucket rather than naming the failure', async () => {
     const answersDown = await (loadHandler({ answersFail: true })).handler(post('what fintech work has he done'));
     assert.equal(answersDown.headers.get('X-Ask-Reason'), 'unavailable');
 
-    // A reply was still drafted, so reporting it as unavailable would be a lie
-    // about a request that succeeded. Different bucket, still no cause.
-    const drafted = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
-    assert.equal(drafted.headers.get('X-Ask-Source'), 'generated');
-    assert.equal(drafted.headers.get('X-Ask-Reason'), 'degraded');
+    const routerDown = await (loadHandler({ routeThrows: true })).handler(post('what fintech work has he done'));
+    assert.equal(routerDown.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(routerDown.headers.get('X-Ask-Reason'), 'unavailable');
 
-    const composed = await (loadHandler({ routeReturns: 'I cannot help with that', generateThrows: true }))
+    const unreadable = await (loadHandler({ routeReturns: 'I cannot help with that' }))
       .handler(post('what fintech work has he done'));
-    assert.equal(composed.headers.get('X-Ask-Reason'), 'unavailable',
-      'a composed reason must not leak either of its halves');
+    assert.equal(unreadable.headers.get('X-Ask-Reason'), 'unavailable');
   } finally {
     process.env.ASK_DETAILED_REASONS = '1';
   }
@@ -931,7 +930,7 @@ test('the reasons a visitor can act on survive production', async () => {
     assert.equal(sourced.headers.get('X-Ask-Reason'), 'router-sourced');
 
     const declined = await (loadHandler()).handler(post('what fintech work has he done'));
-    assert.equal(declined.headers.get('X-Ask-Reason'), 'router-declined');
+    assert.equal(declined.headers.get('X-Ask-Reason'), 'no-material');
 
     const limited = loadHandler().handler;
     const drain = () => new Request('https://designedbyomar.com/api/ask', {
@@ -1127,7 +1126,7 @@ test('every chunk is encoded, not just the first', async () => {
     production, which is the bug this whole change is about.
   */
   const parts = ['Omar ', '— “embedded ', 'payments” — ', 'Plastiq Connect.'];
-  const { handler } = loadHandler({ streamChunks: parts });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api', streamChunks: parts });
   const response = await handler(post('what fintech work has he done'));
 
   assert.equal(response.headers.get('X-Ask-Source'), 'generated');
@@ -1139,7 +1138,7 @@ test('every chunk is encoded, not just the first', async () => {
 test('a leading empty chunk does not lose the text that follows', async () => {
   // The buffer exists because providers open with empty chunks. Those are held
   // and replayed, so they must be encoded too.
-  const { handler } = loadHandler({ streamChunks: ['', '', 'Plastiq — “Connect”.'] });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api', streamChunks: ['', '', 'Plastiq — “Connect”.'] });
   const response = await handler(post('what fintech work has he done'));
 
   const { text } = await readBody(response, { requireBytes: true });
@@ -1149,7 +1148,7 @@ test('a leading empty chunk does not lose the text that follows', async () => {
 test('a multi-byte character survives the encoding', async () => {
   // Naive chunking splits a character across two chunks and corrupts it. The
   // answers use em dashes and curly quotes throughout.
-  const { handler } = loadHandler({ streamText: 'Omar — “embedded payments” — Plastiq' });
+  const { handler } = loadHandler({ routeReturns: 'SOURCES: connect-api', streamText: 'Omar — “embedded payments” — Plastiq' });
   const response = await handler(post('what fintech work has he done'));
 
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();

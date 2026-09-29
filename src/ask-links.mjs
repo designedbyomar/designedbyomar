@@ -85,3 +85,18 @@ export const tokenizeAnswer = (text, studies = [], citedIds = []) => {
   if (cursor < text.length) tokens.push({ type: 'text', value: text.slice(cursor) });
   return tokens;
 };
+
+/**
+ * The cited studies that the prose actually names, in mention order.
+ *
+ * Generated replies may be grounded in several studies without using all of
+ * them in the final wording. Citation chips should describe the visible reply,
+ * not every document the model was allowed to read.
+ */
+export const mentionedStudyIds = (text, studies = [], citedIds = []) => [
+  ...new Set(
+    tokenizeAnswer(text, studies, citedIds)
+      .filter(token => token.type === 'link')
+      .map(token => token.id),
+  ),
+];

@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { tokenizeAnswer, hrefForStudy } from '../src/ask-links.mjs';
+import { tokenizeAnswer, hrefForStudy, mentionedStudyIds } from '../src/ask-links.mjs';
 
 const studies = JSON.parse(
   readFileSync(new URL('../src/content/case-studies.json', import.meta.url), 'utf8'),
@@ -78,4 +78,14 @@ test('empty or uncited input degrades to plain text', () => {
 
 test('hrefForStudy points at the published route', () => {
   assert.equal(hrefForStudy('disney-uap'), '/work/disney-uap/');
+});
+
+test('draft citations include only named studies mentioned in the completed reply', () => {
+  const cited = mentionedStudyIds(
+    'Plastiq Connect handled embedded payments. The other material was not needed.',
+    studies,
+    ['connect-api', 'athena-ds'],
+  );
+  assert.deepEqual(cited, ['connect-api']);
+  assert.deepEqual(mentionedStudyIds('There is no published evidence for that.', studies, ['connect-api']), []);
 });

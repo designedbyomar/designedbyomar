@@ -10,6 +10,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fingerprintSources } from '../scripts/ask-fingerprint.mjs';
+import { normalizeExact } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 const caseStudies = JSON.parse(readFileSync(new URL('../src/content/case-studies.json', import.meta.url), 'utf8'));
@@ -58,14 +59,39 @@ test('every answer has at least three aliases', () => {
   }
 });
 
-test('aliases are unique across the whole set', () => {
+test('questions and aliases are unique after exact-match normalization', () => {
   const seen = new Map();
   for (const a of answers) {
-    for (const alias of a.aliases) {
-      const key = alias.toLowerCase().trim();
-      assert.ok(!seen.has(key), `alias "${alias}" is used by both ${seen.get(key)} and ${a.id} — the matcher cannot choose`);
+    for (const phrase of [a.question, ...a.aliases]) {
+      const key = normalizeExact(phrase);
+      assert.ok(!seen.has(key), `"${phrase}" is used by both ${seen.get(key)} and ${a.id} after normalization — the matcher cannot choose`);
       seen.set(key, a.id);
     }
+  }
+});
+
+test('the approved management answers state the verified scope consistently', () => {
+  const formal = answers.find(answer => answer.id === 'formal-people-management');
+  assert.equal(formal?.status, 'approved');
+  assert.match(formal.answer, /directly managed one designer/i);
+  assert.match(formal.answer, /participated in hiring/i);
+  assert.match(formal.answer, /formal performance reviews/i);
+  assert.match(formal.answer, /not 20/i);
+
+  for (const id of ['leadership-or-ic', 'design-mentorship', 'influence-without-authority']) {
+    const answer = answers.find(item => item.id === id);
+    assert.ok(answer, id);
+    assert.doesNotMatch(answer.answer, /no (?:formal )?(?:people )?management|never (?:had|managed) direct reports/i, id);
+  }
+});
+
+test('both Plastiq case studies publicly ground the management claim', () => {
+  for (const id of ['connect-api', 'athena-ds']) {
+    const study = caseStudies.find(item => item.id === id);
+    const published = JSON.stringify(study);
+    assert.match(published, /directly managed one designer|managed one designer directly|direct management of one designer|formal manager of one designer/i, id);
+    assert.match(published, /hiring/i, id);
+    assert.match(published, /formal (?:performance )?reviews/i, id);
   }
 });
 

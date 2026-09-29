@@ -1,4 +1,7 @@
 {
+  "functions": {
+    "api/ask.mjs": { "maxDuration": 25 }
+  },
   "redirects": [
     { "source": "/design-system.html", "destination": "/design-system", "permanent": true },
     { "source": "/ask/", "destination": "/ask", "permanent": true },
