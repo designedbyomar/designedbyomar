@@ -700,6 +700,11 @@ button:focus-visible, a:focus-visible {
   transform: translate3d(0, 0, 0);
 }
 @media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
   .logo-loader path { animation: none; transform: translateY(0%); }
   .logo-track { animation: none; transform: translateX(0); }
   .case-card, .case-card-screen, .case-card-line, .case-card-tag, .case-card-sheen, .hero-stat-card, .faq-item, .faq-answer, .faq-item svg, .text-link, .reveal { transition: none !important; }

@@ -31,6 +31,37 @@ export const tokenize = (text) => String(text)
   .filter(token => token.length > 1 && !STOPWORDS.has(token));
 
 /**
+ * Canonical form for a written question or alias.
+ *
+ * Exact means the same words in the same order, not the same keyboard marks.
+ * A visitor adding a question mark, using a smart apostrophe, or typing two
+ * spaces must not turn an approved answer into a model request.
+ */
+export const normalizeExact = (text) => String(text)
+  .normalize('NFKC')
+  .toLowerCase()
+  .replace(/[‘’']/g, '')
+  .replace(/[^a-z0-9+#]+/g, ' ')
+  .trim()
+  .replace(/\s+/g, ' ');
+
+const FORMAL_MANAGEMENT_ANSWER_ID = 'formal-people-management';
+const FORMAL_MANAGEMENT_PATTERNS = [
+  /\b(?:has|have|had|did|does)\b.{0,48}\b(?:formal(?:ly)? manage(?:d|s|ment|ing)?|direct reports?|manage(?:d|s|ment|ing)? (?:\d+ )?(?:designers?|people|a design team)|people management experience)\b/i,
+  /\bhow many\b.{0,32}\b(?:direct reports?|designers?|people)\b.{0,32}\b(?:manage(?:d|s|ment|ing)?|report(?:ed|s|ing)?)?\b/i,
+  /\b(?:has|have|had|did)\b.{0,32}\b(?:participate(?:d)? in hiring|hire(?:d|s|ing)? designers?)\b/i,
+  /\b(?:has|have|had|did)\b.{0,32}\b(?:(?:do|done|own(?:ed|s|ing)?|conduct(?:ed|s|ing)?|run|ran) )?(?:formal )?performance reviews?\b/i,
+];
+
+const hasFormalManagementIntent = (normalized) => {
+  // “Lead without direct reports” is about influence, not Omar's management
+  // history. The same words appear in both topics, so the negative framing has
+  // to win before checking for factual management experience.
+  if (/\b(?:without|despite(?: having)? no)\b.{0,24}\bdirect reports?\b/i.test(normalized)) return false;
+  return FORMAL_MANAGEMENT_PATTERNS.some(pattern => pattern.test(normalized));
+};
+
+/**
  * Precompute per-answer token sets and IDF weights. Cheap enough to run on
  * load; kept separate so the matcher itself stays pure.
  */
@@ -41,7 +72,14 @@ export const buildIndex = (answers) => {
       ...(answer.aliases ?? []).flatMap(tokenize),
       ...tokenize(answer.topic ?? ''),
     ]);
-    return { answer, tokens, aliases: new Set((answer.aliases ?? []).map(a => a.toLowerCase().trim())) };
+    return {
+      answer,
+      tokens,
+      exactPhrases: new Set([
+        normalizeExact(answer.question),
+        ...(answer.aliases ?? []).map(normalizeExact),
+      ]),
+    };
   });
 
   const documentFrequency = new Map();
@@ -85,11 +123,22 @@ export const MIN_KNOWN_RATIO = 0.51;
  * miss to the nearest case study and the contact link.
  */
 export const matchQuestion = (query, index) => {
-  const normalized = String(query).toLowerCase().trim();
+  const normalized = normalizeExact(query);
   if (!normalized) return null;
 
-  const exact = index.docs.find(doc => doc.aliases.has(normalized) || doc.answer.question.toLowerCase() === normalized);
+  const exact = index.docs.find(doc => doc.exactPhrases.has(normalized));
   if (exact) return { answer: exact.answer, score: 1, exact: true };
+
+  // Formal people-management claims need a factual answer, not a semantic
+  // guess. The approved answer states the verified scope (one direct report),
+  // so a number such as "20" cannot make the router inflate it or deny the
+  // experience altogether. The guard is intentionally limited to factual
+  // questions about management history; leadership without authority and
+  // hiring philosophy still go through their own answer or the router.
+  if (hasFormalManagementIntent(normalized)) {
+    const guarded = index.docs.find(doc => doc.answer.id === FORMAL_MANAGEMENT_ANSWER_ID);
+    if (guarded) return { answer: guarded.answer, score: 1, exact: false, guarded: true };
+  }
 
   const queryTokens = [...new Set(tokenize(normalized))];
   if (!queryTokens.length) return null;

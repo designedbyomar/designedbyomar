@@ -1005,6 +1005,41 @@ test('Ask returns a written answer with a citation into the case study', async (
   await expect(page).toHaveURL(/\/work\/athena-ds\/?$/);
 });
 
+test('ship-fast punctuation variants return reviewed wording, URL and citations with zero API calls', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => { if (request.url().includes('/api/ask')) requests.push(request.url()); });
+
+  await page.goto('/ask');
+  const input = page.locator('#ask-panel input[type="text"]');
+  await input.fill('CAN OMAR SHIP FAST?!');
+  await page.locator('#ask-panel button[type="submit"]').click();
+
+  await expect(page).toHaveURL(/#prioritization-under-constraints$/);
+  await expect(page.getByText(/starts with the outcome that cannot fail/i).first()).toBeVisible();
+  const cited = await page.locator('[data-ask-response-region] a[href^="/work/"]')
+    .evaluateAll(links => [...new Set(links.map(link => link.getAttribute('href')))]);
+  expect(cited).toEqual([
+    '/work/disney-cct/',
+    '/work/page-builder/',
+    '/work/plastiq-mktg/',
+  ]);
+  expect(requests).toHaveLength(0);
+});
+
+test('a 20-direct-reports question returns the verified one-report answer with zero API calls', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => { if (request.url().includes('/api/ask')) requests.push(request.url()); });
+
+  await page.goto('/ask');
+  await page.locator('#ask-panel input[type="text"]').fill('Has Omar formally managed 20 direct reports?');
+  await page.locator('#ask-panel button[type="submit"]').click();
+
+  await expect(page).toHaveURL(/#formal-people-management$/);
+  await expect(page.getByText(/directly managed one designer/i).first()).toBeVisible();
+  await expect(page.getByText(/not 20 or a large design organization/i)).toBeVisible();
+  expect(requests).toHaveLength(0);
+});
+
 test('a typed question is routed, and the routed answer is shown', async ({ page }) => {
   // Typed questions are not answered by word overlap any more, so this needs
   // the endpoint — which `vite preview` does not run. Stubbed to the reply
@@ -1035,7 +1070,7 @@ test('Ask refuses a question it has no written answer for', async ({ page }) => 
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
 });
 
@@ -1065,7 +1100,7 @@ test('Ask still answers when analytics are declined, and sends nothing', async (
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
 
   const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
   expect(events.filter(e => e.eventName.startsWith('ask_')), 'a declined visitor must send no ask_* events').toHaveLength(0);
@@ -1086,7 +1121,7 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
 
   const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
   expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
@@ -1097,19 +1132,13 @@ test('the privacy policy discloses what the Ask box records and where it goes', 
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { name: /The Ask Box/i })).toBeVisible();
   // All three cases have to be stated, because they differ in what leaves the
-  // browser: a verbatim question, a routed one, and one nothing covers.
+  // browser: a normalized exact question, a routed one, and one nothing covers.
   await expect(page.getByText(/answered in your browser: nothing is sent/i)).toBeVisible();
   await expect(page.getByText(/Anything else you type is sent to this site to be matched/i)).toBeVisible();
-  // Drafting now reads the case studies, not only the written answers, so the
-  // policy has to say that is what gets sent.
-  // Stated twice on purpose — in the narrative and in the collected-data list.
-  await expect(page.getByText(/excerpts of the published case studies/i).first()).toBeVisible();
-  await expect(page.getByText(/excerpts of the published case studies/i)).toHaveCount(2);
-  await expect(page.getByText(/Only published material is ever sent/i)).toBeVisible();
-  // Groq is not always called, and an answered question's wording is not
-  // recorded — both were overstated, and both are load-bearing claims.
-  await expect(page.getByText(/If Groq cannot be reached, or the free daily allowance is spent/i)).toBeVisible();
-  await expect(page.getByText(/wording of a question nothing covers is also recorded/i)).toBeVisible();
+  await expect(page.getByText(/Only then is the question sent again with excerpts from those named studies/i)).toBeVisible();
+  await expect(page.getByText(/If the router says none apply or fails, no draft is attempted/i)).toBeVisible();
+  await expect(page.getByText(/shows that it cannot answer rather than substituting a loosely related answer or citation/i)).toBeVisible();
+  await expect(page.getByText(/wording of a question the Ask box cannot safely answer is also recorded/i)).toBeVisible();
   await expect(page.getByText(/does get a written answer is not recorded that way/i)).toBeVisible();
   // Claims that were true before the endpoint existed and must not come back.
   await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
@@ -1135,7 +1164,50 @@ test('a drafted answer is labelled as unreviewed', async ({ page }) => {
 
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toBeVisible();
   await expect(askLive(page).getByText(/has not been reviewed/i)).toBeVisible();
-  await expect(askLive(page).locator('a[href="/work/connect-api/"]')).toBeVisible();
+  await expect(askLive(page).locator('a[href^="/work/"]')).toHaveCount(0);
+});
+
+test('draft citation chips include only studies named in the completed reply', async ({ page }) => {
+  await page.route('**/api/ask', route => route.fulfill({
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Ask-Source': 'generated',
+      'X-Ask-Sources': 'connect-api,athena-ds',
+    },
+    body: 'Plastiq Connect is the published example that supports this reply.',
+  }));
+
+  await page.goto('/ask');
+  await page.locator('#ask-panel input[type="text"]').fill('What is the best payments example?');
+  await page.locator('#ask-panel button[type="submit"]').click();
+
+  const response = page.locator('[data-ask-response-region]');
+  await expect(response.locator('a[href="/work/connect-api/"]')).toHaveCount(2);
+  await expect(response.locator('a[href="/work/athena-ds/"]')).toHaveCount(0);
+});
+
+test('unsupported iOS and Apple questions show no unrelated citations', async ({ page }) => {
+  await page.route('**/api/ask', route => route.fulfill({
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Ask-Source': 'fallback',
+      'X-Ask-Sources': '',
+      'X-Ask-Reason': 'no-material',
+    },
+    body: '',
+  }));
+
+  await page.goto('/ask');
+  for (const question of ['Has Omar designed native iOS apps?', 'Has Omar worked at Apple?']) {
+    await page.locator('#ask-panel input[type="text"]').fill(question);
+    await page.locator('#ask-panel button[type="submit"]').click();
+    const response = page.locator('[data-ask-response-region]');
+    await expect(response.getByText(/Rather than guess/i)).toBeVisible();
+    await expect(response.locator('a[href^="/work/"]')).toHaveCount(0);
+    await expect(response.locator('a[href^="mailto:"]')).toBeVisible();
+  }
 });
 
 test('the Ask box degrades to its written fallback when the endpoint fails', async ({ page }) => {
@@ -1148,7 +1220,7 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -1168,12 +1240,12 @@ test('with the endpoint down, a loose word match is not served in its place', as
   await askInput(page).fill('has he worked with react');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
 
-test('a verbatim question is answered without touching the network', async ({ page }) => {
+test('a normalized exact question is answered without touching the network', async ({ page }) => {
   // The carve-out the privacy policy relies on. An exact alias must never be
   // routed, and neither must a suggested prompt.
   const requests = [];
@@ -1189,7 +1261,7 @@ test('a verbatim question is answered without touching the network', async ({ pa
   await askInput(page).fill('fintech experience');
   await page.locator('#faq button[type="submit"]').click();
   await expect(askLive(page).getByText(/embedded payments product/i).first()).toBeVisible();
-  expect(requests, 'a verbatim alias must not be routed').toHaveLength(0);
+  expect(requests, 'an exact alias must not be routed').toHaveLength(0);
 });
 
 test('a routed question says it is looking, not that it is drafting', async ({ page }) => {
@@ -1221,6 +1293,53 @@ test('a routed question says it is looking, not that it is drafting', async ({ p
   // The router's pick is rendered from the local copy, reviewed, not as a draft.
   await expect(askLive(page).getByText(/Has Omar built design systems at scale/i)).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
+});
+
+test('loading to fallback keeps the mobile response footprint stable', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.route('**/api/ask', async route => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Ask-Source': 'fallback',
+        'X-Ask-Sources': '',
+        'X-Ask-Reason': 'no-material',
+      },
+      body: '',
+    });
+  });
+
+  await page.goto('/ask');
+  // Isolate the Ask transition from the one-time page loader and webfont
+  // settling; this assertion is about the response card's own footprint.
+  await expect(page.locator('.logo-loader').locator('..')).toHaveCSS('opacity', '0');
+  await page.locator('#ask-panel input[type="text"]').fill('Has Omar worked at Apple?');
+  await page.locator('#ask-panel button[type="submit"]').click();
+
+  const region = page.locator('[data-ask-response-region]');
+  await expect(region.locator('[data-ask-state="loading"]')).toBeVisible();
+  // The async Google Fonts stylesheet can start a font request after the
+  // one-time loader has resolved. Let that independent layout change finish
+  // before measuring the Ask card transition itself.
+  await page.evaluate(() => document.fonts.ready);
+  const before = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
+  await expect(region.getByText(/Rather than guess/i)).toBeVisible();
+  const after = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
+  expect(Math.abs(after - before), 'the footer should not jump when loading becomes fallback').toBeLessThanOrEqual(2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+});
+
+test('reduced motion leaves no running CSS animations after a theme switch', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/ask');
+  await page.getByRole('button', { name: /Switch to light mode/i }).click();
+  await page.waitForTimeout(50);
+
+  const running = await page.evaluate(() => document.getAnimations()
+    .filter(animation => animation.playState === 'running').length);
+  expect(running).toBe(0);
 });
 
 test('the input ring is visible at rest, still until hovered, and leaves focus alone', async ({ page }) => {
@@ -1438,6 +1557,34 @@ test('changing the hash on /ask selects the matching answer', async ({ page }) =
   await expect(page.getByText(/Two years at Plastiq/i).first()).toBeVisible();
 });
 
+test('Back and Forward restore successive answers and bare /ask clears stale content', async ({ page }) => {
+  await page.goto('/ask');
+  const input = page.locator('#ask-panel input[type="text"]');
+  const submit = page.locator('#ask-panel button[type="submit"]');
+
+  await input.fill('How does Omar contribute to product strategy, not just design execution?');
+  await submit.click();
+  await expect(page).toHaveURL(/#product-strategy$/);
+
+  await input.fill('How does Omar work with founders and senior leaders?');
+  await submit.click();
+  await expect(page).toHaveURL(/#founder-executive-partnership$/);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#product-strategy$/);
+  await expect(page.getByText(/helps define what the product should do/i)).toBeVisible();
+
+  await page.goForward();
+  await expect(page).toHaveURL(/#founder-executive-partnership$/);
+  await expect(page.getByText(/Directly, and usually through decisions/i)).toBeVisible();
+
+  await page.goBack();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/ask$/);
+  await expect(page.locator('[data-ask-share="true"]')).toHaveCount(0);
+  await expect(page.locator('[data-ask-response-region]')).toBeEmpty();
+});
+
 test('an answer on /ask has a link of its own that reopens it', async ({ page, context }) => {
   await page.goto('/ask');
 
@@ -1465,7 +1612,7 @@ test('a miss on /ask stops the URL pointing at the previous answer', async ({ pa
 
   await page.locator('#ask-panel input[type="text"]').fill('how do penguins pay for parking in antarctica');
   await page.locator('#ask-panel button[type="submit"]').click();
-  await expect(page.getByText(/could not be drafted either/i)).toBeVisible();
+  await expect(page.getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(page).toHaveURL(/\/ask$/);
 });
 
@@ -1509,7 +1656,8 @@ test('the design system documents the Ask component', async ({ page }) => {
   // described below-threshold overlap as the thing that declines.
   const ask = page.locator('#ask');
   await expect(ask.getByText(/Deciding which written answer a question wants is the model/i)).toBeVisible();
-  await expect(ask.getByText(/only to catch a verbatim question/i)).toBeVisible();
+  await expect(ask.getByText(/normalizing casing, punctuation, apostrophes, and whitespace/i)).toBeVisible();
+  await expect(ask.getByText(/no-answer state with email and no citation chips/i)).toBeVisible();
 });
 
 test('a routed answer is not reported as a missing one', async ({ page }) => {
@@ -1629,5 +1777,5 @@ test('picking a suggestion mid-stream does not resurrect the draft', async ({ pa
 
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
-  await expect(askLive(page).getByText(/could not be drafted either/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toHaveCount(0);
 });
