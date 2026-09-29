@@ -251,3 +251,99 @@ test('the fallback timeout still aborts a GitHub request that runs long', async 
   assert.equal(response.status, 502);
   assert.deepEqual(failures, [['request-failed']]);
 });
+
+const ENDPOINT = 'https://www.designedbyomar.com/api/github-contributions';
+
+test('serves a warm snapshot without calling GitHub again, even when the URL varies', async () => {
+  // The abuse vector: without a snapshot the endpoint hit GitHub on every request,
+  // so cache-busting could burn the PAT quota. The snapshot ignores the URL.
+  const calls = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date('2026-09-28T12:00:00Z'),
+    fetchImpl: async (...args) => { calls.push(args); return json(githubPayload()); },
+  });
+
+  const first = await handler(new Request(ENDPOINT));
+  assert.equal(first.status, 200);
+  assert.equal(first.headers.get('X-Contributions-Cache'), 'miss');
+  assert.equal(calls.length, 1);
+
+  const second = await handler(new Request(`${ENDPOINT}?bust=${Date.now()}`));
+  assert.equal(second.status, 200);
+  assert.equal(second.headers.get('X-Contributions-Cache'), 'hit');
+  assert.equal((await second.json()).totalContributions, 321);
+  assert.equal(calls.length, 1, 'a cache-busting query string must not force another GitHub call');
+});
+
+test('rate-limits the refresh path per IP when there is no snapshot to serve', async () => {
+  const calls = [];
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    rateLimit: 2,
+    // Every refresh fails, so the cache stays empty and every request stays on the
+    // refresh path — isolating the limiter from the snapshot.
+    fetchImpl: async (...args) => { calls.push(args); return json({ message: 'down' }, { status: 500 }); },
+    reportFailure: (...failure) => failures.push(failure),
+  });
+  const req = () => new Request(ENDPOINT, { headers: { 'x-vercel-forwarded-for': '203.0.113.7' } });
+
+  assert.equal((await handler(req())).status, 502);
+  assert.equal((await handler(req())).status, 502);
+  const limited = await handler(req());
+
+  assert.equal(limited.status, 429);
+  assert.equal(limited.headers.get('Cache-Control'), 'no-store');
+  assert.ok(Number(limited.headers.get('Retry-After')) > 0);
+  assert.equal(calls.length, 2, 'the over-limit request never reaches GitHub');
+  assert.ok(failures.some(([category]) => category === 'rate-limited'));
+});
+
+test('serves the last good snapshot when a later refresh fails', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    fetchImpl: async () => {
+      fetchCount += 1;
+      return fetchCount === 1 ? json(githubPayload()) : json({ message: 'down' }, { status: 500 });
+    },
+    reportFailure: () => {},
+  });
+
+  const fresh = await handler(new Request(ENDPOINT));
+  assert.equal(fresh.headers.get('X-Contributions-Cache'), 'miss');
+
+  clock += 5000; // past the 1s fresh window, inside the 1h stale window
+  const stale = await handler(new Request(ENDPOINT));
+  assert.equal(stale.status, 200, 'GitHub is down, but the snapshot is still served');
+  assert.equal(stale.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal((await stale.json()).totalContributions, 321);
+  assert.equal(fetchCount, 2, 'it attempted a refresh before falling back to the snapshot');
+});
+
+test('a rate-limited refresh serves the snapshot instead of calling GitHub', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    rateLimit: 1,
+    fetchImpl: async () => { fetchCount += 1; return json(githubPayload()); },
+  });
+  const req = () => new Request(ENDPOINT, { headers: { 'x-vercel-forwarded-for': '203.0.113.9' } });
+
+  await handler(req()); // stores the snapshot (counts one refresh)
+  clock += 5000; // now stale, so the next request would refresh — but it is over the limit
+  const limited = await handler(req());
+
+  assert.equal(limited.status, 200);
+  assert.equal(limited.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 1, 'the over-limit refresh is answered from the snapshot, not GitHub');
+});
