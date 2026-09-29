@@ -68,11 +68,15 @@
   font-size: var(--font-size-body-md);
   font-weight: var(--font-weight-medium);
   text-decoration: none;
-  transition: background var(--duration-fast) ease, transform var(--duration-fast) ease;
+  transition: background var(--duration-fast) ease, box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
 }
 
+/* The button sits on a --bg-subtle card, so a --bg-subtle hover would be
+   invisible. A translucent foreground tint plus a darker inset ring reads on the
+   card and, unlike the lift, still gives feedback under reduced motion. */
 .github-contributions-link:hover {
-  background: var(--bg-subtle);
+  background: color-mix(in oklab, var(--fg-primary) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fg-primary) 28%, var(--color-gray-100));
   transform: translateY(-1px);
 }
 

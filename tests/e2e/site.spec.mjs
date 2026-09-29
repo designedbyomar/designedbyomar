@@ -715,7 +715,7 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('#github-activity').getByRole('link', { name: /View GitHub profile/i })).toBeVisible();
 });
 
-test('design system section titles resolve their aria label and expose a copy control', async ({ page }) => {
+test('design system section titles resolve their aria label and copy a reference', async ({ page }) => {
   await page.goto('/design-system');
 
   // The section's aria-labelledby now resolves to a real heading id.
@@ -723,10 +723,22 @@ test('design system section titles resolve their aria label and expose a copy co
   await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
   await expect(page.locator('#buttons-title')).toHaveText('Buttons');
 
-  // A labelled copy control sits next to the title (revealed on hover/focus).
+  await page.evaluate(() => {
+    window.__written = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (text) => { window.__written.push(text); } },
+    });
+  });
+
+  // The labelled copy control writes the section reference and confirms the copy.
   const copy = section.locator('.ds-section-header__copy');
-  await expect(copy).toHaveCount(1);
   await expect(copy).toHaveAttribute('aria-label', /Copy a reference to the "Buttons" section/);
+  await copy.click();
+
+  await expect(copy).toHaveAttribute('aria-label', /Copied reference to the "Buttons" section/);
+  const written = await page.evaluate(() => window.__written);
+  expect(written).toEqual(['Design System — "Buttons" (/design-system#buttons)']);
 });
 
 test('design system displays visual audit specimens for foundations, patterns, and accessibility', async ({ page }) => {

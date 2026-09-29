@@ -1316,7 +1316,7 @@ const ComponentsSection = () => (
       <ExampleFrame label="Intensity scale">
         <div className="github-contributions" style={{ marginTop: 0 }}>
           <div className="github-contributions-meta">
-            <span>Sep 2025 &ndash; Sep 2026</span>
+            <span>Rolling year</span>
             <div className="github-contributions-legend" aria-label="Contribution intensity from less to more">
               <span>Less</span>
               {[0, 1, 2, 3, 4].map((level) => (
@@ -1367,7 +1367,7 @@ const PatternsSection = () => (
       ['privacy-consent', 'Privacy and consent', 'Privacy surfaces use plain language and preserve the current analytics behavior.', 'privacy'],
     ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Patterns" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Patterns" title={title}>{body}</SectionHeader>
         <ExampleFrame label={`${title} specimen`}>
           <PatternPreview kind={kind} />
         </ExampleFrame>
@@ -1419,7 +1419,7 @@ const MotionSection = ({ theme }) => (
       ['reduced-motion', 'Reduced motion', 'Every moving treatment needs a stable equivalent. Canvas pauses, translate effects are skipped, and the final state remains readable.'],
     ].map(([id, title, body]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Motion" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Motion" title={title}>{body}</SectionHeader>
         {id === 'reduced-motion' && (
           <ExampleFrame label="Stable fallback">
             <div className="ds-reduced-motion-preview" data-audit-example="reduced-motion-pattern">
@@ -1459,7 +1459,7 @@ const ContentAccessibilityResources = () => (
       ['microcopy', 'Microcopy', 'Small copy should reduce doubt. Use exact labels for buttons, links, privacy actions, and copy controls.'],
     ].map(([id, title, body]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Content" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Content" title={title}>{body}</SectionHeader>
       </section>
     ))}
 
@@ -1485,7 +1485,7 @@ const ContentAccessibilityResources = () => (
       ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.', 'contrast'],
     ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader eyebrow="Accessibility" title={title}>{body}</SectionHeader>
+        <SectionHeader id={id} eyebrow="Accessibility" title={title}>{body}</SectionHeader>
         <ExampleFrame label={`${title} specimen`}>
           <AccessibilityPreview kind={kind} />
         </ExampleFrame>
