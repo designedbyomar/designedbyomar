@@ -33,6 +33,7 @@ If you're a hiring manager or founder, the things to look at are:
 - **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a public reference page at `/design-system` documenting tokens, components, patterns, motion, content, accessibility, and theming.
 - **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, generated `sitemap.xml`, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
+- **Live GitHub activity**: a rolling one-year contribution calendar backed by GitHub GraphQL and cached through a same-origin Vercel function.
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
 - **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization, plus automatic 1200×627 JPEG social previews for every case study during production builds.
 
@@ -94,7 +95,11 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Env: set `VITE_SENTRY_DSN` to enable Sentry. Without it, the site builds and ships normally.
+- Environment variables:
+  - `GITHUB_CONTRIBUTIONS_TOKEN` enables the live contribution calendar. Use a minimally scoped fine-grained personal access token with public-resource access only, store it in Vercel rather than the client, and rotate it before its expiration date.
+  - `VITE_SENTRY_DSN` enables Sentry. Without it, the site builds and ships normally.
+
+The GitHub widget degrades to a profile link when its token or upstream data is unavailable. The token is read only by `/api/github-contributions` and is never included in the browser bundle or response.
 
 ## Branch workflow
 
