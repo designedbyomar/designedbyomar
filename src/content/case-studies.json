@@ -40,7 +40,7 @@
     "accent": "develop",
     "challenge": "Wisdom's ops team managed 260+ offices across 9 Team Leads using 200+ interconnected Google Sheets. Risk was invisible until it became a crisis — at-risk clients were caught too late, capacity was opaque, and manual reconciliation was creating payroll and billing errors.",
     "approach": "Designed a centralized Management Portal as an ops command center. Built an LLM-powered Office Watchlist that detects A/R aging signals and ranks offices by urgency before issues escalate. Added workforce capacity views, per-specialist performance tracking, centralized profiles, and executive portfolio dashboards — replacing manual PDFs and spreadsheets with in-app reporting.",
-    "outcome": "Platform in development for Q1–Q2 2026 rollout. Designed to support 260→900 office scale, achieve 90%+ WAU among Team Leads, reduce churn from 1.8% to below 1.0%, and decommission 200+ operational spreadsheets. Shifts the ops model from reactive firefighting to proactive risk management.",
+    "outcome": "Shipped and rolled out to the operations org in 2026. The figures below are the targets the platform was designed to hit — 260→900 office scale, 90%+ WAU among Team Leads, churn from 1.8% to below 1.0%, and 200+ operational spreadsheets decommissioned; measured results are not yet available. Shifts the ops model from reactive firefighting to proactive risk management.",
     "body": [
       {
         "type": "heading",
@@ -354,7 +354,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Management Portal is currently in development, with planned rollout across Q1–Q2 2026. The outcomes below reflect the intended impact of the platform based on defined goals, operational baselines, and leadership alignment."
+        "text": "Management Portal shipped and rolled out to the operations org in 2026. The outcomes below are the targets it was designed to hit — based on defined goals, operational baselines, and leadership alignment — and measured results are not yet available."
       },
       {
         "type": "heading",
@@ -463,11 +463,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Management Portal is not positioned as a quick fix—it is foundational infrastructure. The platform is being built to help Wisdom operate more proactively, reduce preventable churn, maintain service quality at scale, and give teams the clarity they need to make better decisions every day."
+        "text": "Management Portal is not positioned as a quick fix—it is foundational infrastructure. The platform helps Wisdom operate more proactively, reduce preventable churn, maintain service quality at scale, and give teams the clarity they need to make better decisions every day."
       },
       {
         "type": "paragraph",
-        "text": "By the time it launches, success won’t be measured by dashboards alone—but by how effectively teams can anticipate problems, act earlier, and scale without losing control."
+        "text": "Success won’t be measured by dashboards alone—but by how effectively teams can anticipate problems, act earlier, and scale without losing control."
       }
     ]
   },
