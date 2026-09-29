@@ -900,7 +900,9 @@
         "how does he scope an MVP",
         "working under tight deadlines",
         "speed versus quality",
-        "how does he handle constraints"
+        "how does he handle constraints",
+        "how quickly can Omar move",
+        "can Omar ship fast"
       ],
       "sources": [
         "disney-cct",
@@ -977,7 +979,9 @@
         "handling stakeholder disagreement",
         "competing priorities",
         "executive alignment",
-        "cross functional alignment"
+        "cross functional alignment",
+        "how does Omar handle disagreement",
+        "what if stakeholders have strong opinions"
       ],
       "sources": [
         "disney-uap",
@@ -997,7 +1001,8 @@
         "discovery to launch",
         "can he own the full product process",
         "has he shipped products",
-        "full lifecycle design"
+        "full lifecycle design",
+        "can Omar own the whole product process"
       ],
       "sources": [
         "connect-api",
@@ -1007,6 +1012,124 @@
       "answer": "Yes, across both new products and rebuilds.\n\nOn Plastiq Connect he helped set the product vision from nothing, researched the partner and internal teams, designed both the embedded payment widget and developer portal, specified the responsive and compliance behavior, and supported a launch that cleared $20M+ in monthly volume in its first month.\n\nOn Page Builder 2.0 he owned interviews, competitive analysis, product requirements and design in the absence of a PM, then partnered with the lead engineer to ship in two months. At Disney he carried the Critical Communication Tool from discovery and journey mapping through prototyping, usability testing, accessibility review, regression testing and launch.",
       "status": "approved",
       "sourcesFingerprint": "ce41b852c36e"
+    },
+    {
+      "id": "product-strategy",
+      "topic": "leadership",
+      "question": "How does Omar contribute to product strategy, not just design execution?",
+      "aliases": [
+        "strategy beyond execution",
+        "product strategy experience",
+        "can he shape product direction",
+        "does he define products or only design screens",
+        "product direction experience"
+      ],
+      "sources": [
+        "mgmt-portal",
+        "connect-api",
+        "page-builder"
+      ],
+      "answer": "He helps define what the product should do before deciding what the interface should look like.\n\nFor Wisdom's Management Portal, that meant defining the product vision and problem space with Operations, Finance and Engineering leadership, then mapping where risk, capacity and performance decisions were breaking down. On Plastiq Connect, he set the product vision with the product manager from nothing. On Page Builder 2.0, there was no product manager, so he owned the requirements as well as the design.\n\nThe pattern is consistent: clarify the outcome, model the workflow and constraints, and use that foundation to decide what deserves to be built.",
+      "status": "draft",
+      "sourcesFingerprint": "ac3e3070baa9"
+    },
+    {
+      "id": "founder-executive-partnership",
+      "topic": "leadership",
+      "question": "How does Omar work with founders and senior leaders?",
+      "aliases": [
+        "how does Omar partner with founders",
+        "founder partnership",
+        "working with executives",
+        "senior leadership collaboration",
+        "executive partnership"
+      ],
+      "sources": [
+        "page-builder",
+        "plastiq-mktg"
+      ],
+      "answer": "Directly, and usually through decisions and working artifacts rather than presentation theatre.\n\nHis current practice involves working directly with founders, product and engineering teams. At Simplero, a founder-led SaaS company, he owned the requirements for Page Builder 2.0 in the absence of a product manager and partnered with the lead engineer to ship it in two months. At Plastiq, he translated a COO-sponsored, three-to-four-week relaunch into a plan an eight-person team could execute.\n\nHe is most useful when leadership needs someone who can turn business context into a concrete product direction and then stay involved through delivery.",
+      "status": "draft",
+      "sourcesFingerprint": "e54c7a61d3e9"
+    },
+    {
+      "id": "design-mentorship",
+      "topic": "leadership",
+      "question": "Can Omar mentor other designers and raise the quality bar?",
+      "aliases": [
+        "does he mentor designers",
+        "design mentorship",
+        "can he coach designers",
+        "raise the design quality bar",
+        "experience mentoring a design team"
+      ],
+      "sources": [
+        "disney-uap",
+        "athena-ds"
+      ],
+      "answer": "Yes — with an important distinction between design leadership and formal people management.\n\nOn Disney's Unified Ad Platform, he mentored the two designers assigned to the project as well as designers elsewhere on the team. On Athena, he co-led the design system, facilitated alignment workshops, and helped establish the governance and documentation other teams needed to contribute.\n\nThe published work supports mentorship, critique and leadership through shared standards. It does not establish that he has owned hiring, performance reviews or a formal team of direct reports; those should be discussed directly if the role requires them.",
+      "status": "draft",
+      "sourcesFingerprint": "bc8c1c86f5d6"
+    },
+    {
+      "id": "balancing-product-constraints",
+      "topic": "process",
+      "question": "How does Omar balance user needs, business goals, and engineering constraints?",
+      "aliases": [
+        "balance user business and engineering",
+        "user needs versus business goals",
+        "technical tradeoffs",
+        "business and engineering constraints",
+        "product tradeoff approach"
+      ],
+      "sources": [
+        "connect-api",
+        "disney-cct",
+        "page-builder"
+      ],
+      "answer": "He treats all three as inputs to the product rather than resolving one at the expense of the others.\n\nPlastiq Connect had to support partner branding and a usable payment experience without weakening compliance requirements. Disney's Critical Communication Tool combined user research and usability testing with a constrained budget, engineering limits and a tightly defined MVP. Page Builder 2.0 had to address customer churn and migration barriers while remaining practical enough to ship in two months.\n\nHis approach is to identify the constraints early, make the tradeoffs visible, and preserve the parts of the experience that cannot fail.",
+      "status": "draft",
+      "sourcesFingerprint": "ce41b852c36e"
+    },
+    {
+      "id": "domain-learning",
+      "topic": "research",
+      "question": "How does Omar learn an unfamiliar industry or workflow?",
+      "aliases": [
+        "how does he learn a new domain",
+        "domain learning",
+        "unfamiliar industry experience",
+        "how he gets up to speed",
+        "subject matter expert collaboration"
+      ],
+      "sources": [
+        "posting-asst",
+        "connect-api",
+        "disney-uap"
+      ],
+      "answer": "He starts with the people doing the work and studies the decisions they make — not merely the screens they use.\n\nAt Wisdom, he conducted more than 200 interviews and discovery sessions. For Posting Assistant, he used observational research to watch specialists work across multiple monitors. For Plastiq Connect, he interviewed prospective partners' engineering and product teams alongside internal sales, operations and compliance experts. At Disney, he mapped how a single decision moved through seven business functions.\n\nThat is how he has moved between healthcare, payments, ad sales and enterprise operations without pretending to be the domain expert on day one.",
+      "status": "draft",
+      "sourcesFingerprint": "b7716327ccfe"
+    },
+    {
+      "id": "influence-without-authority",
+      "topic": "leadership",
+      "question": "Can Omar lead without formal authority?",
+      "aliases": [
+        "influence without authority",
+        "can he lead without direct reports",
+        "cross functional leadership",
+        "informal design leadership",
+        "leading through influence"
+      ],
+      "sources": [
+        "plastiq-mktg",
+        "disney-uap",
+        "athena-ds"
+      ],
+      "answer": "Yes. His strongest leadership examples come from creating clarity and momentum rather than relying on a reporting line.\n\nFor Plastiq's marketing relaunch, he stepped into the creative lead role while the Head of Design was occupied elsewhere, aligned an eight-person cross-functional team, and delivered in three to four weeks. On Disney's Unified Ad Platform, he led design across engineers, product, business analysis, brand directors, sales and operations while mentoring other designers. On Athena, he co-led an organizational system that required teams to adopt shared principles and governance.\n\nThose projects required influence, facilitation and hands-on execution — not direct reports.",
+      "status": "draft",
+      "sourcesFingerprint": "d2badc208362"
     }
   ]
 }
