@@ -1,5 +1,48 @@
 import { expect, test } from '@playwright/test';
 
+const CONTRIBUTION_START = new Date(Date.UTC(2025, 8, 28));
+const contributionWeeks = Array.from({ length: 53 }, (_, weekIndex) => {
+  const firstDay = new Date(CONTRIBUTION_START);
+  firstDay.setUTCDate(firstDay.getUTCDate() + weekIndex * 7);
+  const isLastWeek = weekIndex === 52;
+  const days = Array.from({ length: isLastWeek ? 2 : 7 }, (_, weekday) => {
+    const date = new Date(firstDay);
+    date.setUTCDate(date.getUTCDate() + weekday);
+    const count = (weekIndex + weekday) % 6 === 0 ? (weekIndex % 4) + 1 : 0;
+    return {
+      date: date.toISOString().slice(0, 10),
+      weekday,
+      count,
+      level: count,
+    };
+  });
+  return { firstDay: firstDay.toISOString().slice(0, 10), days };
+});
+
+const CONTRIBUTION_FIXTURE = {
+  login: 'designedbyomar',
+  profileUrl: 'https://github.com/designedbyomar',
+  totalContributions: 321,
+  range: { from: '2025-09-28', to: '2026-09-28' },
+  months: [
+    { name: 'Sep', firstDay: '2025-09-28', totalWeeks: 1 },
+    { name: 'Oct', firstDay: '2025-10-01', totalWeeks: 4 },
+    { name: 'Nov', firstDay: '2025-11-01', totalWeeks: 4 },
+    { name: 'Dec', firstDay: '2025-12-01', totalWeeks: 5 },
+    { name: 'Jan', firstDay: '2026-01-01', totalWeeks: 4 },
+    { name: 'Feb', firstDay: '2026-02-01', totalWeeks: 4 },
+    { name: 'Mar', firstDay: '2026-03-01', totalWeeks: 5 },
+    { name: 'Apr', firstDay: '2026-04-01', totalWeeks: 4 },
+    { name: 'May', firstDay: '2026-05-01', totalWeeks: 4 },
+    { name: 'Jun', firstDay: '2026-06-01', totalWeeks: 5 },
+    { name: 'Jul', firstDay: '2026-07-01', totalWeeks: 4 },
+    { name: 'Aug', firstDay: '2026-08-01', totalWeeks: 4 },
+    { name: 'Sep', firstDay: '2026-09-01', totalWeeks: 5 },
+  ],
+  weeks: contributionWeeks,
+  updatedAt: '2026-09-28T12:00:00.000Z',
+};
+
 const expectWorkIndex = async (page) => {
   await expect(page).toHaveURL(/\/work\/?$/);
   await expect(page.getByRole('heading', { level: 1, name: /Selected work\./i })).toBeVisible();
@@ -8,6 +51,11 @@ const expectWorkIndex = async (page) => {
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.route('**/api/github-contributions', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(CONTRIBUTION_FIXTURE),
+  }));
   await page.addInitScript(() => {
     if (localStorage.getItem('__preserveOmarThemeForTest') === 'true') {
       localStorage.removeItem('__preserveOmarThemeForTest');
@@ -41,6 +89,72 @@ test('homepage renders the primary portfolio experience', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Complex systems\.\s*Clear products\./i })).toBeVisible();
   await expect(page.getByRole('link', { name: /View case studies/i })).toBeVisible();
   await expect(page.getByText('CURRENTLY LOOKING FOR MY NEXT ROLE.')).toHaveCount(0);
+});
+
+test('At a glance shows the live rolling GitHub contribution calendar', async ({ page }) => {
+  await page.goto('/');
+
+  const section = page.locator('#at-a-glance');
+  await section.scrollIntoViewIfNeeded();
+  const widget = section.locator('[data-github-contributions]');
+
+  await expect(widget.getByRole('heading', { name: '321 contributions in the last year' })).toBeVisible();
+  await expect(widget.getByText('Sep 28, 2025 to Sep 28, 2026')).toBeVisible();
+  await expect(widget.getByText('Less', { exact: true })).toBeVisible();
+  await expect(widget.getByText('More', { exact: true })).toBeVisible();
+  await expect(widget.getByRole('link', { name: /View GitHub profile/i })).toHaveAttribute('href', 'https://github.com/designedbyomar');
+  await expect(widget.getByRole('cell')).toHaveCount(366);
+  await expect(widget.locator('[role="cell"][tabindex]')).toHaveCount(0);
+  await expect(widget.getByText('Oct', { exact: true })).toBeVisible();
+  await expect(widget.getByText('Sep', { exact: true })).toHaveCount(1);
+  await expect(widget.locator('[data-month-first-day="2025-09-28"]')).toHaveCount(0);
+  const octoberColumn = await widget.locator('[data-month-first-day="2025-10-01"]').evaluate(node => node.style.gridColumn);
+  expect(octoberColumn).toBe('2 / span 4');
+
+  const followsFacts = await widget.evaluate(node => node.parentElement.previousElementSibling?.classList.contains('facts-grid'));
+  expect(followsFacts).toBe(true);
+});
+
+test('GitHub calendar reserves space while loading and keeps the profile link on failure', async ({ page }) => {
+  await page.unroute('**/api/github-contributions');
+  let releaseResponse;
+  const responseGate = new Promise(resolve => { releaseResponse = resolve; });
+  await page.route('**/api/github-contributions', async (route) => {
+    await responseGate;
+    await route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' });
+  });
+
+  await page.goto('/');
+  const widget = page.locator('[data-github-contributions]');
+  await widget.scrollIntoViewIfNeeded();
+  await expect(widget.getByRole('status', { name: 'Loading GitHub activity' })).toBeVisible();
+  const loadingHeight = await widget.evaluate(node => node.getBoundingClientRect().height);
+  expect(loadingHeight).toBeGreaterThan(200);
+
+  releaseResponse();
+  await expect(widget.getByRole('heading', { name: 'GitHub activity is temporarily unavailable.' })).toBeVisible();
+  await expect(widget.getByText('The live calendar could not load. The public profile is still available.')).toBeVisible();
+  await expect(widget.getByRole('link', { name: /View GitHub profile/i })).toHaveAttribute('href', 'https://github.com/designedbyomar');
+});
+
+test('GitHub calendar scrolls within its panel without widening a phone layout', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+
+  const widget = page.locator('[data-github-contributions]');
+  await widget.scrollIntoViewIfNeeded();
+  await expect(widget.getByRole('heading', { name: '321 contributions in the last year' })).toBeVisible();
+  const scrollArea = widget.locator('[data-github-calendar-scroll]');
+  const dimensions = await scrollArea.evaluate(node => ({
+    clientWidth: node.clientWidth,
+    scrollWidth: node.scrollWidth,
+    scrollLeft: node.scrollLeft,
+  }));
+
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+  expect(dimensions.scrollLeft).toBeGreaterThanOrEqual(dimensions.scrollWidth - dimensions.clientWidth - 2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  await expect(scrollArea).toHaveAttribute('tabindex', '0');
 });
 
 test('/work loads directly as the full case-study index', async ({ page }) => {
@@ -414,6 +528,15 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   await expect(page.getByText('Try one of these')).toBeVisible();
   await page.locator('#ask-panel [data-ask-suggestion="true"]').first().click();
   await expectLatestAnalyticsEvent(page, 'ask_suggested_click', { answer_id: 'kind-of-designer' });
+
+  await page.context().route('https://github.com/**', route => route.abort());
+  const githubPopup = page.waitForEvent('popup');
+  await page.locator('[data-github-contributions]').getByRole('link', { name: /View GitHub profile/i }).click();
+  await expectLatestAnalyticsEvent(page, 'contact_click_github', {
+    section: 'at_a_glance_contributions',
+    link_url: 'https://github.com/designedbyomar',
+  });
+  await (await githubPopup).close();
 
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await page.locator('#contact [data-copy-button="true"]').click();
