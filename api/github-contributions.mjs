@@ -52,7 +52,12 @@ const jsonResponse = (body, status, headers = {}) => new Response(JSON.stringify
   },
 });
 
-const unavailable = (status = 502) => jsonResponse(
+// One outward status for every "temporarily unavailable" cause — a missing token,
+// an upstream HTTP error, or a malformed payload all return 503 with the same
+// generic body, so an outside caller cannot tell a configuration problem from an
+// upstream outage. The specific cause is still written to the runtime logs (see
+// `logFailure`), which is internal, the same split api/ask.mjs uses.
+const unavailable = (status = 503) => jsonResponse(
   { error: 'GitHub activity is temporarily unavailable.' },
   status,
   { 'Cache-Control': 'no-store' },
@@ -153,12 +158,92 @@ const createRequestTimeout = (ms) => {
   return { signal: controller.signal, cancel: () => clearTimeout(timer) };
 };
 
+/*
+  Abuse controls.
+
+  The endpoint is public and used to call GitHub on every invocation, so an
+  attacker could cache-bust (vary the query string or headers) to force endless
+  upstream calls and burn the PAT's hourly quota — leaving the widget degraded.
+
+  Two controls, in order of importance:
+
+  1. A single module-scope snapshot of the last good calendar, served for its TTL.
+     This decouples request volume from GitHub calls: however many requests reach
+     a warm instance, at most one refresh per TTL fires, and it ignores the URL and
+     headers, so cache-busting cannot force a miss. When GitHub is down the snapshot
+     is served stale rather than failing, which also removes the pressure to retry.
+  2. A per-IP ceiling on the refresh path only (serving the snapshot is free and is
+     never counted). Best-effort — edge instances are ephemeral and regional, so it
+     caps one hot instance rather than enforcing a global budget; the snapshot is
+     the real protection. Mirrors the limiter in api/ask.mjs.
+*/
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;   // fresh window; matches the CDN s-maxage
+const STALE_MAX_MS = 24 * 60 * 60 * 1000;  // still served if GitHub is down; matches the SWR window
+const RATE_LIMIT = 20;
+const RATE_WINDOW_MS = 60 * 1000;
+
+const IP_SHAPE = /^[0-9a-f.:]{2,45}$/i;
+
+// The leftmost x-forwarded-for entry is client-controlled, so reading it lets one
+// visitor rotate through unlimited buckets. Vercel sets x-vercel-forwarded-for /
+// x-real-ip itself, so those win; failing both, the rightmost forwarded entry is
+// the one the nearest proxy appended, which the client cannot choose.
+const clientKey = (request) => {
+  const { headers } = request;
+  const platform = (headers.get('x-vercel-forwarded-for') ?? headers.get('x-real-ip'))
+    ?.split(',')[0]?.trim();
+  // Index access rather than `.at(-1)`: this file already feature-detects for
+  // runtime variability, so it stays on the most broadly supported primitives.
+  const forwardedList = headers.get('x-forwarded-for')
+    ?.split(',').map(part => part.trim()).filter(Boolean);
+  const forwarded = forwardedList && forwardedList.length ? forwardedList[forwardedList.length - 1] : undefined;
+  const ip = platform || forwarded;
+  return ip && IP_SHAPE.test(ip) ? ip.toLowerCase() : 'unknown';
+};
+
+const overLimit = (hits, ip, limit, windowMs, nowMs) => {
+  const recent = (hits.get(ip) ?? []).filter(t => nowMs - t < windowMs);
+  recent.push(nowMs);
+  hits.set(ip, recent);
+  if (hits.size > 5000) hits.clear();
+  return recent.length > limit;
+};
+
+// After a failed refresh, don't retry GitHub again for this long. During an
+// outage a burst of cache-busted requests should not keep spending quota while a
+// usable snapshot exists; one instance retries at most once per cooldown.
+const COOLDOWN_MS = 60 * 1000;
+
+// A stale snapshot gets a short CDN lifetime, capped by what remains of its 24h
+// window: short so the CDN rechecks the endpoint within minutes and picks up
+// GitHub's recovery — rather than serving the old calendar for the whole
+// remaining window — and capped so no cache period can reach past the snapshot's
+// hard limit. No stale-while-revalidate, or the CDN could extend it further.
+const STALE_REVALIDATE_MS = 5 * 60 * 1000;
+const staleCacheHeaders = (remainingMs) => {
+  const revalidate = Math.max(0, Math.floor(Math.min(STALE_REVALIDATE_MS, remainingMs) / 1000));
+  return {
+    'Cache-Control': `public, max-age=${revalidate}`,
+    'CDN-Cache-Control': `public, s-maxage=${revalidate}`,
+    'Vercel-CDN-Cache-Control': `public, s-maxage=${revalidate}`,
+  };
+};
+
 export const createHandler = ({
   fetchImpl = fetch,
   getToken = () => process.env.GITHUB_CONTRIBUTIONS_TOKEN,
   now = () => new Date(),
   reportFailure = logFailure,
   timeoutMs = REQUEST_TIMEOUT_MS,
+  // Per-handler so tests stay isolated; the production singleton (the default
+  // export) creates one of each, shared across every request its instance sees.
+  store = { data: null, at: 0, failedAt: 0, inflight: null },
+  rateState = new Map(),
+  cacheTtlMs = CACHE_TTL_MS,
+  staleMaxMs = STALE_MAX_MS,
+  rateLimit = RATE_LIMIT,
+  rateWindowMs = RATE_WINDOW_MS,
+  cooldownMs = COOLDOWN_MS,
 } = {}) => async (request) => {
   if (request.method !== 'GET') {
     return jsonResponse(
@@ -168,59 +253,116 @@ export const createHandler = ({
     );
   }
 
+  const nowMs = now().getTime();
+  const age = store.data ? nowMs - store.at : Infinity;
+  const cached = (status, headers) => jsonResponse(store.data, 200, { ...headers, 'X-Contributions-Cache': status });
+
+  // 1. Fresh snapshot: serve it without a token, a fetch, or touching the limit.
+  if (store.data && age < cacheTtlMs) return cached('hit', CACHE_HEADERS);
+
+  // The stale snapshot is the fallback whenever a refresh cannot or should not
+  // run. Its cache directives are capped to the snapshot's remaining life, so the
+  // CDN cannot keep serving it past the 24h window.
+  const stale = store.data && age < staleMaxMs
+    ? () => cached('stale', staleCacheHeaders(staleMaxMs - age))
+    : null;
+
   const token = getToken();
   if (!token) {
+    if (stale) return stale();
     reportFailure('missing-token');
-    return unavailable(503);
+    return unavailable();
   }
 
-  const { signal, cancel } = createRequestTimeout(timeoutMs);
-
-  try {
-    let response;
-    try {
-      response = await fetchImpl(GITHUB_GRAPHQL_URL, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'User-Agent': 'designedbyomar.com',
-        },
-        body: JSON.stringify({
-          query: CONTRIBUTION_QUERY,
-          variables: { login: GITHUB_LOGIN },
-        }),
-        signal,
-      });
-    } catch {
-      reportFailure('request-failed');
-      return unavailable();
-    }
-
-    if (!response.ok) {
-      reportFailure('upstream-http', response.status);
-      return unavailable();
-    }
-
-    let payload;
-    try {
-      payload = await response.json();
-    } catch {
-      reportFailure('invalid-json');
-      return unavailable();
-    }
-
-    try {
-      const normalized = normalizeContributionData(payload, now());
-      return jsonResponse(normalized, 200, CACHE_HEADERS);
-    } catch {
-      reportFailure('invalid-payload');
-      return unavailable();
-    }
-  } finally {
-    cancel();
+  // 2. Gate the upstream refresh per IP. Serving cache above never reaches here,
+  // so a flood against a warm instance is already free of GitHub calls; this only
+  // bounds the cold/stale path where a refresh would otherwise fire every request.
+  if (overLimit(rateState, clientKey(request), rateLimit, rateWindowMs, nowMs)) {
+    if (stale) return stale();
+    reportFailure('rate-limited');
+    return jsonResponse(
+      { error: 'GitHub activity is temporarily unavailable.' },
+      429,
+      { 'Cache-Control': 'no-store', 'Retry-After': String(Math.ceil(rateWindowMs / 1000)) },
+    );
   }
+
+  // 3. Back off after a recent failure. During an outage this stops cache-busted
+  // traffic from retrying GitHub on every request while a snapshot is available.
+  // A refresh already in flight is joined below rather than blocked by this.
+  if (!store.inflight && store.failedAt && nowMs - store.failedAt < cooldownMs) {
+    return stale ? stale() : unavailable();
+  }
+
+  // 4. One refresh at a time. On a cold instance or after the snapshot expires,
+  // concurrent requests would each start their own GitHub call; they now share a
+  // single in-flight refresh, so a burst costs one quota unit rather than many.
+  const runRefresh = async () => {
+    const { signal, cancel } = createRequestTimeout(timeoutMs);
+    try {
+      let response;
+      try {
+        response = await fetchImpl(GITHUB_GRAPHQL_URL, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'designedbyomar.com',
+          },
+          body: JSON.stringify({
+            query: CONTRIBUTION_QUERY,
+            variables: { login: GITHUB_LOGIN },
+          }),
+          signal,
+        });
+      } catch {
+        reportFailure('request-failed');
+        return null;
+      }
+
+      if (!response.ok) {
+        reportFailure('upstream-http', response.status);
+        return null;
+      }
+
+      let payload;
+      try {
+        payload = await response.json();
+      } catch {
+        reportFailure('invalid-json');
+        return null;
+      }
+
+      try {
+        return normalizeContributionData(payload, now());
+      } catch {
+        reportFailure('invalid-payload');
+        return null;
+      }
+    } finally {
+      cancel();
+    }
+  };
+
+  if (!store.inflight) {
+    store.inflight = runRefresh()
+      .then((data) => {
+        if (data) {
+          store.data = data;
+          store.at = nowMs;
+          store.failedAt = 0;
+        } else {
+          store.failedAt = nowMs;
+        }
+        return data;
+      })
+      .finally(() => { store.inflight = null; });
+  }
+
+  const data = await store.inflight;
+  if (data) return jsonResponse(data, 200, { ...CACHE_HEADERS, 'X-Contributions-Cache': 'miss' });
+  return stale ? stale() : unavailable();
 };
 
 export const config = { runtime: 'edge' };

@@ -147,7 +147,7 @@ test('returns a generic uncached error for upstream HTTP and GraphQL failures', 
       reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
     assert.deepEqual(failures, [['upstream-http', 500]]);
@@ -161,7 +161,7 @@ test('returns a generic uncached error for upstream HTTP and GraphQL failures', 
       reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
     assert.deepEqual(failures, [['invalid-payload']]);
@@ -248,6 +248,232 @@ test('the fallback timeout still aborts a GitHub request that runs long', async 
 
   const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
 
-  assert.equal(response.status, 502);
+  assert.equal(response.status, 503);
   assert.deepEqual(failures, [['request-failed']]);
+});
+
+const ENDPOINT = 'https://www.designedbyomar.com/api/github-contributions';
+
+test('serves a warm snapshot without calling GitHub again, even when the URL varies', async () => {
+  // The abuse vector: without a snapshot the endpoint hit GitHub on every request,
+  // so cache-busting could burn the PAT quota. The snapshot ignores the URL.
+  const calls = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date('2026-09-28T12:00:00Z'),
+    fetchImpl: async (...args) => { calls.push(args); return json(githubPayload()); },
+  });
+
+  const first = await handler(new Request(ENDPOINT));
+  assert.equal(first.status, 200);
+  assert.equal(first.headers.get('X-Contributions-Cache'), 'miss');
+  assert.equal(calls.length, 1);
+
+  const second = await handler(new Request(`${ENDPOINT}?bust=${Date.now()}`));
+  assert.equal(second.status, 200);
+  assert.equal(second.headers.get('X-Contributions-Cache'), 'hit');
+  assert.equal((await second.json()).totalContributions, 321);
+  assert.equal(calls.length, 1, 'a cache-busting query string must not force another GitHub call');
+});
+
+test('rate-limits the refresh path per IP when there is no snapshot to serve', async () => {
+  const calls = [];
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    rateLimit: 2,
+    cooldownMs: 0, // isolate the limiter from the post-failure backoff
+    // Every refresh fails, so the cache stays empty and every request stays on the
+    // refresh path — isolating the limiter from the snapshot.
+    fetchImpl: async (...args) => { calls.push(args); return json({ message: 'down' }, { status: 500 }); },
+    reportFailure: (...failure) => failures.push(failure),
+  });
+  const req = () => new Request(ENDPOINT, { headers: { 'x-vercel-forwarded-for': '203.0.113.7' } });
+
+  assert.equal((await handler(req())).status, 503);
+  assert.equal((await handler(req())).status, 503);
+  const limited = await handler(req());
+
+  assert.equal(limited.status, 429);
+  assert.equal(limited.headers.get('Cache-Control'), 'no-store');
+  assert.ok(Number(limited.headers.get('Retry-After')) > 0);
+  assert.equal(calls.length, 2, 'the over-limit request never reaches GitHub');
+  assert.ok(failures.some(([category]) => category === 'rate-limited'));
+});
+
+test('serves the last good snapshot when a later refresh fails', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    fetchImpl: async () => {
+      fetchCount += 1;
+      return fetchCount === 1 ? json(githubPayload()) : json({ message: 'down' }, { status: 500 });
+    },
+    reportFailure: () => {},
+  });
+
+  const fresh = await handler(new Request(ENDPOINT));
+  assert.equal(fresh.headers.get('X-Contributions-Cache'), 'miss');
+
+  clock += 5000; // past the 1s fresh window, inside the 1h stale window
+  const stale = await handler(new Request(ENDPOINT));
+  assert.equal(stale.status, 200, 'GitHub is down, but the snapshot is still served');
+  assert.equal(stale.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal((await stale.json()).totalContributions, 321);
+  assert.equal(fetchCount, 2, 'it attempted a refresh before falling back to the snapshot');
+});
+
+test('a rate-limited refresh serves the snapshot instead of calling GitHub', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    rateLimit: 1,
+    fetchImpl: async () => { fetchCount += 1; return json(githubPayload()); },
+  });
+  const req = () => new Request(ENDPOINT, { headers: { 'x-vercel-forwarded-for': '203.0.113.9' } });
+
+  await handler(req()); // stores the snapshot (counts one refresh)
+  clock += 5000; // now stale, so the next request would refresh — but it is over the limit
+  const limited = await handler(req());
+
+  assert.equal(limited.status, 200);
+  assert.equal(limited.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 1, 'the over-limit refresh is answered from the snapshot, not GitHub');
+});
+
+test('the rate-limit key uses the rightmost forwarded entry, not the spoofable leftmost', async () => {
+  // The leftmost x-forwarded-for entry is client-controlled; rotating it must not
+  // mint a fresh bucket. Also exercises the index-based read of the forwarded
+  // list (no Array.prototype.at).
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => 'token',
+    rateLimit: 2,
+    cooldownMs: 0,
+    fetchImpl: async () => json({ message: 'down' }, { status: 500 }),
+    reportFailure: (...failure) => failures.push(failure),
+  });
+  const req = (i) => new Request(ENDPOINT, { headers: { 'x-forwarded-for': `192.0.2.${i}, 198.51.100.9` } });
+
+  assert.equal((await handler(req(1))).status, 503);
+  assert.equal((await handler(req(2))).status, 503);
+  const limited = await handler(req(3));
+
+  assert.equal(limited.status, 429, 'a rotating leftmost entry must share the bucket keyed on the rightmost');
+  assert.ok(failures.some(([category]) => category === 'rate-limited'));
+});
+
+test('collapses concurrent cold-start refreshes into a single GitHub call', async () => {
+  let release;
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date('2026-09-28T12:00:00Z'),
+    fetchImpl: async () => {
+      fetchCount += 1;
+      await new Promise((resolve) => { release = resolve; });
+      return json(githubPayload());
+    },
+  });
+
+  // Three overlapping requests (varied URLs) before the first fetch resolves.
+  const pending = [
+    handler(new Request(ENDPOINT)),
+    handler(new Request(`${ENDPOINT}?x=2`)),
+    handler(new Request(`${ENDPOINT}?x=3`)),
+  ];
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(fetchCount, 1, 'a burst of concurrent requests shares one in-flight refresh');
+
+  release();
+  const responses = await Promise.all(pending);
+  for (const response of responses) {
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).totalContributions, 321);
+  }
+  assert.equal(fetchCount, 1);
+});
+
+test('backs off after a failed refresh instead of retrying GitHub every request', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  let mode = 'ok';
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    cooldownMs: 5 * 60 * 1000,
+    fetchImpl: async () => {
+      fetchCount += 1;
+      return mode === 'ok' ? json(githubPayload()) : json({ message: 'down' }, { status: 500 });
+    },
+    reportFailure: () => {},
+  });
+
+  await handler(new Request(ENDPOINT)); // stores the snapshot (fetch 1)
+  clock += 5000; // stale
+  mode = 'down';
+  const failed = await handler(new Request(ENDPOINT)); // attempts, fails, serves stale, opens the cooldown (fetch 2)
+  assert.equal(failed.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 2);
+
+  clock += 1000; // still inside the cooldown
+  const cooled = await handler(new Request(`${ENDPOINT}?bust=1`));
+  assert.equal(cooled.status, 200);
+  assert.equal(cooled.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 2, 'a cache-busted request during the cooldown is served the snapshot, not a GitHub retry');
+
+  clock += 5 * 60 * 1000; // past the cooldown
+  await handler(new Request(`${ENDPOINT}?bust=2`));
+  assert.equal(fetchCount, 3, 'once the cooldown expires it retries at most once');
+});
+
+test('a stale response revalidates soon and never outlives the snapshot window', async () => {
+  const t0 = Date.parse('2026-09-28T12:00:00Z');
+  let clock = t0;
+  let mode = 'ok';
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000, // 1h snapshot lifetime
+    cooldownMs: 0,
+    fetchImpl: async () => (mode === 'ok' ? json(githubPayload()) : json({ message: 'down' }, { status: 500 })),
+  });
+
+  await handler(new Request(ENDPOINT)); // stores the snapshot at t0
+  mode = 'down';
+
+  // Early in the stale window: a short recheck interval, not the ~55 min remaining,
+  // so the CDN picks up recovery within minutes.
+  clock = t0 + 5 * 60 * 1000;
+  const early = await handler(new Request(ENDPOINT));
+  assert.equal(early.headers.get('X-Contributions-Cache'), 'stale');
+  let cdn = early.headers.get('CDN-Cache-Control') || '';
+  let sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
+  assert.ok(sMaxAge > 0 && sMaxAge <= 300, `stale s-maxage ${sMaxAge} should be a short recheck interval`);
+  assert.ok(!/stale-while-revalidate/.test(cdn), 'a stale response must not extend itself with stale-while-revalidate');
+
+  // Near the end of the window: the interval is capped so no cache period can
+  // reach past the snapshot's hard limit.
+  clock = t0 + 60 * 60 * 1000 - 120 * 1000; // 120s of life left
+  cdn = (await handler(new Request(ENDPOINT))).headers.get('CDN-Cache-Control') || '';
+  sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
+  assert.ok(sMaxAge > 0 && sMaxAge <= 120, `near end-of-life s-maxage ${sMaxAge} must fit the remaining window`);
+
+  // Past the window: the snapshot is no longer served, and the 503 is uncached,
+  // so the CDN drops the old calendar.
+  clock = t0 + 60 * 60 * 1000 + 1000;
+  const expired = await handler(new Request(ENDPOINT));
+  assert.equal(expired.status, 503);
+  assert.equal(expired.headers.get('Cache-Control'), 'no-store');
 });
