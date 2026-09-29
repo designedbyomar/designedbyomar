@@ -20,7 +20,7 @@
         "athena-ds"
       ],
       "status": "approved",
-      "sourcesFingerprint": "9e7ebc916dd9"
+      "sourcesFingerprint": "7c5400af2e1a"
     },
     {
       "id": "fintech-depth",
@@ -41,7 +41,7 @@
         "connect-api"
       ],
       "status": "approved",
-      "sourcesFingerprint": "3d5aeeaf5186"
+      "sourcesFingerprint": "7d3a0c5bc88a"
     },
     {
       "id": "ai-llm-work",
@@ -69,22 +69,43 @@
       "topic": "leadership",
       "question": "Is Omar a design leader or an individual contributor?",
       "aliases": [
-        "has he managed designers",
         "does he lead teams",
         "leadership experience",
         "is he hands on",
         "team lead or IC",
-        "has he managed people",
         "leader or IC"
       ],
-      "answer": "Both, and the roles track it.\n\nHe was the founding and sole design lead at Wisdom for two years, owning design across Management Portal, Reporting, Insurance Verification and Posting Assistant. At Plastiq he co-led the Athena design system and ran the cross-functional workshops that set its principles. On Disney's Unified Ad Platform he led two designers and mentored others on the wider design team.\n\nHe has stayed hands-on throughout, describing his current engagements as equal parts consulting and building — as likely to be rebuilding a design system as shipping a feature to production.",
+      "answer": "Both: he is a hands-on design leader and individual contributor, with formal management experience.\n\nAt Plastiq, he directly managed one designer across Connect and Athena, participated in hiring and owned formal performance reviews. He also co-led Athena and ran the cross-functional workshops that set its principles. At Wisdom he was the founding and sole design lead, and on Disney's Unified Ad Platform he led two designers and mentored others on the wider design team.\n\nHe has stayed hands-on throughout — as likely to be rebuilding a design system as shipping a feature to production.",
       "sources": [
+        "connect-api",
         "athena-ds",
         "disney-uap",
         "mgmt-portal"
       ],
       "status": "approved",
-      "sourcesFingerprint": "6c6f0a4c37d6"
+      "sourcesFingerprint": "598feb930e46"
+    },
+    {
+      "id": "formal-people-management",
+      "topic": "leadership",
+      "question": "Has Omar formally managed people or had direct reports?",
+      "aliases": [
+        "has he managed designers",
+        "has he managed people",
+        "does Omar have direct reports",
+        "has Omar had direct reports",
+        "formal people management experience",
+        "has Omar hired designers",
+        "has Omar done performance reviews",
+        "how many direct reports has Omar managed"
+      ],
+      "answer": "Yes. At Plastiq, Omar directly managed one designer working across Plastiq Connect and the Athena Design System. He participated in hiring and owned that designer's formal performance reviews and ongoing management.\n\nHe remained hands-on at the same time: setting product direction and designing Connect's payer flow and partner portal, while co-leading Athena's workshops, foundations, documentation and governance.\n\nThe verified scope is one direct report — not 20 or a large design organization. For roles where the size or structure of the management experience matters, Omar can provide the details directly.",
+      "sources": [
+        "connect-api",
+        "athena-ds"
+      ],
+      "status": "approved",
+      "sourcesFingerprint": "e399ad400e9b"
     },
     {
       "id": "technical-depth",
@@ -103,7 +124,7 @@
         "athena-ds"
       ],
       "status": "approved",
-      "sourcesFingerprint": "9e7ebc916dd9"
+      "sourcesFingerprint": "7c5400af2e1a"
     },
     {
       "id": "research-process",
@@ -145,7 +166,7 @@
         "disney-cct"
       ],
       "status": "approved",
-      "sourcesFingerprint": "4abd824a2890"
+      "sourcesFingerprint": "36b8700f9621"
     },
     {
       "id": "looking-for",
@@ -250,7 +271,7 @@
         "connect-api"
       ],
       "status": "approved",
-      "sourcesFingerprint": "3d5aeeaf5186"
+      "sourcesFingerprint": "7d3a0c5bc88a"
     },
     {
       "id": "cs-athena",
@@ -267,7 +288,7 @@
         "athena-ds"
       ],
       "status": "approved",
-      "sourcesFingerprint": "9e7ebc916dd9"
+      "sourcesFingerprint": "7c5400af2e1a"
     },
     {
       "id": "cs-disney-cct",
@@ -399,7 +420,7 @@
         "page-builder"
       ],
       "status": "approved",
-      "sourcesFingerprint": "ac3e3070baa9"
+      "sourcesFingerprint": "7506be9628fa"
     },
     {
       "id": "api-developer-tools",
@@ -417,7 +438,7 @@
         "connect-api"
       ],
       "status": "approved",
-      "sourcesFingerprint": "3d5aeeaf5186"
+      "sourcesFingerprint": "7d3a0c5bc88a"
     },
     {
       "id": "accessibility",
@@ -455,7 +476,7 @@
         "athena-ds"
       ],
       "status": "approved",
-      "sourcesFingerprint": "7a5f14813144"
+      "sourcesFingerprint": "e1901e87e27c"
     },
     {
       "id": "working-with-engineers",
@@ -476,7 +497,7 @@
         "disney-uap"
       ],
       "status": "approved",
-      "sourcesFingerprint": "b95a580b8ad8"
+      "sourcesFingerprint": "6f6e4640db21"
     },
     {
       "id": "working-with-pms",
@@ -495,7 +516,7 @@
         "athena-ds"
       ],
       "status": "approved",
-      "sourcesFingerprint": "91b8e8b2ff05"
+      "sourcesFingerprint": "3809e6cfbb54"
     },
     {
       "id": "handling-ambiguity",
@@ -514,7 +535,7 @@
         "mgmt-portal"
       ],
       "status": "approved",
-      "sourcesFingerprint": "9556ba0b5398"
+      "sourcesFingerprint": "88ecf0857fc3"
     },
     {
       "id": "measuring-success",
@@ -552,7 +573,7 @@
         "page-builder"
       ],
       "status": "approved",
-      "sourcesFingerprint": "170e45c77264"
+      "sourcesFingerprint": "c9016b810f02"
     },
     {
       "id": "facilitation",
@@ -571,7 +592,7 @@
         "plastiq-mktg"
       ],
       "status": "approved",
-      "sourcesFingerprint": "7a5f14813144"
+      "sourcesFingerprint": "e1901e87e27c"
     },
     {
       "id": "does-he-write",
@@ -696,7 +717,7 @@
         "chatbot or human",
         "who am I talking to"
       ],
-      "answer": "Neither, exactly. Most of what you get back was drafted from the case studies published on this site and then reviewed by Omar before going live — so the words are pre-written rather than improvised.\n\nA model usually picks which of them answers you, because matching on shared words alone got it wrong too often. It chooses from the written set and cannot edit what it picks. When none of them fits, a model drafts a reply from the closest reviewed answers, and that reply is labelled “drafted, not reviewed” wherever it appears — reviewed and drafted are never presented as the same thing.\n\nOn a hiring site, an assistant that quietly invents a detail is worse than one that flags what has not been checked. For anything that matters, email him.",
+      "answer": "Neither, exactly. Most replies were drafted from the case studies published on this site and then reviewed by Omar before going live, so the words are pre-written rather than improvised.\n\nA model usually chooses which reviewed answer fits because matching on shared words alone got it wrong too often. It cannot edit the answer it picks. When none fits, it may draft only if the router has named relevant case studies; a decline, invalid result or failure stops with an honest no-answer state and no unrelated citations. Any generated reply is labelled “drafted, not reviewed.”\n\nOn a hiring site, quietly inventing a detail is worse than flagging what has not been checked. For anything that matters, email him.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -711,7 +732,7 @@
         "is this tracked",
         "data collection"
       ],
-      "answer": "Clicking a suggested question, or typing one word for word, is answered in your browser from a static file — nothing is sent.\n\nAnything else goes to this site's own endpoint, because word overlap alone got it wrong too often. From there it is usually passed to Groq with the list of written questions, so a model can say which one you mean. If Groq cannot be reached, or the daily limit is spent, nothing leaves this site. A question none of them covers is sent again with excerpts of the published case studies, so a reply can be drafted from them and labelled unreviewed.\n\nIf you accepted analytics, the wording of a question nothing covers is recorded, so Omar can see which answers are missing.",
+      "answer": "Clicking a suggested question, or typing the same reviewed question or alias with ordinary casing, punctuation, apostrophe or spacing changes, is answered in your browser from a static file — nothing is sent.\n\nAnything else goes to this site's endpoint and is usually passed to Groq with the list of written questions, so a model can identify the right one. If that routing fails or names no relevant work, the assistant stops without drafting or attaching a citation. Only when the router names relevant case studies can a second request draft from those published sources, and that reply is labelled unreviewed.\n\nIf you accepted analytics, the wording of a question nothing covers is recorded so Omar can see which answers are missing.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -814,7 +835,7 @@
       ],
       "answer": "A principal product designer working on complex B2B products — AI workflows, enterprise platforms, fintech, healthcare SaaS and design systems.\n\nThe range is deliberate rather than scattered: he works across strategy, research, UX architecture, prototyping, UI systems and launch execution, because in the products he takes on those are rarely separable. A workflow tool with messy data cannot be researched and then handed off; the architecture and the interface decide each other.\n\nIf a role expects someone to pick one of those and stop, it is probably not the right fit.",
       "status": "approved",
-      "sourcesFingerprint": "9556ba0b5398"
+      "sourcesFingerprint": "88ecf0857fc3"
     },
     {
       "id": "company-fit",
@@ -832,7 +853,7 @@
       ],
       "answer": "Startups and growth-stage teams building workflow products, AI tools, fintech platforms, healthcare SaaS, enterprise software, API products or internal operational systems.\n\nThe common thread is a product where the hard part is the domain rather than the surface — payment rails and compliance at Plastiq, dental operations at Wisdom, cross-brand ad sales at Disney. He was the founding designer at Wisdom and the lead on a 0→1 payments product at Plastiq, so a team without an established design practice is familiar ground rather than a risk.",
       "status": "approved",
-      "sourcesFingerprint": "653d61d363b1"
+      "sourcesFingerprint": "c3766b2cd17c"
     },
     {
       "id": "problems-to-solve",
@@ -869,7 +890,7 @@
       ],
       "answer": "The ones that are measured, with their scope attached.\n\nPosting Assistant cut manual posting time by about 40%. Connect API Payments cleared $20M+ in monthly payment volume in its first month, with three partnerships secured pre-launch. Disney's Critical Communication Tool reached 1,600+ users and carried 200,000+ communications across 250 critical incidents. He ran 200+ interviews and discovery sessions across the Wisdom products.\n\nOther numbers on the site are targets a design was built to hit rather than results, and are labelled that way.",
       "status": "approved",
-      "sourcesFingerprint": "a76253ebe779"
+      "sourcesFingerprint": "bd3097ce5ffb"
     },
     {
       "id": "operating-without-structure",
@@ -990,7 +1011,7 @@
       ],
       "answer": "He gives the disagreement something concrete to organize around.\n\nOn Disney's Unified Ad Platform, eight brand perspectives and seven business functions had different language, tools and operating needs. He mapped the current decision flow so stakeholders could point to the same handoffs and risks, then used prototypes to make tradeoffs visible without flattening the differences that mattered.\n\nFor Athena, the team aligned product, design and engineering on principles and KPIs before producing components. On Plastiq's marketing relaunch, he ran workshops across design, copy, marketing and engineering against a three-to-four-week deadline. The artifacts change with the project; the goal is a shared decision, not a ceremonial workshop.",
       "status": "approved",
-      "sourcesFingerprint": "d2badc208362"
+      "sourcesFingerprint": "641f80f0f9e0"
     },
     {
       "id": "end-to-end-ownership",
@@ -1011,7 +1032,7 @@
       ],
       "answer": "Yes, across both new products and rebuilds.\n\nOn Plastiq Connect he helped set the product vision from nothing, researched the partner and internal teams, designed both the embedded payment widget and developer portal, specified the responsive and compliance behavior, and supported a launch that cleared $20M+ in monthly volume in its first month.\n\nOn Page Builder 2.0 he owned interviews, competitive analysis, product requirements and design in the absence of a PM, then partnered with the lead engineer to ship in two months. At Disney he carried the Critical Communication Tool from discovery and journey mapping through prototyping, usability testing, accessibility review, regression testing and launch.",
       "status": "approved",
-      "sourcesFingerprint": "ce41b852c36e"
+      "sourcesFingerprint": "479b34d18333"
     },
     {
       "id": "product-strategy",
@@ -1031,7 +1052,7 @@
       ],
       "answer": "He helps define what the product should do before deciding what the interface should look like.\n\nFor Wisdom's Management Portal, that meant defining the product vision and problem space with Operations, Finance and Engineering leadership, then mapping where risk, capacity and performance decisions were breaking down. On Plastiq Connect, he set the product vision with the product manager from nothing. On Page Builder 2.0, there was no product manager, so he owned the requirements as well as the design.\n\nThe pattern is consistent: clarify the outcome, model the workflow and constraints, and use that foundation to decide what deserves to be built.",
       "status": "approved",
-      "sourcesFingerprint": "ac3e3070baa9"
+      "sourcesFingerprint": "7506be9628fa"
     },
     {
       "id": "founder-executive-partnership",
@@ -1064,12 +1085,13 @@
         "experience mentoring a design team"
       ],
       "sources": [
+        "connect-api",
         "disney-uap",
         "athena-ds"
       ],
-      "answer": "Yes — with an important distinction between design leadership and formal people management.\n\nOn Disney's Unified Ad Platform, he mentored the two designers assigned to the project as well as designers elsewhere on the team. On Athena, he co-led the design system, facilitated alignment workshops, and helped establish the governance and documentation other teams needed to contribute.\n\nThe published work supports mentorship, critique and leadership through shared standards. It does not establish that he has owned hiring, performance reviews or a formal team of direct reports; those should be discussed directly if the role requires them.",
+      "answer": "Yes. At Plastiq, he directly managed one designer across Connect and Athena, including participating in hiring and owning formal performance reviews.\n\nOn Disney's Unified Ad Platform, he mentored the two designers assigned to the project as well as designers elsewhere on the team. On Athena, he co-led the design system, facilitated alignment workshops, and helped establish the governance and documentation other teams needed to contribute.\n\nThe pattern is consistent: clear feedback, shared standards and enough structure for other designers to do stronger work.",
       "status": "approved",
-      "sourcesFingerprint": "bc8c1c86f5d6"
+      "sourcesFingerprint": "a9e435fd7751"
     },
     {
       "id": "balancing-product-constraints",
@@ -1089,7 +1111,7 @@
       ],
       "answer": "He treats all three as inputs to the product rather than resolving one at the expense of the others.\n\nPlastiq Connect had to support partner branding and a usable payment experience without weakening compliance requirements. Disney's Critical Communication Tool combined user research and usability testing with a constrained budget, engineering limits and a tightly defined MVP. Page Builder 2.0 had to address customer churn and migration barriers while remaining practical enough to ship in two months.\n\nHis approach is to identify the constraints early, make the tradeoffs visible, and preserve the parts of the experience that cannot fail.",
       "status": "approved",
-      "sourcesFingerprint": "ce41b852c36e"
+      "sourcesFingerprint": "479b34d18333"
     },
     {
       "id": "domain-learning",
@@ -1109,7 +1131,7 @@
       ],
       "answer": "He starts with the people doing the work and studies the decisions they make — not merely the screens they use.\n\nFor Posting Assistant at Wisdom, he conducted 40+ interviews for that product and used observational research to watch specialists work across multiple monitors. For Plastiq Connect, he interviewed prospective partners' engineering and product teams alongside internal sales, operations and compliance experts. At Disney, he mapped how a single decision moved through seven business functions.\n\nThat is how he has moved between healthcare, payments, ad sales and enterprise operations without pretending to be the domain expert on day one.",
       "status": "approved",
-      "sourcesFingerprint": "b7716327ccfe"
+      "sourcesFingerprint": "aeed6da53f6f"
     },
     {
       "id": "influence-without-authority",
@@ -1127,9 +1149,9 @@
         "disney-uap",
         "athena-ds"
       ],
-      "answer": "Yes. His strongest leadership examples come from creating clarity and momentum rather than relying on a reporting line.\n\nFor Plastiq's marketing relaunch, he stepped into the creative lead role while the Head of Design was occupied elsewhere, aligned an eight-person cross-functional team, and delivered in three to four weeks. On Disney's Unified Ad Platform, he led design across engineers, product, business analysis, brand directors, sales and operations while mentoring other designers. On Athena, he co-led an organizational system that required teams to adopt shared principles and governance.\n\nThose projects required influence, facilitation and hands-on execution — not direct reports.",
+      "answer": "Yes. His strongest leadership examples come from creating clarity and momentum rather than relying on a reporting line.\n\nFor Plastiq's marketing relaunch, he stepped into the creative lead role while the Head of Design was occupied elsewhere, aligned an eight-person cross-functional team, and delivered in three to four weeks. On Disney's Unified Ad Platform, he led design across engineers, product, business analysis, brand directors, sales and operations while mentoring other designers. On Athena, he co-led an organizational system that required teams to adopt shared principles and governance.\n\nThose projects show that he can lead through influence even when a reporting line is not the source of authority.",
       "status": "approved",
-      "sourcesFingerprint": "d2badc208362"
+      "sourcesFingerprint": "641f80f0f9e0"
     }
   ]
 }
