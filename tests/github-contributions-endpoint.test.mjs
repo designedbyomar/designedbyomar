@@ -282,6 +282,7 @@ test('rate-limits the refresh path per IP when there is no snapshot to serve', a
   const handler = createHandler({
     getToken: () => 'token',
     rateLimit: 2,
+    cooldownMs: 0, // isolate the limiter from the post-failure backoff
     // Every refresh fails, so the cache stays empty and every request stays on the
     // refresh path — isolating the limiter from the snapshot.
     fetchImpl: async (...args) => { calls.push(args); return json({ message: 'down' }, { status: 500 }); },
@@ -356,6 +357,7 @@ test('the rate-limit key uses the rightmost forwarded entry, not the spoofable l
   const handler = createHandler({
     getToken: () => 'token',
     rateLimit: 2,
+    cooldownMs: 0,
     fetchImpl: async () => json({ message: 'down' }, { status: 500 }),
     reportFailure: (...failure) => failures.push(failure),
   });
@@ -367,4 +369,94 @@ test('the rate-limit key uses the rightmost forwarded entry, not the spoofable l
 
   assert.equal(limited.status, 429, 'a rotating leftmost entry must share the bucket keyed on the rightmost');
   assert.ok(failures.some(([category]) => category === 'rate-limited'));
+});
+
+test('collapses concurrent cold-start refreshes into a single GitHub call', async () => {
+  let release;
+  let fetchCount = 0;
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date('2026-09-28T12:00:00Z'),
+    fetchImpl: async () => {
+      fetchCount += 1;
+      await new Promise((resolve) => { release = resolve; });
+      return json(githubPayload());
+    },
+  });
+
+  // Three overlapping requests (varied URLs) before the first fetch resolves.
+  const pending = [
+    handler(new Request(ENDPOINT)),
+    handler(new Request(`${ENDPOINT}?x=2`)),
+    handler(new Request(`${ENDPOINT}?x=3`)),
+  ];
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(fetchCount, 1, 'a burst of concurrent requests shares one in-flight refresh');
+
+  release();
+  const responses = await Promise.all(pending);
+  for (const response of responses) {
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).totalContributions, 321);
+  }
+  assert.equal(fetchCount, 1);
+});
+
+test('backs off after a failed refresh instead of retrying GitHub every request', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let fetchCount = 0;
+  let mode = 'ok';
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000,
+    cooldownMs: 5 * 60 * 1000,
+    fetchImpl: async () => {
+      fetchCount += 1;
+      return mode === 'ok' ? json(githubPayload()) : json({ message: 'down' }, { status: 500 });
+    },
+    reportFailure: () => {},
+  });
+
+  await handler(new Request(ENDPOINT)); // stores the snapshot (fetch 1)
+  clock += 5000; // stale
+  mode = 'down';
+  const failed = await handler(new Request(ENDPOINT)); // attempts, fails, serves stale, opens the cooldown (fetch 2)
+  assert.equal(failed.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 2);
+
+  clock += 1000; // still inside the cooldown
+  const cooled = await handler(new Request(`${ENDPOINT}?bust=1`));
+  assert.equal(cooled.status, 200);
+  assert.equal(cooled.headers.get('X-Contributions-Cache'), 'stale');
+  assert.equal(fetchCount, 2, 'a cache-busted request during the cooldown is served the snapshot, not a GitHub retry');
+
+  clock += 5 * 60 * 1000; // past the cooldown
+  await handler(new Request(`${ENDPOINT}?bust=2`));
+  assert.equal(fetchCount, 3, 'once the cooldown expires it retries at most once');
+});
+
+test('a stale response does not renew CDN freshness beyond the snapshot lifetime', async () => {
+  let clock = Date.parse('2026-09-28T12:00:00Z');
+  let mode = 'ok';
+  const handler = createHandler({
+    getToken: () => 'token',
+    now: () => new Date(clock),
+    cacheTtlMs: 1000,
+    staleMaxMs: 60 * 60 * 1000, // 1h snapshot lifetime
+    cooldownMs: 0,
+    fetchImpl: async () => (mode === 'ok' ? json(githubPayload()) : json({ message: 'down' }, { status: 500 })),
+  });
+
+  await handler(new Request(ENDPOINT)); // stores the snapshot
+  clock += 30 * 60 * 1000; // 30 min in — 30 min (1800s) of life left
+  mode = 'down';
+  const stale = await handler(new Request(ENDPOINT));
+
+  assert.equal(stale.headers.get('X-Contributions-Cache'), 'stale');
+  const cdn = stale.headers.get('CDN-Cache-Control') || '';
+  const sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
+  assert.ok(sMaxAge > 0 && sMaxAge <= 1800, `stale s-maxage ${sMaxAge} must fit inside the remaining lifetime`);
+  assert.ok(!/stale-while-revalidate/.test(cdn), 'a stale response must not extend itself with stale-while-revalidate');
 });

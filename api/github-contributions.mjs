@@ -209,6 +209,24 @@ const overLimit = (hits, ip, limit, windowMs, nowMs) => {
   return recent.length > limit;
 };
 
+// After a failed refresh, don't retry GitHub again for this long. During an
+// outage a burst of cache-busted requests should not keep spending quota while a
+// usable snapshot exists; one instance retries at most once per cooldown.
+const COOLDOWN_MS = 60 * 1000;
+
+// A stale snapshot must not renew the CDN's full six-hour freshness — that would
+// let revalidations keep serving it past its 24h life, even after GitHub recovers.
+// Cap the CDN lifetime to what remains of the snapshot's window and drop
+// stale-while-revalidate so it cannot extend itself.
+const staleCacheHeaders = (remainingMs) => {
+  const remaining = Math.max(0, Math.floor(remainingMs / 1000));
+  return {
+    'Cache-Control': `public, max-age=${Math.min(300, remaining)}`,
+    'CDN-Cache-Control': `public, s-maxage=${remaining}`,
+    'Vercel-CDN-Cache-Control': `public, s-maxage=${remaining}`,
+  };
+};
+
 export const createHandler = ({
   fetchImpl = fetch,
   getToken = () => process.env.GITHUB_CONTRIBUTIONS_TOKEN,
@@ -217,12 +235,13 @@ export const createHandler = ({
   timeoutMs = REQUEST_TIMEOUT_MS,
   // Per-handler so tests stay isolated; the production singleton (the default
   // export) creates one of each, shared across every request its instance sees.
-  store = { data: null, at: 0 },
+  store = { data: null, at: 0, failedAt: 0, inflight: null },
   rateState = new Map(),
   cacheTtlMs = CACHE_TTL_MS,
   staleMaxMs = STALE_MAX_MS,
   rateLimit = RATE_LIMIT,
   rateWindowMs = RATE_WINDOW_MS,
+  cooldownMs = COOLDOWN_MS,
 } = {}) => async (request) => {
   if (request.method !== 'GET') {
     return jsonResponse(
@@ -234,13 +253,17 @@ export const createHandler = ({
 
   const nowMs = now().getTime();
   const age = store.data ? nowMs - store.at : Infinity;
-  const cached = (status) => jsonResponse(store.data, 200, { ...CACHE_HEADERS, 'X-Contributions-Cache': status });
+  const cached = (status, headers) => jsonResponse(store.data, 200, { ...headers, 'X-Contributions-Cache': status });
 
   // 1. Fresh snapshot: serve it without a token, a fetch, or touching the limit.
-  if (store.data && age < cacheTtlMs) return cached('hit');
+  if (store.data && age < cacheTtlMs) return cached('hit', CACHE_HEADERS);
 
-  // The stale snapshot is the fallback whenever a refresh cannot or should not run.
-  const stale = store.data && age < staleMaxMs ? () => cached('stale') : null;
+  // The stale snapshot is the fallback whenever a refresh cannot or should not
+  // run. Its cache directives are capped to the snapshot's remaining life, so the
+  // CDN cannot keep serving it past the 24h window.
+  const stale = store.data && age < staleMaxMs
+    ? () => cached('stale', staleCacheHeaders(staleMaxMs - age))
+    : null;
 
   const token = getToken();
   if (!token) {
@@ -262,55 +285,82 @@ export const createHandler = ({
     );
   }
 
-  const { signal, cancel } = createRequestTimeout(timeoutMs);
-
-  try {
-    let response;
-    try {
-      response = await fetchImpl(GITHUB_GRAPHQL_URL, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'User-Agent': 'designedbyomar.com',
-        },
-        body: JSON.stringify({
-          query: CONTRIBUTION_QUERY,
-          variables: { login: GITHUB_LOGIN },
-        }),
-        signal,
-      });
-    } catch {
-      reportFailure('request-failed');
-      return stale ? stale() : unavailable();
-    }
-
-    if (!response.ok) {
-      reportFailure('upstream-http', response.status);
-      return stale ? stale() : unavailable();
-    }
-
-    let payload;
-    try {
-      payload = await response.json();
-    } catch {
-      reportFailure('invalid-json');
-      return stale ? stale() : unavailable();
-    }
-
-    try {
-      const normalized = normalizeContributionData(payload, now());
-      store.data = normalized;
-      store.at = nowMs;
-      return jsonResponse(normalized, 200, { ...CACHE_HEADERS, 'X-Contributions-Cache': 'miss' });
-    } catch {
-      reportFailure('invalid-payload');
-      return stale ? stale() : unavailable();
-    }
-  } finally {
-    cancel();
+  // 3. Back off after a recent failure. During an outage this stops cache-busted
+  // traffic from retrying GitHub on every request while a snapshot is available.
+  // A refresh already in flight is joined below rather than blocked by this.
+  if (!store.inflight && store.failedAt && nowMs - store.failedAt < cooldownMs) {
+    return stale ? stale() : unavailable();
   }
+
+  // 4. One refresh at a time. On a cold instance or after the snapshot expires,
+  // concurrent requests would each start their own GitHub call; they now share a
+  // single in-flight refresh, so a burst costs one quota unit rather than many.
+  const runRefresh = async () => {
+    const { signal, cancel } = createRequestTimeout(timeoutMs);
+    try {
+      let response;
+      try {
+        response = await fetchImpl(GITHUB_GRAPHQL_URL, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'designedbyomar.com',
+          },
+          body: JSON.stringify({
+            query: CONTRIBUTION_QUERY,
+            variables: { login: GITHUB_LOGIN },
+          }),
+          signal,
+        });
+      } catch {
+        reportFailure('request-failed');
+        return null;
+      }
+
+      if (!response.ok) {
+        reportFailure('upstream-http', response.status);
+        return null;
+      }
+
+      let payload;
+      try {
+        payload = await response.json();
+      } catch {
+        reportFailure('invalid-json');
+        return null;
+      }
+
+      try {
+        return normalizeContributionData(payload, now());
+      } catch {
+        reportFailure('invalid-payload');
+        return null;
+      }
+    } finally {
+      cancel();
+    }
+  };
+
+  if (!store.inflight) {
+    store.inflight = runRefresh()
+      .then((data) => {
+        if (data) {
+          store.data = data;
+          store.at = nowMs;
+          store.failedAt = 0;
+        } else {
+          store.failedAt = nowMs;
+        }
+        return data;
+      })
+      .finally(() => { store.inflight = null; });
+  }
+
+  const data = await store.inflight;
+  if (data) return jsonResponse(data, 200, { ...CACHE_HEADERS, 'X-Contributions-Cache': 'miss' });
+  return stale ? stale() : unavailable();
 };
 
 export const config = { runtime: 'edge' };
