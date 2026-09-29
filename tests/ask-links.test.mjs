@@ -89,3 +89,10 @@ test('draft citations include only named studies mentioned in the completed repl
   assert.deepEqual(cited, ['connect-api']);
   assert.deepEqual(mentionedStudyIds('There is no published evidence for that.', studies, ['connect-api']), []);
 });
+
+test('a grounded draft can cite a case study by its verified product name', () => {
+  assert.deepEqual(
+    mentionedStudyIds('AdVisor unified the ad-sales workflow.', studies, ['disney-uap']),
+    ['disney-uap'],
+  );
+});

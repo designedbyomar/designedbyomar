@@ -1926,11 +1926,12 @@ const usePrefersReducedMotion = () => {
 // so a later paragraph does not re-link one an earlier paragraph already did.
 const ANSWER_PARAGRAPH_STYLE = { margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 };
 const ANSWER_LINK_STYLE = { color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'color-mix(in srgb, var(--fg-primary) 40%, transparent)' };
+const ASK_RESPONSE_MIN_HEIGHT = 288;
 const ASK_RESPONSE_CARD_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--space-4)',
-  minHeight: 256,
+  minHeight: ASK_RESPONSE_MIN_HEIGHT,
   padding: 'var(--space-5) var(--space-6)',
   borderRadius: 'var(--radius-comfort)',
   boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
@@ -2427,7 +2428,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-4)',
-          minHeight: responseActive ? 256 : 0,
+          minHeight: responseActive ? ASK_RESPONSE_MIN_HEIGHT : 0,
         }}
       >
         {result && (
@@ -2570,7 +2571,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         {missed && (
           <div style={{ ...ASK_RESPONSE_CARD_STYLE, gap: 'var(--space-3)' }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
-              That one has no written answer, and it could not be drafted from clearly relevant published work. Rather than guess, email is the faster route.
+              I couldn&apos;t safely match that to a reviewed answer or clearly relevant published work. Rather than guess, email is the faster route.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
@@ -3095,14 +3096,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question; when the router identifies relevant published work, the question may also be sent to Groq with excerpts from only those case studies so a reply can be drafted</li>
+          <li>questions typed into the Ask box that it cannot safely answer, including the wording of the question; when the router identifies relevant published work, the question may also be sent to Groq with excerpts from only those case studies so a reply can be drafted</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
         <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing the same reviewed question or alias with ordinary changes in casing, punctuation, apostrophes, or spacing, is answered in your browser: nothing is sent and nothing leaves this site.</p>
         <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, returns an invalid result, or the allowance is spent, the Ask box shows that it cannot answer rather than substituting a loosely related answer or citation.</p>
-        <p style={{ margin: 0 }}>If no written answer fits, Groq may name one or two relevant case studies. Only then is the question sent again with excerpts from those named studies and any reviewed answer grounded entirely in the same studies. If the router says none apply or fails, no draft is attempted. A drafted reply is labelled as drafted and unreviewed wherever it appears, and citation links appear only for named studies the completed reply actually mentions. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
+        <p style={{ margin: 0 }}>If no written answer fits, Groq may name one or two relevant case studies. Only then is the question sent again with excerpts from those named studies and any reviewed answer grounded entirely in the same studies. If the router says none apply or fails, no draft is attempted. A drafted reply is labelled as drafted and unreviewed wherever it appears, and citation links appear only for named studies the completed reply actually mentions. The wording of a question the Ask box cannot safely answer is also recorded in an analytics event, which is how I can see missing answers and routing failures. A question that does get a written answer is not recorded that way.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>

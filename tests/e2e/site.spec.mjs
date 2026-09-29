@@ -1024,7 +1024,7 @@ test('Ask refuses a question it has no written answer for', async ({ page }) => 
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/could not be drafted from clearly relevant published work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
 });
 
@@ -1054,7 +1054,7 @@ test('Ask still answers when analytics are declined, and sends nothing', async (
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/could not be drafted from clearly relevant published work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
 
   const events = await page.evaluate(() => window.__omarAnalyticsEvents ?? []);
   expect(events.filter(e => e.eventName.startsWith('ask_')), 'a declined visitor must send no ask_* events').toHaveLength(0);
@@ -1075,7 +1075,7 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
   await openAsk(page);
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
-  await expect(askLive(page).getByText(/could not be drafted from clearly relevant published work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
 
   const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
   expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
@@ -1092,7 +1092,7 @@ test('the privacy policy discloses what the Ask box records and where it goes', 
   await expect(page.getByText(/Only then is the question sent again with excerpts from those named studies/i)).toBeVisible();
   await expect(page.getByText(/If the router says none apply or fails, no draft is attempted/i)).toBeVisible();
   await expect(page.getByText(/shows that it cannot answer rather than substituting a loosely related answer or citation/i)).toBeVisible();
-  await expect(page.getByText(/wording of a question nothing covers is also recorded/i)).toBeVisible();
+  await expect(page.getByText(/wording of a question the Ask box cannot safely answer is also recorded/i)).toBeVisible();
   await expect(page.getByText(/does get a written answer is not recorded that way/i)).toBeVisible();
   // Claims that were true before the endpoint existed and must not come back.
   await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
@@ -1174,7 +1174,7 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/could not be drafted from clearly relevant published work/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -1194,7 +1194,7 @@ test('with the endpoint down, a loose word match is not served in its place', as
   await askInput(page).fill('has he worked with react');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/no written answer/i)).toBeVisible();
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -1269,12 +1269,15 @@ test('loading to fallback keeps the mobile response footprint stable', async ({ 
   // Isolate the Ask transition from the one-time page loader and webfont
   // settling; this assertion is about the response card's own footprint.
   await expect(page.locator('.logo-loader').locator('..')).toHaveCSS('opacity', '0');
-  await page.evaluate(() => document.fonts.ready);
   await page.locator('#ask-panel input[type="text"]').fill('Has Omar worked at Apple?');
   await page.locator('#ask-panel button[type="submit"]').click();
 
   const region = page.locator('[data-ask-response-region]');
   await expect(region.locator('[data-ask-state="loading"]')).toBeVisible();
+  // The async Google Fonts stylesheet can start a font request after the
+  // one-time loader has resolved. Let that independent layout change finish
+  // before measuring the Ask card transition itself.
+  await page.evaluate(() => document.fonts.ready);
   const before = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
   await expect(region.getByText(/Rather than guess/i)).toBeVisible();
   const after = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
@@ -1563,7 +1566,7 @@ test('a miss on /ask stops the URL pointing at the previous answer', async ({ pa
 
   await page.locator('#ask-panel input[type="text"]').fill('how do penguins pay for parking in antarctica');
   await page.locator('#ask-panel button[type="submit"]').click();
-  await expect(page.getByText(/could not be drafted from clearly relevant published work/i)).toBeVisible();
+  await expect(page.getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
   await expect(page).toHaveURL(/\/ask$/);
 });
 
@@ -1728,5 +1731,5 @@ test('picking a suggestion mid-stream does not resurrect the draft', async ({ pa
 
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
-  await expect(askLive(page).getByText(/could not be drafted from clearly relevant published work/i)).toHaveCount(0);
+  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toHaveCount(0);
 });

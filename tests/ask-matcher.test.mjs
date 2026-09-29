@@ -50,6 +50,15 @@ test('formal management intent always resolves to the verified one-report answer
   const influence = matchQuestion('Can he lead without direct reports?', index);
   assert.equal(influence?.answer.id, 'influence-without-authority');
   assert.equal(influence?.exact, true, 'the specific reviewed alias wins before the guard');
+
+  for (const query of [
+    'How can Omar lead without direct reports?',
+    'How does Omar approach hiring?',
+  ]) {
+    const hit = matchQuestion(query, index);
+    assert.notEqual(hit?.answer.id, 'formal-people-management', query);
+    assert.equal(hit?.guarded, undefined, query);
+  }
 });
 
 test('distinctive terms route to the right answer', () => {

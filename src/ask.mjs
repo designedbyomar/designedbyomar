@@ -46,7 +46,20 @@ export const normalizeExact = (text) => String(text)
   .replace(/\s+/g, ' ');
 
 const FORMAL_MANAGEMENT_ANSWER_ID = 'formal-people-management';
-const FORMAL_MANAGEMENT_INTENT = /\b(?:direct reports?|formal(?:ly)? manage(?:d|s|ment|ing)?|people manage(?:r|rs|ment)|manage(?:d|s|ment|ing)? (?:a )?(?:designers?|design team|people)|(?:designers?|people)\b.{0,24}\bmanage(?:d|s|ment|ing)?|hiring|performance reviews?)\b/i;
+const FORMAL_MANAGEMENT_PATTERNS = [
+  /\b(?:has|have|had|did|does)\b.{0,48}\b(?:formal(?:ly)? manage(?:d|s|ment|ing)?|direct reports?|manage(?:d|s|ment|ing)? (?:\d+ )?(?:designers?|people|a design team)|people management experience)\b/i,
+  /\bhow many\b.{0,32}\b(?:direct reports?|designers?|people)\b.{0,32}\b(?:manage(?:d|s|ment|ing)?|report(?:ed|s|ing)?)?\b/i,
+  /\b(?:has|have|had|did)\b.{0,32}\b(?:participate(?:d)? in hiring|hire(?:d|s|ing)? designers?)\b/i,
+  /\b(?:has|have|had|did)\b.{0,32}\b(?:(?:do|done|own(?:ed|s|ing)?|conduct(?:ed|s|ing)?|run|ran) )?(?:formal )?performance reviews?\b/i,
+];
+
+const hasFormalManagementIntent = (normalized) => {
+  // “Lead without direct reports” is about influence, not Omar's management
+  // history. The same words appear in both topics, so the negative framing has
+  // to win before checking for factual management experience.
+  if (/\b(?:without|despite(?: having)? no)\b.{0,24}\bdirect reports?\b/i.test(normalized)) return false;
+  return FORMAL_MANAGEMENT_PATTERNS.some(pattern => pattern.test(normalized));
+};
 
 /**
  * Precompute per-answer token sets and IDF weights. Cheap enough to run on
@@ -119,9 +132,10 @@ export const matchQuestion = (query, index) => {
   // Formal people-management claims need a factual answer, not a semantic
   // guess. The approved answer states the verified scope (one direct report),
   // so a number such as "20" cannot make the router inflate it or deny the
-  // experience altogether. Exact aliases run first so "lead without direct
-  // reports" keeps its specific influence-without-authority answer.
-  if (FORMAL_MANAGEMENT_INTENT.test(normalized)) {
+  // experience altogether. The guard is intentionally limited to factual
+  // questions about management history; leadership without authority and
+  // hiring philosophy still go through their own answer or the router.
+  if (hasFormalManagementIntent(normalized)) {
     const guarded = index.docs.find(doc => doc.answer.id === FORMAL_MANAGEMENT_ANSWER_ID);
     if (guarded) return { answer: guarded.answer, score: 1, exact: false, guarded: true };
   }

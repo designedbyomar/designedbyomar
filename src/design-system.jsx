@@ -1284,8 +1284,9 @@ const ComponentsSection = () => (
           wants is the model&rsquo;s job, and it may decline. A draft is allowed only when the router names
           relevant case studies; a decline, invalid result, timeout, or failure shows the no-answer
           state with email and no citation chips. Exact matching still runs in the browser after
-          normalizing casing, punctuation, apostrophes, and whitespace; formal management intent is
-          also guarded locally so a number in a question cannot inflate the verified scope. A loose
+          normalizing casing, punctuation, apostrophes, and whitespace; factual questions about formal
+          management experience are also guarded locally so a number cannot inflate the verified scope,
+          without intercepting questions about leadership or hiring approach. A loose
           overlap match is never served on its own.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">

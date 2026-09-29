@@ -204,6 +204,20 @@ test('formal-management questions use the verified one-report answer without a m
   assert.match(text, /not 20/i);
 });
 
+test('leadership-without-authority and hiring-approach questions bypass the management guard', async () => {
+  const leadership = loadHandler({ routeReturns: 'ANSWER: influence-without-authority' });
+  const leadershipResponse = await leadership.handler(post('How can Omar lead without direct reports?'));
+  assert.equal(leadershipResponse.headers.get('X-Ask-Answer-Id'), 'influence-without-authority');
+  assert.equal(leadershipResponse.headers.get('X-Ask-Matched-By'), 'router');
+  assert.equal(leadership.routeCalls.length, 1);
+
+  const hiring = loadHandler({ routeReturns: 'NONE' });
+  const hiringResponse = await hiring.handler(post('How does Omar approach hiring?'));
+  assert.equal(hiringResponse.headers.get('X-Ask-Source'), 'fallback');
+  assert.equal(hiringResponse.headers.get('X-Ask-Reason'), 'no-material');
+  assert.equal(hiring.routeCalls.length, 1);
+});
+
 test('the router decides a non-exact question, and its pick is returned verbatim', async () => {
   const { handler, calls, routeCalls } = loadHandler({ routeReturns: 'ANSWER: leadership-or-ic' });
   const response = await handler(post('is he a manager'));

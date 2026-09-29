@@ -2238,7 +2238,8 @@
     "client": "Disney (DTCI)",
     "title": "Unified Ad Platform",
     "mentions": [
-      "Unified Ad Platform"
+      "Unified Ad Platform",
+      "AdVisor"
     ],
     "subtitle": "Seven Disney ad-sales brands brought onto one platform without breaking the workflow it already ran.",
     "metaDescription": "Brought seven Disney ad-sales brands onto AdVisor without regressing the ESPN workflow it already ran. Decision-flow mapping, eight-brand alignment, and reusable React patterns for Adapt.",
