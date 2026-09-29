@@ -5,6 +5,28 @@ import './github-contributions.css';
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DISPLAYED_DAY_LABELS = new Set([1, 3, 5]);
 
+const getMonthPlacements = (months, weeks) => {
+  const placements = months.map((month) => {
+    const containingWeek = weeks.findIndex((week, index) => (
+      month.firstDay >= week.firstDay
+      && (index === weeks.length - 1 || month.firstDay < weeks[index + 1].firstDay)
+    ));
+    return {
+      ...month,
+      startIndex: containingWeek === -1
+        ? (month.firstDay < weeks[0]?.firstDay ? 0 : Math.max(weeks.length - 1, 0))
+        : containingWeek,
+    };
+  });
+
+  return placements.map((month, index) => {
+    const nextDistinctMonth = placements.slice(index + 1).find(candidate => candidate.startIndex > month.startIndex);
+    const nextMonthSharesWeek = placements[index + 1]?.startIndex === month.startIndex;
+    const span = Math.max(1, (nextDistinctMonth?.startIndex ?? weeks.length) - month.startIndex);
+    return { ...month, span, visible: !nextMonthSharesWeek && span > 1 };
+  });
+};
+
 const formatDate = (date, options) => new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
   ...options,
@@ -38,14 +60,13 @@ const CalendarSkeleton = () => (
 const ContributionCalendar = ({ data }) => {
   const scrollRef = React.useRef(null);
   const columnTemplate = `32px repeat(${data.weeks.length}, var(--github-cell-size))`;
+  const monthPlacements = getMonthPlacements(data.months, data.weeks);
 
   React.useLayoutEffect(() => {
     const scrollArea = scrollRef.current;
     if (!scrollArea) return;
     scrollArea.scrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth;
   }, [data]);
-
-  let monthColumn = 2;
 
   return (
     <>
@@ -59,23 +80,20 @@ const ContributionCalendar = ({ data }) => {
         <div className="github-contributions-calendar">
           <div className="github-contributions-months" style={{ gridTemplateColumns: columnTemplate }} aria-hidden="true">
             <span />
-            {data.months.map((month) => {
-              const start = monthColumn;
-              monthColumn += month.totalWeeks;
-              return (
-                <span
-                  key={`${month.firstDay}-${month.name}`}
-                  style={{ gridColumn: `${start} / span ${month.totalWeeks}` }}
-                >
-                  {month.totalWeeks > 1 ? month.name : ''}
-                </span>
-              );
-            })}
+            {monthPlacements.map(month => (
+              <span
+                key={`${month.firstDay}-${month.name}`}
+                data-month-first-day={month.firstDay}
+                style={{ gridColumn: `${month.startIndex + 2} / span ${month.span}` }}
+              >
+                {month.visible ? month.name : ''}
+              </span>
+            ))}
           </div>
 
           <div
             className="github-contributions-grid"
-            role="grid"
+            role="table"
             aria-label={`${data.totalContributions.toLocaleString('en-US')} GitHub contributions from ${formatRange(data.range)}`}
           >
             {DAY_LABELS.map((label, weekday) => (
@@ -96,7 +114,7 @@ const ContributionCalendar = ({ data }) => {
                       className="github-contributions-day"
                       data-date={day.date}
                       data-level={day.level}
-                      role="gridcell"
+                      role="cell"
                       aria-label={dayAriaLabel(day)}
                     />
                   ) : (

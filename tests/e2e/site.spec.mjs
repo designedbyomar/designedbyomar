@@ -103,10 +103,12 @@ test('At a glance shows the live rolling GitHub contribution calendar', async ({
   await expect(widget.getByText('Less', { exact: true })).toBeVisible();
   await expect(widget.getByText('More', { exact: true })).toBeVisible();
   await expect(widget.getByRole('link', { name: /View GitHub profile/i })).toHaveAttribute('href', 'https://github.com/designedbyomar');
-  await expect(widget.getByRole('gridcell')).toHaveCount(366);
-  await expect(widget.locator('[role="gridcell"][tabindex]')).toHaveCount(0);
+  await expect(widget.getByRole('cell')).toHaveCount(366);
+  await expect(widget.locator('[role="cell"][tabindex]')).toHaveCount(0);
   await expect(widget.getByText('Oct', { exact: true })).toBeVisible();
   await expect(widget.getByText('Sep', { exact: true })).toHaveCount(1);
+  const octoberColumn = await widget.locator('[data-month-first-day="2025-10-01"]').evaluate(node => node.style.gridColumn);
+  expect(octoberColumn).toBe('2 / span 4');
 
   const followsFacts = await widget.evaluate(node => node.parentElement.previousElementSibling?.classList.contains('facts-grid'));
   expect(followsFacts).toBe(true);

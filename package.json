@@ -38,6 +38,7 @@
     "test:content": "node --test tests/ask-answers.test.mjs tests/ask-matcher.test.mjs tests/ask-endpoint.test.mjs tests/ask-links.test.mjs tests/ask-rundown.test.mjs tests/github-contributions-endpoint.test.mjs",
     "test:e2e": "npm run build && playwright test",
     "test:e2e:ui": "npm run build && playwright test --ui",
+    "smoke:github": "node scripts/smoke-github-contributions.mjs",
     "optimize:image": "node scripts/optimize-image.mjs",
     "generate:social-images": "node scripts/generate-social-images.mjs",
     "ask:rundown": "node scripts/ask-rundown.mjs"

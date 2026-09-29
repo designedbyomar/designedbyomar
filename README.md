@@ -101,6 +101,14 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 
 The GitHub widget degrades to a profile link when its token or upstream data is unavailable. The token is read only by `/api/github-contributions` and is never included in the browser bundle or response.
 
+After deployment, smoke-test the real function and its cache contract:
+
+```bash
+npm run smoke:github -- --url https://www.designedbyomar.com/api/github-contributions
+```
+
+To verify the explicit missing-token fallback against an unprotected preview that intentionally omits the secret, add `--expect-fallback`.
+
 ## Branch workflow
 
 Keep `main` protected and deployable. Use short-lived feature branches for one focused change at a time, then merge through a pull request.

@@ -60,6 +60,11 @@ const unavailable = (status = 502) => jsonResponse(
 const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value);
 const validInteger = value => Number.isInteger(value) && value >= 0;
 
+const logFailure = (category, status) => {
+  const suffix = Number.isInteger(status) ? ` status=${status}` : '';
+  console.error(`[github-contributions] ${category}${suffix}`);
+};
+
 export const normalizeContributionData = (payload, updatedAt = new Date()) => {
   if (payload?.errors?.length) throw new Error('GitHub returned GraphQL errors.');
 
@@ -128,6 +133,7 @@ export const createHandler = ({
   fetchImpl = fetch,
   getToken = () => process.env.GITHUB_CONTRIBUTIONS_TOKEN,
   now = () => new Date(),
+  reportFailure = logFailure,
 } = {}) => async (request) => {
   if (request.method !== 'GET') {
     return jsonResponse(
@@ -138,10 +144,14 @@ export const createHandler = ({
   }
 
   const token = getToken();
-  if (!token) return unavailable(503);
+  if (!token) {
+    reportFailure('missing-token');
+    return unavailable(503);
+  }
 
+  let response;
   try {
-    const response = await fetchImpl(GITHUB_GRAPHQL_URL, {
+    response = await fetchImpl(GITHUB_GRAPHQL_URL, {
       method: 'POST',
       headers: {
         Accept: 'application/vnd.github+json',
@@ -155,11 +165,29 @@ export const createHandler = ({
       }),
       signal: AbortSignal.timeout(8_000),
     });
+  } catch {
+    reportFailure('request-failed');
+    return unavailable();
+  }
 
-    if (!response.ok) return unavailable();
-    const normalized = normalizeContributionData(await response.json(), now());
+  if (!response.ok) {
+    reportFailure('upstream-http', response.status);
+    return unavailable();
+  }
+
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    reportFailure('invalid-json');
+    return unavailable();
+  }
+
+  try {
+    const normalized = normalizeContributionData(payload, now());
     return jsonResponse(normalized, 200, CACHE_HEADERS);
   } catch {
+    reportFailure('invalid-payload');
     return unavailable();
   }
 };

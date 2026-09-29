@@ -124,35 +124,46 @@ test('rejects non-GET requests without contacting GitHub', async () => {
 });
 
 test('returns an uncached 503 when the server token is missing', async () => {
-  const handler = createHandler({ getToken: () => '' });
+  const failures = [];
+  const handler = createHandler({
+    getToken: () => '',
+    reportFailure: (...failure) => failures.push(failure),
+  });
   const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
 
   assert.equal(response.status, 503);
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
+  assert.deepEqual(failures, [['missing-token']]);
 });
 
 test('returns a generic uncached error for upstream HTTP and GraphQL failures', async (t) => {
   await t.test('HTTP failure', async () => {
+    const failures = [];
     const handler = createHandler({
       getToken: () => 'token',
       fetchImpl: async () => json({ message: 'secret upstream detail' }, { status: 500 }),
+      reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
     assert.equal(response.status, 502);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
+    assert.deepEqual(failures, [['upstream-http', 500]]);
   });
 
   await t.test('GraphQL failure', async () => {
+    const failures = [];
     const handler = createHandler({
       getToken: () => 'token',
       fetchImpl: async () => json(githubPayload({ errors: [{ message: 'private detail' }] })),
+      reportFailure: (...failure) => failures.push(failure),
     });
     const response = await handler(new Request('https://www.designedbyomar.com/api/github-contributions'));
     assert.equal(response.status, 502);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { error: 'GitHub activity is temporarily unavailable.' });
+    assert.deepEqual(failures, [['invalid-payload']]);
   });
 });
 
