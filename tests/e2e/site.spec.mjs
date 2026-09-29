@@ -189,6 +189,21 @@ test('the homepage does not scroll horizontally at 375 in either theme', async (
   }
 });
 
+test('the nav and hero align to the same container as the sections', async ({ page }) => {
+  // This shipped: the nav and hero put their 24px padding inside the max-width
+  // box while every section padded a full-width outer around a centred box, so
+  // past 1200px the nav/hero content sat 24px further in and 48px narrower than
+  // the sections. Now they share one container, so the left edges line up.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  const left = (sel) => page.locator(sel).first().evaluate((el) => Math.round(el.getBoundingClientRect().left));
+  const navLogoLeft = await page.locator('header > div > div').first().evaluate((el) => Math.round(el.getBoundingClientRect().left));
+  const heroLeft = await left('#top h1');
+  const aboutLeft = await page.locator('#about .about-grid > *').first().evaluate((el) => Math.round(el.getBoundingClientRect().left));
+  expect(heroLeft, 'hero content aligns with the About section').toBe(aboutLeft);
+  expect(navLogoLeft, 'nav content aligns with the About section').toBe(aboutLeft);
+});
+
 test('on a wide viewport the CTA stays in the sticky column', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');

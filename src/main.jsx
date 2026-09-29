@@ -733,8 +733,11 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
       WebkitBackdropFilter: scrolled ? 'var(--blur-strong)' : 'none',
       boxShadow: scrolled ? 'rgba(127, 127, 127, var(--opacity-18)) 0px -1px 0px 0px inset' : 'none',
       transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
+      padding: '0 var(--space-6)',
     }}>
-      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: '0 var(--space-6)', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+      {/* Padding lives on the full-width header, not the max-width row, so the row
+          aligns with the content sections' inner containers at every width. */}
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         {/* Menu trigger sits left of the logo, matching the design-system header. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           {isMobile && (
@@ -836,10 +839,13 @@ const SHOW_ROLE_STATUS = false;
 const ROLE_STATUS_COPY = 'CURRENTLY LOOKING FOR MY NEXT ROLE.';
 
 const Hero = ({ galaxy, theme, scrollToSection }) => (
-  <section id="top" className="hero-editorial" style={{
-    maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--layout-2)',
-    display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
-  }}>
+  <section id="top" className="hero-editorial-outer" style={{ padding: 'var(--space-7) var(--space-6) var(--layout-2)' }}>
+    {/* Inner max-width box carries the grid, so the hero lines up with the
+        content sections' containers instead of insetting an extra gutter. */}
+    <div className="hero-editorial" style={{
+      maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto',
+      display: 'grid', gridTemplateColumns: '1.1fr 1fr', alignItems: 'center', gap: 'var(--layout-1)',
+    }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       {SHOW_ROLE_STATUS && (
         <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -893,6 +899,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
       </div>
     </div>
     <Portrait galaxy={galaxy} theme={theme} />
+    </div>
   </section>
 );
 
