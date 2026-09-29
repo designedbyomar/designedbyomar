@@ -214,16 +214,18 @@ const overLimit = (hits, ip, limit, windowMs, nowMs) => {
 // usable snapshot exists; one instance retries at most once per cooldown.
 const COOLDOWN_MS = 60 * 1000;
 
-// A stale snapshot must not renew the CDN's full six-hour freshness — that would
-// let revalidations keep serving it past its 24h life, even after GitHub recovers.
-// Cap the CDN lifetime to what remains of the snapshot's window and drop
-// stale-while-revalidate so it cannot extend itself.
+// A stale snapshot gets a short CDN lifetime, capped by what remains of its 24h
+// window: short so the CDN rechecks the endpoint within minutes and picks up
+// GitHub's recovery — rather than serving the old calendar for the whole
+// remaining window — and capped so no cache period can reach past the snapshot's
+// hard limit. No stale-while-revalidate, or the CDN could extend it further.
+const STALE_REVALIDATE_MS = 5 * 60 * 1000;
 const staleCacheHeaders = (remainingMs) => {
-  const remaining = Math.max(0, Math.floor(remainingMs / 1000));
+  const revalidate = Math.max(0, Math.floor(Math.min(STALE_REVALIDATE_MS, remainingMs) / 1000));
   return {
-    'Cache-Control': `public, max-age=${Math.min(300, remaining)}`,
-    'CDN-Cache-Control': `public, s-maxage=${remaining}`,
-    'Vercel-CDN-Cache-Control': `public, s-maxage=${remaining}`,
+    'Cache-Control': `public, max-age=${revalidate}`,
+    'CDN-Cache-Control': `public, s-maxage=${revalidate}`,
+    'Vercel-CDN-Cache-Control': `public, s-maxage=${revalidate}`,
   };
 };
 

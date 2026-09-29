@@ -437,8 +437,9 @@ test('backs off after a failed refresh instead of retrying GitHub every request'
   assert.equal(fetchCount, 3, 'once the cooldown expires it retries at most once');
 });
 
-test('a stale response does not renew CDN freshness beyond the snapshot lifetime', async () => {
-  let clock = Date.parse('2026-09-28T12:00:00Z');
+test('a stale response revalidates soon and never outlives the snapshot window', async () => {
+  const t0 = Date.parse('2026-09-28T12:00:00Z');
+  let clock = t0;
   let mode = 'ok';
   const handler = createHandler({
     getToken: () => 'token',
@@ -449,14 +450,30 @@ test('a stale response does not renew CDN freshness beyond the snapshot lifetime
     fetchImpl: async () => (mode === 'ok' ? json(githubPayload()) : json({ message: 'down' }, { status: 500 })),
   });
 
-  await handler(new Request(ENDPOINT)); // stores the snapshot
-  clock += 30 * 60 * 1000; // 30 min in — 30 min (1800s) of life left
+  await handler(new Request(ENDPOINT)); // stores the snapshot at t0
   mode = 'down';
-  const stale = await handler(new Request(ENDPOINT));
 
-  assert.equal(stale.headers.get('X-Contributions-Cache'), 'stale');
-  const cdn = stale.headers.get('CDN-Cache-Control') || '';
-  const sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
-  assert.ok(sMaxAge > 0 && sMaxAge <= 1800, `stale s-maxage ${sMaxAge} must fit inside the remaining lifetime`);
+  // Early in the stale window: a short recheck interval, not the ~55 min remaining,
+  // so the CDN picks up recovery within minutes.
+  clock = t0 + 5 * 60 * 1000;
+  const early = await handler(new Request(ENDPOINT));
+  assert.equal(early.headers.get('X-Contributions-Cache'), 'stale');
+  let cdn = early.headers.get('CDN-Cache-Control') || '';
+  let sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
+  assert.ok(sMaxAge > 0 && sMaxAge <= 300, `stale s-maxage ${sMaxAge} should be a short recheck interval`);
   assert.ok(!/stale-while-revalidate/.test(cdn), 'a stale response must not extend itself with stale-while-revalidate');
+
+  // Near the end of the window: the interval is capped so no cache period can
+  // reach past the snapshot's hard limit.
+  clock = t0 + 60 * 60 * 1000 - 120 * 1000; // 120s of life left
+  cdn = (await handler(new Request(ENDPOINT))).headers.get('CDN-Cache-Control') || '';
+  sMaxAge = Number(/s-maxage=(\d+)/.exec(cdn)?.[1]);
+  assert.ok(sMaxAge > 0 && sMaxAge <= 120, `near end-of-life s-maxage ${sMaxAge} must fit the remaining window`);
+
+  // Past the window: the snapshot is no longer served, and the 503 is uncached,
+  // so the CDN drops the old calendar.
+  clock = t0 + 60 * 60 * 1000 + 1000;
+  const expired = await handler(new Request(ENDPOINT));
+  assert.equal(expired.status, 503);
+  assert.equal(expired.headers.get('Cache-Control'), 'no-store');
 });
