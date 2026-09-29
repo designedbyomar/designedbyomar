@@ -741,6 +741,24 @@ test('design system section titles resolve their aria label and copy a reference
   expect(written).toEqual(['Design System — "Buttons" (/design-system#buttons)']);
 });
 
+test('every design-system aria-labelledby points at an element that exists', async ({ page }) => {
+  // Guards the SectionHeader contract for the whole page at once: a section (or a
+  // future one) that declares aria-labelledby="<id>-title" but never renders that
+  // heading id — the exact bug this work fixes — fails here rather than shipping a
+  // label pointing at nothing. Covers the runtime-expanded mapped sections too.
+  await page.goto('/design-system');
+  const dangling = await page.evaluate(() => {
+    const missing = [];
+    for (const el of document.querySelectorAll('[aria-labelledby]')) {
+      for (const id of (el.getAttribute('aria-labelledby') || '').split(/\s+/).filter(Boolean)) {
+        if (!document.getElementById(id)) missing.push(id);
+      }
+    }
+    return missing;
+  });
+  expect(dangling, `aria-labelledby ids with no matching element: ${dangling.join(', ')}`).toEqual([]);
+});
+
 test('design system displays visual audit specimens for foundations, patterns, and accessibility', async ({ page }) => {
   await page.goto('/design-system');
 
