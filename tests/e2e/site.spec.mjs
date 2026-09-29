@@ -713,6 +713,20 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
 });
 
+test('design system section titles resolve their aria label and expose a copy control', async ({ page }) => {
+  await page.goto('/design-system');
+
+  // The section's aria-labelledby now resolves to a real heading id.
+  const section = page.locator('#buttons');
+  await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
+  await expect(page.locator('#buttons-title')).toHaveText('Buttons');
+
+  // A labelled copy control sits next to the title (revealed on hover/focus).
+  const copy = section.locator('.ds-section-header__copy');
+  await expect(copy).toHaveCount(1);
+  await expect(copy).toHaveAttribute('aria-label', /Copy a reference to the "Buttons" section/);
+});
+
 test('design system displays visual audit specimens for foundations, patterns, and accessibility', async ({ page }) => {
   await page.goto('/design-system');
 

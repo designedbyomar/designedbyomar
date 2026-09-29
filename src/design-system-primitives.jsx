@@ -14,7 +14,9 @@ export const IconButton = ({ icon, label, className = '', ...props }) => (
   </button>
 );
 
-export const CopyButton = ({ value, label = 'Copy value' }) => {
+// Shared clipboard behaviour for every copy control: writes the value, flips to a
+// confirmed state for 1.2s, and clears its timer on unmount.
+const useCopy = () => {
   const [copied, setCopied] = React.useState(false);
   const timerRef = React.useRef(null);
 
@@ -22,7 +24,7 @@ export const CopyButton = ({ value, label = 'Copy value' }) => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
   }, []);
 
-  const handleCopy = async () => {
+  const copy = async (value) => {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
@@ -33,13 +35,18 @@ export const CopyButton = ({ value, label = 'Copy value' }) => {
     }
   };
 
+  return { copied, copy };
+};
+
+export const CopyButton = ({ value, label = 'Copy value' }) => {
+  const { copied, copy } = useCopy();
   return (
     <button
       className="ds-copy-button"
       type="button"
       aria-label={copied ? `Copied ${label}` : label}
       title={copied ? 'Copied' : label}
-      onClick={handleCopy}
+      onClick={() => copy(value)}
     >
       <AppIcon icon={copied ? Check : Copy} size={13} />
       <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -47,10 +54,35 @@ export const CopyButton = ({ value, label = 'Copy value' }) => {
   );
 };
 
-export const SectionHeader = ({ eyebrow, title, children }) => (
+// Icon-only copy control shown on hover/focus next to a section title. Copies a
+// reference the user can paste back when asking for a change to that section.
+const SectionAnchorCopy = ({ title, anchor }) => {
+  const { copied, copy } = useCopy();
+  const label = `Copy a reference to the "${title}" section`;
+  return (
+    <button
+      className="ds-section-header__copy"
+      type="button"
+      aria-label={copied ? `Copied reference to the "${title}" section` : label}
+      title={copied ? 'Copied' : label}
+      onClick={() => copy(`Design System — "${title}" (/design-system#${anchor})`)}
+    >
+      <AppIcon icon={copied ? Check : Copy} size={15} />
+    </button>
+  );
+};
+
+export const SectionHeader = ({ id, eyebrow, title, children }) => (
   <div className="ds-section-header">
     <div className="mono-label">{eyebrow}</div>
-    <h2>{title}</h2>
+    {id ? (
+      <div className="ds-section-header__title-row">
+        <h2 id={`${id}-title`}>{title}</h2>
+        <SectionAnchorCopy title={title} anchor={id} />
+      </div>
+    ) : (
+      <h2>{title}</h2>
+    )}
     {children && <p>{children}</p>}
   </div>
 );

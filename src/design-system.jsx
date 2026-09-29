@@ -944,7 +944,7 @@ const HomeSection = ({ theme }) => (
     </section>
 
     <section id="what-it-powers" className="ds-section" aria-labelledby="what-it-powers-title">
-      <SectionHeader eyebrow="Home" title="What it powers">
+      <SectionHeader id="what-it-powers" eyebrow="Home" title="What it powers">
         A practical map of where the system shows up in production, from the homepage to route metadata and privacy surfaces.
       </SectionHeader>
       <div className="ds-power-strip">
@@ -961,7 +961,7 @@ const HomeSection = ({ theme }) => (
 const FoundationsSection = () => (
   <>
     <section id="foundations" className="ds-section" aria-labelledby="foundations-title">
-      <SectionHeader eyebrow="Foundations" title="Shared foundations">
+      <SectionHeader id="foundations" eyebrow="Foundations" title="Shared foundations">
         The portfolio and this documentation surface now share the same token source for theme, color, type, spacing, depth, opacity, motion, and responsive rhythm.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -978,7 +978,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="color" className="ds-section" aria-labelledby="color-title">
-      <SectionHeader eyebrow="Foundations" title="Color">
+      <SectionHeader id="color" eyebrow="Foundations" title="Color">
         Semantic neutrals carry most of the interface. Develop blue, preview pink, and ship red mark workflow states and signature motion.
       </SectionHeader>
       <div className="ds-token-stack">
@@ -996,7 +996,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="typography" className="ds-section" aria-labelledby="typography-title">
-      <SectionHeader eyebrow="Foundations" title="Typography">
+      <SectionHeader id="typography" eyebrow="Foundations" title="Typography">
         Geist Sans handles editorial hierarchy. Geist Mono handles labels, metadata, source references, and implementation-adjacent copy.
       </SectionHeader>
       <div className="ds-typography-map">
@@ -1007,7 +1007,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="spacing" className="ds-section" aria-labelledby="spacing-title">
-      <SectionHeader eyebrow="Foundations" title="Spacing">
+      <SectionHeader id="spacing" eyebrow="Foundations" title="Spacing">
         UI spacing uses compact steps. Layout spacing uses larger bands for page rhythm and section separation.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1029,7 +1029,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="radius-elevation" className="ds-section" aria-labelledby="radius-elevation-title">
-      <SectionHeader eyebrow="Foundations" title="Radius and elevation">
+      <SectionHeader id="radius-elevation" eyebrow="Foundations" title="Radius and elevation">
         Radius stays restrained. Shadow-as-border creates definition without heavy outlines or decorative framing.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1046,14 +1046,14 @@ const FoundationsSection = () => (
     </section>
 
     <section id="foundation-specimens" className="ds-section" aria-labelledby="foundation-specimens-title">
-      <SectionHeader eyebrow="Foundations" title="Visual specimens">
+      <SectionHeader id="foundation-specimens" eyebrow="Foundations" title="Visual specimens">
         Radius, opacity, layering, and breakpoint rules are shown as rendered objects so token behavior is easier to audit.
       </SectionHeader>
       <FoundationSpecimens />
     </section>
 
     <section id="blur" className="ds-section" aria-labelledby="blur-title">
-      <SectionHeader eyebrow="Foundations" title="Blur">
+      <SectionHeader id="blur" eyebrow="Foundations" title="Blur">
         Blur tokens are used for sticky headers, overlays, drawers, and polished glassy surfaces where the content underneath should remain implied.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1064,7 +1064,7 @@ const FoundationsSection = () => (
     </section>
 
     <section id="motion-tokens" className="ds-section" aria-labelledby="motion-tokens-title">
-      <SectionHeader eyebrow="Foundations" title="Motion tokens">
+      <SectionHeader id="motion-tokens" eyebrow="Foundations" title="Motion tokens">
         Durations and easing keep interactions crisp. Motion should orient the reader, not compete with the work.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1090,7 +1090,7 @@ cubic-bezier(0.4, 0, 0.2, 1)`}</pre>
 const ComponentsSection = () => (
   <>
     <section id="components" className="ds-section" aria-labelledby="components-title">
-      <SectionHeader eyebrow="Components" title="Core primitives">
+      <SectionHeader id="components" eyebrow="Components" title="Core primitives">
         V1 extracts documentation-ready primitives first. Larger production patterns remain documented here and can be pulled into a shared library later.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1103,7 +1103,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="buttons" className="ds-section" aria-labelledby="buttons-title">
-      <SectionHeader eyebrow="Components" title="Buttons">
+      <SectionHeader id="buttons" eyebrow="Components" title="Buttons">
         Buttons keep a stable 44px hit area, concise labels, visible focus, and clear hierarchy.
       </SectionHeader>
       <ExampleFrame label="Variants and states">
@@ -1116,7 +1116,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
-      <SectionHeader eyebrow="Components" title="Cards and accordions">
+      <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
         Cards frame repeated items. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1157,7 +1157,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="copy-actions" className="ds-section" aria-labelledby="copy-actions-title">
-      <SectionHeader eyebrow="Components" title="Copy actions">
+      <SectionHeader id="copy-actions" eyebrow="Components" title="Copy actions">
         Copy controls are used for tokens, source paths, and contact details. The copied state is temporary and does not resize the control.
       </SectionHeader>
       <ExampleFrame label="Copy controls">
@@ -1167,7 +1167,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="navigation-drawers" className="ds-section" aria-labelledby="navigation-drawers-title">
-      <SectionHeader eyebrow="Components" title="Navigation and drawers">
+      <SectionHeader id="navigation-drawers" eyebrow="Components" title="Navigation and drawers">
         Production navigation stays sparse. Drawers are reserved for dense work lists and long-form about content.
       </SectionHeader>
       <div className="ds-two-column">
@@ -1185,7 +1185,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="cookie-banner" className="ds-section" aria-labelledby="cookie-banner-title">
-      <SectionHeader eyebrow="Components" title="Cookie banner">
+      <SectionHeader id="cookie-banner" eyebrow="Components" title="Cookie banner">
         Consent copy should be direct and calm. The banner must never block the core portfolio experience.
       </SectionHeader>
       <ExampleFrame label="Consent shell">
@@ -1202,7 +1202,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
-      <SectionHeader eyebrow="Components" title="Ask">
+      <SectionHeader id="ask" eyebrow="Components" title="Ask">
         Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or a
         verbatim question is matched in the browser; anything else is matched by a model, because word
         overlap answered “is he a manager” with a refusal. When nothing written covers a question, a
@@ -1307,7 +1307,7 @@ const ComponentsSection = () => (
 const PatternsSection = () => (
   <>
     <section id="patterns" className="ds-section" aria-labelledby="patterns-title">
-      <SectionHeader eyebrow="Patterns" title="Production patterns">
+      <SectionHeader id="patterns" eyebrow="Patterns" title="Production patterns">
         Patterns document how primitives become recognizable portfolio surfaces.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1342,7 +1342,7 @@ const PatternsSection = () => (
 const MotionSection = ({ theme }) => (
   <>
     <section id="motion" className="ds-section" aria-labelledby="motion-title">
-      <SectionHeader eyebrow="Motion" title="Motion">
+      <SectionHeader id="motion" eyebrow="Motion" title="Motion">
         Motion is a signature layer for orientation, feedback, and personality. It must respect reduced-motion preferences across canvas, animation, and scroll behavior.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1355,7 +1355,7 @@ const MotionSection = ({ theme }) => (
     </section>
 
     <section id="alien-arrival" className="ds-section" aria-labelledby="alien-arrival-title">
-      <SectionHeader eyebrow="Motion" title="Alien arrival">
+      <SectionHeader id="alien-arrival" eyebrow="Motion" title="Alien arrival">
         The alien animation is the restrained signature moment: noticeable enough to be memorable, small enough to preserve the portfolio's seriousness.
       </SectionHeader>
       <ExampleFrame label="Signature animation">
@@ -1364,7 +1364,7 @@ const MotionSection = ({ theme }) => (
     </section>
 
     <section id="pixel-orbit" className="ds-section" aria-labelledby="pixel-orbit-title">
-      <SectionHeader eyebrow="Motion" title="Pixel orbit">
+      <SectionHeader id="pixel-orbit" eyebrow="Motion" title="Pixel orbit">
         The square-particle field supports the visual identity while remaining pointer-safe and reduced-motion aware.
       </SectionHeader>
       <ExampleFrame label="Canvas motif">
@@ -1400,7 +1400,7 @@ const MotionSection = ({ theme }) => (
 const ContentAccessibilityResources = () => (
   <>
     <section id="content" className="ds-section" aria-labelledby="content-title">
-      <SectionHeader eyebrow="Content" title="Voice and tone">
+      <SectionHeader id="content" eyebrow="Content" title="Voice and tone">
         Copy should sound specific, senior, and human. Avoid inflated claims, generic AI phrasing, and unverifiable outcomes.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1427,7 +1427,7 @@ const ContentAccessibilityResources = () => (
     ))}
 
     <section id="accessibility" className="ds-section" aria-labelledby="accessibility-title">
-      <SectionHeader eyebrow="Accessibility" title="Accessibility">
+      <SectionHeader id="accessibility" eyebrow="Accessibility" title="Accessibility">
         WCAG AA is the floor. Focus states, keyboard flows, contrast, touch targets, and reduced motion are design-system requirements, not QA cleanup.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1456,7 +1456,7 @@ const ContentAccessibilityResources = () => (
     ))}
 
     <section id="resources" className="ds-section" aria-labelledby="resources-title">
-      <SectionHeader eyebrow="Resources" title="Source files">
+      <SectionHeader id="resources" eyebrow="Resources" title="Source files">
         These files are the implementation source of truth for the system.
       </SectionHeader>
       <div className="ds-card-grid">
@@ -1476,7 +1476,7 @@ const ContentAccessibilityResources = () => (
     </section>
 
     <section id="audit-notes" className="ds-section" aria-labelledby="audit-notes-title">
-      <SectionHeader eyebrow="Resources" title="Audit notes">
+      <SectionHeader id="audit-notes" eyebrow="Resources" title="Audit notes">
         This audit cross-checks the documentation against src/design-tokens.css, src/main.jsx, src/footer-alien.jsx, and src/galaxy.jsx.
       </SectionHeader>
       <div className="ds-two-column">
