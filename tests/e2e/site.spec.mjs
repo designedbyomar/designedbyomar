@@ -716,20 +716,20 @@ test('design system documents restored foundations and component flow', async ({
 });
 
 test('design system section titles resolve their aria label and copy a reference', async ({ page }) => {
-  await page.goto('/design-system');
-
-  // The section's aria-labelledby now resolves to a real heading id.
-  const section = page.locator('#buttons');
-  await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
-  await expect(page.locator('#buttons-title')).toHaveText('Buttons');
-
-  await page.evaluate(() => {
+  // Installed before navigation so every script sees the stub, not the real API.
+  await page.addInitScript(() => {
     window.__written = [];
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: { writeText: async (text) => { window.__written.push(text); } },
     });
   });
+  await page.goto('/design-system');
+
+  // The section's aria-labelledby now resolves to a real heading id.
+  const section = page.locator('#buttons');
+  await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
+  await expect(page.locator('#buttons-title')).toHaveText('Buttons');
 
   // The labelled copy control writes the section reference and confirms the copy.
   const copy = section.locator('.ds-section-header__copy');

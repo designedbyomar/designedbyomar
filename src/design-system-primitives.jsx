@@ -14,8 +14,30 @@ export const IconButton = ({ icon, label, className = '', ...props }) => (
   </button>
 );
 
+// Legacy clipboard path for non-secure contexts and older browsers that lack the
+// async Clipboard API. Returns whether the copy succeeded.
+const legacyCopy = (value) => {
+  try {
+    const area = document.createElement('textarea');
+    area.value = value;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.top = '-9999px';
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(area);
+    return ok;
+  } catch {
+    return false;
+  }
+};
+
 // Shared clipboard behaviour for every copy control: writes the value, flips to a
-// confirmed state for 1.2s, and clears its timer on unmount.
+// confirmed state for 1.2s, and clears its timer on unmount. The async Clipboard
+// API is feature-detected — it is absent in non-secure contexts and some
+// browsers — with an execCommand fallback, and the confirmed state is only shown
+// when a copy actually happened, never on a blocked or failing clipboard.
 const useCopy = () => {
   const [copied, setCopied] = React.useState(false);
   const timerRef = React.useRef(null);
@@ -24,12 +46,21 @@ const useCopy = () => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
   }, []);
 
+  const confirmCopied = () => {
+    setCopied(true);
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setCopied(false), 1200);
+  };
+
   const copy = async (value) => {
     try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => setCopied(false), 1200);
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        confirmCopied();
+        return;
+      }
+      if (legacyCopy(value)) confirmCopied();
+      else setCopied(false);
     } catch {
       setCopied(false);
     }
