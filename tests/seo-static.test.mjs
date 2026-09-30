@@ -566,34 +566,41 @@ test('declared PNG favicons are built, square, match their sizes, and clear Goog
   // Google shows a search favicon only when a rel="icon" is square and at least
   // 48x48; the site regressed to the generic globe when the largest was 32x32.
   // This guards the built assets so a broken href or an undersized replacement
-  // cannot pass while quietly bringing the globe back.
-  const html = readDist('index.html');
-  const iconTags = [...html.matchAll(/<link rel="icon"[^>]*>/gi)].map((match) => match[0]);
-  assert.ok(iconTags.length > 0, 'the homepage declares at least one rel="icon"');
+  // cannot pass while quietly bringing the globe back. Every standalone HTML
+  // entry is checked, not just the homepage — design-system.html and 404.html are
+  // separate entries that don't inherit the homepage head, so a missing icon
+  // there (a page shown with no declared favicon) is caught too.
+  const pages = ['index.html', 'design-system/index.html', '404.html'];
 
-  let largestSquare = 0;
-  for (const tag of iconTags) {
-    const href = /href="([^"]+)"/i.exec(tag)?.[1];
-    assert.ok(href, `rel="icon" is missing an href: ${tag}`);
-    // Only local PNGs are build assets whose dimensions we can verify here.
-    if (!href.startsWith('/') || !href.toLowerCase().endsWith('.png')) continue;
+  for (const page of pages) {
+    const html = readDist(page);
+    const iconTags = [...html.matchAll(/<link rel="icon"[^>]*>/gi)].map((match) => match[0]);
+    assert.ok(iconTags.length > 0, `${page} declares at least one rel="icon"`);
 
-    const file = path.join(DIST, href.replace(/^\//, ''));
-    assert.ok(fs.existsSync(file), `declared favicon is missing from the build: ${href}`);
+    let largestSquare = 0;
+    for (const tag of iconTags) {
+      const href = /href="([^"]+)"/i.exec(tag)?.[1];
+      assert.ok(href, `${page}: rel="icon" is missing an href: ${tag}`);
+      // Only local PNGs are build assets whose dimensions we can verify here.
+      if (!href.startsWith('/') || !href.toLowerCase().endsWith('.png')) continue;
 
-    const meta = await sharp(file).metadata();
-    assert.equal(meta.width, meta.height, `${href} must be square (built ${meta.width}x${meta.height})`);
+      const file = path.join(DIST, href.replace(/^\//, ''));
+      assert.ok(fs.existsSync(file), `${page}: declared favicon is missing from the build: ${href}`);
 
-    const declared = /sizes="(\d+)x(\d+)"/i.exec(tag);
-    if (declared) {
-      assert.equal(meta.width, Number(declared[1]), `${href} width must match its declared size ${declared[1]}`);
-      assert.equal(meta.height, Number(declared[2]), `${href} height must match its declared size ${declared[2]}`);
+      const meta = await sharp(file).metadata();
+      assert.equal(meta.width, meta.height, `${page}: ${href} must be square (built ${meta.width}x${meta.height})`);
+
+      const declared = /sizes="(\d+)x(\d+)"/i.exec(tag);
+      if (declared) {
+        assert.equal(meta.width, Number(declared[1]), `${page}: ${href} width must match its declared size ${declared[1]}`);
+        assert.equal(meta.height, Number(declared[2]), `${page}: ${href} height must match its declared size ${declared[2]}`);
+      }
+      largestSquare = Math.max(largestSquare, meta.width);
     }
-    largestSquare = Math.max(largestSquare, meta.width);
-  }
 
-  assert.ok(
-    largestSquare >= 48,
-    `at least one rel="icon" must be >= 48x48 for Google to show it (largest built is ${largestSquare})`,
-  );
+    assert.ok(
+      largestSquare >= 48,
+      `${page}: at least one rel="icon" must be >= 48x48 for Google to show it (largest built is ${largestSquare})`,
+    );
+  }
 });

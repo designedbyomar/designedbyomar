@@ -299,10 +299,6 @@
 
 .ds-hero-title__line1 {
   display: block;
-  position: relative;
-  isolation: isolate;
-  overflow: visible;
-  white-space: nowrap;
 }
 
 .ds-hero-title__text {
@@ -315,22 +311,56 @@
   overflow-wrap: break-word;
 }
 
-.ds-hero-title__orbit-slot {
-  display: inline-block;
-  position: relative;
-  width: 0;
-  height: 0;
-  overflow: visible;
-  vertical-align: top;
+/* Hero splits into a lede (title + intro) on the left and the pixel orbit on the
+   right, mirroring the main site hero where the portrait sits inside the galaxy. */
+.ds-hero-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--layout-1);
+}
+
+.ds-hero-lede {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+.ds-hero-orbit-stage {
+  display: grid;
+  place-items: center;
   pointer-events: none;
 }
 
-.ds-hero-title__orbit-slot .ds-pixel-orbit {
-  position: absolute;
-  left: -1em;
-  top: -0.53em;
-  width: 2em;
-  height: 2em;
+.ds-hero-orbit-stage .ds-pixel-orbit {
+  width: clamp(240px, 24vw, 320px);
+  height: clamp(240px, 24vw, 320px);
+}
+
+/* The persistent sidebar leaves the hero too narrow for the display title and
+   orbit to share a row at smaller desktop widths. Stack first, then let the
+   title scale to its actual grid column before the full-size composition fits. */
+@media (min-width: 1055px) and (max-width: 1399px) {
+  .ds-hero-top {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .ds-hero-orbit-stage .ds-pixel-orbit {
+    width: clamp(240px, 24vw, 280px);
+    height: clamp(240px, 24vw, 280px);
+  }
+}
+
+@media (min-width: 1400px) and (max-width: 1507px) {
+  .ds-hero-lede {
+    container-type: inline-size;
+  }
+
+  .ds-hero h1 {
+    font-size: clamp(48px, 13cqi, 104px);
+  }
 }
 
 .ds-hero-intro {
@@ -405,6 +435,19 @@
   box-shadow: 0 0 0 6px color-mix(in oklab, var(--fg-primary) 8%, transparent);
   transform: translate(-50%, -50%) rotate(45deg);
   pointer-events: none;
+}
+
+/* When the orbit carries the alien, the center becomes a holder for it rather
+   than the small diamond marker — the alien sits still while the icons orbit. */
+.ds-pixel-orbit__center--alien {
+  width: auto;
+  height: auto;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  box-shadow: none;
+  transform: translate(-50%, -50%);
+  line-height: 0;
 }
 
 .ds-quick-links {
@@ -1264,12 +1307,15 @@
     font-size: clamp(48px, 12vw, 128px);
   }
 
-  /* Orbit 1.5em × 1.5em at tablet — larger than 1em but top:-0.1em stays within layout padding */
-  .ds-hero-title__orbit-slot .ds-pixel-orbit {
-    left: -1.5em;
-    top: -0.1em;
-    width: 1.5em;
-    height: 1.5em;
+  /* Stack the hero: lede above, orbit below, at tablet and narrower. */
+  .ds-hero-top {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .ds-hero-orbit-stage .ds-pixel-orbit {
+    width: clamp(200px, 42vw, 260px);
+    height: clamp(200px, 42vw, 260px);
   }
 
   .ds-back-link {
@@ -1346,11 +1392,9 @@
     overflow-wrap: break-word;
   }
 
-  .ds-hero-title__orbit-slot .ds-pixel-orbit {
-    left: -1.6em;
-    top: -0.1em;
-    width: 1.6em;
-    height: 1.6em;
+  .ds-hero-orbit-stage .ds-pixel-orbit {
+    width: clamp(180px, 60vw, 240px);
+    height: clamp(180px, 60vw, 240px);
   }
 
   .ds-power-strip,

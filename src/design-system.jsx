@@ -20,7 +20,7 @@ import {
   X,
   Zap,
 } from './ui-icons.jsx';
-import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+import { AlienPixel, footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { onMediaChange } from './media-query.js';
 import {
@@ -390,7 +390,7 @@ const SideNavigation = ({ activeId, onNavigate, testId }) => {
               onClick={() => toggleGroup(group.title)}
             >
               <span className="ds-nav-category__label">
-                <AppIcon icon={group.icon} size={16} />
+                <SignalGradientIcon icon={group.icon} size={16} />
                 <span>{group.title}</span>
               </span>
               <AppIcon icon={ChevronDown} size={16} className="ds-nav-category__chevron" />
@@ -460,7 +460,7 @@ const AlienReplayDemo = ({
 const ORBIT_ICON_LIST = [Palette, Box, Search, Zap, ShieldCheck];
 const ORBIT_ICON_HALF = 9; // half of 18px icon size
 
-const PixelOrbitIcons = ({ theme = 'dark' }) => {
+const PixelOrbitIcons = ({ theme = 'dark', showAlien = false }) => {
   const canvasBackRef = React.useRef(null);
   const canvasFrontRef = React.useRef(null);
   const iconRefs = React.useRef([]);
@@ -645,7 +645,9 @@ const PixelOrbitIcons = ({ theme = 'dark' }) => {
           <SignalGradientIcon icon={icon} size={18} />
         </span>
       ))}
-      <span className="ds-pixel-orbit__center" />
+      <span className={`ds-pixel-orbit__center${showAlien ? ' ds-pixel-orbit__center--alien' : ''}`}>
+        {showAlien && <AlienPixel size="clamp(56px, 7vw, 84px)" title="" />}
+      </span>
     </div>
   );
 };
@@ -923,20 +925,24 @@ const FAQAccordionDemo = () => {
 const HomeSection = ({ theme }) => (
   <>
     <section id="overview" className="ds-section ds-hero" aria-labelledby="overview-title">
-      <h1 id="overview-title" className="ds-hero-title">
-        <span className="ds-hero-title__line1">
-          <span className="ds-hero-title__text">designedbyomar</span>
-          <span className="ds-hero-title__orbit-slot" aria-hidden="true">
-            <PixelOrbitIcons theme={theme} />
-          </span>
-        </span>
-        <span className="ds-hero-title__line2">Design System</span>
-      </h1>
-      <div className="ds-hero-intro">
-        <p>
-          The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns,
-          motion language, and public design-engineering workflow.
-        </p>
+      <div className="ds-hero-top">
+        <div className="ds-hero-lede">
+          <h1 id="overview-title" className="ds-hero-title">
+            <span className="ds-hero-title__line1">
+              <span className="ds-hero-title__text">designedbyomar</span>
+            </span>
+            <span className="ds-hero-title__line2">Design System</span>
+          </h1>
+          <div className="ds-hero-intro">
+            <p>
+              The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns,
+              motion language, and public design-engineering workflow.
+            </p>
+          </div>
+        </div>
+        <div className="ds-hero-orbit-stage" aria-hidden="true">
+          <PixelOrbitIcons theme={theme} showAlien />
+        </div>
       </div>
       <div id="quick-links" className="ds-quick-links" aria-label="Quick links">
         {QUICK_LINK_CARDS.map(([label, href, body, icon]) => (
