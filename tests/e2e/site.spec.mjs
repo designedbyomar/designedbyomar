@@ -642,12 +642,15 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
     const size = Math.round(Math.max(rect.width, rect.height));
     return size > 220 && size <= 340;
   })).toBe(true);
-  // It sits to the right of the title, away from the typography, with the alien centered.
+  // It stays clear of the rendered title text whether the responsive hero
+  // places the orbit beside the lede or beneath it.
   await expect.poll(() => page.evaluate(() => {
-    const orbit = document.querySelector('.ds-pixel-orbit');
-    const h1 = document.querySelector('#overview-title');
-    if (!orbit || !h1) return false;
-    return orbit.getBoundingClientRect().left >= h1.getBoundingClientRect().right;
+    const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+    const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+    const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+    if (!lede || !orbit || !title) return false;
+    return title.right <= lede.right + 0.5
+      && (orbit.left >= title.right || orbit.top >= lede.bottom - 0.5);
   })).toBe(true);
   await expect(page.locator('.ds-pixel-orbit__center--alien svg')).toBeVisible();
   await expect.poll(() => page.evaluate(() => {
@@ -657,6 +660,32 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
   await expect.poll(() => page.locator('.ds-doc-card').first().evaluate((card) => (
     getComputedStyle(card).boxShadow.includes('inset')
   ))).toBe(true);
+});
+
+test('design system hero keeps its title clear of the orbit at intermediate desktop widths', async ({ page }) => {
+  await page.goto('/design-system');
+
+  for (const width of [1055, 1280, 1399]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(() => page.evaluate(() => {
+      const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+      const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+      const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+      if (!lede || !orbit || !title) return false;
+      return title.right <= lede.right + 0.5 && orbit.top >= lede.bottom - 0.5;
+    })).toBe(true);
+  }
+
+  for (const width of [1400, 1440, 1507, 1508]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(() => page.evaluate(() => {
+      const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+      const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+      const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+      if (!lede || !orbit || !title) return false;
+      return title.right <= lede.right + 0.5 && title.right <= orbit.left;
+    })).toBe(true);
+  }
 });
 
 test('design system sidebar categories collapse and expand', async ({ page }) => {

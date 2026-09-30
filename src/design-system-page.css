@@ -338,6 +338,31 @@
   height: clamp(240px, 24vw, 320px);
 }
 
+/* The persistent sidebar leaves the hero too narrow for the display title and
+   orbit to share a row at smaller desktop widths. Stack first, then let the
+   title scale to its actual grid column before the full-size composition fits. */
+@media (min-width: 1055px) and (max-width: 1399px) {
+  .ds-hero-top {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .ds-hero-orbit-stage .ds-pixel-orbit {
+    width: clamp(240px, 24vw, 280px);
+    height: clamp(240px, 24vw, 280px);
+  }
+}
+
+@media (min-width: 1400px) and (max-width: 1507px) {
+  .ds-hero-lede {
+    container-type: inline-size;
+  }
+
+  .ds-hero h1 {
+    font-size: clamp(48px, 13cqi, 104px);
+  }
+}
+
 .ds-hero-intro {
   max-width: 720px;
 }
