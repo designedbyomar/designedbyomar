@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './about-page.css';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
@@ -138,7 +139,7 @@ const trackPortfolioEvent = (eventName, params) => {
 // ============================================================
 const HERO_STATS = [
   {
-    value: '10+ years',
+    value: '12+ years',
     label: 'SaaS · fintech · AI · enterprise',
     desktop: { top: '48%', left: '-10%', maxWidth: 172 },
     mobile: { top: '42%', left: '-1%', maxWidth: 144 },
@@ -693,7 +694,7 @@ const NavLogo = ({ onClick }) => {
   );
 };
 
-const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
+const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
   const [scrolled, setScrolled] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const viewportWidth = useViewportWidth();
@@ -773,10 +774,10 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Design System</a>
-            <button onClick={() => onOpenAbout('nav')} style={navLink}
+            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { source: 'nav' })} style={{ ...navLink, textDecoration: 'none' }}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >About</button>
+            >About</a>
             <a href="#faq" onClick={goSection('faq')} style={navLink}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
@@ -813,7 +814,7 @@ const Nav = ({ theme, setTheme, onOpenAbout, onHome, scrollToSection }) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
-              <button onClick={() => { closeMobileMenu(); onOpenAbout('mobile_nav'); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>About</button>
+              <a href="/about" onClick={() => { closeMobileMenu(); trackPortfolioEvent('about_page_open', { source: 'mobile_nav' }); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)', textDecoration: 'none' }}>About</a>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Ask</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
@@ -911,14 +912,75 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
 // ============================================================
 const ABOUT_HEADER = `I work on the part most teams avoid.`;
 const ABOUT_SUBHEAD = `Messy workflows, edge cases, and systems that don't scale — that's where design actually matters.`;
-const ABOUT_SHORT = `I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 10+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.`;
+const ABOUT_SHORT = `I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.`;
 
-const ABOUT_LONG = [
-  { heading: 'Background', body: `I grew up in Brooklyn as an artist and found design through Photoshop, music covers, flyers, and the early internet. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.\n\nThe through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.` },
-  { heading: 'How I work', body: `I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.\n\nI'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.\n\nI've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.`, link: { href: '/design-system', label: 'See the design system this site runs on' } },
-  { heading: 'Currently', body: `I run an independent product design practice. I work with Welcome Lend and a few other companies I keep private, and the engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production.\n\nAt Welcome Lend I rebuilt the design system and shipped work their brokers use daily. One project was a lender comparison tool: brokers weigh quotes to find the right fit for a borrower, and the existing matrix had turned into something you decoded rather than read. Another was sponsor expiration — designing how records lapse on a schedule instead of quietly going stale.\n\nBefore this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.\n\nPreviously: Plastiq, Disney, Simplero, GoNation.` },
-  { heading: 'Tools & craft', body: `Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.\n\nI use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.` },
-  { heading: 'Off the clock', body: `Amateur boxer, music producer, and dedicated father. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.` },
+// /about page content — verbatim from the approved copy kit (about-page-copy.md).
+const ABOUT_HERO_H1 = 'I started out designing flyers for my own parties.';
+const ABOUT_HERO_LEDE = 'Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.';
+
+const ABOUT_STATS = [
+  ['12+ years', 'in product design (15+ designing overall)'],
+  ['500+', 'interviews with customers, operators and teams'],
+  ['4', 'design systems'],
+  ['30+', 'launches'],
+];
+
+const ABOUT_PHOTOS = {
+  boxing: { src: '/Images/about/about-boxing.webp', alt: 'Omar in the boxing ring, mid-fight, wearing Title headgear and red gloves', width: 1400, height: 1297 },
+  drawings: { src: '/Images/about/about-drawings.webp', alt: "A collage of Omar's drawings and paintings: portraits, figure studies, a graffiti piece, with a few UX sketches mixed in", width: 1421, height: 1421 },
+  flyers: { src: '/Images/about/about-flyers.webp', alt: 'A collage of event flyers and posters Omar designed during his DJ years', width: 1536, height: 1536 },
+  hike: { src: '/Images/about/about-hike.webp', alt: 'Omar on a hike, overlooking a lake', width: 800, height: 600 },
+  evening: { src: '/Images/about/about-evening.webp', alt: 'Omar on a night out', width: 800, height: 1067 },
+  dj: { src: '/Images/about/about-dj.webp', alt: 'Omar DJing a live event', width: 640, height: 427 },
+};
+
+const ABOUT_CAPTION = 'Where it started: flyers from the DJ years, and a lifetime of drawing. A few UX sketches snuck in.';
+
+const ABOUT_SECTIONS = [
+  {
+    label: 'Background',
+    heading: 'Background',
+    paras: [
+      "I grew up in Brooklyn as an artist, and I've been drawing and painting my whole life. I found design through music. I was a professional DJ, and I started designing flyers for my own parties. That led to Photoshop, music covers, and the early internet, and then graphic, web and visual design. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.",
+      "The through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.",
+    ],
+    caption: ABOUT_CAPTION,
+  },
+  {
+    label: 'How I work',
+    heading: 'How I work',
+    paras: [
+      "I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.",
+      "I'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.",
+      "I've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.",
+    ],
+    link: { href: '/design-system', label: 'See the design system this site runs on' },
+  },
+  {
+    label: 'Currently',
+    heading: 'Currently',
+    paras: [
+      "I run an independent product design practice. I work with Welcome Lend and a few other companies I keep private, and the engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production.",
+      "At Welcome Lend I rebuilt the design system and shipped work their brokers use daily. One project was a lender comparison tool: brokers weigh quotes to find the right fit for a borrower, and the existing matrix had turned into something you decoded rather than read. Another was sponsor expiration — designing how records lapse on a schedule instead of quietly going stale.",
+      "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
+      "Previously: Plastiq, Disney, Simplero, GoNation.",
+    ],
+  },
+  {
+    label: 'Tools & craft',
+    heading: 'Tools & craft',
+    paras: [
+      "Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.",
+      "I use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.",
+    ],
+  },
+  {
+    label: 'Off the clock',
+    heading: 'Off the clock',
+    paras: [
+      "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
+    ],
+  },
 ];
 
 const COMPANY_LOGOS = [
@@ -961,7 +1023,7 @@ const LogoCarousel = () => (
   </Reveal>
 );
 
-const About = ({ onOpenDrawer }) => (
+const About = () => (
   <>
     <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 64px' }}>
       <div className="about-grid" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: LAYOUT.GRID_DESKTOP, gap: 'var(--layout-3)', alignItems: 'start' }}>
@@ -979,18 +1041,18 @@ const About = ({ onOpenDrawer }) => (
             {ABOUT_SHORT}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <button onClick={onOpenDrawer} style={{
+            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { source: 'about_section' })} style={{
               alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
               minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background var(--duration-fast)',
+              border: 'none', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', transition: 'background var(--duration-fast)',
             }}
               onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               Read more about me
               <AppIcon icon={ArrowUpRight} size={12} />
-            </button>
+            </a>
             <div style={{
               fontFamily: 'var(--font-mono)',
               fontSize: 'var(--font-size-body-xs)',
@@ -1011,23 +1073,16 @@ const About = ({ onOpenDrawer }) => (
 
 const FOCUSABLE_SELECTORS = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
-const AboutDrawer = ({ open, onClose }) => {
-  const triggerRef = React.useRef(null);
-  const drawerRef = React.useRef(null);
+// ============================================================
+// About page (/about) — replaces the old drawer
+// ============================================================
+const AboutLightbox = ({ photo, onClose }) => {
+  const dialogRef = React.useRef(null);
   React.useEffect(() => {
-    if (open) {
-      triggerRef.current = document.activeElement;
-      const first = drawerRef.current?.querySelector(FOCUSABLE_SELECTORS);
-      if (first) first.focus();
-    } else if (triggerRef.current) {
-      triggerRef.current.focus();
-      triggerRef.current = null;
-    }
-  }, [open]);
-  React.useEffect(() => {
-    if (!open) return;
-    const el = drawerRef.current;
-    const trap = (e) => {
+    const trigger = document.activeElement;
+    const el = dialogRef.current;
+    (el?.querySelector(FOCUSABLE_SELECTORS))?.focus();
+    const onKey = (e) => {
       if (e.key === 'Escape') { onClose(); return; }
       if (e.key !== 'Tab' || !el) return;
       const nodes = Array.from(el.querySelectorAll(FOCUSABLE_SELECTORS));
@@ -1038,47 +1093,131 @@ const AboutDrawer = ({ open, onClose }) => {
         e.preventDefault(); nodes[0].focus();
       }
     };
-    document.addEventListener('keydown', trap);
+    document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
-    return () => { document.removeEventListener('keydown', trap); document.body.style.overflow = ''; };
-  }, [open, onClose]);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      if (trigger && typeof trigger.focus === 'function') trigger.focus();
+    };
+  }, [onClose]);
+
   return (
-    <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: open ? 'rgba(0, 0, 0, var(--opacity-45))' : 'transparent', backdropFilter: open ? 'var(--blur-subtle)' : 'none', WebkitBackdropFilter: open ? 'var(--blur-subtle)' : 'none', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity var(--duration-base-plus) ease' }} />
-      <div ref={drawerRef} role="dialog" aria-modal="true" aria-hidden={!open} aria-label="About Omar" style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 81, width: 'min(640px, 92vw)',
-        background: 'var(--bg-page)', boxShadow: open ? '-24px 0 80px rgba(0, 0, 0, var(--opacity-35)), inset 1px 0 0 var(--color-gray-100)' : 'none',
-        transform: open ? 'translateX(0)' : 'translateX(100%)', transition: 'transform var(--duration-slowest) var(--easing-ease-out)',
-        display: 'flex', flexDirection: 'column',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid var(--color-gray-100)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>About / long-form</div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 44, height: 44, borderRadius: 'var(--radius-circle)', display: 'grid', placeItems: 'center', background: 'transparent', color: 'var(--fg-primary)', border: 'none', cursor: 'pointer', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-            <AppIcon icon={X} size={14} />
-          </button>
-        </div>
-        <div style={{ padding: '36px 36px 72px', overflowY: 'auto', flex: 1 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 3.2vw, 40px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 20px' }}>
-            A longer version,<br /><span style={{ color: 'var(--fg-tertiary)' }}>for the curious.</span>
-          </h2>
-          <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: '0 0 36px', maxWidth: 560 }}>{ABOUT_SHORT}</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', maxWidth: 560 }}>
-            {ABOUT_LONG.map(s => (
-              <div key={s.heading}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.heading}</div>
-                <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{s.body}</p>
-                {s.link && (
-                  <a href={s.link.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-4)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
-                    {s.link.label}
-                    <AppIcon icon={ArrowUpRight} size={12} />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+    <div
+      className="about-lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label={photo.alt}
+      ref={dialogRef}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <button type="button" className="about-lightbox__close" aria-label="Close" onClick={onClose}>
+        <AppIcon icon={X} size={16} />
+      </button>
+      <figure className="about-lightbox__figure">
+        <img src={photo.src} alt={photo.alt} />
+        <figcaption className="about-lightbox__caption">{photo.alt}</figcaption>
+      </figure>
+    </div>
+  );
+};
+
+const AboutCollage = ({ onOpen }) => {
+  const reducedMotion = usePrefersReducedMotion();
+  const [played, setPlayed] = React.useState(false);
+  React.useEffect(() => {
+    if (reducedMotion) { setPlayed(true); return undefined; }
+    const raf = requestAnimationFrame(() => setPlayed(true));
+    return () => cancelAnimationFrame(raf);
+  }, [reducedMotion]);
+
+  const photo = (key, className, delay) => {
+    const p = ABOUT_PHOTOS[key];
+    return (
+      <figure className={`${className} about-collage__item`} style={{ '--about-delay': `${delay}ms` }}>
+        <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
+          <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="eager" decoding="async" />
+        </button>
+      </figure>
+    );
+  };
+
+  return (
+    <div className={`about-collage${played ? ' is-in' : ''}`}>
+      <div className="about-collage__grid">
+        {photo('boxing', 'about-photo about-photo--boxing', 0)}
+        {photo('drawings', 'about-photo about-photo--drawings', 70)}
+        {photo('flyers', 'about-photo about-photo--flyers', 140)}
       </div>
-    </>
+      <div className="about-snaps-row">
+        {photo('hike', 'about-snap about-snap--hike', 210)}
+        {photo('evening', 'about-snap about-snap--evening', 280)}
+        {photo('dj', 'about-snap about-snap--dj', 350)}
+      </div>
+    </div>
+  );
+};
+
+const AboutPage = () => {
+  const [lightbox, setLightbox] = React.useState(null);
+  const ctaBase = {
+    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
+    padding: '10px 18px', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
+    borderRadius: 'var(--radius-standard)', textDecoration: 'none',
+  };
+  return (
+    <article className="about-page">
+      <div className="about-hero">
+        <div className="about-hero__lede">
+          <div className="about-eyebrow">About</div>
+          <h1>{ABOUT_HERO_H1}</h1>
+          <p className="about-lede">{ABOUT_HERO_LEDE}</p>
+        </div>
+        <AboutCollage onOpen={setLightbox} />
+      </div>
+
+      <div className="about-stats">
+        {ABOUT_STATS.map(([value, label]) => (
+          <div className="about-stat" key={value + label}>
+            <div className="about-stat__value">{value}</div>
+            <div className="about-stat__label">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {ABOUT_SECTIONS.map((section) => (
+        <section className="about-section" key={section.heading}>
+          <div className="about-section__label">{section.label}</div>
+          <h2>{section.heading}</h2>
+          {section.paras.map((para, i) => <p key={i}>{para}</p>)}
+          {section.caption && <p className="about-caption">{section.caption}</p>}
+          {section.link && (
+            <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
+          )}
+        </section>
+      ))}
+
+      <section className="about-section">
+        <div className="about-section__label">Next</div>
+        <div className="about-cta">
+          <a href="/work" style={{ ...ctaBase, color: 'var(--bg-page)', background: 'var(--fg-primary)' }}>
+            See the work <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
+          <a href="/ask" style={{ ...ctaBase, color: 'var(--fg-primary)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+            Ask about the work <AppIcon icon={ArrowUpRight} size={12} />
+          </a>
+          <a
+            href="mailto:omar@designedbyomar.com"
+            onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_email', { link_url: 'mailto:omar@designedbyomar.com', section: 'about' }); }}
+            style={{ ...ctaBase, padding: '10px 4px', color: 'var(--fg-secondary)', background: 'transparent' }}
+          >
+            omar@designedbyomar.com
+          </a>
+        </div>
+      </section>
+
+      {lightbox && <AboutLightbox photo={lightbox} onClose={() => setLightbox(null)} />}
+    </article>
   );
 };
 
@@ -2869,7 +3008,7 @@ const FooterAlien = () => {
   return <div ref={ref} style={{ display: 'inline-block' }}><FooterArrival played={played} /></div>;
 };
 
-const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
+const SiteFooter = ({ onHome, scrollToSection }) => {
   const footerLabelStyle = {
     fontFamily: 'var(--font-mono)',
     fontSize: 'var(--font-size-body-sm)',
@@ -2951,12 +3090,9 @@ const SiteFooter = ({ onOpenAbout, onHome, scrollToSection }) => {
               Work
             </a>
             <a
-              href="#about"
+              href="/about"
               className="text-link site-footer-link"
-              onClick={(event) => {
-                event.preventDefault();
-                onOpenAbout('footer');
-              }}
+              onClick={() => trackPortfolioEvent('about_page_open', { source: 'footer' })}
             >
               About
             </a>
@@ -3264,6 +3400,9 @@ const WORK_URL = `${SITE_ORIGIN}/work`;
 const ASK_TITLE = 'Ask about the work — Omar Tavarez';
 const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
 const ASK_URL = `${SITE_ORIGIN}/ask`;
+const ABOUT_TITLE = 'About — Omar Tavarez';
+const ABOUT_DESCRIPTION = 'Omar Tavarez is a principal product designer who turns undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. Former DJ, lifelong artist, amateur boxer.';
+const ABOUT_URL = `${SITE_ORIGIN}/about`;
 const LOADER_SESSION_KEY = 'omar.loader-seen';
 
 const toAbsoluteUrl = (pathOrUrl) => {
@@ -3400,6 +3539,27 @@ const buildRouteStructuredData = (route, currentCase) => {
     };
   }
 
+  if (route.type === 'about') {
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'ProfilePage',
+          name: ABOUT_TITLE,
+          url: ABOUT_URL,
+          description: ABOUT_DESCRIPTION,
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'designedbyomar',
+            url: `${SITE_ORIGIN}/`,
+          },
+          mainEntity: personSchema,
+        },
+        personSchema,
+      ],
+    };
+  }
+
   if (route.type === 'work') {
     return buildWorkStructuredData();
   }
@@ -3462,6 +3622,20 @@ const getRouteMeta = (route, currentCase) => {
       imageWidth: 1200,
       imageHeight: 630,
       imageAlt: 'Privacy Policy — Omar Tavarez',
+    };
+  }
+
+  if (route.type === 'about') {
+    return {
+      title: ABOUT_TITLE,
+      description: ABOUT_DESCRIPTION,
+      url: `${SITE_ORIGIN}/about`,
+      robots: 'index,follow,max-image-preview:large',
+      image: DEFAULT_OG_IMAGE,
+      imageType: imageType(DEFAULT_OG_IMAGE),
+      imageWidth: 1200,
+      imageHeight: 630,
+      imageAlt: ABOUT_TITLE,
     };
   }
 
@@ -3655,7 +3829,6 @@ const App = () => {
   };
 
   const showPrivacy = () => {
-    setAboutOpen(false);
     history.pushState(null, '', '/privacy');
     window.dispatchEvent(new Event('popstate'));
   };
@@ -3692,13 +3865,7 @@ const App = () => {
     };
   }, [loading, theme]);
 
-  const [aboutOpen, setAboutOpen] = React.useState(false);
   const galaxy = { density: 1.9, speed: 0.75, style: 'pixel', accent: 'workflow', theme };
-
-  const openAboutDrawer = React.useCallback((source) => {
-    trackPortfolioEvent('about_drawer_open', { source });
-    setAboutOpen(true);
-  }, []);
 
   const route = useRoute();
   const currentCase = route.type === 'case' ? CASE_STUDIES.find(c => c.id === route.id) : null;
@@ -3906,10 +4073,12 @@ const App = () => {
       `}</style>
       <LogoLoader visible={loading} prefersReducedMotion={prefersReducedMotion} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
-        <Nav theme={theme} setTheme={setTheme} onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
+        <Nav theme={theme} setTheme={setTheme} onHome={goHome} scrollToSection={scrollToSection} />
         <main>
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
+          ) : route.type === 'about' ? (
+            <AboutPage />
           ) : route.type === 'ask' ? (
             <AskPage />
           ) : route.type === 'work' ? (
@@ -3919,7 +4088,7 @@ const App = () => {
           ) : (
             <>
               <Hero galaxy={galaxy} theme={theme} scrollToSection={scrollToSection} />
-              <About onOpenDrawer={() => openAboutDrawer('about_section')} />
+              <About />
               <Work />
               <KeyFacts />
               <AskSection scrollToSection={scrollToSection} />
@@ -3927,9 +4096,8 @@ const App = () => {
             </>
           )}
         </main>
-        <SiteFooter onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
+        <SiteFooter onHome={goHome} scrollToSection={scrollToSection} />
       </div>
-      <AboutDrawer open={aboutOpen} onClose={() => setAboutOpen(false)} />
       {showCookieBanner && <CookieBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} onPrivacy={showPrivacy} />}
       {analyticsAccepted && (
         <>
