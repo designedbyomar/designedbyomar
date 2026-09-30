@@ -918,13 +918,6 @@ const ABOUT_SHORT = `I turn undefined product problems into shipped software acr
 const ABOUT_HERO_H1 = 'I started out designing flyers for my own parties.';
 const ABOUT_HERO_LEDE = 'Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.';
 
-const ABOUT_STATS = [
-  ['12+ years', 'in product design (15+ designing overall)'],
-  ['500+', 'interviews with customers, operators and teams'],
-  ['4', 'design systems'],
-  ['30+', 'launches'],
-];
-
 const ABOUT_PHOTOS = {
   boxing: { src: '/Images/about/about-boxing.webp', alt: 'Omar in the boxing ring, mid-fight, wearing Title headgear and red gloves', width: 1400, height: 1297 },
   drawings: { src: '/Images/about/about-drawings.webp', alt: "A collage of Omar's drawings and paintings: portraits, figure studies, a graffiti piece, with a few UX sketches mixed in", width: 1421, height: 1421 },
@@ -932,13 +925,16 @@ const ABOUT_PHOTOS = {
   hike: { src: '/Images/about/about-hike.webp', alt: 'Omar on a hike, overlooking a lake', width: 800, height: 600 },
   evening: { src: '/Images/about/about-evening.webp', alt: 'Omar on a night out', width: 800, height: 1067 },
   dj: { src: '/Images/about/about-dj.webp', alt: 'Omar DJing a live event', width: 640, height: 427 },
+  portrait: { src: '/Images/about/about-portrait.webp', alt: 'Portrait of Omar Tavarez', width: 1200, height: 1200 },
+  reading: { src: '/Images/about/about-reading.webp', alt: "Omar reading 'Designing Brand Identity'", width: 1200, height: 1200 },
+  family: { src: '/Images/about/about-family.webp', alt: 'Omar with his two daughters', width: 1000, height: 1000 },
+  designsystem: { src: '/Images/about/about-designsystem.webp', alt: 'The Athena 2.0 design system — components and color styles Omar co-led at Plastiq', width: 1600, height: 900 },
 };
 
 const ABOUT_CAPTION = 'Where it started: flyers from the DJ years, and a lifetime of drawing. A few UX sketches snuck in.';
 
 const ABOUT_SECTIONS = [
   {
-    label: 'Background',
     heading: 'Background',
     paras: [
       "I grew up in Brooklyn as an artist, and I've been drawing and painting my whole life. I found design through music. I was a professional DJ, and I started designing flyers for my own parties. That led to Photoshop, music covers, and the early internet, and then graphic, web and visual design. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.",
@@ -947,7 +943,6 @@ const ABOUT_SECTIONS = [
     caption: ABOUT_CAPTION,
   },
   {
-    label: 'How I work',
     heading: 'How I work',
     paras: [
       "I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.",
@@ -955,19 +950,19 @@ const ABOUT_SECTIONS = [
       "I've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.",
     ],
     link: { href: '/design-system', label: 'See the design system this site runs on' },
+    images: ['reading'],
   },
   {
-    label: 'Currently',
     heading: 'Currently',
     paras: [
-      "I run an independent product design practice. I work with Welcome Lend and a few other companies I keep private, and the engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production.",
-      "At Welcome Lend I rebuilt the design system and shipped work their brokers use daily. One project was a lender comparison tool: brokers weigh quotes to find the right fit for a borrower, and the existing matrix had turned into something you decoded rather than read. Another was sponsor expiration — designing how records lapse on a schedule instead of quietly going stale.",
+      "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
+      "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
       "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
       "Previously: Plastiq, Disney, Simplero, GoNation.",
     ],
+    images: ['designsystem'],
   },
   {
-    label: 'Tools & craft',
     heading: 'Tools & craft',
     paras: [
       "Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.",
@@ -975,11 +970,11 @@ const ABOUT_SECTIONS = [
     ],
   },
   {
-    label: 'Off the clock',
     heading: 'Off the clock',
     paras: [
       "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
     ],
+    images: ['family', 'hike', 'evening'],
   },
 ];
 
@@ -1122,39 +1117,90 @@ const AboutLightbox = ({ photo, onClose }) => {
   );
 };
 
+// The hero image cluster. On load the tiles start collapsed into a centered pile
+// and fan out (FLIP) into their grid — the Codrops ImageStackGrid intro — after
+// which the rest of the page reveals on scroll. Skipped under reduced motion.
+const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'drawings', 'flyers', 'dj'];
+
 const AboutCollage = ({ onOpen }) => {
   const reducedMotion = usePrefersReducedMotion();
-  const [played, setPlayed] = React.useState(false);
-  React.useEffect(() => {
-    if (reducedMotion) { setPlayed(true); return undefined; }
-    const raf = requestAnimationFrame(() => setPlayed(true));
-    return () => cancelAnimationFrame(raf);
+  const gridRef = React.useRef(null);
+
+  React.useLayoutEffect(() => {
+    if (reducedMotion) return undefined;
+    const grid = gridRef.current;
+    if (!grid) return undefined;
+    const items = Array.from(grid.querySelectorAll('.about-collage__item'));
+    if (!items.length) return undefined;
+
+    const gridRect = grid.getBoundingClientRect();
+    const cx = gridRect.width / 2;
+    const cy = gridRect.height / 2;
+    const mid = (items.length - 1) / 2;
+
+    // Invert: pile every tile onto the grid center, scaled down and fanned.
+    items.forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      const dx = cx - (r.left - gridRect.left + r.width / 2);
+      const dy = cy - (r.top - gridRect.top + r.height / 2);
+      const rot = (i - mid) * 5;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px, ${dy}px) scale(0.5) rotate(${rot}deg)`;
+      el.style.opacity = '0';
+      el.style.zIndex = String(items.length - i);
+    });
+
+    // Play: release to the natural grid with a short stagger.
+    const raf = requestAnimationFrame(() => {
+      items.forEach((el, i) => {
+        el.style.transition = `transform 640ms cubic-bezier(0.22, 0.61, 0.36, 1) ${i * 80}ms, opacity 420ms ease ${i * 80}ms`;
+        el.style.transform = '';
+        el.style.opacity = '1';
+      });
+    });
+
+    // Clear inline styles once settled so resize/layout stay clean.
+    const settle = window.setTimeout(() => {
+      items.forEach((el) => {
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.zIndex = '';
+        el.style.opacity = '';
+      });
+    }, 640 + items.length * 80 + 120);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(settle);
+    };
   }, [reducedMotion]);
 
-  const photo = (key, className, delay) => {
-    const p = ABOUT_PHOTOS[key];
-    return (
-      <figure className={`${className} about-collage__item`} style={{ '--about-delay': `${delay}ms` }}>
-        <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
-          <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="eager" decoding="async" />
-        </button>
-      </figure>
-    );
-  };
-
   return (
-    <div className={`about-collage${played ? ' is-in' : ''}`}>
-      <div className="about-collage__grid">
-        {photo('boxing', 'about-photo about-photo--boxing', 0)}
-        {photo('drawings', 'about-photo about-photo--drawings', 70)}
-        {photo('flyers', 'about-photo about-photo--flyers', 140)}
-      </div>
-      <div className="about-snaps-row">
-        {photo('hike', 'about-snap about-snap--hike', 210)}
-        {photo('evening', 'about-snap about-snap--evening', 280)}
-        {photo('dj', 'about-snap about-snap--dj', 350)}
-      </div>
+    <div className="about-collage" ref={gridRef}>
+      {ABOUT_HERO_KEYS.map((key) => {
+        const p = ABOUT_PHOTOS[key];
+        return (
+          <figure className={`about-photo about-photo--${key} about-collage__item`} key={key}>
+            <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
+              <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="eager" decoding="async" />
+            </button>
+          </figure>
+        );
+      })}
     </div>
+  );
+};
+
+// A single peppered photo that reveals on scroll and opens in the lightbox.
+const AboutFigure = ({ photoKey, onOpen, delay = 0, className = '' }) => {
+  const p = ABOUT_PHOTOS[photoKey];
+  if (!p) return null;
+  return (
+    <Reveal as="figure" variant="soft" delay={delay} className={`about-figure ${className}`.trim()}>
+      <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
+        <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
+      </button>
+    </Reveal>
   );
 };
 
@@ -1176,29 +1222,28 @@ const AboutPage = () => {
         <AboutCollage onOpen={setLightbox} />
       </div>
 
-      <div className="about-stats">
-        {ABOUT_STATS.map(([value, label]) => (
-          <div className="about-stat" key={value + label}>
-            <div className="about-stat__value">{value}</div>
-            <div className="about-stat__label">{label}</div>
-          </div>
-        ))}
-      </div>
-
-      {ABOUT_SECTIONS.map((section) => (
-        <section className="about-section" key={section.heading}>
-          <div className="about-section__label">{section.label}</div>
-          <h2>{section.heading}</h2>
-          {section.paras.map((para, i) => <p key={i}>{para}</p>)}
-          {section.caption && <p className="about-caption">{section.caption}</p>}
-          {section.link && (
-            <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
-          )}
-        </section>
-      ))}
+      {ABOUT_SECTIONS.map((section) => {
+        const images = section.images || [];
+        return (
+          <section className="about-section" key={section.heading}>
+            <h2>{section.heading}</h2>
+            {section.paras.map((para, i) => <p key={i}>{para}</p>)}
+            {section.caption && <p className="about-caption">{section.caption}</p>}
+            {section.link && (
+              <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
+            )}
+            {images.length > 0 && (
+              <div className={`about-figures about-figures--${images.length > 1 ? 'grid' : 'single'}`}>
+                {images.map((key, i) => (
+                  <AboutFigure key={key} photoKey={key} onOpen={setLightbox} delay={i * 90} />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
 
       <section className="about-section">
-        <div className="about-section__label">Next</div>
         <div className="about-cta">
           <a href="/work" style={{ ...ctaBase, color: 'var(--bg-page)', background: 'var(--fg-primary)' }}>
             See the work <AppIcon icon={ArrowUpRight} size={12} />
@@ -1209,9 +1254,9 @@ const AboutPage = () => {
           <a
             href="mailto:omar@designedbyomar.com"
             onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_email', { link_url: 'mailto:omar@designedbyomar.com', section: 'about' }); }}
-            style={{ ...ctaBase, padding: '10px 4px', color: 'var(--fg-secondary)', background: 'transparent' }}
+            style={{ ...ctaBase, color: 'var(--fg-primary)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}
           >
-            omar@designedbyomar.com
+            Email me <AppIcon icon={ArrowUpRight} size={12} />
           </a>
         </div>
       </section>

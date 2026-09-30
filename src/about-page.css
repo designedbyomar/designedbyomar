@@ -1,5 +1,6 @@
-/* /about page — editorial layout, photo collage, restrained stack→settle intro,
-   and an accessible lightbox. Design-system tokens only. */
+/* /about page — editorial layout, a stack→grid hero intro (Codrops ImageStackGrid),
+   photos peppered through the sections, and an accessible lightbox.
+   Design-system tokens only. */
 
 .about-page {
   max-width: 1040px;
@@ -7,7 +8,7 @@
   padding: 40px 24px 96px;
 }
 
-/* Hero: text left, collage right on desktop; stacked on narrow screens. */
+/* Hero: text left, image cluster right on desktop; stacked on narrow screens. */
 .about-hero {
   display: grid;
   grid-template-columns: 1fr;
@@ -56,30 +57,32 @@
   color: var(--fg-secondary);
 }
 
-/* ---- Collage ---- */
+/* ---- Hero image cluster ---- */
 .about-collage {
   position: relative;
-  width: 100%;
-}
-
-.about-collage__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
+  width: 100%;
 }
 
 .about-photo {
   margin: 0;
-  border: 6px solid var(--color-white);
-  border-radius: var(--radius-standard);
-  background: var(--color-white);
-  box-shadow: var(--shadow-card-subtle);
-  overflow: hidden;
   padding: 0;
+  border-radius: var(--radius-image);
+  overflow: hidden;
+  background: var(--bg-subtle);
+  box-shadow: var(--shadow-card-subtle);
 }
 
+/* dj shot runs full width as a wide banner at the foot of the cluster. */
+.about-photo--dj { grid-column: 1 / -1; }
+.about-photo--dj img { aspect-ratio: 2 / 1; }
+
+.about-photo img { aspect-ratio: 1 / 1; }
+
 .about-photo button,
-.about-snap button {
+.about-figure button {
   display: block;
   width: 100%;
   height: 100%;
@@ -90,130 +93,23 @@
 }
 
 .about-photo img,
-.about-snap img {
+.about-figure img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.about-photo--boxing { grid-column: 1 / -1; }
-.about-photo--boxing img { aspect-ratio: 3 / 2; }
-.about-photo--drawings img,
-.about-photo--flyers img { aspect-ratio: 1 / 1; }
-
-/* Loose-print snapshots overlapping the edges (desktop). */
-.about-snap {
-  position: absolute;
-  width: clamp(120px, 32%, 160px);
-  margin: 0;
-  border: 6px solid var(--color-white);
-  border-radius: var(--radius-standard);
-  background: var(--color-white);
-  box-shadow: var(--shadow-card-full);
-  overflow: hidden;
-  z-index: 2;
-}
-
-.about-snap--hike { top: -18px; left: -18px; }
-.about-snap--evening { top: -14px; right: -18px; }
-.about-snap--dj { top: 40%; right: -14px; width: clamp(120px, 34%, 168px); }
-
-/* ---- Intro: restrained stack → settle ---- */
-.about-collage__item {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0) scale(0.94);
-  transition:
-    opacity 420ms ease,
-    transform 520ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
-  transition-delay: var(--about-delay, 0ms);
-  will-change: transform, opacity;
-}
-
-.about-collage.is-in .about-photo { opacity: 1; transform: none; }
-.about-collage.is-in .about-snap--hike { opacity: 1; transform: rotate(-4deg); }
-.about-collage.is-in .about-snap--evening { opacity: 1; transform: rotate(4deg); }
-.about-collage.is-in .about-snap--dj { opacity: 1; transform: rotate(-3deg); }
-
+/* Reduced motion: the intro never runs, so the cluster is shown as-is. */
 @media (prefers-reduced-motion: reduce) {
   .about-collage__item {
-    opacity: 1;
-    transition: none;
-    will-change: auto;
+    opacity: 1 !important;
+    transform: none !important;
   }
-  .about-photo { transform: none; }
-  .about-snap--hike { transform: rotate(-4deg); }
-  .about-snap--evening { transform: rotate(4deg); }
-  .about-snap--dj { transform: rotate(-3deg); }
-}
-
-/* Narrow screens: no overlap, no rotation — base photos stack, snapshots sit in a row below. */
-@media (max-width: 640px) {
-  .about-snap,
-  .about-collage.is-in .about-snap--hike,
-  .about-collage.is-in .about-snap--evening,
-  .about-collage.is-in .about-snap--dj {
-    position: static;
-    width: auto;
-    transform: none;
-  }
-  .about-snaps-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-3);
-    margin-top: var(--space-3);
-  }
-}
-
-/* Above 640, the snapshot row is only a positioning context host (its children are absolute). */
-@media (min-width: 641px) {
-  .about-snaps-row { display: contents; }
-}
-
-/* ---- Stats ---- */
-.about-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--layout-2);
-}
-
-@media (max-width: 700px) {
-  .about-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-.about-stat {
-  padding: var(--space-5);
-  border-radius: var(--radius-standard);
-  background: var(--bg-subtle);
-  box-shadow: inset 0 0 0 1px var(--color-gray-100);
-}
-
-.about-stat__value {
-  font-size: clamp(24px, 3vw, 34px);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: -0.03em;
-  color: var(--fg-primary);
-}
-
-.about-stat__label {
-  margin-top: var(--space-2);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-relaxed);
-  color: var(--fg-secondary);
 }
 
 /* ---- Body sections ---- */
 .about-section { max-width: 640px; margin: 0 auto var(--layout-2); }
-
-.about-section__label {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-body-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--fg-tertiary);
-  margin-bottom: var(--space-4);
-}
 
 .about-section h2 {
   margin: 0 0 var(--space-4);
@@ -230,7 +126,7 @@
   color: var(--fg-secondary);
 }
 
-.about-section p:last-child { margin-bottom: 0; }
+.about-section p:last-of-type { margin-bottom: 0; }
 
 .about-caption {
   font-style: italic;
@@ -244,6 +140,44 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* ---- Peppered photos within a section ---- */
+.about-figures { margin-top: var(--space-6); }
+
+.about-figures--single {
+  display: flex;
+  justify-content: center;
+}
+
+.about-figures--single .about-figure {
+  width: 100%;
+  max-width: 480px;
+}
+
+.about-figures--single .about-figure img {
+  height: auto;
+  aspect-ratio: auto;
+}
+
+.about-figures--grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 560px) {
+  .about-figures--grid { grid-template-columns: 1fr 1fr; }
+}
+
+.about-figure {
+  margin: 0;
+  border-radius: var(--radius-image);
+  overflow: hidden;
+  background: var(--bg-subtle);
+  box-shadow: var(--shadow-card-subtle);
+}
+
+.about-figures--grid .about-figure img { aspect-ratio: 1 / 1; }
 
 /* ---- Closing CTA ---- */
 .about-cta {

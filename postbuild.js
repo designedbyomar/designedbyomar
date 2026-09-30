@@ -623,8 +623,8 @@ function generateRoutes() {
       "I've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.",
     ]],
     ['Currently', [
-      "I run an independent product design practice. I work with Welcome Lend and a few other companies I keep private, and the engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production.",
-      "At Welcome Lend I rebuilt the design system and shipped work their brokers use daily. One project was a lender comparison tool: brokers weigh quotes to find the right fit for a borrower, and the existing matrix had turned into something you decoded rather than read. Another was sponsor expiration — designing how records lapse on a schedule instead of quietly going stale.",
+      "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
+      "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
       "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
       "Previously: Plastiq, Disney, Simplero, GoNation.",
     ]],
@@ -636,17 +636,10 @@ function generateRoutes() {
       "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
     ]],
   ];
-  const aboutStats = [
-    ['12+ years', 'in product design (15+ designing overall)'],
-    ['500+', 'interviews with customers, operators and teams'],
-    ['4', 'design systems'],
-    ['30+', 'launches'],
-  ];
   const aboutBody = [
     `<article style="${HIDDEN_STYLE}">`,
     `<h1>${escapeText('I started out designing flyers for my own parties.')}</h1>`,
     `<p>${escapeText('Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.')}</p>`,
-    `<ul>${aboutStats.map(([v, l]) => `<li>${escapeText(`${v} — ${l}`)}</li>`).join('')}</ul>`,
     ...aboutSections.map(([heading, paras]) => `<h2>${escapeText(heading)}</h2>${paras.map((p) => `<p>${escapeText(p)}</p>`).join('')}`),
     '</article>',
   ].join('');

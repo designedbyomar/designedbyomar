@@ -183,23 +183,27 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
 });
 
-test('/about loads directly with the hero, collage, stats, and sections', async ({ page }) => {
+test('/about loads directly with the hero cluster, peppered photos, and sections', async ({ page }) => {
   await page.goto('/about');
 
   await expect(page).toHaveURL(/\/about\/?$/);
   await expect(page.getByRole('heading', { level: 1, name: /designing flyers for my own parties/i })).toBeVisible();
   await expect(page.locator('.about-eyebrow')).toHaveText('About');
 
-  // All six collage photos render, each with alt text.
+  // The hero cluster renders its photos, each with alt text.
   const photos = page.locator('.about-collage img');
-  await expect(photos).toHaveCount(6);
-  for (let i = 0; i < 6; i += 1) {
+  await expect(photos).toHaveCount(5);
+  const heroCount = await photos.count();
+  for (let i = 0; i < heroCount; i += 1) {
     await expect(photos.nth(i)).toHaveAttribute('alt', /.+/);
   }
 
-  await expect(page.locator('.about-stat')).toHaveCount(4);
+  // Photos are also peppered through the body sections.
+  await expect(page.locator('.about-figure img').first()).toHaveAttribute('alt', /.+/);
+
   await expect(page.locator('.about-section')).toHaveCount(6); // 5 copy sections + closing CTA
   await expect(page.getByRole('link', { name: /See the work/i })).toHaveAttribute('href', '/work');
+  await expect(page.getByRole('link', { name: /^Email me$/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
 });
 
 test('the About page photo lightbox opens, shows a caption, and returns focus on close', async ({ page }) => {
