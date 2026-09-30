@@ -893,7 +893,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Lead product designer, 0→1. The core build ran roughly April to November 2021 with one product manager, one business analyst and five to seven engineers; expansion work continued through 2022."
+        "text": "Lead product designer, 0→1, and formal manager of one designer working across Connect and the Athena Design System. The core build ran roughly April to November 2021 with one product manager, one business analyst and five to seven engineers; expansion work continued through 2022."
       },
       {
         "type": "list",
@@ -902,7 +902,8 @@
           "Owned the payer flow end to end, and the partner portal alongside it",
           "Built the component set the widget was assembled from, including the partner-specific overrides",
           "Ran the expert interviews — prospective partners’ engineering and product teams, plus Plastiq’s own sales, operations and compliance staff — and the competitive benchmark against Stripe Connect",
-          "Owned engineering handoff"
+          "Owned engineering handoff",
+          "Managed one designer directly across Connect and Athena, including participating in hiring and owning formal performance reviews"
         ]
       },
       {
@@ -1282,7 +1283,7 @@
       },
       {
         "type": "paragraph",
-        "text": "I am leading the design system (DS) effort (along with co-lead Danny Lopez) to create consistency, increase development efficiency, and decrease time to implementation throughout Plastiq’s suite of products. I work on transforming Athena, previously only a component library, to an enterprise level design system that can solve for a host of products and marketing channels. I did this by guiding our team through workshops to gain a purpose and principles for our DS and also identify issues affecting our products. Additionally, I worked on revamping our components by adding usage documentation and encouraging the Engineering team into creating a Storybook equivalent to our effort."
+        "text": "I am leading the design system (DS) effort (along with co-lead Danny Lopez) to create consistency, increase development efficiency, and decrease time to implementation throughout Plastiq’s suite of products. I work on transforming Athena, previously only a component library, to an enterprise level design system that can solve for a host of products and marketing channels. I also directly managed one designer working across Athena and Connect, including participating in hiring and owning formal performance reviews. I did this by guiding our team through workshops to gain a purpose and principles for our DS and also identify issues affecting our products. Additionally, I worked on revamping our components by adding usage documentation and encouraging the Engineering team into creating a Storybook equivalent to our effort."
       },
       {
         "type": "heading",
@@ -2237,7 +2238,8 @@
     "client": "Disney (DTCI)",
     "title": "Unified Ad Platform",
     "mentions": [
-      "Unified Ad Platform"
+      "Unified Ad Platform",
+      "AdVisor"
     ],
     "subtitle": "Seven Disney ad-sales brands brought onto one platform without breaking the workflow it already ran.",
     "metaDescription": "Brought seven Disney ad-sales brands onto AdVisor without regressing the ESPN workflow it already ran. Decision-flow mapping, eight-brand alignment, and reusable React patterns for Adapt.",

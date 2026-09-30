@@ -11,7 +11,7 @@ import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
-import { tokenizeAnswer } from './ask-links.mjs';
+import { mentionedStudyIds, tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 
@@ -512,12 +512,12 @@ const LOADER_PHRASES = [
   "Building something thoughtful",
 ];
 
-const LogoLoader = ({ visible }) => {
+const LogoLoader = ({ visible, prefersReducedMotion = false }) => {
   const [index, setIndex] = React.useState(() => Math.floor(Math.random() * LOADER_PHRASES.length));
   const [isExiting, setIsExiting] = React.useState(false);
 
   React.useEffect(() => {
-    if (!visible) return;
+    if (!visible || prefersReducedMotion) return;
     const interval = setInterval(() => {
       setIsExiting(true);
       setTimeout(() => {
@@ -530,14 +530,14 @@ const LogoLoader = ({ visible }) => {
       }, 400); // Allow exit animation to complete
     }, 1400); // 1.4s overall rotation duration
     return () => clearInterval(interval);
-  }, [visible]);
+  }, [visible, prefersReducedMotion]);
 
   return (
     <div style={{
       position: 'fixed', inset: 0, background: 'var(--bg-page)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       zIndex: 9999, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none',
-      transition: 'opacity var(--duration-slower-xl) ease',
+      transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-slower-xl) ease',
     }}>
       <div className="logo-loader">
         <svg width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg" overflow="visible">
@@ -567,11 +567,13 @@ const LogoLoader = ({ visible }) => {
               aria-hidden="true"
               style={{
                 display: 'inline-block',
-                animation: isExiting
-                  ? `letterExit var(--duration-base-plus) var(--easing-ease-in-out-strong) ${i * 5}ms forwards`
-                  : `letterEnter var(--duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
-                opacity: 0,
-                willChange: 'transform, opacity, filter'
+                animation: prefersReducedMotion
+                  ? 'none'
+                  : isExiting
+                    ? `letterExit var(--duration-base-plus) var(--easing-ease-in-out-strong) ${i * 5}ms forwards`
+                    : `letterEnter var(--duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 10}ms forwards`,
+                opacity: prefersReducedMotion ? 1 : 0,
+                willChange: prefersReducedMotion ? 'auto' : 'transform, opacity, filter'
               }}
             >
               {char}
@@ -1870,7 +1872,7 @@ const ASK_MAX_SUGGESTIONS = 8;
 
 /**
  * Three is enough to show what the box is for without becoming a wall of
- * buttons above the answer. The rest are behind one control, and all 48 are
+ * buttons above the answer. The rest are behind one control, and the full set is
  * behind the link to /ask.
  */
 const ASK_COLLAPSED_SUGGESTIONS = 3;
@@ -1924,6 +1926,16 @@ const usePrefersReducedMotion = () => {
 // so a later paragraph does not re-link one an earlier paragraph already did.
 const ANSWER_PARAGRAPH_STYLE = { margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 };
 const ANSWER_LINK_STYLE = { color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'color-mix(in srgb, var(--fg-primary) 40%, transparent)' };
+const ASK_RESPONSE_MIN_HEIGHT = 288;
+const ASK_RESPONSE_CARD_STYLE = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--space-4)',
+  minHeight: ASK_RESPONSE_MIN_HEIGHT,
+  padding: 'var(--space-5) var(--space-6)',
+  borderRadius: 'var(--radius-comfort)',
+  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
+};
 
 const AnswerBody = ({ text, citedIds = [], answerId }) => {
   const remaining = new Set(citedIds);
@@ -1960,10 +1972,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const [answers, setAnswers] = React.useState(null);
   const [query, setQuery] = React.useState('');
   const [result, setResult] = React.useState(null);
-  // `missed` is tracked separately from `nearest` because a miss with no
-  // nearby topic is still a miss, and still has to say so.
   const [missed, setMissed] = React.useState(false);
-  const [nearest, setNearest] = React.useState(null);
   // A drafted reply, when the written set had no answer. Held apart from
   // `result` so the UI can never present unreviewed text as reviewed.
   const [drafted, setDrafted] = React.useState(null);
@@ -1975,6 +1984,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // arriving for an older one can be discarded rather than rendered.
   const requestRef = React.useRef(0);
   const abortRef = React.useRef(null);
+  const resolvedHashRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
   // 'idle' | 'copied' | 'failed'. A rejected clipboard write used to look
   // identical to never having pressed the button, and clipboard writes are
@@ -2132,19 +2142,30 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     claim();
     setResult(answer);
     setMissed(false);
-    setNearest(null);
     setDrafted(null);
     setPhase(null);
     setCopyState('idle');
   };
 
-  const show = (answer) => {
+  const clearAnswer = () => {
+    claim();
+    setResult(null);
+    setMissed(false);
+    setDrafted(null);
+    setPhase(null);
+    setCopyState('idle');
+  };
+
+  const show = (answer, { historyMode = 'push' } = {}) => {
     take(answer);
-    if (linkable) history.replaceState(null, '', `#${answer.id}`);
+    if (!linkable) return;
+    const hash = `#${answer.id}`;
+    if (window.location.hash !== hash) history[`${historyMode}State`](null, '', hash);
+    resolvedHashRef.current = answer.id;
   };
 
   /**
-   * Resolve /ask#<answer-id>, on arrival and on every later hash change.
+   * Resolve /ask#<answer-id>, on arrival and on every later history change.
    *
    * Goes through take(), not a bare setResult: following a link to another
    * answer while a request is in flight has to cancel that request, or it
@@ -2154,33 +2175,46 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   React.useEffect(() => {
     if (!linkable || !answers?.length) return undefined;
 
-    const resolveHash = () => {
+    const resolveLocation = () => {
       const id = decodeURIComponent(window.location.hash.slice(1));
-      if (!id) return;
+      if (id === resolvedHashRef.current) return;
+      resolvedHashRef.current = id;
+      if (!id) {
+        clearAnswer();
+        return;
+      }
       const answer = answers.find(a => a.id === id);
-      if (answer) take(answer);
+      if (answer) {
+        take(answer);
+      } else {
+        clearAnswer();
+      }
     };
 
-    resolveHash();
-    window.addEventListener('hashchange', resolveHash);
-    return () => window.removeEventListener('hashchange', resolveHash);
+    resolveLocation();
+    window.addEventListener('popstate', resolveLocation);
+    window.addEventListener('hashchange', resolveLocation);
+    return () => {
+      window.removeEventListener('popstate', resolveLocation);
+      window.removeEventListener('hashchange', resolveLocation);
+    };
     // `take` is stable in everything that matters — refs and setters — so it is
     // deliberately not a dependency; including it would re-register per render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkable, answers]);
 
-  const fallBack = (near) => { setResult(null); setDrafted(null); setNearest(near); setMissed(true); };
+  const fallBack = () => { setResult(null); setDrafted(null); setMissed(true); };
 
   /**
    * Token overlap could not be trusted with this one. Ask the endpoint, which
    * puts every written question to a model and returns the one this is asking
-   * for — or, when none of them is, drafts a reply grounded in the nearest.
+   * for — or, when none of them is, drafts a reply only from the case studies
+   * the router explicitly names.
    *
-   * Any failure — offline, rate limited, no key, provider down — lands on the
-   * local match if there was one, and otherwise on the fallback the site
-   * shipped before any of this existed.
+   * Any failure — offline, rate limited, no key, provider down — fails closed
+   * to the email handoff without attaching loosely related citations.
    */
-  const ask = async (asked, near) => {
+  const ask = async (asked, reviewedHistoryMode = 'push') => {
     reasonRef.current = '';
     const token = requestRef.current;
     const controller = new AbortController();
@@ -2210,10 +2244,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         const id = response.headers.get('X-Ask-Answer-Id');
         const reviewed = answers.find(a => a.id === id);
         // 'exact' cannot reach here — the client answers those itself — so this
-        // is the router's pick, or the endpoint's own local fallback.
+        // is the router's pick.
         const matchedBy = response.headers.get('X-Ask-Matched-By') || 'router';
         if (reviewed) {
-          show(reviewed);
+          show(reviewed, { historyMode: reviewedHistoryMode });
           // A written answer was served, so this is not a missing answer and the
           // wording is not recorded. Only the id, which is not personal and is
           // what says whether routing is picking sensibly.
@@ -2253,13 +2287,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
     if (!current()) return 'superseded';
 
-    // The endpoint could not help, and the loose local match is deliberately not
-    // used in its place — the same call the endpoint makes, for the same reason.
-    // Word overlap put "what is the strongest fintech case study he has" against
-    // the Wisdom Management Portal, which is healthcare. The miss below already
-    // offers the nearest published work and an email route, which is the honest
-    // version of "here is the closest thing".
-    fallBack(near);
+    // The endpoint could not help, and the loose local match is deliberately
+    // not used in its place. Without an explicit routing boundary, even a
+    // plausible-looking citation can support the wrong subject.
+    fallBack();
     return 'fallback';
   };
 
@@ -2269,12 +2300,12 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     const asked = query.trim();
     const hit = matchQuestion(asked, index);
 
-    // An exact hit — the typed string is a question or alias verbatim. The only
-    // result token overlap cannot get wrong, so it is answered here and nothing
-    // is sent anywhere. Everything else is routed, because a non-exact match
-    // scoring 1.00 is as likely to be wrong as right.
-    if (hit?.exact) {
-      trackPortfolioEvent('ask_submit', { matched: true, matched_by: 'exact', answer_id: hit.answer.id });
+    // Exact phrases and guarded management intent are deterministic. They are
+    // answered here and nothing is sent anywhere. Everything else is routed,
+    // because a non-exact overlap score is as likely to be wrong as right.
+    if (hit?.exact || hit?.guarded) {
+      const matchedBy = hit.exact ? 'exact' : 'guardrail';
+      trackPortfolioEvent('ask_submit', { matched: true, matched_by: matchedBy, answer_id: hit.answer.id });
       show(hit.answer);
       return;
     }
@@ -2287,20 +2318,24 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     trackPortfolioEvent('ask_submit', { matched: false, matched_by: 'routing' });
     // Nothing written is on screen any more, so the hash must not keep
     // pointing at the answer that was.
-    if (linkable) history.replaceState(null, '', window.location.pathname);
+    let reviewedHistoryMode = 'push';
+    if (linkable && window.location.hash) {
+      history.pushState(null, '', window.location.pathname);
+      reviewedHistoryMode = 'replace';
+    }
+    resolvedHashRef.current = '';
     claim();
     setResult(null);
     setMissed(false);
     setDrafted(null);
-    setNearest(near);
-    ask(asked, near).then(answered => {
+    ask(asked, reviewedHistoryMode).then(answered => {
       if (answered === 'superseded') return;
-      // A written answer was served — by the router or by the local fallback —
+      // A written answer was served by the router,
       // so `ask_routed` has already reported it, without the wording. Recording
       // it here too would put covered questions into the missing-answer count,
       // which is the one signal that decides what gets written next, and would
       // send their wording against what the privacy policy says.
-      if (answered === 'router' || answered === 'local') return;
+      if (answered === 'router') return;
       trackPortfolioEvent('ask_no_match', {
         question: asked,
         nearest_id: near?.id ?? 'none',
@@ -2316,6 +2351,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const sourcesFor = (answer) => (answer.sources ?? [])
     .map(id => CASE_STUDIES.find(c => c.id === id))
     .filter(Boolean);
+  const responseActive = Boolean(result || phase || drafted || missed);
 
   return (
     <div ref={sentinelRef} style={{
@@ -2382,19 +2418,21 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         labelled.
       */}
       <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-        Written and reviewed in advance. Anything they don&rsquo;t cover is drafted from them, and labelled.
+        Written and reviewed in advance. When published work supports something new, a drafted reply is clearly labelled.
       </p>
 
-      <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <div
+        aria-live="polite"
+        data-ask-response-region="true"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-4)',
+          minHeight: responseActive ? ASK_RESPONSE_MIN_HEIGHT : 0,
+        }}
+      >
         {result && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-4)',
-            padding: 'var(--space-5) var(--space-6)',
-            borderRadius: 'var(--radius-comfort)',
-            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
-          }}>
+          <div style={ASK_RESPONSE_CARD_STYLE}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
               <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
                 {result.question}
@@ -2460,15 +2498,19 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         )}
 
         {phase === 'looking' && (
-          <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
-            Looking for a written answer…
-          </p>
+          <div data-ask-state="loading" style={{ ...ASK_RESPONSE_CARD_STYLE, justifyContent: 'center' }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
+              Looking for a written answer…
+            </p>
+          </div>
         )}
 
         {phase === 'drafting' && !drafted && (
-          <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
-            Nothing written covers that one — drafting from the published answers…
-          </p>
+          <div data-ask-state="loading" style={{ ...ASK_RESPONSE_CARD_STYLE, justifyContent: 'center' }}>
+            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
+              Nothing written covers that one — drafting from relevant published work…
+            </p>
+          </div>
         )}
 
         {drafted && (() => {
@@ -2476,19 +2518,15 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           // show at most three, so the inline linker is given exactly that set —
           // otherwise a fourth cited study could be linked in the prose with no
           // matching chip beneath it.
-          const citedStudies = (drafted.sources ?? [])
+          const visibleSourceIds = phase === 'drafting'
+            ? []
+            : mentionedStudyIds(drafted.text, CASE_STUDIES, drafted.sources ?? []);
+          const citedStudies = visibleSourceIds
             .map(id => CASE_STUDIES.find(c => c.id === id))
             .filter(Boolean)
             .slice(0, 3);
           return (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-4)',
-            padding: 'var(--space-5) var(--space-6)',
-            borderRadius: 'var(--radius-comfort)',
-            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
-          }}>
+          <div style={ASK_RESPONSE_CARD_STYLE}>
             <div style={{
               fontFamily: 'var(--font-mono)',
               fontSize: 'var(--font-size-body-sm)',
@@ -2500,8 +2538,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
             </div>
             <AnswerBody text={drafted.text} citedIds={citedStudies.map(c => c.id)} answerId="drafted" />
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-              There is no written answer to that question, so this was drafted from the published
-              answers below and has not been reviewed. For anything that matters, email Omar.
+              There is no written answer to that question, so this was drafted from relevant published
+              work and has not been reviewed. For anything that matters, email Omar.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {citedStudies
@@ -2531,31 +2569,11 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
         })()}
 
         {missed && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-3)',
-            padding: 'var(--space-5) var(--space-6)',
-            borderRadius: 'var(--radius-comfort)',
-            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
-          }}>
+          <div style={{ ...ASK_RESPONSE_CARD_STYLE, gap: 'var(--space-3)' }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
-              {nearest
-                ? 'That one has no written answer, and it could not be drafted either \u2014 so rather than guess, the closest published work is below, and email is faster for anything specific.'
-                : 'That one has no written answer, and it could not be drafted either. Rather than guess, email is the faster route.'}
+              I couldn&apos;t safely match that to a reviewed answer or clearly relevant published work. Rather than guess, email is the faster route.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              {sourcesFor(nearest ?? {}).slice(0, 1).map(caseStudy => (
-                <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'none', case_study_id: caseStudy.id })} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
-                  padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
-                  color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
-                  boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                }}>
-                  {caseStudy.title}
-                  <AppIcon icon={ArrowUpRight} size={12} />
-                </a>
-              ))}
               <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
                 padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
@@ -3078,14 +3096,14 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <li>how long people stay</li>
           <li>what devices or browsers are being used</li>
           <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that have no written answer, including the wording of the question, which is normally also sent to Groq alongside excerpts of the published case studies so a reply can be drafted</li>
+          <li>questions typed into the Ask box that it cannot safely answer, including the wording of the question; when the router identifies relevant published work, the question may also be sent to Groq with excerpts from only those case studies so a reply can be drafted</li>
         </ul>
         <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
 
         <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing one word for word, is answered in your browser: nothing is sent and nothing leaves this site.</p>
-        <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, or the free daily allowance is spent, nothing is passed on and the closest written answer is used instead.</p>
-        <p style={{ margin: 0 }}>If none of them fits, the question is sent to Groq again — this time with excerpts of the published case studies, and of the closest written answers — so a reply can be drafted from them. Only published material is ever sent. A drafted reply is labelled as drafted and unreviewed wherever it appears, because it has not been through the review every written answer goes through. The wording of a question nothing covers is also recorded in an analytics event, which is the only way I can see which answers are missing and write them. A question that does get a written answer is not recorded that way.</p>
+        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing the same reviewed question or alias with ordinary changes in casing, punctuation, apostrophes, or spacing, is answered in your browser: nothing is sent and nothing leaves this site.</p>
+        <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, returns an invalid result, or the allowance is spent, the Ask box shows that it cannot answer rather than substituting a loosely related answer or citation.</p>
+        <p style={{ margin: 0 }}>If no written answer fits, Groq may name one or two relevant case studies. Only then is the question sent again with excerpts from those named studies and any reviewed answer grounded entirely in the same studies. If the router says none apply or fails, no draft is attempted. A drafted reply is labelled as drafted and unreviewed wherever it appears, and citation links appear only for named studies the completed reply actually mentions. The wording of a question the Ask box cannot safely answer is also recorded in an analytics event, which is how I can see missing answers and routing failures. A question that does get a written answer is not recorded that way.</p>
         <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
 
         <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
@@ -3609,6 +3627,7 @@ const trackSectionNavigation = (id, source) => {
 // ============================================================
 const App = () => {
   const [theme, setTheme] = React.useState(() => localStorage.getItem('omar.theme') || 'dark');
+  const prefersReducedMotion = usePrefersReducedMotion();
   React.useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem('omar.theme', theme); }, [theme]);
 
   const [loading, setLoading] = React.useState(() => {
@@ -3885,7 +3904,7 @@ const App = () => {
           text-align: right;
         }
       `}</style>
-      <LogoLoader visible={loading} />
+      <LogoLoader visible={loading} prefersReducedMotion={prefersReducedMotion} />
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
         <Nav theme={theme} setTheme={setTheme} onOpenAbout={openAboutDrawer} onHome={goHome} scrollToSection={scrollToSection} />
         <main>

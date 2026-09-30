@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Added
+- 2026-09-29 — Ask: an approved 62nd answer documents Omar's verified formal management scope at Plastiq — one designer across Connect and Athena, including hiring and formal performance reviews — with matching evidence added to both case studies and deterministic aliases for management and direct-report questions
 - 2026-09-29 — Design system now documents the GitHub activity component: a `#github-activity` section in Components (and the sidebar) covering the rolling-year calendar, its GraphQL/CDN-cached endpoint and fallback, with a live intensity-scale legend and the on-system profile link
 - 2026-09-29 — Design system: each section title on `/design-system` now reveals a copy button on hover or keyboard focus that copies a reference like `Design System — "Buttons" (/design-system#buttons)`, so a specific section is easy to cite when requesting a change
 - 2026-09-29 — Ask: six research-backed answers now cover product strategy, founder and executive partnership, design mentorship, product tradeoffs, domain learning, and leadership without formal authority; three related hiring questions route to existing answers instead of duplicating them
@@ -14,9 +15,11 @@ All notable changes to designedbyomar.com are documented here.
 
 ### Changed
 - 2026-09-29 — Design system hero: the icon pixel orbit moved out of the title (where it sat inline next to the type) into the empty space on the right, enlarged, with a static alien centered inside it — mirroring how the main hero's portrait sits inside the galaxy. The left-nav category icons now use the same ship-red→pink→blue gradient stroke as the quick-link cards
+- 2026-09-29 — Ask: exact matching now normalizes casing, punctuation, Unicode apostrophes, and repeated whitespace; deliberate answer selections create browser-history entries, while Back and Forward restore the matching answer and bare `/ask` clears stale content
 - 2026-09-28 — Management Portal case study now reads as shipped: the "in development / Q1–Q2 2026 rollout" language (three months past) is replaced with "shipped and rolled out to the operations org in 2026." The three metrics stay labelled as design targets — measured results are not in yet — so the page makes no unearned claim. The 13 Ask answers that cite the study were re-fingerprinted; none needed a wording change, since they already describe those numbers as projected rather than measured
 
 ### Fixed
+- 2026-09-29 — Ask production QA: routing now fails closed on `NONE`, invalid output, timeout, and router failure; the management guard is limited to factual experience questions; drafting is limited to explicitly named case studies; citation chips recognize verified study and product names; failure copy no longer mistakes router downtime for a missing answer; loading and fallback share a stable response card; reduced motion stops loader rotation and CSS transitions; and the endpoint uses a four-second router budget within a 25-second Vercel duration
 - 2026-09-29 — Design system typography table now labels the sans family "Geist" to match the `--font-sans` token (was "Geist Sans", which no font-family string uses)
 - 2026-09-29 — Design system: section titles set `id="<id>-title"` so each section's `aria-labelledby` resolves to its heading — the ~25 `SectionHeader` sections previously pointed their label at a non-existent element
 - 2026-09-29 — GitHub activity: the "View GitHub profile" button was off-system — mono font at the small size with a hard border. It now matches the design-system secondary button (Geist Sans at body-md/medium, inset ring), with a hover that stays legible on the `--bg-subtle` card and under reduced motion (a foreground tint plus a darker ring, not a lift alone)

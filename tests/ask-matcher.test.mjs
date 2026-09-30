@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildIndex, matchQuestion, nearestTopic, tokenize } from '../src/ask.mjs';
+import { buildIndex, matchQuestion, nearestTopic, normalizeExact, tokenize } from '../src/ask.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../src/content/ask-answers.json', import.meta.url), 'utf8'));
 const index = buildIndex(doc.answers);
@@ -21,10 +21,50 @@ test('an exact alias returns its answer outright', () => {
   assert.equal(hit.exact, true);
 });
 
+test('exact matching ignores casing, punctuation, Unicode apostrophes and repeated whitespace', () => {
+  for (const query of [
+    'Can Omar ship fast?',
+    'CAN OMAR SHIP FAST?!',
+    '  can   omar   ship   fast  ',
+  ]) {
+    const hit = matchQuestion(query, index);
+    assert.equal(hit?.answer.id, 'prioritization-under-constraints', query);
+    assert.equal(hit?.exact, true, query);
+  }
+  assert.equal(normalizeExact("What’s Omar’s process?"), normalizeExact("What's Omar's process!"));
+});
+
+test('formal management intent always resolves to the verified one-report answer', () => {
+  for (const query of [
+    'Has Omar formally managed 20 direct reports?',
+    'Did Omar formally manage a design team?',
+    'How many direct reports has Omar managed?',
+    'How many designers has Omar managed?',
+    'Did Omar participate in hiring?',
+  ]) {
+    const hit = matchQuestion(query, index);
+    assert.equal(hit?.answer.id, 'formal-people-management', query);
+    assert.ok(hit.exact || hit.guarded, query);
+  }
+
+  const influence = matchQuestion('Can he lead without direct reports?', index);
+  assert.equal(influence?.answer.id, 'influence-without-authority');
+  assert.equal(influence?.exact, true, 'the specific reviewed alias wins before the guard');
+
+  for (const query of [
+    'How can Omar lead without direct reports?',
+    'How does Omar approach hiring?',
+  ]) {
+    const hit = matchQuestion(query, index);
+    assert.notEqual(hit?.answer.id, 'formal-people-management', query);
+    assert.equal(hit?.guarded, undefined, query);
+  }
+});
+
 test('distinctive terms route to the right answer', () => {
   const cases = [
     ['does he have design system experience', 'design-systems'],
-    ['what fintech work has he done', 'fintech-depth'],
+    ['has he worked in fintech', 'fintech-depth'],
     ['tell me about the unified ad platform', 'cs-disney-uap'],
     ['has he designed for developers', 'api-developer-tools'],
     ['where has he worked', 'work-history'],
@@ -75,8 +115,8 @@ test('a shared filler word cannot outweigh a distinctive one', () => {
   // matching enterprise-experience. Aliases are now keyword-shaped; this pins
   // the behaviour rather than the shape, since the shape is not the real rule.
   const cases = [
-    ['what fintech work has he done', 'fintech-depth'],
-    ['what enterprise work has he done', 'enterprise-experience'],
+    ['has he worked in fintech', 'fintech-depth'],
+    ['enterprise scale experience', 'enterprise-experience'],
     ['what design system work has he done', 'design-systems'],
   ];
   for (const [query, expected] of cases) {

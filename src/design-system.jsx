@@ -1211,11 +1211,13 @@ const ComponentsSection = () => (
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
       <SectionHeader id="ask" eyebrow="Components" title="Ask">
-        Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or a
-        verbatim question is matched in the browser; anything else is matched by a model, because word
-        overlap answered “is he a manager” with a refusal. When nothing written covers a question, a
-        reply is drafted from the reviewed set and labelled as drafted — the two are never presented
-        as the same thing. The component exists to shorten the distance
+        Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or the
+        same reviewed question or alias with ordinary punctuation, casing, apostrophe, or spacing changes
+        is matched in the browser; anything else is matched by a model, because word overlap answered
+        “is he a manager” with a refusal. When nothing written covers a question, a reply is drafted only
+        if the router names relevant case studies; a decline, invalid result, or failure shows the honest
+        no-answer state without unrelated citations. Drafted and reviewed replies are never presented as
+        the same thing. The component exists to shorten the distance
         between a hiring question and the case study that answers it, so every part of it either
         answers or hands off.
       </SectionHeader>
@@ -1280,19 +1282,20 @@ const ComponentsSection = () => (
           A question the written set does not cover is not answered by whichever answer shares the
           most words — that is how &ldquo;the strongest fintech case study&rdquo; returned a
           healthcare one. The router names the case studies instead, excerpts of those are retrieved,
-          and a reply is drafted from them and labelled. The studies do not use a visitor&rsquo;s
+          and a reply is drafted from them and labelled. If the router names no relevant study,
+          drafting stops. The studies do not use a visitor&rsquo;s
           vocabulary, which is why the model names them rather than a text search: the word
           &ldquo;fintech&rdquo; appears in none of the 153 sections.
         </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
           A confident wrong answer costs more than no answer. Deciding which written answer a question
-          wants is the model&rsquo;s job, and it may decline; when it does, or when it picks nothing
-          recognisable, the component drafts a labelled reply or offers the nearest case study plus
-          email. Inverse-document-frequency weighted overlap over each answer&rsquo;s question and
-          aliases still runs in the browser, but only to catch a verbatim question. A loose overlap
-          match is never served on its own — not even when the model cannot be reached, which is
-          the path where wrong answers kept resurfacing. Without a judgement, the panel says there is
-          no written answer and offers the nearest published work.
+          wants is the model&rsquo;s job, and it may decline. A draft is allowed only when the router names
+          relevant case studies; a decline, invalid result, timeout, or failure shows the no-answer
+          state with email and no citation chips. Exact matching still runs in the browser after
+          normalizing casing, punctuation, apostrophes, and whitespace; factual questions about formal
+          management experience are also guarded locally so a number cannot inflate the verified scope,
+          without intercepting questions about leadership or hiring approach. A loose
+          overlap match is never served on its own.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">
           Answers carry a review status and a fingerprint of the case studies they cite. Only approved
