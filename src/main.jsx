@@ -933,17 +933,22 @@ const ABOUT_PHOTOS = {
 
 const ABOUT_CAPTION = 'Where it started: flyers from the DJ years, and a lifetime of drawing. A few UX sketches snuck in.';
 
+// Each section is a two-column row: `side` is which side the image cluster sits on
+// (desktop), alternating down the page. Tools & craft is a text-only interlude.
 const ABOUT_SECTIONS = [
   {
     heading: 'Background',
+    side: 'left',
     paras: [
       "I grew up in Brooklyn as an artist, and I've been drawing and painting my whole life. I found design through music. I was a professional DJ, and I started designing flyers for my own parties. That led to Photoshop, music covers, and the early internet, and then graphic, web and visual design. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.",
       "The through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.",
     ],
     caption: ABOUT_CAPTION,
+    images: ['drawings', 'flyers'],
   },
   {
     heading: 'How I work',
+    side: 'right',
     paras: [
       "I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.",
       "I'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.",
@@ -954,6 +959,7 @@ const ABOUT_SECTIONS = [
   },
   {
     heading: 'Currently',
+    side: 'left',
     paras: [
       "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
       "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
@@ -964,6 +970,7 @@ const ABOUT_SECTIONS = [
   },
   {
     heading: 'Tools & craft',
+    interlude: true,
     paras: [
       "Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.",
       "I use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.",
@@ -971,6 +978,7 @@ const ABOUT_SECTIONS = [
   },
   {
     heading: 'Off the clock',
+    side: 'right',
     paras: [
       "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
     ],
@@ -1117,10 +1125,46 @@ const AboutLightbox = ({ photo, onClose }) => {
   );
 };
 
-// The hero image cluster. On load the tiles start collapsed into a centered pile
-// and fan out (FLIP) into their grid — the Codrops ImageStackGrid intro — after
-// which the rest of the page reveals on scroll. Skipped under reduced motion.
-const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'drawings', 'flyers', 'dj'];
+// A framed photo: an overflow-clipped frame (fixed aspect) around the image, so
+// the intro/parallax can scale the image without it spilling. Opens the lightbox.
+const AboutTile = ({ photoKey, onOpen, parallax = 0, eager = false, className = '' }) => {
+  const p = ABOUT_PHOTOS[photoKey];
+  if (!p) return null;
+  return (
+    <figure className={`about-tile ${className}`.trim()} data-parallax={parallax || undefined}>
+      <button type="button" className="about-tile__btn" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
+        <span className="about-frame">
+          <img
+            className="about-frame__img"
+            src={p.src}
+            alt={p.alt}
+            width={p.width}
+            height={p.height}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        </span>
+      </button>
+    </figure>
+  );
+};
+
+// A section image cluster: one framed image, or a loose 2–3 image stack.
+const CLUSTER_PARALLAX = [0.06, -0.05, 0.04];
+const AboutCluster = ({ images, onOpen }) => (
+  <div className={`about-cluster about-cluster--${images.length}`}>
+    {images.map((key, i) => (
+      <AboutTile key={key} photoKey={key} onOpen={onOpen} parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]} />
+    ))}
+  </div>
+);
+
+// The hero image cluster. On load the tiles start piled at the center (scaled,
+// rotated, inner image zoomed) and fan out to their grid — the Codrops
+// ImageStackGrid intro, reproduced in vanilla JS. Skipped under reduced motion.
+const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'dj'];
+const ABOUT_INTRO_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const ABOUT_INTRO_ROTATIONS = [-5, 4, -3, 5, -4];
 
 const AboutCollage = ({ onOpen }) => {
   const reducedMotion = usePrefersReducedMotion();
@@ -1130,44 +1174,48 @@ const AboutCollage = ({ onOpen }) => {
     if (reducedMotion) return undefined;
     const grid = gridRef.current;
     if (!grid) return undefined;
-    const items = Array.from(grid.querySelectorAll('.about-collage__item'));
-    if (!items.length) return undefined;
+    const tiles = Array.from(grid.querySelectorAll('.about-tile'));
+    if (!tiles.length) return undefined;
 
     const gridRect = grid.getBoundingClientRect();
     const cx = gridRect.width / 2;
     const cy = gridRect.height / 2;
-    const mid = (items.length - 1) / 2;
 
-    // Invert: pile every tile onto the grid center, scaled down and fanned.
-    items.forEach((el, i) => {
+    // Pile every tile onto the grid center — scaled down, gently rotated, inner
+    // image zoomed — with the first tile on top of the stack.
+    tiles.forEach((el, i) => {
+      const inner = el.querySelector('.about-frame__img');
       const r = el.getBoundingClientRect();
       const dx = cx - (r.left - gridRect.left + r.width / 2);
       const dy = cy - (r.top - gridRect.top + r.height / 2);
-      const rot = (i - mid) * 5;
+      el.style.zIndex = String(tiles.length - i);
       el.style.transition = 'none';
-      el.style.transform = `translate(${dx}px, ${dy}px) scale(0.5) rotate(${rot}deg)`;
-      el.style.opacity = '0';
-      el.style.zIndex = String(items.length - i);
+      el.style.transform = `translate(${dx}px, ${dy}px) scale(0.6) rotate(${ABOUT_INTRO_ROTATIONS[i % ABOUT_INTRO_ROTATIONS.length]}deg)`;
+      if (inner) { inner.style.transition = 'none'; inner.style.transform = 'scale(1.4)'; }
     });
 
-    // Play: release to the natural grid with a short stagger.
+    // Release the stack to the grid, each with a short stagger.
     const raf = requestAnimationFrame(() => {
-      items.forEach((el, i) => {
-        el.style.transition = `transform 640ms cubic-bezier(0.22, 0.61, 0.36, 1) ${i * 80}ms, opacity 420ms ease ${i * 80}ms`;
-        el.style.transform = '';
-        el.style.opacity = '1';
+      tiles.forEach((el, i) => {
+        const inner = el.querySelector('.about-frame__img');
+        const delay = i * 90;
+        el.style.transition = `transform 1150ms ${ABOUT_INTRO_EASE} ${delay}ms`;
+        el.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+        if (inner) {
+          inner.style.transition = `transform 1150ms ${ABOUT_INTRO_EASE} ${delay}ms`;
+          inner.style.transform = 'scale(1)';
+        }
       });
     });
 
-    // Clear inline styles once settled so resize/layout stay clean.
+    // Clear inline styles once settled so parallax/resize stay clean.
     const settle = window.setTimeout(() => {
-      items.forEach((el) => {
-        el.style.transition = '';
-        el.style.transform = '';
-        el.style.zIndex = '';
-        el.style.opacity = '';
+      tiles.forEach((el) => {
+        const inner = el.querySelector('.about-frame__img');
+        el.style.transition = ''; el.style.transform = ''; el.style.zIndex = '';
+        if (inner) { inner.style.transition = ''; inner.style.transform = ''; }
       });
-    }, 640 + items.length * 80 + 120);
+    }, 1150 + (tiles.length - 1) * 90 + 150);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -1177,44 +1225,91 @@ const AboutCollage = ({ onOpen }) => {
 
   return (
     <div className="about-collage" ref={gridRef}>
-      {ABOUT_HERO_KEYS.map((key) => {
-        const p = ABOUT_PHOTOS[key];
-        return (
-          <figure className={`about-photo about-photo--${key} about-collage__item`} key={key}>
-            <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
-              <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="eager" decoding="async" />
-            </button>
-          </figure>
-        );
-      })}
+      {ABOUT_HERO_KEYS.map((key, i) => (
+        <AboutTile
+          key={key}
+          photoKey={key}
+          onOpen={onOpen}
+          eager
+          parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]}
+          className={`about-collage__tile about-collage__tile--${key}`}
+        />
+      ))}
     </div>
   );
 };
 
-// A single peppered photo that reveals on scroll and opens in the lightbox.
-const AboutFigure = ({ photoKey, onOpen, delay = 0, className = '' }) => {
-  const p = ABOUT_PHOTOS[photoKey];
-  if (!p) return null;
+// A subtle scroll "float" — each [data-parallax] element drifts by a capped
+// offset from its distance to the viewport center. Off under reduced motion.
+const useAboutParallax = (rootRef, reducedMotion) => {
+  React.useEffect(() => {
+    if (reducedMotion || !rootRef.current) return undefined;
+    const els = Array.from(rootRef.current.querySelectorAll('[data-parallax]'));
+    if (!els.length) return undefined;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const vh = window.innerHeight || 1;
+      for (const el of els) {
+        const r = el.getBoundingClientRect();
+        const rel = (r.top + r.height / 2 - vh / 2) / vh;
+        const speed = parseFloat(el.dataset.parallax) || 0;
+        const y = Math.max(-20, Math.min(20, -rel * speed * 120));
+        el.style.setProperty('--parallax-y', `${y.toFixed(1)}px`);
+      }
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [rootRef, reducedMotion]);
+};
+
+// A body section: a two-column row (text + image cluster, side alternating), or
+// a full-measure text-only interlude.
+const AboutRow = ({ section, onOpen }) => {
+  const body = (
+    <div className="about-row__text">
+      <h2>{section.heading}</h2>
+      {section.paras.map((para, i) => <p key={i}>{para}</p>)}
+      {section.caption && <p className="about-caption">{section.caption}</p>}
+      {section.link && (
+        <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
+      )}
+    </div>
+  );
+
+  if (section.interlude || !section.images?.length) {
+    return <Reveal as="section" variant="soft" className="about-section about-interlude">{body}</Reveal>;
+  }
+
   return (
-    <Reveal as="figure" variant="soft" delay={delay} className={`about-figure ${className}`.trim()}>
-      <button type="button" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
-        <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
-      </button>
+    <Reveal as="section" variant="soft" className="about-row" data-side={section.side}>
+      {body}
+      <AboutCluster images={section.images} onOpen={onOpen} />
     </Reveal>
   );
 };
 
 const AboutPage = () => {
   const [lightbox, setLightbox] = React.useState(null);
+  const rootRef = React.useRef(null);
+  const reducedMotion = usePrefersReducedMotion();
+  useAboutParallax(rootRef, reducedMotion);
   const ctaBase = {
     display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
     padding: '10px 18px', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
     borderRadius: 'var(--radius-standard)', textDecoration: 'none',
   };
   return (
-    <article className="about-page">
-      <div className="about-hero">
-        <div className="about-hero__lede">
+    <article className="about-page" ref={rootRef}>
+      <div className="about-hero about-row" data-side="right">
+        <div className="about-row__text about-hero__lede">
           <div className="about-eyebrow">About</div>
           <h1>{ABOUT_HERO_H1}</h1>
           <p className="about-lede">{ABOUT_HERO_LEDE}</p>
@@ -1222,28 +1317,11 @@ const AboutPage = () => {
         <AboutCollage onOpen={setLightbox} />
       </div>
 
-      {ABOUT_SECTIONS.map((section) => {
-        const images = section.images || [];
-        return (
-          <section className="about-section" key={section.heading}>
-            <h2>{section.heading}</h2>
-            {section.paras.map((para, i) => <p key={i}>{para}</p>)}
-            {section.caption && <p className="about-caption">{section.caption}</p>}
-            {section.link && (
-              <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
-            )}
-            {images.length > 0 && (
-              <div className={`about-figures about-figures--${images.length > 1 ? 'grid' : 'single'}`}>
-                {images.map((key, i) => (
-                  <AboutFigure key={key} photoKey={key} onOpen={setLightbox} delay={i * 90} />
-                ))}
-              </div>
-            )}
-          </section>
-        );
-      })}
+      {ABOUT_SECTIONS.map((section) => (
+        <AboutRow key={section.heading} section={section} onOpen={setLightbox} />
+      ))}
 
-      <section className="about-section">
+      <section className="about-section about-cta-section">
         <div className="about-cta">
           <a href="/work" style={{ ...ctaBase, color: 'var(--bg-page)', background: 'var(--fg-primary)' }}>
             See the work <AppIcon icon={ArrowUpRight} size={12} />

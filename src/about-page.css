@@ -1,6 +1,6 @@
-/* /about page — editorial layout, a stack→grid hero intro (Codrops ImageStackGrid),
-   photos peppered through the sections, and an accessible lightbox.
-   Design-system tokens only. */
+/* /about page — an alternating editorial layout (text + image cluster per row),
+   a stack→grid hero intro (Codrops ImageStackGrid, reproduced in vanilla JS), a
+   subtle scroll float, and an accessible lightbox. Design-system tokens only. */
 
 .about-page {
   max-width: 1040px;
@@ -8,8 +8,8 @@
   padding: 40px 24px 96px;
 }
 
-/* Hero: text left, image cluster right on desktop; stacked on narrow screens. */
-.about-hero {
+/* ---- Rows: text one side, image cluster the other, alternating ---- */
+.about-row {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--layout-1);
@@ -17,18 +17,25 @@
   margin-bottom: var(--layout-2);
 }
 
-@media (min-width: 900px) {
-  .about-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(380px, 44%);
+@media (min-width: 860px) {
+  .about-row {
+    grid-template-columns: 1fr 1fr;
   }
+  /* data-side controls which column the image cluster sits in. */
+  .about-row[data-side="left"] > .about-row__text { order: 2; }
+  .about-row[data-side="left"] > .about-cluster,
+  .about-row[data-side="left"] > .about-collage { order: 1; }
 }
 
-.about-hero__lede {
+.about-row__text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+  max-width: 560px;
   min-width: 0;
 }
+
+.about-hero__lede { gap: var(--space-5); }
 
 .about-eyebrow {
   font-family: var(--font-mono);
@@ -37,8 +44,6 @@
   letter-spacing: 0.08em;
   color: var(--fg-tertiary);
 }
-
-.about-eyebrow span { color: var(--color-develop-blue); }
 
 .about-hero__lede h1 {
   margin: 0;
@@ -51,87 +56,30 @@
 
 .about-lede {
   margin: 0;
-  max-width: 640px;
   font-size: clamp(17px, 1.6vw, 21px);
   line-height: var(--line-height-relaxed-plus);
   color: var(--fg-secondary);
 }
 
-/* ---- Hero image cluster ---- */
-.about-collage {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-  width: 100%;
-}
-
-.about-photo {
+.about-row__text h2 {
   margin: 0;
-  padding: 0;
-  border-radius: var(--radius-image);
-  overflow: hidden;
-  background: var(--bg-subtle);
-  box-shadow: var(--shadow-card-subtle);
-}
-
-/* dj shot runs full width as a wide banner at the foot of the cluster. */
-.about-photo--dj { grid-column: 1 / -1; }
-.about-photo--dj img { aspect-ratio: 2 / 1; }
-
-.about-photo img { aspect-ratio: 1 / 1; }
-
-.about-photo button,
-.about-figure button {
-  display: block;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
-}
-
-.about-photo img,
-.about-figure img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Reduced motion: the intro never runs, so the cluster is shown as-is. */
-@media (prefers-reduced-motion: reduce) {
-  .about-collage__item {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* ---- Body sections ---- */
-.about-section { max-width: 640px; margin: 0 auto var(--layout-2); }
-
-.about-section h2 {
-  margin: 0 0 var(--space-4);
   font-size: var(--font-size-heading-md);
   font-weight: var(--font-weight-semibold);
   letter-spacing: -0.02em;
   color: var(--fg-primary);
 }
 
-.about-section p {
-  margin: 0 0 var(--space-4);
+.about-row__text p {
+  margin: 0;
   font-size: clamp(16px, 1.25vw, 19px);
   line-height: var(--line-height-loose);
   color: var(--fg-secondary);
 }
 
-.about-section p:last-of-type { margin-bottom: 0; }
-
 .about-caption {
   font-style: italic;
-  color: var(--fg-tertiary);
-  font-size: var(--font-size-body-sm);
+  color: var(--fg-tertiary) !important;
+  font-size: var(--font-size-body-sm) !important;
 }
 
 .about-link {
@@ -141,48 +89,106 @@
   text-underline-offset: 3px;
 }
 
-/* ---- Peppered photos within a section ---- */
-.about-figures { margin-top: var(--space-6); }
-
-.about-figures--single {
-  display: flex;
-  justify-content: center;
+/* ---- Text-only interlude (Tools & craft) ---- */
+.about-interlude,
+.about-section {
+  max-width: 640px;
+  margin: 0 auto var(--layout-2);
 }
 
-.about-figures--single .about-figure {
-  width: 100%;
-  max-width: 480px;
-}
+.about-interlude .about-row__text { max-width: none; }
 
-.about-figures--single .about-figure img {
-  height: auto;
-  aspect-ratio: auto;
-}
-
-.about-figures--grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
-}
-
-@media (max-width: 560px) {
-  .about-figures--grid { grid-template-columns: 1fr 1fr; }
-}
-
-.about-figure {
+/* ---- Framed photo primitive ---- */
+.about-tile {
   margin: 0;
-  border-radius: var(--radius-image);
+  /* rotation (per position) composed with the scroll-float offset */
+  transform: rotate(var(--tile-rot, 0deg)) translate3d(0, var(--parallax-y, 0px), 0);
+}
+
+.about-tile__btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.about-frame {
+  display: block;
+  position: relative;
   overflow: hidden;
+  border-radius: var(--radius-image);
   background: var(--bg-subtle);
   box-shadow: var(--shadow-card-subtle);
 }
 
-.about-figures--grid .about-figure img { aspect-ratio: 1 / 1; }
+.about-frame__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  transition: transform var(--duration-slow, 600ms) var(--easing-standard, ease);
+}
+
+.about-tile__btn:hover .about-frame__img { transform: scale(1.04); }
+
+/* ---- Hero cluster (stack→grid intro) ---- */
+.about-collage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.about-collage .about-frame { aspect-ratio: 1 / 1; }
+.about-collage__tile--dj { grid-column: 1 / -1; }
+.about-collage__tile--dj .about-frame { aspect-ratio: 2 / 1; }
+
+/* ---- Section clusters ---- */
+.about-cluster { position: relative; width: 100%; }
+
+/* Single image — shown at its natural ratio. */
+.about-cluster--1 .about-frame { max-width: 480px; margin: 0 auto; }
+.about-cluster--1 .about-frame__img { height: auto; }
+
+/* Two artwork images (no faces) — a loose overlapping stack. */
+.about-cluster--2 { display: grid; }
+.about-cluster--2 .about-frame { aspect-ratio: 4 / 5; }
+.about-cluster--2 .about-tile:nth-child(1) { width: 80%; justify-self: start; --tile-rot: -2deg; z-index: 1; }
+.about-cluster--2 .about-tile:nth-child(2) { width: 80%; justify-self: end; margin-top: -22%; --tile-rot: 2deg; z-index: 2; }
+
+/* Three photos (faces) — a rotated grid, no overlap over faces. */
+.about-cluster--3 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start; }
+.about-cluster--3 .about-frame { aspect-ratio: 4 / 5; }
+.about-cluster--3 .about-tile:nth-child(1) { grid-column: 1 / -1; --tile-rot: -1.5deg; }
+.about-cluster--3 .about-tile:nth-child(1) .about-frame { aspect-ratio: 16 / 10; }
+.about-cluster--3 .about-tile:nth-child(2) { --tile-rot: 1.5deg; }
+.about-cluster--3 .about-tile:nth-child(3) { --tile-rot: -1deg; }
+
+/* Mobile: flatten every cluster — no overlap, no rotation. */
+@media (max-width: 640px) {
+  .about-cluster--2,
+  .about-cluster--3 { grid-template-columns: 1fr; }
+  .about-cluster--3 .about-tile:nth-child(1) { grid-column: auto; }
+  .about-cluster .about-tile {
+    width: auto;
+    margin-top: 0;
+    justify-self: stretch;
+    --tile-rot: 0deg;
+  }
+}
+
+/* Reduced motion: no intro transforms, no float. */
+@media (prefers-reduced-motion: reduce) {
+  .about-collage .about-tile,
+  .about-collage .about-frame__img { transform: none !important; opacity: 1 !important; }
+  .about-frame__img { transition: none; }
+}
 
 /* ---- Closing CTA ---- */
 .about-cta {
-  max-width: 640px;
-  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
@@ -204,17 +210,20 @@
 
 .about-lightbox__figure {
   margin: 0;
-  max-width: min(1000px, 92vw);
-  max-height: 88vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-3);
 }
 
+/* Size the image to its own aspect so the radius/shadow hug the picture, not a
+   letterboxed box. */
 .about-lightbox__figure img {
-  max-width: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(1000px, 92vw);
   max-height: 78vh;
-  object-fit: contain;
   border-radius: var(--radius-image);
   box-shadow: var(--shadow-card-full);
 }
