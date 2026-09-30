@@ -636,18 +636,23 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
   });
   await expect.poll(() => page.locator('#quick-links').evaluate((grid) => Math.round(grid.getBoundingClientRect().width))).toBeGreaterThan(900);
   await expect(page.locator('.ds-pixel-orbit')).toBeVisible();
+  // The orbit is now the enlarged hero-right composition, not the tiny inline mark.
   await expect.poll(() => page.locator('.ds-pixel-orbit').evaluate((orbit) => {
     const rect = orbit.getBoundingClientRect();
-    return Math.round(Math.max(rect.width, rect.height));
-  })).toBeLessThanOrEqual(220);
-  await expect.poll(() => page.evaluate(() => {
-    const orbit = document.querySelector('.ds-pixel-orbit');
-    const h1 = document.querySelector('#overview-title');
-    if (!orbit || !h1) return false;
-    const orbitCenterY = (orbit.getBoundingClientRect().top + orbit.getBoundingClientRect().bottom) / 2;
-    const h1Rect = h1.getBoundingClientRect();
-    return orbitCenterY >= h1Rect.top && orbitCenterY <= h1Rect.bottom;
+    const size = Math.round(Math.max(rect.width, rect.height));
+    return size > 220 && size <= 340;
   })).toBe(true);
+  // It stays clear of the rendered title text whether the responsive hero
+  // places the orbit beside the lede or beneath it.
+  await expect.poll(() => page.evaluate(() => {
+    const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+    const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+    const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+    if (!lede || !orbit || !title) return false;
+    return title.right <= lede.right + 0.5
+      && (orbit.left >= title.right || orbit.top >= lede.bottom - 0.5);
+  })).toBe(true);
+  await expect(page.locator('.ds-pixel-orbit__center--alien svg')).toBeVisible();
   await expect.poll(() => page.evaluate(() => {
     const width = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
     return width <= window.innerWidth;
@@ -657,11 +662,39 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
   ))).toBe(true);
 });
 
+test('design system hero keeps its title clear of the orbit at intermediate desktop widths', async ({ page }) => {
+  await page.goto('/design-system');
+
+  for (const width of [1055, 1280, 1399]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(() => page.evaluate(() => {
+      const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+      const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+      const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+      if (!lede || !orbit || !title) return false;
+      return title.right <= lede.right + 0.5 && orbit.top >= lede.bottom - 0.5;
+    })).toBe(true);
+  }
+
+  for (const width of [1400, 1440, 1507, 1508]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(() => page.evaluate(() => {
+      const lede = document.querySelector('.ds-hero-lede')?.getBoundingClientRect();
+      const orbit = document.querySelector('.ds-hero-orbit-stage')?.getBoundingClientRect();
+      const title = document.querySelector('.ds-hero-title__text')?.getBoundingClientRect();
+      if (!lede || !orbit || !title) return false;
+      return title.right <= lede.right + 0.5 && title.right <= orbit.left;
+    })).toBe(true);
+  }
+});
+
 test('design system sidebar categories collapse and expand', async ({ page }) => {
   await page.goto('/design-system');
 
   const sidebar = page.getByTestId('design-system-sidebar');
   await expect(sidebar).toHaveAttribute('data-sidebar-mode', 'collapsible');
+  // Category icons use the same gradient stroke as the quick-link cards.
+  await expect(sidebar.locator('.ds-nav-category .ds-signal-gradient-icon').first()).toBeVisible();
   await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'true');
   await sidebar.getByRole('button', { name: /Components/i }).click();
   await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'false');
@@ -836,6 +869,7 @@ test('design system hero shows pixel orbit and motion section shows alien replay
   await expect(pixelOrbit.locator('.ds-pixel-orbit__icon')).toHaveCount(5);
   await expect(pixelOrbit.locator('.ds-signal-gradient-icon')).toHaveCount(5);
   await expect(pixelOrbit.locator('.ds-pixel-orbit__center')).toBeVisible();
+  await expect(pixelOrbit.locator('.ds-pixel-orbit__center--alien svg')).toBeVisible();
 
   await page.locator('#alien-arrival').scrollIntoViewIfNeeded();
   const motionReplayButton = page.locator('#alien-arrival').getByRole('button', { name: /Replay animation/i });
