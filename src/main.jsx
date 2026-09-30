@@ -1152,120 +1152,109 @@ const AboutTile = ({ photoKey, onOpen, parallax = 0, eager = false, className = 
 const CLUSTER_PARALLAX = [0.06, -0.05, 0.04];
 const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'dj'];
 const ABOUT_INTRO_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
-const ABOUT_INTRO_ROTATIONS = [-8, 7, -6, 9, -5];
-const STACK_DEAL_MS = 150;   // gap between each card landing on the pile
-const STACK_HOLD_MS = 260;   // pause once the pile is assembled
-const STACK_FAN_MS = 1000;   // fan-out duration
+const ABOUT_INTRO_ROTATIONS = [-9, 8, -6, 10, -8, 6, -10, 7, -5, 9];
+const STACK_DEAL_MS = 85;    // gap between each card landing on the pile
+const STACK_HOLD_MS = 240;   // pause once the whole pile is assembled
+const STACK_FAN_MS = 950;    // break-out duration
+const STACK_FAN_STAGGER_MS = 55;
 
-// The Codrops ImageStackGrid intro, reproduced in vanilla JS: the cards deal
-// onto a center pile one-by-one, hold, then fan out to their placements. The
-// tile carries the scroll-float (translate); its inner button carries the
-// placement rotation + intro transform, both via CSS vars so nothing jumps.
-const useStackIntro = (ref, { reducedMotion, immediate }) => {
-  React.useLayoutEffect(() => {
-    if (reducedMotion) return undefined;
-    const stack = ref.current;
-    if (!stack) return undefined;
-    const tiles = Array.from(stack.querySelectorAll('.about-tile'));
-    if (!tiles.length) return undefined;
-    const inners = tiles.map((t) => t.querySelector('.about-tile__btn'));
-    const timers = [];
-    let rafId = 0;
-    let observer;
+// The Codrops ImageStackGrid demo2 intro, reproduced in vanilla JS as ONE
+// page-load choreography: every image on the page deals onto a single pile at
+// the viewport center, holds, then all break out to their real positions.
+// The tile carries the scroll-float; its inner button carries placement
+// rotation + the intro transform, both via CSS vars so nothing jumps.
+const useAboutIntro = (rootRef, { play, reducedMotion }) => {
+  const playedRef = React.useRef(false);
 
-    // Pre-paint: hide each card and pile it at the stack center.
-    const stackRect = stack.getBoundingClientRect();
-    const cx = stackRect.width / 2;
-    const cy = stackRect.height / 2;
+  // Pile every card at the viewport center, hidden — pre-paint so there's no
+  // flash of the settled layout before the animation runs.
+  const arm = React.useCallback(() => {
+    const root = rootRef.current;
+    if (!root) return [];
+    const tiles = Array.from(root.querySelectorAll('.about-tile'));
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
     tiles.forEach((el, i) => {
+      const inner = el.querySelector('.about-tile__btn');
       const r = el.getBoundingClientRect();
-      const dx = cx - (r.left - stackRect.left + r.width / 2);
-      const dy = cy - (r.top - stackRect.top + r.height / 2);
-      const inner = inners[i];
+      const dx = cx - (r.left + r.width / 2);
+      const dy = cy - (r.top + r.height / 2);
       el.style.opacity = '0';
-      el.style.zIndex = String(tiles.length - i);
+      el.style.position = 'relative';
+      el.style.zIndex = String(200 + i);
       if (inner) {
         inner.style.transition = 'none';
         inner.style.setProperty('--deal-x', `${dx}px`);
         inner.style.setProperty('--deal-y', `${dy}px`);
-        inner.style.setProperty('--deal-s', '0.55');
+        inner.style.setProperty('--deal-s', '0.5');
         inner.style.setProperty('--deal-rot', `${ABOUT_INTRO_ROTATIONS[i % ABOUT_INTRO_ROTATIONS.length]}deg`);
       }
     });
+    return tiles;
+  }, [rootRef]);
 
-    const play = () => {
-      // Deal the cards onto the pile in sequence.
+  React.useLayoutEffect(() => {
+    if (reducedMotion || playedRef.current) return;
+    arm();
+  }, [arm, reducedMotion]);
+
+  React.useEffect(() => {
+    if (reducedMotion || !play || playedRef.current) return undefined;
+    playedRef.current = true;
+    const tiles = arm(); // re-measure now that the page is visible/settled
+    if (!tiles.length) return undefined;
+    const timers = [];
+
+    // Deal each card onto the pile in sequence.
+    tiles.forEach((el, i) => {
+      timers.push(window.setTimeout(() => { el.style.opacity = '1'; }, i * STACK_DEAL_MS));
+    });
+    // Break the pile out to every card's real position.
+    const fanStart = tiles.length * STACK_DEAL_MS + STACK_HOLD_MS;
+    timers.push(window.setTimeout(() => {
       tiles.forEach((el, i) => {
-        timers.push(window.setTimeout(() => { el.style.opacity = '1'; }, i * STACK_DEAL_MS));
+        const inner = el.querySelector('.about-tile__btn');
+        if (!inner) return;
+        inner.style.transition = `transform ${STACK_FAN_MS}ms ${ABOUT_INTRO_EASE} ${i * STACK_FAN_STAGGER_MS}ms`;
+        inner.style.setProperty('--deal-x', '0px');
+        inner.style.setProperty('--deal-y', '0px');
+        inner.style.setProperty('--deal-s', '1');
+        inner.style.setProperty('--deal-rot', '0deg');
       });
-      // Fan them out to their placements.
-      const fanStart = tiles.length * STACK_DEAL_MS + STACK_HOLD_MS;
-      timers.push(window.setTimeout(() => {
-        inners.forEach((inner, i) => {
-          if (!inner) return;
-          inner.style.transition = `transform ${STACK_FAN_MS}ms ${ABOUT_INTRO_EASE} ${i * 70}ms`;
-          inner.style.setProperty('--deal-x', '0px');
-          inner.style.setProperty('--deal-y', '0px');
-          inner.style.setProperty('--deal-s', '1');
-          inner.style.setProperty('--deal-rot', '0deg');
-        });
-      }, fanStart));
-      // Settle: hand the transform back to CSS (placement rotation + parallax).
-      const total = fanStart + STACK_FAN_MS + (tiles.length - 1) * 70 + 120;
-      timers.push(window.setTimeout(() => {
-        tiles.forEach((el, i) => {
-          const inner = inners[i];
-          el.style.opacity = ''; el.style.zIndex = '';
-          if (inner) {
-            inner.style.transition = '';
-            ['--deal-x', '--deal-y', '--deal-s', '--deal-rot'].forEach((v) => inner.style.removeProperty(v));
-          }
-        });
-      }, total));
-    };
-
-    if (immediate) {
-      rafId = requestAnimationFrame(play);
-    } else {
-      observer = new IntersectionObserver((entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          observer.disconnect();
-          observer = undefined;
-          play();
+    }, fanStart));
+    // Settle: hand the transform back to CSS (placement rotation + parallax).
+    const total = fanStart + STACK_FAN_MS + (tiles.length - 1) * STACK_FAN_STAGGER_MS + 150;
+    timers.push(window.setTimeout(() => {
+      tiles.forEach((el) => {
+        const inner = el.querySelector('.about-tile__btn');
+        el.style.opacity = ''; el.style.zIndex = ''; el.style.position = '';
+        if (inner) {
+          inner.style.transition = '';
+          ['--deal-x', '--deal-y', '--deal-s', '--deal-rot'].forEach((v) => inner.style.removeProperty(v));
         }
-      }, { threshold: 0.25 });
-      observer.observe(stack);
-    }
+      });
+    }, total));
 
-    return () => {
-      timers.forEach((t) => window.clearTimeout(t));
-      if (rafId) cancelAnimationFrame(rafId);
-      if (observer) observer.disconnect();
-    };
-  }, [ref, reducedMotion, immediate]);
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [arm, play, reducedMotion]);
 };
 
-// An image cluster: one framed photo, or a loose overlapping stack that plays
-// the deal→fan intro (on mount for the hero, on scroll for body sections).
-const AboutStack = ({ images, onOpen, immediate = false, eager = false, className = '', tilePrefix = 'about-stack__tile' }) => {
-  const reducedMotion = usePrefersReducedMotion();
-  const ref = React.useRef(null);
-  useStackIntro(ref, { reducedMotion, immediate });
-  return (
-    <div className={`about-stack about-stack--${images.length} ${className}`.trim()} ref={ref}>
-      {images.map((key, i) => (
-        <AboutTile
-          key={key}
-          photoKey={key}
-          onOpen={onOpen}
-          eager={eager}
-          parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]}
-          className={`${tilePrefix} ${tilePrefix}--${key}`}
-        />
-      ))}
-    </div>
-  );
-};
+// An image cluster: one framed photo, or a loose overlapping stack. Images are
+// eager so the page-load pile isn't empty for below-fold tiles.
+const AboutStack = ({ images, onOpen, className = '', tilePrefix = 'about-stack__tile' }) => (
+  <div className={`about-stack about-stack--${images.length} ${className}`.trim()}>
+    {images.map((key, i) => (
+      <AboutTile
+        key={key}
+        photoKey={key}
+        onOpen={onOpen}
+        eager
+        parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]}
+        className={`${tilePrefix} ${tilePrefix}--${key}`}
+      />
+    ))}
+  </div>
+);
 
 // A subtle scroll "float" — each [data-parallax] element drifts by a capped
 // offset from its distance to the viewport center. Off under reduced motion.
@@ -1313,21 +1302,22 @@ const AboutRow = ({ section, onOpen }) => {
   );
 
   if (section.interlude || !section.images?.length) {
-    return <Reveal as="section" variant="soft" className="about-section about-interlude">{body}</Reveal>;
+    return <section className="about-section about-interlude">{body}</section>;
   }
 
   return (
-    <Reveal as="section" variant="soft" className="about-row" data-side={section.side}>
+    <section className="about-row" data-side={section.side}>
       {body}
       <AboutStack images={section.images} onOpen={onOpen} />
-    </Reveal>
+    </section>
   );
 };
 
-const AboutPage = () => {
+const AboutPage = ({ introReady = true }) => {
   const [lightbox, setLightbox] = React.useState(null);
   const rootRef = React.useRef(null);
   const reducedMotion = usePrefersReducedMotion();
+  useAboutIntro(rootRef, { play: introReady, reducedMotion });
   useAboutParallax(rootRef, reducedMotion);
   const ctaBase = {
     display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
@@ -1342,7 +1332,7 @@ const AboutPage = () => {
           <h1>{ABOUT_HERO_H1}</h1>
           <p className="about-lede">{ABOUT_HERO_LEDE}</p>
         </div>
-        <AboutStack images={ABOUT_HERO_KEYS} onOpen={setLightbox} immediate eager className="about-collage" tilePrefix="about-collage__tile" />
+        <AboutStack images={ABOUT_HERO_KEYS} onOpen={setLightbox} className="about-collage" tilePrefix="about-collage__tile" />
       </div>
 
       {ABOUT_SECTIONS.map((section) => (
@@ -4229,7 +4219,7 @@ const App = () => {
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
           ) : route.type === 'about' ? (
-            <AboutPage />
+            <AboutPage introReady={!loading} />
           ) : route.type === 'ask' ? (
             <AskPage />
           ) : route.type === 'work' ? (
