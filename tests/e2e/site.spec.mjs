@@ -183,7 +183,7 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
 });
 
-test('/about loads directly with the hero cluster, peppered photos, and sections', async ({ page }) => {
+test('/about loads directly with the hero cluster, alternating rows, and photos', async ({ page }) => {
   await page.goto('/about');
 
   await expect(page).toHaveURL(/\/about\/?$/);
@@ -192,23 +192,25 @@ test('/about loads directly with the hero cluster, peppered photos, and sections
 
   // The hero cluster renders its photos, each with alt text.
   const photos = page.locator('.about-collage img');
-  await expect(photos).toHaveCount(5);
+  await expect(photos).toHaveCount(3);
   const heroCount = await photos.count();
   for (let i = 0; i < heroCount; i += 1) {
     await expect(photos.nth(i)).toHaveAttribute('alt', /.+/);
   }
 
-  // Photos are also peppered through the body sections.
-  await expect(page.locator('.about-figure img').first()).toHaveAttribute('alt', /.+/);
+  // Sections alternate: at least one row has its image cluster on each side.
+  await expect(page.locator('.about-row[data-side="left"]').first()).toBeVisible();
+  await expect(page.locator('.about-row[data-side="right"]').first()).toBeVisible();
+  // Photos are distributed through the body rows too.
+  await expect(page.locator('.about-row .about-frame__img').first()).toHaveAttribute('alt', /.+/);
 
-  await expect(page.locator('.about-section')).toHaveCount(6); // 5 copy sections + closing CTA
   await expect(page.getByRole('link', { name: /See the work/i })).toHaveAttribute('href', '/work');
   await expect(page.getByRole('link', { name: /^Email me$/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
 });
 
 test('the About page photo lightbox opens, shows a caption, and returns focus on close', async ({ page }) => {
   await page.goto('/about');
-  const trigger = page.locator('.about-photo--boxing button');
+  const trigger = page.locator('.about-collage__tile--boxing .about-tile__btn');
   await trigger.click();
 
   const dialog = page.getByRole('dialog');
