@@ -23,8 +23,7 @@
   }
   /* data-side controls which column the image cluster sits in. */
   .about-row[data-side="left"] > .about-row__text { order: 2; }
-  .about-row[data-side="left"] > .about-cluster,
-  .about-row[data-side="left"] > .about-collage { order: 1; }
+  .about-row[data-side="left"] > .about-stack { order: 1; }
 }
 
 .about-row__text {
@@ -99,10 +98,12 @@
 .about-interlude .about-row__text { max-width: none; }
 
 /* ---- Framed photo primitive ---- */
+/* Two transform layers: the figure carries the scroll-float; the inner button
+   carries the placement rotation + the deal→fan intro (all via CSS vars, so
+   clearing intro state never jumps and parallax keeps working). */
 .about-tile {
   margin: 0;
-  /* rotation (per position) composed with the scroll-float offset */
-  transform: rotate(var(--tile-rot, 0deg)) translate3d(0, var(--parallax-y, 0px), 0);
+  transform: translate3d(0, var(--parallax-y, 0px), 0);
 }
 
 .about-tile__btn {
@@ -112,6 +113,10 @@
   border: 0;
   background: none;
   cursor: zoom-in;
+  transform:
+    translate(var(--deal-x, 0px), var(--deal-y, 0px))
+    scale(var(--deal-s, 1))
+    rotate(calc(var(--tile-rot, 0deg) + var(--deal-rot, 0deg)));
 }
 
 .about-frame {
@@ -134,56 +139,53 @@
 
 .about-tile__btn:hover .about-frame__img { transform: scale(1.04); }
 
-/* ---- Hero cluster (stack→grid intro) ---- */
-.about-collage {
+/* ---- Stack: a loose overlapping pile (hero + multi-image sections) ---- */
+.about-stack {
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
   width: 100%;
 }
 
-.about-collage .about-frame { aspect-ratio: 1 / 1; }
-.about-collage__tile--dj { grid-column: 1 / -1; }
-.about-collage__tile--dj .about-frame { aspect-ratio: 2 / 1; }
+.about-stack .about-frame { aspect-ratio: 4 / 5; }
 
-/* ---- Section clusters ---- */
-.about-cluster { position: relative; width: 100%; }
+/* Multi-image piles cascade diagonally: alternating sides keep the overlap at
+   opposite corners, so each card's center (faces) stays visible. */
+.about-stack--2 .about-tile,
+.about-stack--3 .about-tile { width: 76%; }
+.about-stack--2 .about-tile:nth-child(odd),
+.about-stack--3 .about-tile:nth-child(odd) { justify-self: start; }
+.about-stack--2 .about-tile:nth-child(even),
+.about-stack--3 .about-tile:nth-child(even) { justify-self: end; }
+.about-stack--2 .about-tile:not(:first-child),
+.about-stack--3 .about-tile:not(:first-child) { margin-top: -16%; }
+.about-stack .about-tile:nth-child(1) { --tile-rot: -3deg; z-index: 1; }
+.about-stack .about-tile:nth-child(2) { --tile-rot: 2.5deg; z-index: 2; }
+.about-stack .about-tile:nth-child(3) { --tile-rot: -2deg; z-index: 3; }
 
-/* Single image — shown at its natural ratio. */
-.about-cluster--1 .about-frame { max-width: 480px; margin: 0 auto; }
-.about-cluster--1 .about-frame__img { height: auto; }
+/* Single image — natural ratio, centered, no cascade. */
+.about-stack--1 { justify-items: center; }
+.about-stack--1 .about-tile { width: 100%; max-width: 480px; --tile-rot: 0deg; }
+.about-stack--1 .about-frame { aspect-ratio: auto; }
+.about-stack--1 .about-frame__img { height: auto; }
 
-/* Two artwork images (no faces) — a loose overlapping stack. */
-.about-cluster--2 { display: grid; }
-.about-cluster--2 .about-frame { aspect-ratio: 4 / 5; }
-.about-cluster--2 .about-tile:nth-child(1) { width: 80%; justify-self: start; --tile-rot: -2deg; z-index: 1; }
-.about-cluster--2 .about-tile:nth-child(2) { width: 80%; justify-self: end; margin-top: -22%; --tile-rot: 2deg; z-index: 2; }
+/* Hero: portrait + boxing square, DJ landscape. */
+.about-collage .about-collage__tile--portrait .about-frame,
+.about-collage .about-collage__tile--boxing .about-frame { aspect-ratio: 1 / 1; }
+.about-collage .about-collage__tile--dj .about-frame { aspect-ratio: 16 / 10; }
 
-/* Three photos (faces) — a rotated grid, no overlap over faces. */
-.about-cluster--3 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start; }
-.about-cluster--3 .about-frame { aspect-ratio: 4 / 5; }
-.about-cluster--3 .about-tile:nth-child(1) { grid-column: 1 / -1; --tile-rot: -1.5deg; }
-.about-cluster--3 .about-tile:nth-child(1) .about-frame { aspect-ratio: 16 / 10; }
-.about-cluster--3 .about-tile:nth-child(2) { --tile-rot: 1.5deg; }
-.about-cluster--3 .about-tile:nth-child(3) { --tile-rot: -1deg; }
-
-/* Mobile: flatten every cluster — no overlap, no rotation. */
+/* Mobile: flatten every stack — full width, no overlap, no rotation. */
 @media (max-width: 640px) {
-  .about-cluster--2,
-  .about-cluster--3 { grid-template-columns: 1fr; }
-  .about-cluster--3 .about-tile:nth-child(1) { grid-column: auto; }
-  .about-cluster .about-tile {
-    width: auto;
-    margin-top: 0;
+  .about-stack .about-tile {
+    width: 100%;
     justify-self: stretch;
     --tile-rot: 0deg;
   }
+  .about-stack .about-tile:not(:first-child) { margin-top: var(--space-3); }
 }
 
-/* Reduced motion: no intro transforms, no float. */
+/* Reduced motion: no intro (tiles never armed), no float. */
 @media (prefers-reduced-motion: reduce) {
-  .about-collage .about-tile,
-  .about-collage .about-frame__img { transform: none !important; opacity: 1 !important; }
+  .about-tile { opacity: 1 !important; }
   .about-frame__img { transition: none; }
 }
 
