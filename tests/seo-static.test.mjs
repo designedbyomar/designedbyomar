@@ -7,6 +7,11 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { PRIVACY_POLICY } from '../src/content/privacy-policy.mjs';
 import {
+  CASE_CARD_IMAGE_WIDTHS,
+  getCaseStudyCoverImage,
+  getResponsiveCaseStudyImage,
+} from '../src/case-study-media.mjs';
+import {
   DESIGN_SYSTEM_PAGE_COPY,
   HOME_PAGE_COPY,
   WORK_PAGE_COPY,
@@ -714,5 +719,22 @@ test('declared PNG favicons are built, square, match their sizes, and clear Goog
       largestSquare >= 48,
       `${page}: at least one rel="icon" must be >= 48x48 for Google to show it (largest built is ${largestSquare})`,
     );
+  }
+});
+
+test('every case-card cover has correctly mapped responsive WebP variants', async () => {
+  for (const caseStudy of caseStudySource()) {
+    const source = getCaseStudyCoverImage(caseStudy);
+    assert.ok(source, `${caseStudy.id}: resolves a still image for its case card`);
+
+    for (const width of CASE_CARD_IMAGE_WIDTHS) {
+      const variant = getResponsiveCaseStudyImage(source, width);
+      const file = path.join(DIST, variant.replace(/^\//, ''));
+      assert.ok(fs.existsSync(file), `${caseStudy.id}: generated variant is missing: ${variant}`);
+
+      const metadata = await sharp(file).metadata();
+      assert.equal(metadata.format, 'webp', `${caseStudy.id}: ${variant} must be WebP`);
+      assert.equal(metadata.width, width, `${caseStudy.id}: ${variant} must be ${width}px wide`);
+    }
   }
 });

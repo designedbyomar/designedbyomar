@@ -35,7 +35,7 @@ If you're a hiring manager or founder, the things to look at are:
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Live GitHub activity**: a rolling one-year contribution calendar backed by GitHub GraphQL and cached through a same-origin Vercel function.
 - **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
-- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization, plus automatic 1200×627 JPEG social previews for every case study during production builds.
+- **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization, plus automatic responsive WebP card covers and 1200×627 JPEG social previews for every case study during production builds.
 
 ## Stack
 
@@ -65,7 +65,7 @@ npm run build      # vite build → dist/, then postbuild.js generates routes an
 npm run preview    # preview the built dist/ locally
 ```
 
-The build first runs `scripts/generate-social-images.mjs`, which center-crops each case-study cover into a share-safe `cover-og.jpg` without changing the on-page WebP.
+The build first runs `scripts/generate-responsive-case-images.mjs` and `scripts/generate-social-images.mjs`. They create 640px, 960px, and 1440px WebP card covers plus a center-cropped, share-safe `cover-og.jpg` without changing the original on-page cover.
 
 ## Automated tests
 
