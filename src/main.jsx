@@ -21,9 +21,13 @@ import { isGaEnabled } from './analytics-env.mjs';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
-// Google Analytics loads only in production builds, so dev/test traffic never
-// reaches the production GA4 property. Consent still gates it on top of this.
-const GA_ENABLED = isGaEnabled(import.meta.env);
+// Google Analytics loads only on the production build served from the production
+// host, so dev, tests, and Vercel previews never reach the production GA4
+// property. Consent still gates it on top of this.
+const GA_ENABLED = isGaEnabled(
+  import.meta.env,
+  typeof window !== 'undefined' ? window.location.hostname : '',
+);
 const ANALYTICS_CONSENT_KEY = 'omar.analyticsConsent';
 const LEGACY_CONSENT_KEY = 'omar.consent';
 const ANALYTICS_ACCEPTED = 'accepted';

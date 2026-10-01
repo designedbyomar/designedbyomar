@@ -193,13 +193,19 @@ p {
   .button, .button-secondary { justify-content: center; }
 }
 </style>
-<!-- Google tag (gtag.js), consent-gated.
-     The React app loads GA4 only after analytics consent is accepted. This page is
-     static with no app bundle, so it repeats that check inline rather than loading
-     the tag outright. Mirrors getStoredAnalyticsConsent() in src/main.jsx, including
-     the legacy omar.consent key, but does not migrate it — that stays the app's job. -->
+<!-- Google tag (gtag.js), consent-gated and production-host-gated.
+     The React app loads GA4 only after analytics consent is accepted, and only on
+     the production host. This page is static with no app bundle, so it repeats both
+     checks inline rather than loading the tag outright. The consent check mirrors
+     getStoredAnalyticsConsent() in src/main.jsx (including the legacy omar.consent
+     key, which it reads but does not migrate — that stays the app's job); the host
+     check mirrors the production-host allowlist in src/analytics-env.mjs, so dev
+     (a developer opening /404.html) and Vercel previews never load production GA. -->
 <script>
   (function () {
+    var host = (location.hostname || '').toLowerCase();
+    if (host !== 'designedbyomar.com' && host !== 'www.designedbyomar.com') return;
+
     var accepted;
     try {
       var stored = localStorage.getItem('omar.analyticsConsent');
