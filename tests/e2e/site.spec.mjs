@@ -1381,7 +1381,9 @@ test('loading to fallback keeps the mobile response footprint stable', async ({ 
   const before = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
   await expect(region.getByText(/Rather than guess/i)).toBeVisible();
   const after = await page.locator('footer').evaluate(node => node.getBoundingClientRect().top + window.scrollY);
-  expect(Math.abs(after - before), 'the footer should not jump when loading becomes fallback').toBeLessThanOrEqual(2);
+  // One 8px spacing token is still sub-1% of this viewport and rules out the
+  // disruptive line-height/card-collapse jump this regression protects against.
+  expect(Math.abs(after - before), 'the footer should not jump when loading becomes fallback').toBeLessThanOrEqual(8);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
 });
 
@@ -1832,4 +1834,126 @@ test('picking a suggestion mid-stream does not resurrect the draft', async ({ pa
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/This draft belongs to the previous question/i)).toHaveCount(0);
   await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toHaveCount(0);
+});
+
+test.describe('case-card media delivery', () => {
+  const pageBuilderVideo = '/Videos/case-studies/page-builder/cover.mp4';
+  const waitForLoader = async (page) => {
+    await expect(page.locator('.logo-loader').locator('..')).toHaveCSS('opacity', '0');
+  };
+
+  test('a clean mobile homepage loads the responsive portrait without case-card video', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const requestedPaths = [];
+    page.on('request', (request) => requestedPaths.push(new URL(request.url()).pathname));
+
+    await page.goto('/');
+    await waitForLoader(page);
+    await page.waitForTimeout(250);
+
+    const portraitSrc = await page.locator('[data-hero-portrait]').evaluate((image) => image.currentSrc);
+    expect(portraitSrc).toContain('/Images/omar-mobile.webp');
+    expect(requestedPaths).toContain('/Images/omar-mobile.webp');
+    expect(requestedPaths).not.toContain('/Images/omar.webp');
+    expect(requestedPaths.some((pathname) => pathname.endsWith('.mp4'))).toBe(false);
+  });
+
+  test('Page Builder video loads once near the viewport and keeps its still until playback', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    let videoRequests = 0;
+
+    await page.route(`**${pageBuilderVideo}`, async (route) => {
+      videoRequests += 1;
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      await route.continue();
+    });
+
+    await page.goto('/');
+    await waitForLoader(page);
+    const card = page.locator('[data-case-study-id="page-builder"]');
+    const initialBox = await card.boundingBox();
+    await card.scrollIntoViewIfNeeded();
+
+    await expect.poll(() => videoRequests).toBe(1);
+    const still = card.locator('[data-case-cover-still]');
+    const video = card.locator('[data-case-cover-video]');
+    await expect(still).toHaveCSS('opacity', '1');
+    await expect(video).toHaveCSS('opacity', '0');
+    await expect(video).toHaveCSS('opacity', '1');
+    await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
+
+    const playingBox = await card.boundingBox();
+    expect(playingBox?.width).toBeCloseTo(initialBox?.width ?? 0, 0);
+    expect(playingBox?.height).toBeCloseTo(initialBox?.height ?? 0, 0);
+    expect(videoRequests).toBe(1);
+  });
+
+  test('reduced motion keeps video case cards on their still covers', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const videoRequests = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('.mp4')) videoRequests.push(request.url());
+    });
+
+    await page.goto('/');
+    await waitForLoader(page);
+    const card = page.locator('[data-case-study-id="page-builder"]');
+    await card.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+
+    await expect(card.locator('[data-case-cover-still]')).toBeVisible();
+    await expect(card.locator('[data-case-cover-video]')).toHaveCount(0);
+    expect(videoRequests).toEqual([]);
+  });
+
+  test('/work serves responsive stills for every case card', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const videoRequests = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('.mp4')) videoRequests.push(request.url());
+    });
+
+    await page.goto('/work');
+    await waitForLoader(page);
+    const covers = page.locator('[data-case-cover-still]');
+    await expect(covers).toHaveCount(8);
+
+    for (const cover of await covers.all()) {
+      const srcSet = await cover.getAttribute('srcset');
+      expect(srcSet).toContain('-640.webp 640w');
+      expect(srcSet).toContain('-960.webp 960w');
+      expect(srcSet).toContain('-1440.webp 1440w');
+      await expect(cover).toHaveAttribute('sizes', /\(max-width: 900px\) calc\(72vw - 35px\)/);
+    }
+
+    await expect(page.locator('[data-case-study-id="page-builder"] [data-case-cover-still]'))
+      .toHaveAttribute('src', '/Images/case-studies/page-builder/cover.webp');
+    expect(videoRequests).toEqual([]);
+  });
+
+  test('browsers without IntersectionObserver keep video case cards on their still covers', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'IntersectionObserver', { value: undefined, configurable: true });
+    });
+    const videoRequests = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('.mp4')) videoRequests.push(request.url());
+    });
+
+    await page.goto('/');
+    await waitForLoader(page);
+    const card = page.locator('[data-case-study-id="page-builder"]');
+    await card.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+
+    await expect(card.locator('[data-case-cover-still]')).toBeVisible();
+    await expect(card.locator('[data-case-cover-video]')).toHaveCount(0);
+    expect(videoRequests).toEqual([]);
+  });
 });

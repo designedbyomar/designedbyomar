@@ -29,7 +29,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run generate:social-images && vite build && node postbuild.js",
+    "build": "npm run generate:responsive-images && npm run generate:social-images && vite build && node postbuild.js",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
     "test": "npm run test:build && npm run test:seo && npm run test:content && playwright test",
@@ -40,6 +40,7 @@
     "test:e2e:ui": "npm run build && playwright test --ui",
     "smoke:github": "node scripts/smoke-github-contributions.mjs",
     "optimize:image": "node scripts/optimize-image.mjs",
+    "generate:responsive-images": "node scripts/generate-responsive-case-images.mjs",
     "generate:social-images": "node scripts/generate-social-images.mjs",
     "ask:rundown": "node scripts/ask-rundown.mjs"
   },

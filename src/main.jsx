@@ -10,6 +10,7 @@ import { Galaxy } from './galaxy.jsx';
 import { GitHubContributions } from './github-contributions.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
+import { getCaseStudyCoverImage, getCaseStudyCoverSrcSet } from './case-study-media.mjs';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { PRIVACY_POLICY } from './content/privacy-policy.mjs';
 import { HOME_PAGE_COPY, WORK_PAGE_COPY } from './content/static-page-copy.mjs';
@@ -421,7 +422,7 @@ const Portrait = ({ galaxy, theme }) => {
         </>
       )}
       <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 3 }}>
-        <img src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} srcSet={isLight ? undefined : '/Images/omar-mobile.webp 640w, /Images/omar.webp 1230w'} sizes={isLight ? undefined : '(max-width: 820px) min(100vw, 590px), 590px'} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
+        <img data-hero-portrait src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} srcSet={isLight ? undefined : '/Images/omar-mobile.webp 640w, /Images/omar.webp 1230w'} sizes={isLight ? undefined : '(max-width: 820px) min(100vw, 590px), 590px'} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10, 114, 239, var(--opacity-16))) drop-shadow(0 26px 48px rgba(255, 91, 79, var(--opacity-12))) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'
@@ -1280,17 +1281,92 @@ const AboutPage = () => {
 // ============================================================
 const caseAccentGradient = (accent) => `linear-gradient(135deg, ${accent} 0%, color-mix(in oklab, ${accent} 70%, white) 100%)`;
 
+const CASE_CARD_IMAGE_SIZES = {
+  wide: '(max-width: 900px) calc(72vw - 35px), 830px',
+  standard: '(max-width: 900px) calc(72vw - 35px), 405px',
+};
+
+const CaseCardImage = ({ c, featured, sizes, style }) => (
+  <img
+    data-case-cover-still
+    src={getCaseStudyCoverImage(c)}
+    srcSet={getCaseStudyCoverSrcSet(c)}
+    sizes={sizes}
+    alt={`${c.title} preview`}
+    loading={featured ? 'eager' : 'lazy'}
+    style={style}
+  />
+);
+
+const DeferredCaseCardVideo = ({ c, featured, sizes }) => {
+  const containerRef = React.useRef(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [shouldLoadVideo, setShouldLoadVideo] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  React.useEffect(() => {
+    if (prefersReducedMotion) {
+      setShouldLoadVideo(false);
+      setIsPlaying(false);
+      return undefined;
+    }
+    if (typeof IntersectionObserver !== 'function' || !containerRef.current) return undefined;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      setShouldLoadVideo(true);
+      observer.disconnect();
+    }, { rootMargin: '600px 0px', threshold: 0 });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [prefersReducedMotion]);
+
+  const transition = prefersReducedMotion ? 'none' : 'opacity var(--duration-base) ease';
+  const mediaStyle = {
+    position: 'absolute', inset: 0,
+    width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block',
+    transition,
+  };
+
+  return (
+    <div ref={containerRef} data-deferred-case-video style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <CaseCardImage
+        c={c}
+        featured={featured}
+        sizes={sizes}
+        style={{ ...mediaStyle, opacity: isPlaying ? 0 : 1 }}
+      />
+      {shouldLoadVideo && (
+        <video
+          data-case-cover-video
+          src={c.coverVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          tabIndex={-1}
+          onPlaying={() => setIsPlaying(true)}
+          style={{ ...mediaStyle, opacity: isPlaying ? 1 : 0 }}
+        />
+      )}
+    </div>
+  );
+};
+
 // ============================================================
 // CaseCard — gradient cover tile used on homepage + drawer
 // ============================================================
-const CaseCard = ({ c, featured = false }) => {
+const CaseCard = ({ c, featured = false, wideMedia = false }) => {
   const viewportWidth = useViewportWidth();
   const useSharedMobileAspectRatio = viewportWidth <= TABLET_BREAKPOINT;
   const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
   const accent = c.accent;
 
   return (
-    <a href={`/work/${c.id}/`} className="case-card" style={{
+    <a href={`/work/${c.id}/`} className="case-card" data-case-study-id={c.id} style={{
       display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%',
       textDecoration: 'none', color: 'inherit',
       borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
@@ -1322,8 +1398,8 @@ const CaseCard = ({ c, featured = false }) => {
             </div>
             <div style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-page)' }}>
               {c.coverVideo
-                ? <video src={c.coverVideo} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
-                : <img src={c.coverImage} alt={`${c.title} preview`} loading={featured ? 'eager' : 'lazy'} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
+                ? <DeferredCaseCardVideo c={c} featured={featured} sizes={wideMedia ? CASE_CARD_IMAGE_SIZES.wide : CASE_CARD_IMAGE_SIZES.standard} />
+                : <CaseCardImage c={c} featured={featured} sizes={wideMedia ? CASE_CARD_IMAGE_SIZES.wide : CASE_CARD_IMAGE_SIZES.standard} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
             </div>
           </div>
         ) : (
@@ -1411,7 +1487,7 @@ const Work = () => {
         </Reveal>
 
         <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-8)', marginBottom: 32 }}>
-          <CaseCard c={CASE_STUDIES[0]} featured />
+          <CaseCard c={CASE_STUDIES[0]} featured wideMedia />
         </Reveal>
         <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 32, alignItems: 'stretch' }}>
           <CaseCard c={CASE_STUDIES[1]} />
@@ -3855,14 +3931,19 @@ const App = () => {
       ? Promise.resolve()
       : new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
-    const heroSrc = theme === 'light' ? '/Images/omar-light.webp' : '/Images/omar.webp';
-    const heroImageReady = new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      img.src = heroSrc;
-      if (img.complete) resolve();
-    });
+    const heroImage = document.querySelector('[data-hero-portrait]');
+    const heroImageReady = heroImage
+      ? (typeof heroImage.decode === 'function'
+        ? heroImage.decode().catch(() => undefined)
+        : new Promise((resolve) => {
+          if (heroImage.complete) {
+            resolve();
+            return;
+          }
+          heroImage.addEventListener('load', resolve, { once: true });
+          heroImage.addEventListener('error', resolve, { once: true });
+        }))
+      : Promise.resolve();
 
     Promise.all([pageReady, fontsReady, heroImageReady]).then(() => {
       if (!cancelled) {
@@ -3878,7 +3959,7 @@ const App = () => {
     return () => {
       cancelled = true;
     };
-  }, [loading, theme]);
+  }, [loading]);
 
   const galaxy = { density: 1.9, speed: 0.75, style: 'pixel', accent: 'workflow', theme };
 
