@@ -17,9 +17,13 @@ import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs'
 import { mentionedStudyIds, tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
+import { isGaEnabled } from './analytics-env.mjs';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const SENTRY_ENABLED = import.meta.env.PROD && Boolean(SENTRY_DSN);
+// Google Analytics loads only in production builds, so dev/test traffic never
+// reaches the production GA4 property. Consent still gates it on top of this.
+const GA_ENABLED = isGaEnabled(import.meta.env);
 const ANALYTICS_CONSENT_KEY = 'omar.analyticsConsent';
 const LEGACY_CONSENT_KEY = 'omar.consent';
 const ANALYTICS_ACCEPTED = 'accepted';
@@ -96,6 +100,7 @@ const configureGoogleAnalytics = () => {
 
 const loadGoogleAnalytics = () => {
   if (typeof window === 'undefined') return Promise.resolve(false);
+  if (!GA_ENABLED) return Promise.resolve(false);
   if (!hasAcceptedAnalytics()) return Promise.resolve(false);
   if (window.__omarGaReady) return Promise.resolve(true);
   if (window.__omarGaLoadPromise) return window.__omarGaLoadPromise;
@@ -126,7 +131,7 @@ const loadGoogleAnalytics = () => {
 
 if (typeof window !== 'undefined') {
   window.trackAnalyticsEvent = (eventName, params) => {
-    if (!hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
+    if (!GA_ENABLED || !hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
     window.gtag('event', eventName, params);
   };
 }
@@ -776,7 +781,7 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >Design System</a>
-            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { source: 'nav' })} style={{ ...navLink, textDecoration: 'none' }}
+            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'nav' })} style={{ ...navLink, textDecoration: 'none' }}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
             >About</a>
@@ -816,7 +821,7 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
               <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
-              <a href="/about" onClick={() => { closeMobileMenu(); trackPortfolioEvent('about_page_open', { source: 'mobile_nav' }); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)', textDecoration: 'none' }}>About</a>
+              <a href="/about" onClick={() => { closeMobileMenu(); trackPortfolioEvent('about_page_open', { ui_location: 'mobile_nav' }); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)', textDecoration: 'none' }}>About</a>
               <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Ask</a>
               <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
               <a href="#contact" onClick={goSection('contact')} style={{
@@ -1046,7 +1051,7 @@ const About = () => (
             {ABOUT_SHORT}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { source: 'about_section' })} style={{
+            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'about_section' })} style={{
               alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
               minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
@@ -1629,7 +1634,7 @@ const CaseStudyPage = ({ c, onBack }) => {
         assistant simply disappeared at that point — the reader had to know to
         scroll the homepage to find it again.
       */}
-      <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'case_study', case_study_id: c.id })} style={{
+      <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'case_study', case_study_id: c.id })} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
         textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -2942,7 +2947,7 @@ const AskSection = ({ scrollToSection }) => {
             column, where it does not compete.
           */}
           {isStacked && contactCta}
-          <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { source: 'faq_section' })} className="text-link" style={{
+          <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'faq_section' })} className="text-link" style={{
             alignSelf: 'flex-start',
             display: 'inline-flex',
             alignItems: 'center',
@@ -3146,7 +3151,7 @@ const SiteFooter = ({ onHome, scrollToSection }) => {
             <a
               href="/about"
               className="text-link site-footer-link"
-              onClick={() => trackPortfolioEvent('about_page_open', { source: 'footer' })}
+              onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'footer' })}
             >
               About
             </a>
@@ -3700,7 +3705,7 @@ const syncRouteHead = (meta) => {
 };
 
 const trackPageView = (meta, route, currentCase) => {
-  if (!hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
+  if (!GA_ENABLED || !hasAcceptedAnalytics() || typeof window.gtag !== 'function') return;
 
   window.gtag('event', 'page_view', {
     page_title: meta.title,
@@ -3802,12 +3807,12 @@ const SECTION_LABELS = {
   contact: 'Contact',
 };
 
-const trackSectionNavigation = (id, source) => {
-  if (!source || typeof window.trackAnalyticsEvent !== 'function') return;
+const trackSectionNavigation = (id, uiLocation) => {
+  if (!uiLocation || typeof window.trackAnalyticsEvent !== 'function') return;
   window.trackAnalyticsEvent('section_navigation_click', {
     section_id: id,
     section_label: SECTION_LABELS[id] || id,
-    source,
+    ui_location: uiLocation,
   });
 };
 
@@ -3998,8 +4003,8 @@ const App = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const scrollToSection = (id, source) => {
-    trackSectionNavigation(id, source);
+  const scrollToSection = (id, uiLocation) => {
+    trackSectionNavigation(id, uiLocation);
 
     const performScroll = () => {
       scrollToSectionElement(id, 'smooth');
