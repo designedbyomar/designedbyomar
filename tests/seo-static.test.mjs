@@ -51,8 +51,8 @@ const getRootLinks = (html, sourceUrl) => [...getRootContent(html, sourceUrl).ma
   });
 const getRootWordCount = (html, label) => {
   const text = getRootContent(html, label)
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, ' ');
   return text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0;
