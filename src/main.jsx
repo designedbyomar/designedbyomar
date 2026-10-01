@@ -12,6 +12,7 @@ import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { PRIVACY_POLICY } from './content/privacy-policy.mjs';
+import { HOME_PAGE_COPY, WORK_PAGE_COPY } from './content/static-page-copy.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
 import { mentionedStudyIds, tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
@@ -858,10 +859,10 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         </div>
       )}
       <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-        Complex systems. <span style={{ color: 'var(--fg-tertiary)' }}>Clear products.</span>
+        {HOME_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{HOME_PAGE_COPY.titleAccent}</span>
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
-        AI, enterprise SaaS, fintech, healthcare. Built to scale real-world operations.
+        {HOME_PAGE_COPY.description}
       </p>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
@@ -1401,10 +1402,10 @@ const Work = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
             <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-              Selected work. <span style={{ color: 'var(--fg-tertiary)' }}>Real systems. Measurable impact.</span>
+              {WORK_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{WORK_PAGE_COPY.titleAccent}</span>
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              A few examples of turning messy operations into clear, scalable product experiences.
+              {HOME_PAGE_COPY.workDescription}
             </p>
           </div>
         </Reveal>
@@ -1457,10 +1458,10 @@ const WorkIndexPage = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
             <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
-              Selected work. <span style={{ color: 'var(--fg-tertiary)' }}>Real systems. Measurable impact.</span>
+              {WORK_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{WORK_PAGE_COPY.titleAccent}</span>
             </h1>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
-              Every case study in one place, across AI workflows, design systems, fintech, healthcare, and enterprise software.
+              {WORK_PAGE_COPY.description}
             </p>
           </div>
         </Reveal>

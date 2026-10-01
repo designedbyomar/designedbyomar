@@ -23,6 +23,7 @@ import {
 import { AlienPixel, footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { onMediaChange } from './media-query.js';
+import { DESIGN_SYSTEM_PAGE_COPY } from './content/static-page-copy.mjs';
 import {
   Button,
   CopyButton,
@@ -935,8 +936,7 @@ const HomeSection = ({ theme }) => (
           </h1>
           <div className="ds-hero-intro">
             <p>
-              The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns,
-              motion language, and public design-engineering workflow.
+              {DESIGN_SYSTEM_PAGE_COPY.intro}
             </p>
           </div>
         </div>
@@ -969,8 +969,8 @@ const HomeSection = ({ theme }) => (
 const FoundationsSection = () => (
   <>
     <section id="foundations" className="ds-section" aria-labelledby="foundations-title">
-      <SectionHeader id="foundations" eyebrow="Foundations" title="Shared foundations">
-        The portfolio and this documentation surface now share the same token source for theme, color, type, spacing, depth, opacity, motion, and responsive rhythm.
+      <SectionHeader id="foundations" eyebrow="Foundations" title={DESIGN_SYSTEM_PAGE_COPY.sections.foundations.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.foundations.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {[
@@ -1098,8 +1098,8 @@ cubic-bezier(0.4, 0, 0.2, 1)`}</pre>
 const ComponentsSection = () => (
   <>
     <section id="components" className="ds-section" aria-labelledby="components-title">
-      <SectionHeader id="components" eyebrow="Components" title="Core primitives">
-        V1 extracts documentation-ready primitives first. Larger production patterns remain documented here and can be pulled into a shared library later.
+      <SectionHeader id="components" eyebrow="Components" title={DESIGN_SYSTEM_PAGE_COPY.sections.components.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.components.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {COMPONENT_GUIDANCE.map(([title, body]) => (
@@ -1353,8 +1353,8 @@ const ComponentsSection = () => (
 const PatternsSection = () => (
   <>
     <section id="patterns" className="ds-section" aria-labelledby="patterns-title">
-      <SectionHeader id="patterns" eyebrow="Patterns" title="Production patterns">
-        Patterns document how primitives become recognizable portfolio surfaces.
+      <SectionHeader id="patterns" eyebrow="Patterns" title={DESIGN_SYSTEM_PAGE_COPY.sections.patterns.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.patterns.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {[
@@ -1388,8 +1388,8 @@ const PatternsSection = () => (
 const MotionSection = ({ theme }) => (
   <>
     <section id="motion" className="ds-section" aria-labelledby="motion-title">
-      <SectionHeader id="motion" eyebrow="Motion" title="Motion">
-        Motion is a signature layer for orientation, feedback, and personality. It must respect reduced-motion preferences across canvas, animation, and scroll behavior.
+      <SectionHeader id="motion" eyebrow="Motion" title={DESIGN_SYSTEM_PAGE_COPY.sections.motion.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.motion.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {MOTION_ROWS.map(([title, body]) => (
@@ -1446,8 +1446,8 @@ const MotionSection = ({ theme }) => (
 const ContentAccessibilityResources = () => (
   <>
     <section id="content" className="ds-section" aria-labelledby="content-title">
-      <SectionHeader id="content" eyebrow="Content" title="Voice and tone">
-        Copy should sound specific, senior, and human. Avoid inflated claims, generic AI phrasing, and unverifiable outcomes.
+      <SectionHeader id="content" eyebrow="Content" title={DESIGN_SYSTEM_PAGE_COPY.sections.content.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.content.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {[
@@ -1473,8 +1473,8 @@ const ContentAccessibilityResources = () => (
     ))}
 
     <section id="accessibility" className="ds-section" aria-labelledby="accessibility-title">
-      <SectionHeader id="accessibility" eyebrow="Accessibility" title="Accessibility">
-        WCAG AA is the floor. Focus states, keyboard flows, contrast, touch targets, and reduced motion are design-system requirements, not QA cleanup.
+      <SectionHeader id="accessibility" eyebrow="Accessibility" title={DESIGN_SYSTEM_PAGE_COPY.sections.accessibility.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.accessibility.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {[
@@ -1502,8 +1502,8 @@ const ContentAccessibilityResources = () => (
     ))}
 
     <section id="resources" className="ds-section" aria-labelledby="resources-title">
-      <SectionHeader id="resources" eyebrow="Resources" title="Source files">
-        These files are the implementation source of truth for the system.
+      <SectionHeader id="resources" eyebrow="Resources" title={DESIGN_SYSTEM_PAGE_COPY.sections.resources.title}>
+        {DESIGN_SYSTEM_PAGE_COPY.sections.resources.description}
       </SectionHeader>
       <div className="ds-card-grid">
         {[

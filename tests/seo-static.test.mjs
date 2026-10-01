@@ -6,6 +6,11 @@ import sharp from 'sharp';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { PRIVACY_POLICY } from '../src/content/privacy-policy.mjs';
+import {
+  DESIGN_SYSTEM_PAGE_COPY,
+  HOME_PAGE_COPY,
+  WORK_PAGE_COPY,
+} from '../src/content/static-page-copy.mjs';
 
 const require = createRequire(import.meta.url);
 const {
@@ -201,10 +206,14 @@ test('raw static HTML forms a crawlable canonical internal-link graph', () => {
 
   for (const sourceUrl of urls) {
     const html = fs.readFileSync(pagePathForUrl(sourceUrl), 'utf8');
-    assert.match(
-      getRootContent(html, sourceUrl),
-      /<div data-static-snapshot inert style="[^"]*clip-path:inset\(50%\)/,
-      `${sourceUrl} keeps crawler-only content hidden and out of the focus order before hydration`,
+    const root = getRootContent(html, sourceUrl);
+    const snapshotTag = root.match(/<div data-static-snapshot[^>]*>/i)?.[0] ?? '';
+    assert.match(snapshotTag, /style="[^"]*clip-path:inset\(50%\)/, `${sourceUrl} hides its static snapshot visually`);
+    assert.doesNotMatch(snapshotTag, /\binert\b|\baria-hidden\b/i, `${sourceUrl} keeps its static snapshot in the accessibility tree`);
+    const anchorTags = [...root.matchAll(/<a\b[^>]*>/gi)].map((match) => match[0]);
+    assert.ok(
+      anchorTags.every((tag) => /\btabindex="-1"/i.test(tag)),
+      `${sourceUrl} keeps crawler-only links out of the keyboard tab order`,
     );
     const links = [...new Set(getRootLinks(html, sourceUrl))];
     assert.ok(links.length > 0, `${sourceUrl} has a crawlable internal outgoing link in raw HTML`);
@@ -233,17 +242,21 @@ test('every generated route has one static H1 and thin app-shell pages carry mea
     assert.equal(h1s.length, 1, `${url} has exactly one H1 in its raw HTML`);
   }
 
+  const pageTitle = ({ titleLead, titleAccent }) => `${titleLead} ${titleAccent}`;
   const pages = [
-    [`${SITE_ORIGIN}/`, 'Complex systems. Clear products.'],
-    [`${SITE_ORIGIN}/work`, 'Selected Work'],
-    [`${SITE_ORIGIN}/privacy`, PRIVACY_POLICY.subtitle],
-    [`${SITE_ORIGIN}/design-system`, 'Shared foundations'],
+    [`${SITE_ORIGIN}/`, [pageTitle(HOME_PAGE_COPY), HOME_PAGE_COPY.description, HOME_PAGE_COPY.workDescription]],
+    [`${SITE_ORIGIN}/work`, [pageTitle(WORK_PAGE_COPY), WORK_PAGE_COPY.description]],
+    [`${SITE_ORIGIN}/privacy`, [PRIVACY_POLICY.subtitle]],
+    [`${SITE_ORIGIN}/design-system`, [
+      DESIGN_SYSTEM_PAGE_COPY.intro,
+      ...Object.values(DESIGN_SYSTEM_PAGE_COPY.sections).flatMap(({ title, description }) => [title, description]),
+    ]],
   ];
 
-  for (const [url, expectedText] of pages) {
+  for (const [url, expectedCopy] of pages) {
     const html = fs.readFileSync(pagePathForUrl(url), 'utf8');
     const root = getRootContent(html, url);
-    assert.ok(root.includes(expectedText), `${url} carries page-specific static content`);
+    expectedCopy.forEach((copy) => assert.ok(root.includes(escapeText(copy)), `${url} carries current shared copy: ${copy}`));
     assert.ok(getRootWordCount(html, url) >= 50, `${url} exposes at least 50 meaningful words before JavaScript`);
   }
 });

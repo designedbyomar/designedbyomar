@@ -1,12 +1,14 @@
 const fs = require('fs');
 let normalizeBlocks = (body) => (Array.isArray(body) ? body : []); // replaced below by the shared module
 let PRIVACY_POLICY;
+let HOME_PAGE_COPY;
+let WORK_PAGE_COPY;
+let DESIGN_SYSTEM_PAGE_COPY;
 const CASE_STUDIES = require('./src/content/case-studies.json');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
 const HOME_TITLE = 'Omar Tavarez — Principal Product Designer';
-const HOME_DESCRIPTION = 'Omar Tavarez is a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.';
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
@@ -25,16 +27,6 @@ const STATIC_SITE_LINKS = [
   ['Ask', '/ask'],
   ['Design System', '/design-system'],
   ['Privacy', '/privacy'],
-];
-
-const DESIGN_SYSTEM_STATIC_SECTIONS = [
-  ['Shared foundations', 'The portfolio and this documentation surface share the same token source for theme, color, type, spacing, depth, opacity, motion, and responsive rhythm.'],
-  ['Core primitives', 'Documentation-ready primitives cover buttons, cards, accordions, copy actions, navigation, consent, Ask, and GitHub activity.'],
-  ['Production patterns', 'Production patterns document how primitives become recognizable portfolio surfaces across heroes, case-study covers, footers, and privacy consent.'],
-  ['Motion', 'Motion supports orientation, feedback, and personality while respecting reduced-motion preferences across canvas, animation, and scroll behavior.'],
-  ['Voice and tone', 'Copy should sound specific, senior, and human, without inflated claims, generic AI phrasing, or unverifiable outcomes.'],
-  ['Accessibility', 'WCAG AA is the floor: focus states, keyboard flows, contrast, touch targets, and reduced motion are design-system requirements.'],
-  ['Source files', 'The public guide connects the shared tokens, production components, design rules, source files, and AI-assisted workflow documentation.'],
 ];
 
 const personSchema = {
@@ -353,11 +345,12 @@ const staticSiteNavigationHtml = () => [
 ].join('');
 
 const staticSnapshotHtml = (mainHtml) => [
-  `<div data-static-snapshot inert style="${HIDDEN_STYLE}">`,
-  staticSiteNavigationHtml(),
-  mainHtml,
+  `<div data-static-snapshot style="${HIDDEN_STYLE}">`,
+  `${staticSiteNavigationHtml()}${mainHtml}`.replaceAll('<a ', '<a tabindex="-1" '),
   '</div>',
 ].join('');
+
+const pageCopyTitle = ({ titleLead, titleAccent }) => `${titleLead} ${titleAccent}`;
 
 const caseStudyLinksHtml = ({ detailed = false, headingLevel = 3 } = {}) => [
   '<ol>',
@@ -379,11 +372,11 @@ const caseStudyLinksHtml = ({ detailed = false, headingLevel = 3 } = {}) => [
 const homepageContentHtml = () => staticSnapshotHtml([
   '<main>',
   `<h1>${escapeText(HOME_TITLE)}</h1>`,
-  '<p>Complex systems. Clear products.</p>',
-  `<p>${escapeText(HOME_DESCRIPTION)}</p>`,
+  `<p>${escapeText(pageCopyTitle(HOME_PAGE_COPY))}</p>`,
+  `<p>${escapeText(HOME_PAGE_COPY.description)}</p>`,
   '<section>',
   '<h2>Selected work</h2>',
-  `<p>${escapeText(WORK_DESCRIPTION)}</p>`,
+  `<p>${escapeText(HOME_PAGE_COPY.workDescription)}</p>`,
   caseStudyLinksHtml(),
   '<p><a href="/work">View all selected work</a></p>',
   '</section>',
@@ -402,8 +395,8 @@ const homepageContentHtml = () => staticSnapshotHtml([
 
 const workContentHtml = () => staticSnapshotHtml([
   '<main>',
-  `<h1>${escapeText(WORK_TITLE)}</h1>`,
-  `<p>${escapeText(WORK_DESCRIPTION)}</p>`,
+  `<h1>${escapeText(pageCopyTitle(WORK_PAGE_COPY))}</h1>`,
+  `<p>${escapeText(WORK_PAGE_COPY.description)}</p>`,
   '<section aria-label="Case studies">',
   caseStudyLinksHtml({ detailed: true, headingLevel: 2 }),
   '</section>',
@@ -433,8 +426,8 @@ const privacyContentHtml = () => {
 const designSystemContentHtml = () => staticSnapshotHtml([
   '<main><article>',
   '<h1>designedbyomar Design System</h1>',
-  `<p>${escapeText("The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns, motion language, and public design-engineering workflow.")}</p>`,
-  ...DESIGN_SYSTEM_STATIC_SECTIONS.map(([heading, body]) => `<section><h2>${escapeText(heading)}</h2><p>${escapeText(body)}</p></section>`),
+  `<p>${escapeText(DESIGN_SYSTEM_PAGE_COPY.intro)}</p>`,
+  ...Object.values(DESIGN_SYSTEM_PAGE_COPY.sections).map(({ title, description }) => `<section><h2>${escapeText(title)}</h2><p>${escapeText(description)}</p></section>`),
   '</article></main>',
 ].join(''));
 
@@ -828,12 +821,14 @@ function generateRoutes() {
 }
 
 if (require.main === module) (async () => {
-  const [blockModule, privacyModule] = await Promise.all([
+  const [blockModule, privacyModule, staticPageCopyModule] = await Promise.all([
     import('./src/content/case-study-blocks.mjs'),
     import('./src/content/privacy-policy.mjs'),
+    import('./src/content/static-page-copy.mjs'),
   ]);
   ({ normalizeBlocks } = blockModule);
   ({ PRIVACY_POLICY } = privacyModule);
+  ({ HOME_PAGE_COPY, WORK_PAGE_COPY, DESIGN_SYSTEM_PAGE_COPY } = staticPageCopyModule);
   generateRoutes();
 })();
 
