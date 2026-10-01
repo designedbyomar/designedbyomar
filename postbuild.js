@@ -11,6 +11,9 @@ const DESIGN_SYSTEM_URL = `${SITE_ORIGIN}/design-system`;
 const ASK_TITLE = 'Ask about the work — Omar Tavarez';
 const ASK_DESCRIPTION = 'Answers about Omar Tavarez\u2019s product design work \u2014 design systems, fintech and embedded payments, AI workflows, healthcare SaaS and enterprise UX \u2014 written from the published case studies.';
 const ASK_URL = `${SITE_ORIGIN}/ask`;
+const ABOUT_TITLE = 'About — Omar Tavarez';
+const ABOUT_DESCRIPTION = 'Omar Tavarez is a principal product designer who turns undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. Former DJ, lifelong artist, amateur boxer.';
+const ABOUT_URL = `${SITE_ORIGIN}/about`;
 
 const personSchema = {
   '@type': 'Person',
@@ -179,6 +182,25 @@ const askStructuredData = () => ({
   ],
 });
 
+const aboutStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfilePage',
+      name: ABOUT_TITLE,
+      url: ABOUT_URL,
+      description: ABOUT_DESCRIPTION,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'designedbyomar',
+        url: `${SITE_ORIGIN}/`,
+      },
+      mainEntity: personSchema,
+    },
+    personSchema,
+  ],
+});
+
 // Deliberately not FAQPage. Google limits that rich result to "well-known,
 // authoritative government and health websites", so it would buy nothing and
 // invite a structured-data warning for a mismatch with the visible page.
@@ -245,6 +267,7 @@ function generateSitemap(distDir) {
   const staticPages = [
     { loc: `${SITE_ORIGIN}/`,              changefreq: 'weekly',  priority: '1.0' },
     { loc: `${SITE_ORIGIN}/work`,          changefreq: 'weekly',  priority: '0.9' },
+    { loc: ABOUT_URL,                      changefreq: 'monthly', priority: '0.7' },
     { loc: ASK_URL,                        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${SITE_ORIGIN}/design-system`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE_ORIGIN}/privacy`,       changefreq: 'yearly',  priority: '0.4' },
@@ -584,6 +607,56 @@ function generateRoutes() {
     privacyStructuredData(),
   ), 'Privacy Policy — Omar Tavarez');
   fs.writeFileSync(`${privacyDir}/index.html`, privacyHtml);
+
+  // /about — the copy is client-rendered, so a hidden snapshot is emitted for crawlers.
+  const aboutDir = `${distDir}/about`;
+  fs.mkdirSync(aboutDir, { recursive: true });
+  const aboutSections = [
+    ['Background', [
+      "I grew up in Brooklyn as an artist, and I've been drawing and painting my whole life. I found design through music. I was a professional DJ, and I started designing flyers for my own parties. That led to Photoshop, music covers, and the early internet, and then graphic, web and visual design. Product came through the practical side: HTML, CSS, small agency work, and learning how to turn ideas into interfaces people could actually use. Over time, that path moved through e-commerce, SaaS, fintech, healthcare, ad sales, media, and enterprise tools.",
+      "The through-line has always been the same: I like hard product problems. The kind with messy data, edge cases, operational constraints, business pressure, and users who need the product to work because their job depends on it.",
+      "Where it started: flyers from the DJ years, and a lifetime of drawing. A few UX sketches snuck in.",
+    ]],
+    ['How I work', [
+      "I'm a generalist with a systems mindset. I usually start in plain text: writing, mapping the problem, naming the tradeoffs, and cutting through ambiguity. Then I move quickly into flows, prototypes, and working artifacts.",
+      "I'd rather put a rough prototype in a teammate's hands than spend another week polishing a deck. I care about craft, but I care more about momentum, clarity, and whether the work helps the team make a better decision.",
+      "I've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.",
+    ]],
+    ['Currently', [
+      "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
+      "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
+      "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
+      "Previously: Plastiq, Disney, Simplero, GoNation.",
+    ]],
+    ['Tools & craft', [
+      "Figma, React, HTML/CSS/JS, Claude Code, ChatGPT, Codex, Notion, Linear, and Obsidian.",
+      "I use AI tools as part of my design workflow — to explore faster, prototype smarter, write better documentation, pressure-test ideas, and move from concept to implementation with less friction. I still believe taste, judgment, and product thinking are the real tools. The software just helps me move faster.",
+    ]],
+    ['Off the clock', [
+      "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
+    ]],
+  ];
+  const aboutBody = [
+    `<article style="${HIDDEN_STYLE}">`,
+    `<h1>${escapeText('I started out designing flyers for my own parties.')}</h1>`,
+    `<p>${escapeText('Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.')}</p>`,
+    ...aboutSections.map(([heading, paras]) => `<h2>${escapeText(heading)}</h2>${paras.map((p) => `<p>${escapeText(p)}</p>`).join('')}`),
+    '</article>',
+  ].join('');
+  const aboutHtml = injectRootContent(
+    setStructuredData(
+      setMeta(indexHtml, {
+        title: ABOUT_TITLE,
+        description: ABOUT_DESCRIPTION,
+        url: ABOUT_URL,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      aboutStructuredData(),
+    ),
+    aboutBody,
+    ABOUT_TITLE,
+  );
+  fs.writeFileSync(`${aboutDir}/index.html`, aboutHtml);
 
   const designSystemSourcePath = `${distDir}/design-system.html`;
   if (fs.existsSync(designSystemSourcePath)) {

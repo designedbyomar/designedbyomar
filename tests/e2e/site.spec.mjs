@@ -65,12 +65,6 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-const expectDrawerOffCanvas = async (drawer) => {
-  await expect.poll(() => drawer.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return rect.left >= window.innerWidth - 1;
-  })).toBe(true);
-};
 
 const expectLatestAnalyticsEvent = async (page, eventName, expectedParams) => {
   await expect.poll(() => page.evaluate((name) => {
@@ -187,6 +181,54 @@ test('/privacy loads the privacy policy route', async ({ page }) => {
   await expect(page).toHaveURL(/\/privacy\/?$/);
   await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible();
   await expect(page.getByText('No creepy tracking', { exact: true }).first()).toBeVisible();
+});
+
+test('/about loads directly with the hero cluster, alternating rows, and photos', async ({ page }) => {
+  await page.goto('/about');
+
+  await expect(page).toHaveURL(/\/about\/?$/);
+  await expect(page.getByRole('heading', { level: 1, name: /designing flyers for my own parties/i })).toBeVisible();
+  await expect(page.locator('.about-eyebrow')).toHaveText('About');
+
+  // The hero cluster renders its photos, each with alt text.
+  const photos = page.locator('.about-collage img');
+  await expect(photos).toHaveCount(3);
+  const heroCount = await photos.count();
+  for (let i = 0; i < heroCount; i += 1) {
+    await expect(photos.nth(i)).toHaveAttribute('alt', /.+/);
+  }
+
+  // Sections alternate: at least one row has its image cluster on each side.
+  await expect(page.locator('.about-row[data-side="left"]').first()).toBeVisible();
+  await expect(page.locator('.about-row[data-side="right"]').first()).toBeVisible();
+  // Photos are distributed through the body rows too.
+  await expect(page.locator('.about-row .about-frame__img').first()).toHaveAttribute('alt', /.+/);
+
+  await expect(page.getByRole('link', { name: /See the work/i })).toHaveAttribute('href', '/work');
+  await expect(page.getByRole('link', { name: /^Email me$/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
+});
+
+test('the About page photo lightbox opens, shows a caption, and returns focus on close', async ({ page }) => {
+  await page.goto('/about');
+  const trigger = page.locator('.about-collage__tile--boxing .about-tile__btn');
+  await trigger.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('figcaption')).toHaveText(/boxing ring/i);
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+test('nav, footer, and the home About button all navigate to /about', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: /Read more about me/i }).click();
+  await expect(page).toHaveURL(/\/about$/);
+
+  await page.getByRole('banner').getByRole('link', { name: 'About', exact: true }).click();
+  await expect(page).toHaveURL(/\/about$/);
 });
 
 test('the Ask section offers suggested questions instead of an accordion', async ({ page }) => {
@@ -431,30 +473,6 @@ test('the approved answers are in the served HTML for non-JS consumers', async (
   }
 });
 
-test('About drawer opens from nav and section controls, then closes', async ({ page }) => {
-  await page.goto('/');
-
-  const aboutDrawer = page.locator('[role="dialog"][aria-label="About Omar"]');
-
-  await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
-  const navDialog = page.getByRole('dialog', { name: 'About Omar' });
-  await expect(navDialog).toBeVisible();
-  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
-  await expect(navDialog.getByText('About / long-form')).toBeVisible();
-  await navDialog.getByRole('button', { name: 'Close' }).click();
-  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
-  await expectDrawerOffCanvas(aboutDrawer);
-
-  await page.locator('#about').scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: /Read more about me/i }).click();
-  const sectionDialog = page.getByRole('dialog', { name: 'About Omar' });
-  await expect(sectionDialog).toBeVisible();
-  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'false');
-  await sectionDialog.getByRole('button', { name: 'Close' }).click();
-  await expect(aboutDrawer).toHaveAttribute('aria-hidden', 'true');
-  await expectDrawerOffCanvas(aboutDrawer);
-});
-
 test('Work section links to the full case-study index', async ({ page }) => {
   await page.goto('/');
 
@@ -535,9 +553,11 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
     window.__omarAnalyticsEvents = [];
   });
 
-  await page.getByRole('banner').getByRole('button', { name: 'About' }).click();
-  await expectLatestAnalyticsEvent(page, 'about_drawer_open', { source: 'nav' });
-  await page.getByRole('dialog', { name: 'About Omar' }).getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('banner').getByRole('link', { name: 'About', exact: true }).click();
+  await expectLatestAnalyticsEvent(page, 'about_page_open', { source: 'nav' });
+  await expect(page).toHaveURL(/\/about$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
 
   await page.locator('#faq').scrollIntoViewIfNeeded();
   await expect(page.getByText('Try one of these')).toBeVisible();
