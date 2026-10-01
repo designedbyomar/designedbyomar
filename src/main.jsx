@@ -1282,8 +1282,8 @@ const AboutPage = () => {
 const caseAccentGradient = (accent) => `linear-gradient(135deg, ${accent} 0%, color-mix(in oklab, ${accent} 70%, white) 100%)`;
 
 const CASE_CARD_IMAGE_SIZES = {
-  wide: '(max-width: 767px) 72vw, 830px',
-  standard: '(max-width: 767px) 72vw, 405px',
+  wide: '(max-width: 900px) calc(72vw - 35px), 830px',
+  standard: '(max-width: 900px) calc(72vw - 35px), 405px',
 };
 
 const CaseCardImage = ({ c, featured, sizes, style }) => (

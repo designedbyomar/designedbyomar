@@ -1927,6 +1927,7 @@ test.describe('case-card media delivery', () => {
       expect(srcSet).toContain('-640.webp 640w');
       expect(srcSet).toContain('-960.webp 960w');
       expect(srcSet).toContain('-1440.webp 1440w');
+      await expect(cover).toHaveAttribute('sizes', /\(max-width: 900px\) calc\(72vw - 35px\)/);
     }
 
     await expect(page.locator('[data-case-study-id="page-builder"] [data-case-cover-still]'))
