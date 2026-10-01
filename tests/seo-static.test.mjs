@@ -50,9 +50,9 @@ const getRootLinks = (html, sourceUrl) => [...getRootContent(html, sourceUrl).ma
     return url.href;
   });
 const getRootWordCount = (html, label) => {
-  const text = getRootContent(html, label)
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, ' ')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, ' ')
+  const root = getRootContent(html, label);
+  assert.doesNotMatch(root, /<(?:script|style)\b/i, `${label} keeps scripts and styles outside the static content root`);
+  const text = root
     .replace(/<[^>]+>/g, ' ')
     .replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, ' ');
   return text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0;
