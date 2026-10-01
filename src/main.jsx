@@ -982,7 +982,7 @@ const ABOUT_SECTIONS = [
     paras: [
       "Amateur boxer, music producer, former DJ, and dedicated father. When I'm not training, I'm usually outdoors — hiking, traveling, and meeting new people. I'm usually thinking about systems, behavior, design, music, training, or why Brooklyn still has the best energy of any place on earth.",
     ],
-    images: ['family', 'hike', 'evening'],
+    images: ['family', 'evening', 'hike'],
   },
 ];
 
@@ -1151,104 +1151,16 @@ const AboutTile = ({ photoKey, onOpen, parallax = 0, eager = false, className = 
 
 const CLUSTER_PARALLAX = [0.06, -0.05, 0.04];
 const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'dj'];
-const ABOUT_INTRO_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
-const ABOUT_INTRO_ROTATIONS = [-9, 8, -6, 10, -8, 6, -10, 7, -5, 9];
-const STACK_DEAL_MS = 85;    // gap between each card landing on the pile
-const STACK_HOLD_MS = 240;   // pause once the whole pile is assembled
-const STACK_FAN_MS = 950;    // break-out duration
-const STACK_FAN_STAGGER_MS = 55;
 
-// The Codrops ImageStackGrid demo2 intro, reproduced in vanilla JS as ONE
-// page-load choreography: every image on the page deals onto a single pile at
-// the viewport center, holds, then all break out to their real positions.
-// The tile carries the scroll-float; its inner button carries placement
-// rotation + the intro transform, both via CSS vars so nothing jumps.
-const useAboutIntro = (rootRef, { play, reducedMotion }) => {
-  const playedRef = React.useRef(false);
-
-  // Pile every card at the viewport center, hidden — pre-paint so there's no
-  // flash of the settled layout before the animation runs.
-  const arm = React.useCallback(() => {
-    const root = rootRef.current;
-    if (!root) return [];
-    const tiles = Array.from(root.querySelectorAll('.about-tile'));
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-    tiles.forEach((el, i) => {
-      const inner = el.querySelector('.about-tile__btn');
-      const r = el.getBoundingClientRect();
-      const dx = cx - (r.left + r.width / 2);
-      const dy = cy - (r.top + r.height / 2);
-      el.style.opacity = '0';
-      el.style.position = 'relative';
-      el.style.zIndex = String(200 + i);
-      if (inner) {
-        inner.style.transition = 'none';
-        inner.style.setProperty('--deal-x', `${dx}px`);
-        inner.style.setProperty('--deal-y', `${dy}px`);
-        inner.style.setProperty('--deal-s', '0.5');
-        inner.style.setProperty('--deal-rot', `${ABOUT_INTRO_ROTATIONS[i % ABOUT_INTRO_ROTATIONS.length]}deg`);
-      }
-    });
-    return tiles;
-  }, [rootRef]);
-
-  React.useLayoutEffect(() => {
-    if (reducedMotion || playedRef.current) return;
-    arm();
-  }, [arm, reducedMotion]);
-
-  React.useEffect(() => {
-    if (reducedMotion || !play || playedRef.current) return undefined;
-    playedRef.current = true;
-    const tiles = arm(); // re-measure now that the page is visible/settled
-    if (!tiles.length) return undefined;
-    const timers = [];
-
-    // Deal each card onto the pile in sequence.
-    tiles.forEach((el, i) => {
-      timers.push(window.setTimeout(() => { el.style.opacity = '1'; }, i * STACK_DEAL_MS));
-    });
-    // Break the pile out to every card's real position.
-    const fanStart = tiles.length * STACK_DEAL_MS + STACK_HOLD_MS;
-    timers.push(window.setTimeout(() => {
-      tiles.forEach((el, i) => {
-        const inner = el.querySelector('.about-tile__btn');
-        if (!inner) return;
-        inner.style.transition = `transform ${STACK_FAN_MS}ms ${ABOUT_INTRO_EASE} ${i * STACK_FAN_STAGGER_MS}ms`;
-        inner.style.setProperty('--deal-x', '0px');
-        inner.style.setProperty('--deal-y', '0px');
-        inner.style.setProperty('--deal-s', '1');
-        inner.style.setProperty('--deal-rot', '0deg');
-      });
-    }, fanStart));
-    // Settle: hand the transform back to CSS (placement rotation + parallax).
-    const total = fanStart + STACK_FAN_MS + (tiles.length - 1) * STACK_FAN_STAGGER_MS + 150;
-    timers.push(window.setTimeout(() => {
-      tiles.forEach((el) => {
-        const inner = el.querySelector('.about-tile__btn');
-        el.style.opacity = ''; el.style.zIndex = ''; el.style.position = '';
-        if (inner) {
-          inner.style.transition = '';
-          ['--deal-x', '--deal-y', '--deal-s', '--deal-rot'].forEach((v) => inner.style.removeProperty(v));
-        }
-      });
-    }, total));
-
-    return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [arm, play, reducedMotion]);
-};
-
-// An image cluster: one framed photo, or a loose overlapping stack. Images are
-// eager so the page-load pile isn't empty for below-fold tiles.
-const AboutStack = ({ images, onOpen, className = '', tilePrefix = 'about-stack__tile' }) => (
+// An image cluster: one framed photo, or a loose overlapping stack.
+const AboutStack = ({ images, onOpen, eager = false, className = '', tilePrefix = 'about-stack__tile' }) => (
   <div className={`about-stack about-stack--${images.length} ${className}`.trim()}>
     {images.map((key, i) => (
       <AboutTile
         key={key}
         photoKey={key}
         onOpen={onOpen}
-        eager
+        eager={eager}
         parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]}
         className={`${tilePrefix} ${tilePrefix}--${key}`}
       />
@@ -1313,11 +1225,10 @@ const AboutRow = ({ section, onOpen }) => {
   );
 };
 
-const AboutPage = ({ introReady = true }) => {
+const AboutPage = () => {
   const [lightbox, setLightbox] = React.useState(null);
   const rootRef = React.useRef(null);
   const reducedMotion = usePrefersReducedMotion();
-  useAboutIntro(rootRef, { play: introReady, reducedMotion });
   useAboutParallax(rootRef, reducedMotion);
   const ctaBase = {
     display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
@@ -1332,7 +1243,7 @@ const AboutPage = ({ introReady = true }) => {
           <h1>{ABOUT_HERO_H1}</h1>
           <p className="about-lede">{ABOUT_HERO_LEDE}</p>
         </div>
-        <AboutStack images={ABOUT_HERO_KEYS} onOpen={setLightbox} className="about-collage" tilePrefix="about-collage__tile" />
+        <AboutStack images={ABOUT_HERO_KEYS} onOpen={setLightbox} eager className="about-collage" tilePrefix="about-collage__tile" />
       </div>
 
       {ABOUT_SECTIONS.map((section) => (
@@ -4219,7 +4130,7 @@ const App = () => {
           {route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
           ) : route.type === 'about' ? (
-            <AboutPage introReady={!loading} />
+            <AboutPage />
           ) : route.type === 'ask' ? (
             <AskPage />
           ) : route.type === 'work' ? (

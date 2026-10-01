@@ -113,10 +113,7 @@
   border: 0;
   background: none;
   cursor: zoom-in;
-  transform:
-    translate(var(--deal-x, 0px), var(--deal-y, 0px))
-    scale(var(--deal-s, 1))
-    rotate(calc(var(--tile-rot, 0deg) + var(--deal-rot, 0deg)));
+  transform: rotate(var(--tile-rot, 0deg));
 }
 
 .about-frame {
@@ -190,9 +187,8 @@
   .about-stack--3 .about-tile:nth-child(3) { margin-top: var(--space-3); }
 }
 
-/* Reduced motion: no intro (tiles never armed), no float. */
+/* Reduced motion: no float, no hover zoom transition. */
 @media (prefers-reduced-motion: reduce) {
-  .about-tile { opacity: 1 !important; }
   .about-frame__img { transition: none; }
 }
 
@@ -202,6 +198,7 @@
   flex-wrap: wrap;
   gap: var(--space-3);
   align-items: center;
+  justify-content: center;
 }
 
 /* ---- Lightbox ---- */
