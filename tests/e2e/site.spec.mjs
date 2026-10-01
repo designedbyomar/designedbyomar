@@ -554,7 +554,15 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   });
 
   await page.getByRole('banner').getByRole('link', { name: 'About', exact: true }).click();
-  await expectLatestAnalyticsEvent(page, 'about_page_open', { source: 'nav' });
+  await expectLatestAnalyticsEvent(page, 'about_page_open', { ui_location: 'nav' });
+  // GA4 reserves `source` as an acquisition dimension — internal UI locations
+  // must never be sent under it.
+  const aboutParamKeys = await page.evaluate(() => {
+    const event = (window.__omarAnalyticsEvents || []).find((e) => e.eventName === 'about_page_open');
+    return event ? Object.keys(event.params || {}) : null;
+  });
+  expect(aboutParamKeys, 'about_page_open event should exist').not.toBeNull();
+  expect(aboutParamKeys, 'about_page_open must not carry a `source` param').not.toContain('source');
   await expect(page).toHaveURL(/\/about$/);
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
@@ -608,6 +616,59 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
     case_study_id: 'posting-asst',
     target_case_study_id: 'mgmt-portal',
   });
+});
+
+test('production build does not load Google Analytics before consent', async ({ page }) => {
+  await page.goto('/');
+  // The cookie banner is shown and no consent has been given yet.
+  await expect(page.getByRole('button', { name: 'Accept' })).toBeVisible();
+  const ga = await page.evaluate(() => ({
+    script: document.getElementById('omar-ga4-script') ? 1 : 0,
+    gtag: typeof window.gtag,
+  }));
+  expect(ga.script, 'GA script must not be injected before consent').toBe(0);
+  expect(ga.gtag, 'gtag must not exist before consent').toBe('undefined');
+});
+
+test('production build loads Google Analytics only after consent', async ({ page }) => {
+  // Stub the GA loader request so the test never reaches the network.
+  await page.route('https://www.googletagmanager.com/gtag/js**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/javascript',
+    body: 'window.__omarGaScriptLoaded = true;',
+  }));
+
+  await page.goto('/');
+  expect(await page.evaluate(() => document.getElementById('omar-ga4-script') ? 1 : 0)).toBe(0);
+
+  await page.getByRole('button', { name: 'Accept' }).click();
+  await expect.poll(() => page.evaluate(() => document.getElementById('omar-ga4-script') ? 1 : 0)).toBe(1);
+  await expect.poll(() => page.evaluate(() => window.__omarGaScriptLoaded === true)).toBe(true);
+});
+
+test('each route change emits exactly one manual page_view', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('omar.analyticsConsent', 'accepted');
+    window.__omarAnalyticsConsent = 'accepted';
+    window.__omarGaReady = true;
+    window.__omarAnalyticsEvents = [];
+    window.gtag = (command, eventName, params) => {
+      if (command === 'event') window.__omarAnalyticsEvents.push({ eventName, params });
+    };
+  });
+
+  const pageViewCount = (path) => page.evaluate((p) => (window.__omarAnalyticsEvents || [])
+    .filter((e) => e.eventName === 'page_view' && e.params?.page_path === p).length, path);
+
+  await page.goto('/');
+  // The home route emits exactly one manual page_view.
+  await expect.poll(() => pageViewCount('/')).toBe(1);
+
+  await page.getByRole('banner').getByRole('link', { name: 'About', exact: true }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  // The /about route change emits exactly one more — not zero, not a duplicate.
+  await expect.poll(() => pageViewCount('/about')).toBe(1);
+  expect(await pageViewCount('/')).toBe(1);
 });
 
 test('design system route exposes the public header and intro content', async ({ page }) => {
