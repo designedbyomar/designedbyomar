@@ -1,9 +1,12 @@
 const fs = require('fs');
 let normalizeBlocks = (body) => (Array.isArray(body) ? body : []); // replaced below by the shared module
+let PRIVACY_POLICY;
 const CASE_STUDIES = require('./src/content/case-studies.json');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/Images/og-image.png`;
+const HOME_TITLE = 'Omar Tavarez — Principal Product Designer';
+const HOME_DESCRIPTION = 'Omar Tavarez is a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.';
 const WORK_TITLE = 'Selected Work — Omar Tavarez';
 const WORK_DESCRIPTION = 'Selected product design case studies by Omar Tavarez across AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.';
 const WORK_URL = `${SITE_ORIGIN}/work`;
@@ -14,6 +17,25 @@ const ASK_URL = `${SITE_ORIGIN}/ask`;
 const ABOUT_TITLE = 'About — Omar Tavarez';
 const ABOUT_DESCRIPTION = 'Omar Tavarez is a principal product designer who turns undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. Former DJ, lifelong artist, amateur boxer.';
 const ABOUT_URL = `${SITE_ORIGIN}/about`;
+
+const STATIC_SITE_LINKS = [
+  ['Home', '/'],
+  ['Work', '/work'],
+  ['About', '/about'],
+  ['Ask', '/ask'],
+  ['Design System', '/design-system'],
+  ['Privacy', '/privacy'],
+];
+
+const DESIGN_SYSTEM_STATIC_SECTIONS = [
+  ['Shared foundations', 'The portfolio and this documentation surface share the same token source for theme, color, type, spacing, depth, opacity, motion, and responsive rhythm.'],
+  ['Core primitives', 'Documentation-ready primitives cover buttons, cards, accordions, copy actions, navigation, consent, Ask, and GitHub activity.'],
+  ['Production patterns', 'Production patterns document how primitives become recognizable portfolio surfaces across heroes, case-study covers, footers, and privacy consent.'],
+  ['Motion', 'Motion supports orientation, feedback, and personality while respecting reduced-motion preferences across canvas, animation, and scroll behavior.'],
+  ['Voice and tone', 'Copy should sound specific, senior, and human, without inflated claims, generic AI phrasing, or unverifiable outcomes.'],
+  ['Accessibility', 'WCAG AA is the floor: focus states, keyboard flows, contrast, touch targets, and reduced motion are design-system requirements.'],
+  ['Source files', 'The public guide connects the shared tokens, production components, design rules, source files, and AI-assisted workflow documentation.'],
+];
 
 const personSchema = {
   '@type': 'Person',
@@ -322,9 +344,99 @@ function injectRootContent(html, innerHtml, label) {
   return `${html.slice(0, start)}${innerHtml}${html.slice(end)}`;
 }
 
-function injectH1(html, text) {
-  return injectRootContent(html, `<h1 style="${HIDDEN_STYLE}">${escapeText(text)}</h1>`, text);
-}
+const staticSiteNavigationHtml = () => [
+  '<nav aria-label="Site">',
+  '<ul>',
+  ...STATIC_SITE_LINKS.map(([label, href]) => `<li><a href="${escapeAttr(href)}">${escapeText(label)}</a></li>`),
+  '</ul>',
+  '</nav>',
+].join('');
+
+const staticSnapshotHtml = (mainHtml) => [
+  `<div data-static-snapshot inert style="${HIDDEN_STYLE}">`,
+  staticSiteNavigationHtml(),
+  mainHtml,
+  '</div>',
+].join('');
+
+const caseStudyLinksHtml = ({ detailed = false, headingLevel = 3 } = {}) => [
+  '<ol>',
+  ...CASE_STUDIES.map((caseStudy) => {
+    const href = `/work/${encodeURIComponent(caseStudy.id)}/`;
+    const metadata = [caseStudy.client, caseStudy.year, caseStudy.role].filter(Boolean).join(' · ');
+    const details = detailed
+      ? [
+        caseStudy.subtitle ? `<p>${escapeText(caseStudy.subtitle)}</p>` : '',
+        metadata ? `<p>${escapeText(metadata)}</p>` : '',
+        caseStudy.tags?.length ? `<ul>${caseStudy.tags.map((tag) => `<li>${escapeText(tag)}</li>`).join('')}</ul>` : '',
+      ].join('')
+      : (caseStudy.subtitle ? `<p>${escapeText(caseStudy.subtitle)}</p>` : '');
+    return `<li><article><h${headingLevel}><a href="${escapeAttr(href)}">${escapeText(caseStudy.title)}</a></h${headingLevel}>${details}</article></li>`;
+  }),
+  '</ol>',
+].join('');
+
+const homepageContentHtml = () => staticSnapshotHtml([
+  '<main>',
+  `<h1>${escapeText(HOME_TITLE)}</h1>`,
+  '<p>Complex systems. Clear products.</p>',
+  `<p>${escapeText(HOME_DESCRIPTION)}</p>`,
+  '<section>',
+  '<h2>Selected work</h2>',
+  `<p>${escapeText(WORK_DESCRIPTION)}</p>`,
+  caseStudyLinksHtml(),
+  '<p><a href="/work">View all selected work</a></p>',
+  '</section>',
+  '<section>',
+  '<h2>About Omar</h2>',
+  `<p>${escapeText(ABOUT_DESCRIPTION)}</p>`,
+  '<p><a href="/about">Read more about Omar</a></p>',
+  '</section>',
+  '<section>',
+  '<h2>Ask about the work</h2>',
+  `<p>${escapeText(ASK_DESCRIPTION)}</p>`,
+  '<p><a href="/ask">Browse reviewed answers</a></p>',
+  '</section>',
+  '</main>',
+].join(''));
+
+const workContentHtml = () => staticSnapshotHtml([
+  '<main>',
+  `<h1>${escapeText(WORK_TITLE)}</h1>`,
+  `<p>${escapeText(WORK_DESCRIPTION)}</p>`,
+  '<section aria-label="Case studies">',
+  caseStudyLinksHtml({ detailed: true, headingLevel: 2 }),
+  '</section>',
+  '</main>',
+].join(''));
+
+const privacyContentHtml = () => {
+  const blocks = PRIVACY_POLICY.blocks.map((block) => {
+    if (block.type === 'heading') return `<h2>${escapeText(block.text)}</h2>`;
+    if (block.type === 'list') return `<ul>${block.items.map((item) => `<li>${escapeText(item)}</li>`).join('')}</ul>`;
+    const link = block.link
+      ? `<a href="${escapeAttr(block.link.href)}">${escapeText(block.link.label)}</a>`
+      : '';
+    return `<p>${escapeText(block.text)}${link}${escapeText(block.suffix || '')}</p>`;
+  }).join('');
+
+  return staticSnapshotHtml([
+    '<main><article>',
+    `<h1>${escapeText(PRIVACY_POLICY.title)}</h1>`,
+    `<p>${escapeText(PRIVACY_POLICY.subtitle)}</p>`,
+    `<p>Last updated: ${escapeText(PRIVACY_POLICY.lastUpdated)}</p>`,
+    blocks,
+    '</article></main>',
+  ].join(''));
+};
+
+const designSystemContentHtml = () => staticSnapshotHtml([
+  '<main><article>',
+  '<h1>designedbyomar Design System</h1>',
+  `<p>${escapeText("The system powers Omar Tavarez's portfolio, case-study storytelling, interaction patterns, motion language, and public design-engineering workflow.")}</p>`,
+  ...DESIGN_SYSTEM_STATIC_SECTIONS.map(([heading, body]) => `<section><h2>${escapeText(heading)}</h2><p>${escapeText(body)}</p></section>`),
+  '</article></main>',
+].join(''));
 
 // The full case-study record as static HTML. The rendered React view labels these
 // sections with styled divs (src/main.jsx); real headings here give the static version
@@ -365,15 +477,19 @@ function caseStudyBodyHtml(rawBody) {
     }
   }).join('');
 }
-function caseStudyContentHtml(c) {
-  const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeAttr).join(' · ');
+function caseStudyContentHtml(c, index) {
+  const meta = [c.client, c.year, c.role].filter(Boolean).map(escapeText).join(' · ');
   const list = (items) => (items && items.length ? `<ul>${items.join('')}</ul>` : '');
   const tags = list((c.tags || []).map((t) => `<li>${escapeText(t)}</li>`));
   const metrics = list((c.metrics || []).map((m) => `<li>${escapeText(m.value)} — ${escapeText(m.label)}${m.qualifier ? ` (${escapeText(m.qualifier)})` : ''}</li>`));
   const section = (label, body) => (body ? `<h2>${label}</h2><p>${escapeText(body)}</p>` : '');
+  const previous = CASE_STUDIES[(index - 1 + CASE_STUDIES.length) % CASE_STUDIES.length];
+  const next = CASE_STUDIES[(index + 1) % CASE_STUDIES.length];
 
-  return [
-    `<article style="${HIDDEN_STYLE}">`,
+  return staticSnapshotHtml([
+    '<main>',
+    '<p><a href="/work">Back to selected work</a></p>',
+    '<article>',
     `<h1>${escapeText(c.title)}</h1>`,
     c.subtitle ? `<p>${escapeText(c.subtitle)}</p>` : '',
     meta ? `<p>${meta}</p>` : '',
@@ -384,7 +500,12 @@ function caseStudyContentHtml(c) {
     section('Outcome', c.outcome),
     caseStudyBodyHtml(c.body),
     '</article>',
-  ].join('');
+    '<nav aria-label="More case studies">',
+    `<a href="/work/${escapeAttr(previous.id)}/">Previous: ${escapeText(previous.title)}</a>`,
+    `<a href="/work/${escapeAttr(next.id)}/">Next: ${escapeText(next.title)}</a>`,
+    '</nav>',
+    '</main>',
+  ].join(''));
 }
 
 /**
@@ -534,7 +655,7 @@ function generateAskAnswers(distDir, indexHtml) {
   const askDir = `${distDir}/ask`;
   fs.mkdirSync(askDir, { recursive: true });
   const answersHtml = approved.length ? [
-    `<article style="${HIDDEN_STYLE}">`,
+    '<article>',
     ...approved.map((a) => `<h2>${escapeText(a.question)}</h2><p>${escapeText(a.answer)}</p>`),
     '</article>',
   ].join('') : '';
@@ -548,7 +669,16 @@ function generateAskAnswers(distDir, indexHtml) {
       }),
       askStructuredData(),
     ),
-    `<h1 style="${HIDDEN_STYLE}">${escapeText(ASK_TITLE)}</h1>${answersHtml}`,
+    staticSnapshotHtml([
+      '<main>',
+      `<h1>${escapeText(ASK_TITLE)}</h1>`,
+      `<p>${escapeText(ASK_DESCRIPTION)}</p>`,
+      answersHtml,
+      '<section><h2>Published case studies</h2>',
+      caseStudyLinksHtml(),
+      '</section>',
+      '</main>',
+    ].join('')),
     ASK_TITLE,
   );
   fs.writeFileSync(`${askDir}/index.html`, askHtml);
@@ -562,21 +692,29 @@ function generateRoutes() {
   if (!fs.existsSync(distDir)) return;
 
   const indexHtml = fs.readFileSync(`${distDir}/index.html`, 'utf8');
+  fs.writeFileSync(
+    `${distDir}/index.html`,
+    injectRootContent(indexHtml, homepageContentHtml(), HOME_TITLE),
+  );
 
   const workDir = `${distDir}/work`;
   fs.mkdirSync(workDir, { recursive: true });
-  const workHtml = injectH1(setStructuredData(
-    setMeta(indexHtml, {
-      title: WORK_TITLE,
-      description: WORK_DESCRIPTION,
-      url: WORK_URL,
-      image: DEFAULT_OG_IMAGE,
-    }),
-    workStructuredData(),
-  ), WORK_TITLE);
+  const workHtml = injectRootContent(
+    setStructuredData(
+      setMeta(indexHtml, {
+        title: WORK_TITLE,
+        description: WORK_DESCRIPTION,
+        url: WORK_URL,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      workStructuredData(),
+    ),
+    workContentHtml(),
+    WORK_TITLE,
+  );
   fs.writeFileSync(`${workDir}/index.html`, workHtml);
 
-  CASE_STUDIES.forEach((c) => {
+  CASE_STUDIES.forEach((c, index) => {
     const dir = `${distDir}/work/${c.id}`;
     fs.mkdirSync(dir, { recursive: true });
 
@@ -590,22 +728,26 @@ function generateRoutes() {
       imageAlt: c.title,
     });
     html = setStructuredData(html, caseStudyStructuredData(c));
-    html = injectRootContent(html, caseStudyContentHtml(c), c.title);
+    html = injectRootContent(html, caseStudyContentHtml(c, index), c.title);
 
     fs.writeFileSync(`${dir}/index.html`, html);
   });
 
   const privacyDir = `${distDir}/privacy`;
   fs.mkdirSync(privacyDir, { recursive: true });
-  const privacyHtml = injectH1(setStructuredData(
-    setMeta(indexHtml, {
-      title: 'Privacy Policy — Omar Tavarez',
-      description: 'Privacy policy for designedbyomar.com — what data is collected, how analytics consent works, and how to contact Omar Tavarez with data requests.',
-      url: `${SITE_ORIGIN}/privacy`,
-      image: DEFAULT_OG_IMAGE,
-    }),
-    privacyStructuredData(),
-  ), 'Privacy Policy — Omar Tavarez');
+  const privacyHtml = injectRootContent(
+    setStructuredData(
+      setMeta(indexHtml, {
+        title: 'Privacy Policy — Omar Tavarez',
+        description: 'Privacy policy for designedbyomar.com — what data is collected, how analytics consent works, and how to contact Omar Tavarez with data requests.',
+        url: `${SITE_ORIGIN}/privacy`,
+        image: DEFAULT_OG_IMAGE,
+      }),
+      privacyStructuredData(),
+    ),
+    privacyContentHtml(),
+    'Privacy Policy — Omar Tavarez',
+  );
   fs.writeFileSync(`${privacyDir}/index.html`, privacyHtml);
 
   // /about — the copy is client-rendered, so a hidden snapshot is emitted for crawlers.
@@ -637,11 +779,11 @@ function generateRoutes() {
     ]],
   ];
   const aboutBody = [
-    `<article style="${HIDDEN_STYLE}">`,
+    '<main><article>',
     `<h1>${escapeText('I started out designing flyers for my own parties.')}</h1>`,
     `<p>${escapeText('Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.')}</p>`,
     ...aboutSections.map(([heading, paras]) => `<h2>${escapeText(heading)}</h2>${paras.map((p) => `<p>${escapeText(p)}</p>`).join('')}`),
-    '</article>',
+    '</article></main>',
   ].join('');
   const aboutHtml = injectRootContent(
     setStructuredData(
@@ -653,7 +795,7 @@ function generateRoutes() {
       }),
       aboutStructuredData(),
     ),
-    aboutBody,
+    staticSnapshotHtml(aboutBody),
     ABOUT_TITLE,
   );
   fs.writeFileSync(`${aboutDir}/index.html`, aboutHtml);
@@ -663,15 +805,19 @@ function generateRoutes() {
     const designSystemDir = `${distDir}/design-system`;
     fs.mkdirSync(designSystemDir, { recursive: true });
     const designSystemSource = fs.readFileSync(designSystemSourcePath, 'utf8');
-    const designSystemHtml = injectH1(setStructuredData(
-      setMeta(designSystemSource, {
-        title: 'designedbyomar Design System',
-        description: "The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez's portfolio.",
-        url: DESIGN_SYSTEM_URL,
-        image: DEFAULT_OG_IMAGE,
-      }),
-      designSystemStructuredData(),
-    ), 'designedbyomar Design System');
+    const designSystemHtml = injectRootContent(
+      setStructuredData(
+        setMeta(designSystemSource, {
+          title: 'designedbyomar Design System',
+          description: "The designedbyomar Design System documents the tokens, components, motion, content patterns, and accessibility rules powering Omar Tavarez's portfolio.",
+          url: DESIGN_SYSTEM_URL,
+          image: DEFAULT_OG_IMAGE,
+        }),
+        designSystemStructuredData(),
+      ),
+      designSystemContentHtml(),
+      'designedbyomar Design System',
+    );
     fs.writeFileSync(`${designSystemDir}/index.html`, designSystemHtml);
   }
 
@@ -682,8 +828,13 @@ function generateRoutes() {
 }
 
 if (require.main === module) (async () => {
-  ({ normalizeBlocks } = await import('./src/content/case-study-blocks.mjs'));
+  const [blockModule, privacyModule] = await Promise.all([
+    import('./src/content/case-study-blocks.mjs'),
+    import('./src/content/privacy-policy.mjs'),
+  ]);
+  ({ normalizeBlocks } = blockModule);
+  ({ PRIVACY_POLICY } = privacyModule);
   generateRoutes();
 })();
 
-module.exports = { injectRootContent, escapeAttr, escapeText };
+module.exports = { injectRootContent, rootContentRange, escapeAttr, escapeText };

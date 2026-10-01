@@ -11,6 +11,7 @@ import { GitHubContributions } from './github-contributions.jsx';
 import { LAYOUT, ASPECT_RATIOS } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
 import { normalizeBlocks } from './content/case-study-blocks.mjs';
+import { PRIVACY_POLICY } from './content/privacy-policy.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
 import { mentionedStudyIds, tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
@@ -3249,78 +3250,39 @@ const PrivacyPolicyPage = ({ onBack }) => {
     textDecoration: 'underline',
     textUnderlineOffset: '3px',
   };
+  const renderPrivacyBlock = (block, index) => {
+    const key = `${block.type}-${block.text?.slice(0, 32) || index}`;
+    if (block.type === 'heading') return <h2 key={key} style={sectionHeadingStyle}>{block.text}</h2>;
+    if (block.type === 'list') {
+      return (
+        <ul key={key} style={listStyle}>
+          {block.items.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      );
+    }
+    return (
+      <p key={key} style={{ margin: 0 }}>
+        {block.text}
+        {block.link && <a href={block.link.href} style={privacyLinkStyle}>{block.link.label}</a>}
+        {block.suffix || ''}
+      </p>
+    );
+  };
 
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
       <a href="#" className="text-link" onClick={(e) => { e.preventDefault(); onBack(); }} style={{ marginBottom: 48 }}>← Back to home</a>
       <div style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-4)' }}>Privacy Policy</h1>
-        <p style={{ fontSize: 'var(--font-size-heading-lg)', lineHeight: 'var(--line-height-snug-plus)', color: 'var(--fg-secondary)', margin: 0 }}>No creepy tracking</p>
+        <h1 style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-4)' }}>{PRIVACY_POLICY.title}</h1>
+        <p style={{ fontSize: 'var(--font-size-heading-lg)', lineHeight: 'var(--line-height-snug-plus)', color: 'var(--fg-secondary)', margin: 0 }}>{PRIVACY_POLICY.subtitle}</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed-xl)', fontSize: 'var(--font-size-body-xl)' }}>
-        <p style={{ margin: 0 }}>Last updated: May 8, 2026</p>
-
+        <p style={{ margin: 0 }}>Last updated: {PRIVACY_POLICY.lastUpdated}</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          <p style={{ margin: 0 }}>This site uses a very small amount of analytics to understand what people look at, what pages are useful, and where the experience can be improved.</p>
-          <ul style={listStyle}>
-            <li>No ads.</li>
-            <li>No selling data.</li>
-            <li>No tracking you across the internet.</li>
-            <li>No weird stuff.</li>
-          </ul>
-          <p style={{ margin: 0 }}>The analytics are only here to help make the site better.</p>
+          {PRIVACY_POLICY.blocks.slice(0, 3).map(renderPrivacyBlock)}
         </div>
-
-        <h2 style={sectionHeadingStyle}>Cookies</h2>
-        <p style={{ margin: 0 }}>This site may use cookies or similar technologies for analytics. When you visit the site, you may see a cookie banner that lets you choose whether to allow analytics cookies. If you decline, analytics will not run and the site will still work normally.</p>
-        <p style={{ margin: 0 }}>You can change your choice at any time by clearing cookies or site data in your browser, or by adjusting your browser privacy settings.</p>
-
-        <h2 style={sectionHeadingStyle}>Analytics</h2>
-        <p style={{ margin: 0 }}>This site uses Google Analytics 4, Vercel Analytics, and Vercel Speed Insights to understand how people interact with the site, including things like:</p>
-        <ul style={listStyle}>
-          <li>which pages are visited</li>
-          <li>what links or sections people engage with</li>
-          <li>how long people stay</li>
-          <li>what devices or browsers are being used</li>
-          <li>general location, such as country or city-level information</li>
-          <li>questions typed into the Ask box that it cannot safely answer, including the wording of the question; when the router identifies relevant published work, the question may also be sent to Groq with excerpts from only those case studies so a reply can be drafted</li>
-        </ul>
-        <p style={{ margin: 0 }}>This information is used to improve the site, portfolio, case studies, writing, performance, and overall experience. Analytics data is aggregated where applicable and is not used to personally identify visitors. I do not use analytics for advertising, profiling, retargeting, or tracking you across other websites.</p>
-
-        <h2 style={sectionHeadingStyle}>The Ask Box</h2>
-        <p style={{ margin: 0 }}>The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing the same reviewed question or alias with ordinary changes in casing, punctuation, apostrophes, or spacing, is answered in your browser: nothing is sent and nothing leaves this site.</p>
-        <p style={{ margin: 0 }}>Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, returns an invalid result, or the allowance is spent, the Ask box shows that it cannot answer rather than substituting a loosely related answer or citation.</p>
-        <p style={{ margin: 0 }}>If no written answer fits, Groq may name one or two relevant case studies. Only then is the question sent again with excerpts from those named studies and any reviewed answer grounded entirely in the same studies. If the router says none apply or fails, no draft is attempted. A drafted reply is labelled as drafted and unreviewed wherever it appears, and citation links appear only for named studies the completed reply actually mentions. The wording of a question the Ask box cannot safely answer is also recorded in an analytics event, which is how I can see missing answers and routing failures. A question that does get a written answer is not recorded that way.</p>
-        <p style={{ margin: 0 }}>Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.</p>
-
-        <h2 style={sectionHeadingStyle}>Google Analytics 4</h2>
-        <p style={{ margin: 0 }}>Google Analytics 4 helps measure site activity and performance. GA4 may use cookies to collect analytics information after you accept analytics. This data is processed by Google on my behalf and may be stored or processed in locations outside your country, depending on Google's systems and infrastructure.</p>
-        <p style={{ margin: 0 }}>Google provides controls and safeguards for analytics data, including data retention settings and privacy-focused measurement options.</p>
-
-        <h2 style={sectionHeadingStyle}>Vercel Analytics And Speed Insights</h2>
-        <p style={{ margin: 0 }}>Vercel Analytics and Speed Insights help measure basic site performance and visitor behavior, such as page views, referrers, browser type, device information, and real-world performance metrics.</p>
-        <p style={{ margin: 0 }}>They are used to understand how the site performs in the real world and to make improvements to speed, usability, and content.</p>
-
-        <h2 style={sectionHeadingStyle}>Sentry Error Monitoring</h2>
-        <p style={{ margin: 0 }}>This site uses Sentry for production error monitoring. Sentry only initializes after you accept analytics. It helps identify broken pages, JavaScript errors, browser context, route information, and theme state when something fails.</p>
-        <p style={{ margin: 0 }}>Sentry is used to debug production issues and keep the site working. It is not used for advertising, profiling, or retargeting.</p>
-
-        <h2 style={sectionHeadingStyle}>Contact</h2>
-        <p style={{ margin: 0 }}>If you contact me through an email link or any other method on this site, I collect the information you choose to share, such as your name, email address, company, and message.</p>
-        <p style={{ margin: 0 }}>That information is only used to respond to your inquiry and any related follow-up. I do not sell or share contact messages with advertisers. Messages may be stored in my email inbox or related communication tools for as long as needed to manage the conversation.</p>
-
-        <h2 style={sectionHeadingStyle}>Legal Basis</h2>
-        <p style={{ margin: 0 }}>Where required by privacy laws, analytics cookies are used based on your consent. Contact messages are processed based on legitimate interest: responding to people who reach out about work, services, collaboration, hiring, or general inquiries.</p>
-
-        <h2 style={sectionHeadingStyle}>Sharing And Selling Data</h2>
-        <p style={{ margin: 0 }}>I do not sell your personal data. I do not share your personal data with advertisers. The third-party services currently used for analytics, performance measurement, and error monitoring are Google Analytics 4, Vercel Analytics, Vercel Speed Insights, and Sentry.</p>
-
-        <h2 style={sectionHeadingStyle}>Your Rights</h2>
-        <p style={{ margin: 0 }}>Depending on where you live, you may have the right to request access to, correction of, or deletion of personal information connected to you. To make a request, contact me at <a href="mailto:omar@designedbyomar.com" style={privacyLinkStyle}>omar@designedbyomar.com</a>.</p>
-
-        <h2 style={sectionHeadingStyle}>Updates</h2>
-        <p style={{ margin: 0 }}>This policy may be updated occasionally as the site changes or as tools are added or removed. The latest version will always be available on this page.</p>
+        {PRIVACY_POLICY.blocks.slice(3).map(renderPrivacyBlock)}
       </div>
     </div>
   );

@@ -5,9 +5,15 @@ import path from 'node:path';
 import sharp from 'sharp';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { PRIVACY_POLICY } from '../src/content/privacy-policy.mjs';
 
 const require = createRequire(import.meta.url);
-const { injectRootContent, escapeAttr, escapeText } = require('../postbuild.js');
+const {
+  injectRootContent,
+  rootContentRange,
+  escapeAttr,
+  escapeText,
+} = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
 const PRINCIPAL_TITLE = 'Principal Product Designer';
@@ -31,6 +37,26 @@ const getTitle = (html) => html.match(/<title>(.*?)<\/title>/i)?.[1] ?? '';
 const getCanonical = (html) => html.match(/<link rel="canonical" href="([^"]+)">/i)?.[1] ?? '';
 const getMetaByName = (html, name) => html.match(new RegExp(`<meta name="${name}" content="([^"]+)">`, 'i'))?.[1] ?? '';
 const getMetaByProperty = (html, property) => html.match(new RegExp(`<meta property="${property}" content="([^"]+)">`, 'i'))?.[1] ?? '';
+const getRootContent = (html, label = 'generated page') => {
+  const { start, end } = rootContentRange(html, label);
+  return html.slice(start, end);
+};
+const getRootLinks = (html, sourceUrl) => [...getRootContent(html, sourceUrl).matchAll(/<a\b[^>]*\bhref="([^"]+)"/gi)]
+  .map((match) => new URL(match[1], sourceUrl))
+  .filter((url) => url.origin === SITE_ORIGIN)
+  .map((url) => {
+    url.hash = '';
+    url.search = '';
+    return url.href;
+  });
+const getRootWordCount = (html, label) => {
+  const text = getRootContent(html, label)
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, ' ');
+  return text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0;
+};
 
 const getStructuredData = (html) => {
   const match = html.match(/<script id="structured-data" type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/i);
@@ -165,6 +191,79 @@ test('all sitemap pages have indexable metadata and matching structured data', (
       assert.equal(url.endsWith('/'), true, `${url} case-study canonical keeps trailing slash`);
     }
   });
+});
+
+test('raw static HTML forms a crawlable canonical internal-link graph', () => {
+  const urls = sitemapUrls();
+  const sitemapSet = new Set(urls);
+  const redirectSources = new Set((JSON.parse(readText('vercel.json')).redirects ?? []).map(({ source }) => source));
+  const incoming = new Map(urls.map((url) => [url, new Set()]));
+
+  for (const sourceUrl of urls) {
+    const html = fs.readFileSync(pagePathForUrl(sourceUrl), 'utf8');
+    assert.match(
+      getRootContent(html, sourceUrl),
+      /<div data-static-snapshot inert style="[^"]*clip-path:inset\(50%\)/,
+      `${sourceUrl} keeps crawler-only content hidden and out of the focus order before hydration`,
+    );
+    const links = [...new Set(getRootLinks(html, sourceUrl))];
+    assert.ok(links.length > 0, `${sourceUrl} has a crawlable internal outgoing link in raw HTML`);
+
+    for (const targetUrl of links) {
+      assert.ok(sitemapSet.has(targetUrl), `${sourceUrl} links only to an indexable canonical route: ${targetUrl}`);
+      assert.equal(
+        redirectSources.has(new URL(targetUrl).pathname),
+        false,
+        `${sourceUrl} does not link through the redirect source ${targetUrl}`,
+      );
+      if (targetUrl !== sourceUrl) incoming.get(targetUrl)?.add(sourceUrl);
+    }
+  }
+
+  for (const [url, sources] of incoming) {
+    if (url === `${SITE_ORIGIN}/`) continue;
+    assert.ok(sources.size > 0, `${url} has an incoming link from another indexable page`);
+  }
+});
+
+test('every generated route has one static H1 and thin app-shell pages carry meaningful prose', () => {
+  for (const url of sitemapUrls()) {
+    const html = fs.readFileSync(pagePathForUrl(url), 'utf8');
+    const h1s = [...getRootContent(html, url).matchAll(/<h1\b/gi)];
+    assert.equal(h1s.length, 1, `${url} has exactly one H1 in its raw HTML`);
+  }
+
+  const pages = [
+    [`${SITE_ORIGIN}/`, 'Complex systems. Clear products.'],
+    [`${SITE_ORIGIN}/work`, 'Selected Work'],
+    [`${SITE_ORIGIN}/privacy`, PRIVACY_POLICY.subtitle],
+    [`${SITE_ORIGIN}/design-system`, 'Shared foundations'],
+  ];
+
+  for (const [url, expectedText] of pages) {
+    const html = fs.readFileSync(pagePathForUrl(url), 'utf8');
+    const root = getRootContent(html, url);
+    assert.ok(root.includes(expectedText), `${url} carries page-specific static content`);
+    assert.ok(getRootWordCount(html, url) >= 50, `${url} exposes at least 50 meaningful words before JavaScript`);
+  }
+});
+
+test('privacy policy client copy and static HTML share one content source', () => {
+  const html = readDist('privacy', 'index.html');
+  const root = getRootContent(html, '/privacy');
+
+  assert.ok(root.includes(escapeText(PRIVACY_POLICY.title)));
+  assert.ok(root.includes(escapeText(PRIVACY_POLICY.subtitle)));
+  assert.ok(root.includes(escapeText(PRIVACY_POLICY.lastUpdated)));
+
+  for (const block of PRIVACY_POLICY.blocks) {
+    if (block.type === 'list') {
+      block.items.forEach((item) => assert.ok(root.includes(escapeText(item)), `/privacy includes "${item}"`));
+      continue;
+    }
+    assert.ok(root.includes(escapeText(block.text)), `/privacy includes "${block.text.slice(0, 48)}"`);
+    if (block.link) assert.ok(root.includes(`href="${escapeAttr(block.link.href)}"`));
+  }
 });
 
 test('case-study social previews use share-safe JPEG metadata and assets', async () => {
