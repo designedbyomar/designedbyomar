@@ -834,7 +834,7 @@ const FAQAccordionDemo = () => {
   const reducedMotion = usePrefersReducedMotion();
   const items = [
     ['When should this accordion pattern be used?', 'Use it for short, scan-friendly groups where each label clearly predicts the hidden content.'],
-    ['How does it match production?', 'It mirrors the FAQ rhythm: rounded item shell, full-width button, chevron rotation, and grid-row reveal.'],
+    ['Is this used on the portfolio?', 'This is a documentation-only accordion utility. Production Ask uses the shared AskPanel specimen below.'],
   ];
 
   return (
@@ -1374,7 +1374,7 @@ const ContentAccessibilityResources = () => (
       </SectionHeader>
       <div className="ds-card-grid">
         {[
-          ['Focus and keyboard', 'Every interactive element needs visible focus. Drawers and accordions require explicit state.'],
+          ['Focus and keyboard', 'Every interactive element needs visible focus. Mobile menus, lightboxes and documentation accordions expose their interaction state.'],
           ['Contrast and touch', 'Body text must meet AA contrast. Controls keep a 44px minimum target.'],
           ['Reduced motion', 'All animation, canvas, and scroll-driven behaviors need non-motion equivalents.'],
         ].map(([title, body]) => (
