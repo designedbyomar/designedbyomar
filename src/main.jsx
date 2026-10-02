@@ -682,7 +682,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
   );
 };
 
-const NavLogo = ({ onClick }) => {
+const NavLogo = ({ onClick, style }) => {
   const [key, setKey] = React.useState(0);
   const shapeStyle = (delay) => ({
     transformBox: 'fill-box',
@@ -693,7 +693,7 @@ const NavLogo = ({ onClick }) => {
   return (
     <a href="#" onClick={onClick}
       onMouseEnter={() => setKey(k => k + 1)}
-      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer' }}
+      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer', ...style }}
       aria-label="designedbyomar"
     >
       <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -728,6 +728,7 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
     return () => document.removeEventListener('keydown', onKey);
   }, [isMobileMenuOpen]);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const handleLogoClick = (e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); };
   const goSection = (id) => (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -774,7 +775,10 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
               <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
             </button>
           )}
-          <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
+          <NavLogo
+            onClick={handleLogoClick}
+            style={isMobile ? { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' } : undefined}
+          />
         </div>
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>

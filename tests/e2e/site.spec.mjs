@@ -1008,6 +1008,26 @@ test.describe('mobile navigation', () => {
     await expectWorkIndex(page);
   });
 
+  test('the header logo is centered at phone and tablet widths, and left-aligned past the 900px breakpoint', async ({ page }) => {
+    await page.goto('/');
+    const header = page.locator('header');
+    const logo = header.getByRole('link', { name: 'designedbyomar' });
+
+    for (const width of [390, 768, 900]) {
+      await page.setViewportSize({ width, height: 844 });
+      const [logoBox, headerBox] = [await logo.boundingBox(), await header.boundingBox()];
+      const logoCenter = logoBox.x + logoBox.width / 2;
+      const headerCenter = headerBox.x + headerBox.width / 2;
+      expect(Math.abs(logoCenter - headerCenter)).toBeLessThan(2);
+    }
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const [logoBox, headerBox] = [await logo.boundingBox(), await header.boundingBox()];
+    const logoCenter = logoBox.x + logoBox.width / 2;
+    const headerCenter = headerBox.x + headerBox.width / 2;
+    expect(logoCenter).toBeLessThan(headerCenter - 100);
+  });
+
   test('design system mobile navigation reaches component docs', async ({ page }) => {
     await page.goto('/design-system');
 
