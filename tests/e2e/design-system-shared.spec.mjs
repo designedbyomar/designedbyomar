@@ -78,3 +78,22 @@ test('shared mobile navigation retains the standalone About destination', async 
   await page.keyboard.press('Escape');
   await expect(menu).toHaveAttribute('aria-expanded', 'false');
 });
+
+test('portrait preload and rendered image agree at DPR 1, 2 and 3 in both themes', async ({ browser }) => {
+  for (const theme of ['dark', 'light']) for (const dpr of [1, 2, 3]) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: dpr, reducedMotion: 'reduce' });
+    await context.addInitScript(value => { localStorage.setItem('omar.theme', value); localStorage.setItem('omar.analyticsConsent', 'declined'); }, theme);
+    const page = await context.newPage();
+    await page.goto('/');
+    const image = page.locator('[data-hero-portrait]');
+    await image.evaluate(element => element.decode());
+    const preload = page.locator('link[rel="preload"][as="image"]');
+    await expect(preload).toHaveAttribute('imagesrcset', await image.getAttribute('srcset'));
+    await expect(preload).toHaveAttribute('imagesizes', await image.getAttribute('sizes'));
+    const expectedWidth = theme === 'dark' ? [432, 640, 960][dpr - 1] : [320, 557, 557][dpr - 1];
+    expect(await image.evaluate(element => element.currentSrc)).toContain(`portrait-${theme}-${expectedWidth}.webp`);
+    await page.goto('/about');
+    await expect(page.locator('link[rel="preload"][as="image"]')).toHaveCount(0);
+    await context.close();
+  }
+});

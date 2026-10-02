@@ -81,3 +81,7 @@ About tiles and stacks share their layout and open callback. The lightbox uses E
 The homepage hero, About page arrangement, and individual case-study compositions remain page-specific because they express editorial hierarchy and project-specific storytelling. They assemble shared navigation, controls, cards, body blocks, media, and footer. Documentation navigation, token cards, shortcut cards, and the demonstration accordion are explicitly documentation utilities. See the reference-page coverage inventory for component-to-specimen links and callback contracts.
 
 Existing exact dimensions that do not fit the scale use semantic tokens in `src/design-tokens.css`, including fluid About/body typography, control hit areas, content widths, component layering, and Ask response height. SVG geometry, image dimensions, aspect ratios, and calculated animation geometry remain implementation data.
+
+## Portrait delivery
+
+The portrait image occupies 88% of its square wrapper. Below 639px its slot is `0.88 × (viewport − 48px)`; through 820px it is capped at 519.2px. Above 820px the hero's second grid column gives `0.88 × (viewport − 96px) / 2.1`, capped at approximately 482.743px when the content reaches 1200px. The intrinsic transparent artwork stays contained within that slot. `src/portrait-media.mjs` specifies matching responsive candidates and sizes; regression assertions keep the homepage-only head preload in sync. Light candidates stop at the original 557px width; dark candidates stop at 1230px.

@@ -1935,9 +1935,9 @@ test.describe('case-card media delivery', () => {
     await page.waitForTimeout(250);
 
     const portraitSrc = await page.locator('[data-hero-portrait]').evaluate((image) => image.currentSrc);
-    expect(portraitSrc).toContain('/Images/omar-mobile.webp');
-    expect(requestedPaths).toContain('/Images/omar-mobile.webp');
-    expect(requestedPaths).not.toContain('/Images/omar.webp');
+    expect(portraitSrc).toContain('/Images/portrait-dark-432.webp');
+    expect(requestedPaths).toContain('/Images/portrait-dark-432.webp');
+    expect(requestedPaths).not.toContain('/Images/portrait-dark-1230.webp');
     expect(requestedPaths.some((pathname) => pathname.endsWith('.mp4'))).toBe(false);
   });
 

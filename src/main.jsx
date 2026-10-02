@@ -1,5 +1,6 @@
 import { LinkButton } from './ui/controls.jsx';
 import { CaseStudyTag, CaseStudyMetadata } from './ui/case-study-meta.jsx';
+import { PORTRAIT_SIZES, PORTRAIT_DARK_SRCSET, PORTRAIT_LIGHT_SRCSET } from './portrait-media.mjs';
 import React from 'react';
 import { SiteNavigation } from './ui/navigation.jsx';
 import { ContactCard } from './ui/contact-card.jsx';
@@ -436,7 +437,7 @@ const Portrait = ({ galaxy, theme }) => {
         </>
       )}
       <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 'var(--z-component-action)' }}>
-        <img data-hero-portrait src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} srcSet={isLight ? undefined : '/Images/omar-mobile.webp 640w, /Images/omar.webp 1230w'} sizes={isLight ? undefined : '(max-width: 820px) min(100vw, 590px), 590px'} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
+        <img data-hero-portrait src={isLight ? '/Images/portrait-light-557.webp' : '/Images/portrait-dark-1230.webp'} srcSet={isLight ? PORTRAIT_LIGHT_SRCSET : PORTRAIT_DARK_SRCSET} sizes={PORTRAIT_SIZES} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
             ? 'drop-shadow(0 18px 44px rgba(10, 114, 239, var(--opacity-16))) drop-shadow(0 26px 48px rgba(255, 91, 79, var(--opacity-12))) sepia(0.14) saturate(1.08) hue-rotate(-6deg) brightness(1.04) contrast(0.98)'

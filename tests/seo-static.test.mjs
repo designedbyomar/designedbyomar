@@ -765,3 +765,18 @@ test('legacy case-study URLs permanently redirect to indexable canonical destina
     assert.equal(getMetaByName(html, 'robots'), 'index,follow,max-image-preview:large');
   }
 });
+
+test('portrait preload exactly matches rendered candidate contracts with alpha and no upscaling', async () => {
+  const { PORTRAIT_SIZES, PORTRAIT_DARK_SRCSET, PORTRAIT_LIGHT_SRCSET } = await import('../src/portrait-media.mjs');
+  const source = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  for (const value of [PORTRAIT_SIZES, PORTRAIT_DARK_SRCSET, PORTRAIT_LIGHT_SRCSET]) assert.ok(source.includes(value));
+  const sharp = (await import('sharp')).default;
+  for (const [theme, widths, ceiling] of [['dark', [432, 640, 960, 1230], 1230], ['light', [320, 432, 557], 557]]) {
+    for (const width of widths) {
+      const metadata = await sharp(path.join(ROOT, 'public', 'Images', `portrait-${theme}-${width}.webp`)).metadata();
+      assert.equal(metadata.width, width);
+      assert.equal(metadata.hasAlpha, true);
+      assert.ok(metadata.width <= ceiling);
+    }
+  }
+});
