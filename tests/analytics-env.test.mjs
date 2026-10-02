@@ -39,5 +39,5 @@ test('VITE_GA_ALLOWED_HOSTS overrides the allowlist (so the e2e suite can test t
 test('isProductionHost matches the canonical hosts and is case-insensitive', () => {
   assert.equal(isProductionHost('designedbyomar.com'), true);
   assert.equal(isProductionHost('example.com'), false);
-  assert.ok(PRODUCTION_HOSTS.includes('www.designedbyomar.com'));
+  assert.deepEqual(PRODUCTION_HOSTS, ['designedbyomar.com', 'www.designedbyomar.com']);
 });
