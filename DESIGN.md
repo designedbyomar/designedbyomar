@@ -69,3 +69,15 @@ For design-facing work, review the result as an experience, not only as code:
 - Does it work across mobile, tablet, and desktop?
 - Does it preserve accessibility and reduced-motion behavior?
 - Does it avoid adding visual clutter or unneeded dependencies?
+
+## Shared production components
+
+`src/ui/` contains the presentation modules imported by both application entries. `src/design-system-specimens.jsx` renders these components with labelled, deterministic fixtures. The reference entry never imports `main.jsx`. Production adapters retain routing, analytics, consent storage, and Ask/GitHub requests; presentation modules receive content, state, and callbacks.
+
+Navigation uses standalone `/work` and `/about` pages. Its mobile menu closes on Escape and on selection. Contact links and copy buttons are sibling controls; copying reports success only after the clipboard operation succeeds. Icon buttons require accessible labels. Ask distinguishes reviewed answers, model drafts, loading, and unavailable states.
+
+About tiles and stacks share their layout and open callback. The lightbox uses Escape, a focus trap, and restores focus to the opening tile. Stacks respond to viewport width; reduced-motion preference disables their motion. Page controllers retain scroll choreography.
+
+The homepage hero, About page arrangement, and individual case-study compositions remain page-specific because they express editorial hierarchy and project-specific storytelling. They assemble shared navigation, controls, cards, body blocks, media, and footer. Documentation navigation, token cards, shortcut cards, and the demonstration accordion are explicitly documentation utilities. See the reference-page coverage inventory for component-to-specimen links and callback contracts.
+
+Existing exact dimensions that do not fit the scale use semantic tokens in `src/design-tokens.css`, including fluid About/body typography, control hit areas, content widths, component layering, and Ask response height. SVG geometry, image dimensions, aspect ratios, and calculated animation geometry remain implementation data.
