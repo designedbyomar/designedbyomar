@@ -178,6 +178,11 @@ export const GitHubContributions = ({ profileUrl = 'https://github.com/designedb
     }
   };
 
+  return <GitHubActivity state={state} profileUrl={resolvedProfileUrl} onProfileClick={trackProfileClick} />;
+};
+
+// Presentation accepts fixtures without fetching or sending analytics.
+export const GitHubActivity = ({ state, profileUrl, onProfileClick }) => {
   return (
     <div className="github-contributions" data-github-contributions>
       <div className="github-contributions-header">
@@ -192,11 +197,11 @@ export const GitHubContributions = ({ profileUrl = 'https://github.com/designedb
           )}
         </div>
         <a
-          href={resolvedProfileUrl}
+          href={state.data?.profileUrl || profileUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="github-contributions-link"
-          onClick={trackProfileClick}
+          onClick={onProfileClick}
         >
           View GitHub profile <AppIcon icon={ArrowUpRight} size={15} />
         </a>

@@ -1,21 +1,31 @@
+import { LinkButton } from './ui/controls.jsx';
+import { CaseStudyTag, CaseStudyMetadata } from './ui/case-study-meta.jsx';
 import React from 'react';
+import { SiteNavigation } from './ui/navigation.jsx';
+import { ContactCard } from './ui/contact-card.jsx';
+import { AboutLightbox, AboutStack } from './ui/about-media.jsx';
+import { ABOUT_PHOTOS } from './content/about-photos.js';
+import { CaseCard, caseAccentGradient } from './ui/case-card.jsx';
+import { CaseStudyBody } from './ui/case-study-body.jsx';
+import { SiteFooter } from './ui/site-footer.jsx';
+import { ConsentBanner } from './ui/consent-banner.jsx';
+import { AskPanel } from './ui/ask-panel.jsx';
+import { useViewportWidth, usePrefersReducedMotion } from './ui/hooks.js';
+import './ui/components.css';
+
 import ReactDOM from 'react-dom/client';
 import './about-page.css';
 import * as Sentry from '@sentry/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { AppIcon, ArrowLeft, ArrowUpRight, Check, Copy, Menu, Moon, NotebookPen, Rocket, Sparkles, Sun, Target, X } from './ui-icons.jsx';
-import { footerAlienStyles, FooterArrival } from './footer-alien.jsx';
+import { AppIcon, ArrowLeft, ArrowUpRight, NotebookPen, Rocket, Sparkles, Target } from './ui-icons.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { GitHubContributions } from './github-contributions.jsx';
-import { LAYOUT, ASPECT_RATIOS } from './constants.js';
+import { LAYOUT, LINKEDIN_URL, GITHUB_URL, SUBSTACK_URL, BEHANCE_URL, BOOKING_URL } from './constants.js';
 import { CASE_STUDIES } from './case-studies.js';
-import { getCaseStudyCoverImage, getCaseStudyCoverSrcSet } from './case-study-media.mjs';
-import { normalizeBlocks } from './content/case-study-blocks.mjs';
 import { PRIVACY_POLICY } from './content/privacy-policy.mjs';
 import { HOME_PAGE_COPY, WORK_PAGE_COPY } from './content/static-page-copy.mjs';
 import { buildIndex, matchQuestion, nearestTopic, rankNearest } from './ask.mjs';
-import { mentionedStudyIds, tokenizeAnswer } from './ask-links.mjs';
 import { onMediaChange } from './media-query.js';
 import { isPortfolioRoutePath, parsePortfolioRoute } from './routes.js';
 import { isGaEnabled } from './analytics-env.mjs';
@@ -35,11 +45,6 @@ const ANALYTICS_ACCEPTED = 'accepted';
 const ANALYTICS_DECLINED = 'declined';
 const GA_SCRIPT_ID = 'omar-ga4-script';
 const GA_MEASUREMENT_ID = 'G-T7W0PFD3HD';
-const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
-const GITHUB_URL = 'https://github.com/designedbyomar';
-const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
-const BEHANCE_URL = 'https://www.behance.net/omartavarez';
-const BOOKING_URL = 'https://calendar.app.google/4NcXLDoniazZ5VT78';
 
 let sentryInitialized = false;
 const initSentryIfEnabled = () => {
@@ -380,7 +385,7 @@ const Portrait = ({ galaxy, theme }) => {
   return (
     <div
       ref={portraitRef}
-      style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1/1', margin: '0 auto', cursor: 'pointer' }}
+      style={{ position: 'relative', width: '100%', maxWidth: 'var(--size-portrait-wrapper)', aspectRatio: '1/1', margin: '0 auto', cursor: 'pointer' }}
       role="button"
       tabIndex={0}
       aria-label="Show hero highlights"
@@ -417,20 +422,20 @@ const Portrait = ({ galaxy, theme }) => {
       {isLight && (
         <>
           <div style={{
-            position: 'absolute', inset: '11% 8% 18%', zIndex: 0, pointerEvents: 'none',
+            position: 'absolute', inset: '11% 8% 18%', zIndex: 'var(--z-base)', pointerEvents: 'none',
             borderRadius: '48% 52% 46% 54% / 42% 46% 54% 58%',
             background: 'var(--gradient-hero-radial-blur)',
             filter: 'var(--blur-heavy)', opacity: 0.95,
           }} />
           <div style={{
-            position: 'absolute', inset: '4% 10% auto auto', width: '34%', height: '30%', zIndex: 0, pointerEvents: 'none',
+            position: 'absolute', inset: '4% 10% auto auto', width: '34%', height: '30%', zIndex: 'var(--z-base)', pointerEvents: 'none',
             borderRadius: '9999px',
             background: 'var(--gradient-hero-overlay-pink)',
             filter: 'var(--blur-heavy)', opacity: 0.7,
           }} />
         </>
       )}
-      <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 3 }}>
+      <div style={{ position: 'absolute', inset: '6% 6% 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 'var(--z-component-action)' }}>
         <img data-hero-portrait src={isLight ? '/Images/omar-light.webp' : '/Images/omar.webp'} srcSet={isLight ? undefined : '/Images/omar-mobile.webp 640w, /Images/omar.webp 1230w'} sizes={isLight ? undefined : '(max-width: 820px) min(100vw, 590px), 590px'} alt="Omar Tavarez" fetchPriority="high" draggable={false} style={{
           width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom',
           filter: isLight
@@ -443,13 +448,13 @@ const Portrait = ({ galaxy, theme }) => {
       </div>
       {isLight && (
         <div style={{
-          position: 'absolute', inset: '8% 12% 4%', zIndex: 2, pointerEvents: 'none',
+          position: 'absolute', inset: '8% 12% 4%', zIndex: 'var(--z-component-content)', pointerEvents: 'none',
           borderRadius: '40% 60% 52% 48% / 44% 42% 58% 56%',
           background: 'var(--gradient-overlay-diagonal)',
           opacity: 0.65,
         }} />
       )}
-      <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 1, pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
+      <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 'var(--z-component-cover)', pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
       <div className="hero-stats-layer" aria-hidden={!statsVisible ? true : undefined}>
         {HERO_STATS.map((stat, index) => {
           const position = isTouchLayout ? stat.mobile : stat.desktop;
@@ -475,7 +480,7 @@ const Portrait = ({ galaxy, theme }) => {
           position: 'absolute', bottom: '-28px', left: 0, right: 0, margin: 0,
           textAlign: 'center',
           fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
-          color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
+          color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)',
           opacity: touchHintDismissed ? 0 : 1,
           transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-base-plus) ease',
           pointerEvents: 'none',
@@ -493,7 +498,7 @@ const Portrait = ({ galaxy, theme }) => {
           <p style={{
             margin: 0, textAlign: 'center',
             fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)',
-            color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em',
+            color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)',
             animation: (prefersReducedMotion || desktopHintDismissed) ? 'none' : 'hintPulse 2.5s ease-in-out infinite',
           }}>
             Hover for highlights
@@ -565,8 +570,8 @@ const LogoLoader = ({ visible, prefersReducedMotion = false }) => {
         fontFamily: 'var(--font-mono)',
         fontSize: 'var(--font-size-body-xs)',
         color: 'var(--fg-secondary)',
-        height: 20,
-        marginTop: 48,
+        height: 'var(--size-window-bar)',
+        marginTop: 'var(--layout-1)',
         display: 'flex',
         justifyContent: 'center',
         textAlign: 'center'
@@ -644,68 +649,9 @@ const COMPACT_LAYOUT_BREAKPOINT = LAYOUT.LAYOUT_BREAKPOINT;
 const WIDE_LAYOUT_BREAKPOINT = LAYOUT.MAX_WIDTH;
 const TABLET_BREAKPOINT = LAYOUT.TABLET_BREAKPOINT;
 
-const useViewportWidth = () => {
-  const [viewportWidth, setViewportWidth] = React.useState(() => (
-    typeof window === 'undefined' ? 1280 : window.innerWidth
-  ));
-
-  React.useEffect(() => {
-    const onResize = () => setViewportWidth(window.innerWidth);
-    onResize();
-    window.addEventListener('resize', onResize, { passive: true });
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  return viewportWidth;
-};
-
 // ============================================================
 // Nav
 // ============================================================
-const ThemeToggle = ({ theme, setTheme }) => {
-  const isDark = theme === 'dark';
-  return (
-    <button onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} title={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
-      color: 'var(--fg-primary)', border: 'none',
-      boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', cursor: 'pointer', transition: 'background var(--duration-fast)',
-    }}
-      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
-      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-    >
-      {isDark
-        ? <AppIcon icon={Moon} size={16} />
-        : <AppIcon icon={Sun} size={16} />
-      }
-    </button>
-  );
-};
-
-const NavLogo = ({ onClick, style }) => {
-  const [key, setKey] = React.useState(0);
-  const shapeStyle = (delay) => ({
-    transformBox: 'fill-box',
-    transformOrigin: 'bottom center',
-    animation: key > 0 ? `navShapeBounce var(--duration-nav) var(--easing-ease-out-bouncy) ${delay}ms both` : 'none',
-    fill: 'var(--fg-primary)',
-  });
-  return (
-    <a href="#" onClick={onClick}
-      onMouseEnter={() => setKey(k => k + 1)}
-      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer', ...style }}
-      aria-label="designedbyomar"
-    >
-      <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" style={shapeStyle(0)} />
-        <path d="M39.9286 0H21.5V18H39.9286V0Z" style={shapeStyle(55)} />
-        <path d="M53.75 0L64.5 18H43L53.75 0Z" style={shapeStyle(110)} />
-        <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" style={shapeStyle(165)} />
-      </svg>
-    </a>
-  );
-};
-
 const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
   const [scrolled, setScrolled] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -735,115 +681,12 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
     closeMobileMenu();
     scrollToSection(id, isMobile ? 'mobile_nav' : 'nav');
   };
-  const navLink = {
-    display: 'inline-flex', alignItems: 'center', minHeight: 44,
-    fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-secondary)',
-    textDecoration: 'none', padding: 'var(--space-1) var(--space-2)', borderRadius: 'var(--radius-standard)',
-    transition: 'color var(--duration-fast), background var(--duration-fast)', cursor: 'pointer',
-    background: 'transparent', border: 'none', fontFamily: 'inherit',
-  };
-  return (
-    <header style={{
-      position: 'sticky', top: 0, zIndex: 50,
-      background: scrolled ? 'color-mix(in oklab, var(--bg-page) 82%, transparent)' : 'transparent',
-      backdropFilter: scrolled ? 'var(--blur-strong)' : 'none',
-      WebkitBackdropFilter: scrolled ? 'var(--blur-strong)' : 'none',
-      boxShadow: scrolled ? 'rgba(127, 127, 127, var(--opacity-18)) 0px -1px 0px 0px inset' : 'none',
-      transition: 'background var(--duration-base-short), box-shadow var(--duration-base-short)',
-      padding: '0 var(--space-6)',
-    }}>
-      {/* Padding lives on the full-width header, not the max-width row, so the row
-          aligns with the content sections' inner containers at every width. */}
-      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-        {/* Menu trigger sits left of the logo, matching the design-system header. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          {isMobile && (
-            <button
-              type="button"
-              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(open => !open)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: 'var(--radius-circle)', background: 'transparent',
-                color: 'var(--fg-primary)', border: 'none', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                cursor: 'pointer', transition: 'background var(--duration-fast)',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
-            </button>
-          )}
-          <NavLogo
-            onClick={handleLogoClick}
-            style={isMobile ? { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' } : undefined}
-          />
-        </div>
-        {!isMobile && (
-          <nav style={{ display: 'flex', gap: 2 }}>
-            <a href="/work" onClick={goSection('work')} style={navLink}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >Work</a>
-            <a href="/design-system" style={navLink}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >Design System</a>
-            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'nav' })} style={{ ...navLink, textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >About</a>
-            <a href="#faq" onClick={goSection('faq')} style={navLink}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >Ask</a>
-            <a href="#contact" onClick={goSection('contact')} style={navLink}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-primary)'; e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            >Contact</a>
-          </nav>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          <ThemeToggle theme={theme} setTheme={(t) => {
-            setTheme(t);
-            if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('theme_toggle', { new_theme: t });
-          }} />
-          {!isMobile && (
-            <a href="#contact" onClick={goSection('contact')} style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 44,
-              fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
-            }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >Get in touch</a>
-          )}
-        </div>
-        {isMobile && isMobileMenuOpen && (
-          <div style={{
-            position: 'absolute', top: 'calc(100% + 8px)', left: 24, right: 24, zIndex: 60,
-            padding: 'var(--space-3)', borderRadius: 'var(--radius-large)', background: 'color-mix(in oklab, var(--bg-page) 94%, transparent)',
-            boxShadow: 'var(--shadow-card-full)', border: '1px solid var(--color-gray-100)',
-            backdropFilter: 'var(--blur-heavy)', WebkitBackdropFilter: 'var(--blur-heavy)',
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <a href="/work" onClick={goSection('work')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Work</a>
-              <a href="/design-system" onClick={closeMobileMenu} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Design System</a>
-              <a href="/about" onClick={() => { closeMobileMenu(); trackPortfolioEvent('about_page_open', { ui_location: 'mobile_nav' }); }} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)', textDecoration: 'none' }}>About</a>
-              <a href="#faq" onClick={goSection('faq')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Ask</a>
-              <a href="#contact" onClick={goSection('contact')} style={{ ...navLink, width: '100%', textAlign: 'left', padding: 'var(--space-3) var(--space-3)', color: 'var(--fg-primary)' }}>Contact</a>
-              <a href="#contact" onClick={goSection('contact')} style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44,
-                fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 6,
-                borderRadius: 'var(--radius-comfort)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
-              }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</a>
-            </div>
-          </div>
-        )}
-      </div>
-    </header>
-  );
+  return <SiteNavigation theme={theme} setTheme={(t) => {
+    setTheme(t);
+    trackPortfolioEvent('theme_toggle', { new_theme: t });
+  }} scrolled={scrolled} isMobile={isMobile} isMobileMenuOpen={isMobileMenuOpen}
+    closeMobileMenu={closeMobileMenu} onToggleMenu={() => setIsMobileMenuOpen(open => !open)}
+    handleLogoClick={handleLogoClick} goSection={goSection} onEvent={trackPortfolioEvent} />;
 };
 
 // ============================================================
@@ -851,7 +694,7 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
 // ============================================================
 const Dot = () => (
   <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-    <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--color-status-online)', boxShadow: '0 0 0 3px color-mix(in srgb, var(--color-status-online) 22%, transparent)', display: 'inline-block' }} />
+    <span style={{ width: 'var(--size-window-dot)', height: 'var(--size-window-dot)', borderRadius: 'var(--radius-circle)', background: 'var(--color-status-online)', boxShadow: '0 0 0 3px color-mix(in srgb, var(--color-status-online) 22%, transparent)', display: 'inline-block' }} />
   </span>
 );
 
@@ -868,42 +711,42 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
     }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       {SHOW_ROLE_STATUS && (
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)' }}>
           <Dot /> <span>{ROLE_STATUS_COPY}</span>
         </div>
       )}
-      <h1 style={{ fontSize: 'clamp(44px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+      <h1 style={{ fontSize: 'var(--font-size-hero-title)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
         {HOME_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{HOME_PAGE_COPY.titleAccent}</span>
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
         {HOME_PAGE_COPY.description}
       </p>
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <a href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
+        <LinkButton variant="portfolio" href="/work" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('work', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
-          minHeight: 44, textDecoration: 'none', transition: 'opacity var(--duration-fast)',
+          minHeight: 'var(--control-hit-area)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
           View case studies
           <AppIcon icon={ArrowUpRight} size={12} />
-        </a>
-        <a href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact', 'hero_cta'); }} style={{
+        </LinkButton>
+        <LinkButton variant="portfolio" href="#contact" onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToSection('contact', 'hero_cta'); }} style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
           color: 'var(--fg-primary)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'transparent',
-          minHeight: 44, boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
+          minHeight: 'var(--control-hit-area)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)', textDecoration: 'none', transition: 'background var(--duration-fast)',
         }}
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >Say hello</a>
-        <a href="/Omar%20Tavarez%20Resume.pdf" target="_blank" rel="noopener noreferrer"
+        >Say hello</LinkButton>
+        <LinkButton variant="portfolio" href="/Omar%20Tavarez%20Resume.pdf" target="_blank" rel="noopener noreferrer"
           onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('resume_download', { section: 'hero' }); }}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)',
             fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
-            color: 'var(--fg-secondary)', minHeight: 44, padding: 'var(--space-2) var(--space-3)',
+            color: 'var(--fg-secondary)', minHeight: 'var(--control-hit-area)', padding: 'var(--space-2) var(--space-3)',
             textDecoration: 'none', borderRadius: 'var(--radius-standard)', background: 'transparent',
             transition: 'color var(--duration-fast)',
           }}
@@ -912,7 +755,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
         >
           Resume
           <AppIcon icon={ArrowUpRight} size={12} />
-        </a>
+        </LinkButton>
       </div>
       <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 1,600+ enterprise users • $20M+ revenue-driving workflows</span>
@@ -933,19 +776,6 @@ const ABOUT_SHORT = `I turn undefined product problems into shipped software acr
 // /about page content — verbatim from the approved copy kit (about-page-copy.md).
 const ABOUT_HERO_H1 = 'I started out designing flyers for my own parties.';
 const ABOUT_HERO_LEDE = 'Now I turn undefined product problems into shipped software across AI, fintech, healthcare, and enterprise SaaS. 12+ years leading 0→1 products, building design systems, and partnering with product, engineering, and leadership to move strategy into real product outcomes.';
-
-const ABOUT_PHOTOS = {
-  boxing: { src: '/Images/about/about-boxing.webp', alt: 'Omar in the boxing ring, mid-fight, wearing Title headgear and red gloves', width: 1400, height: 1297 },
-  drawings: { src: '/Images/about/about-drawings.webp', alt: "A collage of Omar's drawings and paintings: portraits, figure studies, a graffiti piece, with a few UX sketches mixed in", width: 1421, height: 1421 },
-  flyers: { src: '/Images/about/about-flyers.webp', alt: 'A collage of event flyers and posters Omar designed during his DJ years', width: 1536, height: 1536 },
-  hike: { src: '/Images/about/about-hike.webp', alt: 'Omar on a hike, overlooking a lake', width: 800, height: 600 },
-  evening: { src: '/Images/about/about-evening.webp', alt: 'Omar on a night out', width: 800, height: 1067 },
-  dj: { src: '/Images/about/about-dj.webp', alt: 'Omar DJing a live event', width: 640, height: 427 },
-  portrait: { src: '/Images/about/about-portrait.webp', alt: 'Portrait of Omar Tavarez', width: 1200, height: 1200 },
-  reading: { src: '/Images/about/about-reading.webp', alt: "Omar reading 'Designing Brand Identity'", width: 1200, height: 1200 },
-  family: { src: '/Images/about/about-family.webp', alt: 'Omar with his two daughters', width: 1000, height: 1000 },
-  designsystem: { src: '/Images/about/about-designsystem.webp', alt: 'The Athena 2.0 design system — components and color styles Omar co-led at Plastiq', width: 1600, height: 900 },
-};
 
 const ABOUT_CAPTION = 'Where it started: flyers from the DJ years, and a lifetime of drawing. A few UX sketches snuck in.';
 
@@ -1016,7 +846,7 @@ const COMPANY_LOGOS = [
 ];
 
 const LogoCarousel = () => (
-  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '0 0 40px' }}>
+  <Reveal as="section" className="logo-band" variant="soft" delay={90} aria-label="Companies Omar has worked with" style={{ padding: '0 0 var(--space-8)' }}>
     <div className="logo-carousel">
       <div className="logo-track">
         {[...COMPANY_LOGOS, ...COMPANY_LOGOS].map((logo, index) => {
@@ -1044,13 +874,13 @@ const LogoCarousel = () => (
 
 const About = () => (
   <>
-    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px 64px' }}>
+    <Reveal as="section" id="about" variant="section" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-3) var(--space-6) var(--layout-2)' }}>
       <div className="about-grid" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: LAYOUT.GRID_DESKTOP, gap: 'var(--layout-3)', alignItems: 'start' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)' }}>
           <span style={{ color: 'var(--color-develop-blue)' }}>01 — </span>About
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 640 }}>
-          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: 'var(--content-reading-width)' }}>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
             {ABOUT_HEADER}
           </h2>
           <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0 }}>
@@ -1060,10 +890,10 @@ const About = () => (
             {ABOUT_SHORT}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <a href="/about" onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'about_section' })} style={{
+            <LinkButton variant="portfolio" href="/about" onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'about_section' })} style={{
               alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-              fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-              minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+              fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: 'var(--control-padding-block) var(--space-4)',
+              minHeight: 'var(--control-hit-area)', borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
               border: 'none', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', transition: 'background var(--duration-fast)',
             }}
               onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -1071,13 +901,13 @@ const About = () => (
             >
               Read more about me
               <AppIcon icon={ArrowUpRight} size={12} />
-            </a>
+            </LinkButton>
             <div style={{
               fontFamily: 'var(--font-mono)',
               fontSize: 'var(--font-size-body-xs)',
               color: 'var(--fg-tertiary)',
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
+              letterSpacing: 'var(--tracking-label-compact)',
               marginTop: 'var(--space-8)'
             }}>
               Built across startups, scaleups, and enterprise teams.
@@ -1090,100 +920,15 @@ const About = () => (
   </>
 );
 
-const FOCUSABLE_SELECTORS = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 // ============================================================
 // About page (/about) — replaces the old drawer
 // ============================================================
-const AboutLightbox = ({ photo, onClose }) => {
-  const dialogRef = React.useRef(null);
-  React.useEffect(() => {
-    const trigger = document.activeElement;
-    const el = dialogRef.current;
-    (el?.querySelector(FOCUSABLE_SELECTORS))?.focus();
-    const onKey = (e) => {
-      if (e.key === 'Escape') { onClose(); return; }
-      if (e.key !== 'Tab' || !el) return;
-      const nodes = Array.from(el.querySelectorAll(FOCUSABLE_SELECTORS));
-      if (!nodes.length) return;
-      if (e.shiftKey && document.activeElement === nodes[0]) {
-        e.preventDefault(); nodes[nodes.length - 1].focus();
-      } else if (!e.shiftKey && document.activeElement === nodes[nodes.length - 1]) {
-        e.preventDefault(); nodes[0].focus();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-      if (trigger && typeof trigger.focus === 'function') trigger.focus();
-    };
-  }, [onClose]);
-
-  return (
-    <div
-      className="about-lightbox"
-      role="dialog"
-      aria-modal="true"
-      aria-label={photo.alt}
-      ref={dialogRef}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <button type="button" className="about-lightbox__close" aria-label="Close" onClick={onClose}>
-        <AppIcon icon={X} size={16} />
-      </button>
-      <figure className="about-lightbox__figure">
-        <img src={photo.src} alt={photo.alt} />
-        <figcaption className="about-lightbox__caption">{photo.alt}</figcaption>
-      </figure>
-    </div>
-  );
-};
-
 // A framed photo: an overflow-clipped frame (fixed aspect) around the image, so
 // the intro/parallax can scale the image without it spilling. Opens the lightbox.
-const AboutTile = ({ photoKey, onOpen, parallax = 0, eager = false, className = '' }) => {
-  const p = ABOUT_PHOTOS[photoKey];
-  if (!p) return null;
-  return (
-    <figure className={`about-tile ${className}`.trim()} data-parallax={parallax || undefined}>
-      <button type="button" className="about-tile__btn" onClick={() => onOpen(p)} aria-label={`View larger: ${p.alt}`}>
-        <span className="about-frame">
-          <img
-            className="about-frame__img"
-            src={p.src}
-            alt={p.alt}
-            width={p.width}
-            height={p.height}
-            loading={eager ? 'eager' : 'lazy'}
-            decoding="async"
-          />
-        </span>
-      </button>
-    </figure>
-  );
-};
-
-const CLUSTER_PARALLAX = [0.06, -0.05, 0.04];
 const ABOUT_HERO_KEYS = ['portrait', 'boxing', 'dj'];
 
 // An image cluster: one framed photo, or a loose overlapping stack.
-const AboutStack = ({ images, onOpen, eager = false, className = '', tilePrefix = 'about-stack__tile' }) => (
-  <div className={`about-stack about-stack--${images.length} ${className}`.trim()}>
-    {images.map((key, i) => (
-      <AboutTile
-        key={key}
-        photoKey={key}
-        onOpen={onOpen}
-        eager={eager}
-        parallax={CLUSTER_PARALLAX[i % CLUSTER_PARALLAX.length]}
-        className={`${tilePrefix} ${tilePrefix}--${key}`}
-      />
-    ))}
-  </div>
-);
-
 // A subtle scroll "float" — each [data-parallax] element drifts by a capped
 // offset from its distance to the viewport center. Off under reduced motion.
 const useAboutParallax = (rootRef, reducedMotion) => {
@@ -1224,7 +969,7 @@ const AboutRow = ({ section, onOpen }) => {
       {section.paras.map((para, i) => <p key={i}>{para}</p>)}
       {section.caption && <p className="about-caption">{section.caption}</p>}
       {section.link && (
-        <p><a className="about-link" href={section.link.href}>{section.link.label}</a></p>
+        <p><LinkButton variant="portfolio" className="about-link" href={section.link.href}>{section.link.label}</LinkButton></p>
       )}
     </div>
   );
@@ -1236,7 +981,7 @@ const AboutRow = ({ section, onOpen }) => {
   return (
     <section className="about-row" data-side={section.side}>
       {body}
-      <AboutStack images={section.images} onOpen={onOpen} />
+      <AboutStack photos={ABOUT_PHOTOS} images={section.images} onOpen={onOpen} />
     </section>
   );
 };
@@ -1247,8 +992,8 @@ const AboutPage = () => {
   const reducedMotion = usePrefersReducedMotion();
   useAboutParallax(rootRef, reducedMotion);
   const ctaBase = {
-    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
-    padding: '10px 18px', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
+    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 'var(--control-hit-area)',
+    padding: 'var(--control-padding-block) var(--control-padding-roomy)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)',
     borderRadius: 'var(--radius-standard)', textDecoration: 'none',
   };
   return (
@@ -1259,7 +1004,7 @@ const AboutPage = () => {
           <h1>{ABOUT_HERO_H1}</h1>
           <p className="about-lede">{ABOUT_HERO_LEDE}</p>
         </div>
-        <AboutStack images={ABOUT_HERO_KEYS} onOpen={setLightbox} eager className="about-collage" tilePrefix="about-collage__tile" />
+        <AboutStack photos={ABOUT_PHOTOS} images={ABOUT_HERO_KEYS} onOpen={setLightbox} eager className="about-collage" tilePrefix="about-collage__tile" />
       </div>
 
       {ABOUT_SECTIONS.map((section) => (
@@ -1268,19 +1013,19 @@ const AboutPage = () => {
 
       <section className="about-section about-cta-section">
         <div className="about-cta">
-          <a href="/work" style={{ ...ctaBase, color: 'var(--bg-page)', background: 'var(--fg-primary)' }}>
+          <LinkButton variant="portfolio" href="/work" style={{ ...ctaBase, color: 'var(--bg-page)', background: 'var(--fg-primary)' }}>
             See the work <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
-          <a href="/ask" style={{ ...ctaBase, color: 'var(--fg-primary)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+          </LinkButton>
+          <LinkButton variant="portfolio" href="/ask" style={{ ...ctaBase, color: 'var(--fg-primary)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
             Ask about the work <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
-          <a
+          </LinkButton>
+          <LinkButton variant="portfolio"
             href="mailto:omar@designedbyomar.com"
             onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_email', { link_url: 'mailto:omar@designedbyomar.com', section: 'about' }); }}
             style={{ ...ctaBase, color: 'var(--fg-primary)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}
           >
             Email me <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
+          </LinkButton>
         </div>
       </section>
 
@@ -1292,188 +1037,6 @@ const AboutPage = () => {
 // ============================================================
 // Case Studies — data
 // ============================================================
-const caseAccentGradient = (accent) => `linear-gradient(135deg, ${accent} 0%, color-mix(in oklab, ${accent} 70%, white) 100%)`;
-
-const CASE_CARD_IMAGE_SIZES = {
-  wide: '(max-width: 900px) calc(72vw - 35px), 830px',
-  standard: '(max-width: 900px) calc(72vw - 35px), 405px',
-};
-
-const CaseCardImage = ({ c, featured, sizes, style }) => (
-  <img
-    data-case-cover-still
-    src={getCaseStudyCoverImage(c)}
-    srcSet={getCaseStudyCoverSrcSet(c)}
-    sizes={sizes}
-    alt={`${c.title} preview`}
-    loading={featured ? 'eager' : 'lazy'}
-    style={style}
-  />
-);
-
-const DeferredCaseCardVideo = ({ c, featured, sizes }) => {
-  const containerRef = React.useRef(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const [shouldLoadVideo, setShouldLoadVideo] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-
-  React.useEffect(() => {
-    if (prefersReducedMotion) {
-      setShouldLoadVideo(false);
-      setIsPlaying(false);
-      return undefined;
-    }
-    if (typeof IntersectionObserver !== 'function' || !containerRef.current) return undefined;
-
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      setShouldLoadVideo(true);
-      observer.disconnect();
-    }, { rootMargin: '600px 0px', threshold: 0 });
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [prefersReducedMotion]);
-
-  const transition = prefersReducedMotion ? 'none' : 'opacity var(--duration-base) ease';
-  const mediaStyle = {
-    position: 'absolute', inset: 0,
-    width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block',
-    transition,
-  };
-
-  return (
-    <div ref={containerRef} data-deferred-case-video style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <CaseCardImage
-        c={c}
-        featured={featured}
-        sizes={sizes}
-        style={{ ...mediaStyle, opacity: isPlaying ? 0 : 1 }}
-      />
-      {shouldLoadVideo && (
-        <video
-          data-case-cover-video
-          src={c.coverVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          tabIndex={-1}
-          onPlaying={() => setIsPlaying(true)}
-          style={{ ...mediaStyle, opacity: isPlaying ? 1 : 0 }}
-        />
-      )}
-    </div>
-  );
-};
-
-// ============================================================
-// CaseCard — gradient cover tile used on homepage + drawer
-// ============================================================
-const CaseCard = ({ c, featured = false, wideMedia = false }) => {
-  const viewportWidth = useViewportWidth();
-  const useSharedMobileAspectRatio = viewportWidth <= TABLET_BREAKPOINT;
-  const mediaAspectRatio = useSharedMobileAspectRatio ? ASPECT_RATIOS.THUMBNAIL : featured ? ASPECT_RATIOS.WIDE : ASPECT_RATIOS.THUMBNAIL;
-  const accent = c.accent;
-
-  return (
-    <a href={`/work/${c.id}/`} className="case-card" data-case-study-id={c.id} style={{
-      display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%',
-      textDecoration: 'none', color: 'inherit',
-      borderRadius: 'var(--radius-image)', transition: 'transform var(--duration-base) ease',
-    }}>
-      <div className="case-card-media" style={{
-        position: 'relative', width: '100%',
-        aspectRatio: mediaAspectRatio,
-        background: caseAccentGradient(accent),
-        borderRadius: 'var(--radius-image)', overflow: 'hidden',
-        boxShadow: 'var(--shadow-card-subtle)',
-      }}>
-        <div className="case-card-sheen" />
-        {(c.coverImage || c.coverVideo) ? (
-          <div style={{
-            position: 'absolute', left: '14%', right: '14%', bottom: '5%', top: '18%',
-            borderRadius: 8, overflow: 'hidden',
-            display: 'flex', flexDirection: 'column',
-            boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0,0,0,var(--opacity-35))`,
-          }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 4,
-              height: 20, padding: '0 8px', flexShrink: 0,
-              background: 'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
-              borderBottom: '1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(255,95,86,var(--opacity-95))', display: 'inline-block' }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(255,189,46,var(--opacity-95))', display: 'inline-block' }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'rgba(39,201,63,var(--opacity-95))', display: 'inline-block' }} />
-            </div>
-            <div style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-page)' }}>
-              {c.coverVideo
-                ? <DeferredCaseCardVideo c={c} featured={featured} sizes={wideMedia ? CASE_CARD_IMAGE_SIZES.wide : CASE_CARD_IMAGE_SIZES.standard} />
-                : <CaseCardImage c={c} featured={featured} sizes={wideMedia ? CASE_CARD_IMAGE_SIZES.wide : CASE_CARD_IMAGE_SIZES.standard} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />}
-            </div>
-          </div>
-        ) : (
-          <div className="case-card-screen" style={{
-            position: 'absolute', left: '16%', right: '16%', bottom: '-6%', top: '22%',
-            background: 'var(--bg-page)',
-            borderRadius: '10px 10px 0 0',
-            boxShadow: `0 -1px 0 0 rgba(255,255,255,0.1), 0 24px 60px rgba(0, 0, 0, var(--opacity-35))`,
-          }}>
-            <div style={{
-              position: 'absolute', top: 10, left: 10, right: 10, height: 18,
-              display: 'flex', alignItems: 'center', gap: 5,
-              borderBottom: `1px solid color-mix(in oklab, ${accent} 18%, transparent)`,
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: accent, opacity: 0.7 }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--fg-tertiary)', opacity: 0.7 }} />
-              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-circle)', background: 'var(--color-gray-100)', opacity: 0.7 }} />
-            </div>
-            <div className="case-card-line case-card-line--full" style={{
-              position: 'absolute', top: 40, left: 16, right: 16, height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `color-mix(in oklab, ${accent} 18%, transparent)`,
-            }} />
-            <div className="case-card-line case-card-line--left" style={{
-              position: 'absolute', top: 58, left: 16, width: '40%', height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `color-mix(in oklab, ${accent} 30%, transparent)`,
-            }} />
-            <div className="case-card-line case-card-line--right" style={{
-              position: 'absolute', top: 58, left: '46%', width: '38%', height: 10, borderRadius: 'var(--radius-subtle)',
-              background: `color-mix(in oklab, ${accent} 18%, transparent)`,
-            }} />
-          </div>
-        )}
-        {/* accent tag */}
-        <div className="case-card-tag" style={{
-          position: 'absolute', top: 16, left: 16,
-          fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', fontWeight: 'var(--font-weight-medium)',
-          color: 'var(--color-white)', textTransform: 'uppercase', letterSpacing: '0.08em',
-          background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 9px', borderRadius: 'var(--radius-subtle)',
-          backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
-        }}>{c.num} · {c.year} · {c.client}</div>
-      </div>
-
-      <div style={{ padding: '4px 4px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 10 }}>
-          <h3 style={{
-            fontSize: featured ? 'clamp(24px, 2.6vw, 32px)' : 22,
-            fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em',
-            color: 'var(--fg-primary)', margin: 0, lineHeight: 'var(--line-height-snug)',
-          }}>{c.title}</h3>
-        </div>
-        <p style={{ fontSize: featured ? 16 : 14, lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: '0 0 14px' }}>{c.subtitle}</p>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
-          {c.tags.slice(0, 3).map(t => (
-            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 'var(--radius-circle)', color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
-          ))}
-        </div>
-      </div>
-    </a>
-  );
-};
-
 // ============================================================
 // Work — homepage section
 // ============================================================
@@ -1483,14 +1046,14 @@ const Work = () => {
   const secondaryColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
 
   return (
-    <section id="work" style={{ borderTop: '1px solid var(--color-gray-100)', padding: '96px 24px' }}>
+    <section id="work" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-3) var(--space-6)' }}>
       <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
-        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: workHeadColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: workHeadColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 'var(--control-copy-reserve)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>02 — </span>Selected work
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
-            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 'var(--content-reading-width)' }}>
+            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
               {WORK_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{WORK_PAGE_COPY.titleAccent}</span>
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
@@ -1499,23 +1062,23 @@ const Work = () => {
           </div>
         </Reveal>
 
-        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-8)', marginBottom: 32 }}>
+        <Reveal delay={70} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-8)', marginBottom: 'var(--space-7)' }}>
           <CaseCard c={CASE_STUDIES[0]} featured wideMedia />
         </Reveal>
-        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 32, alignItems: 'stretch' }}>
+        <Reveal delay={130} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 'var(--space-7)', alignItems: 'stretch' }}>
           <CaseCard c={CASE_STUDIES[1]} />
           <CaseCard c={CASE_STUDIES[2]} />
         </Reveal>
-        <Reveal delay={180} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 48, alignItems: 'stretch' }}>
+        <Reveal delay={180} style={{ display: 'grid', gridTemplateColumns: secondaryColumns, gap: 'var(--space-8)', marginBottom: 'var(--layout-1)', alignItems: 'stretch' }}>
           <CaseCard c={CASE_STUDIES[3]} />
           <CaseCard c={CASE_STUDIES[4]} />
         </Reveal>
 
         <Reveal as="div" delay={230} style={{ display: 'inline-flex' }}>
-          <a href="/work" style={{
+          <LinkButton variant="portfolio" href="/work" style={{
             display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: '10px 16px',
-            minHeight: 44, borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
+            fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', padding: 'var(--control-padding-block) var(--space-4)',
+            minHeight: 'var(--control-hit-area)', borderRadius: 'var(--radius-standard)', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             textDecoration: 'none', transition: 'background var(--duration-fast)',
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-subtle)'}
@@ -1523,7 +1086,7 @@ const Work = () => {
           >
             See all {CASE_STUDIES.length} case studies
             <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
+          </LinkButton>
         </Reveal>
       </div>
     </section>
@@ -1539,14 +1102,14 @@ const WorkIndexPage = () => {
   const featuredColumns = viewportWidth <= TABLET_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))';
 
   return (
-    <section style={{ padding: '40px 24px 96px' }}>
+    <section style={{ padding: 'var(--space-8) var(--space-6) var(--layout-3)' }}>
       <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
-        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: headColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 56 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Reveal className="work-head" variant="section" style={{ display: 'grid', gridTemplateColumns: headColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 24 : 64, alignItems: 'start', marginBottom: 'var(--control-copy-reserve)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)' }}>
             <span style={{ color: 'var(--color-preview-pink)' }}>All — </span>{CASE_STUDIES.length} case studies
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 640 }}>
-            <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 'var(--content-reading-width)' }}>
+            <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
               {WORK_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{WORK_PAGE_COPY.titleAccent}</span>
             </h1>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
@@ -1575,116 +1138,6 @@ const WorkIndexPage = () => {
 // ============================================================
 // Prose holds a 640px measure for readability; images span the full container,
 // which is what fills the empty right-hand column on these pages.
-const CS_TEXT_WIDTH = { maxWidth: 640, width: '100%' };
-const csSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const csWordCount = (blocks) => blocks.reduce(
-  (n, b) => n + `${b.text || ''} ${(b.items || []).join(' ')}`.trim().split(/\s+/).filter(Boolean).length,
-  0,
-);
-
-const CaseStudyBody = ({ blocks: rawBlocks, accent }) => {
-  // Normalized so this renderer and postbuild.js agree on what a block is.
-  const blocks = normalizeBlocks(rawBlocks);
-  if (!blocks.length) return null;
-
-  const sections = blocks.filter((b) => b.type === 'heading' && b.level === 2);
-  const showToc = csWordCount(blocks) > 1200 && sections.length > 2;
-
-  return (
-    <div style={{ marginTop: 'var(--layout-2)', paddingTop: 'var(--layout-1)', borderTop: '1px solid var(--color-gray-100)' }}>
-      {showToc && (
-        <nav aria-label="On this page" style={{ ...CS_TEXT_WIDTH, margin: '0 auto var(--layout-1)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>On this page</div>
-          <ol style={{ margin: 0, paddingLeft: '1.1em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            {sections.map((h) => (
-              <li key={h.text}>
-                <a href={`#${csSlug(h.text)}`} className="text-link" style={{ fontSize: 'var(--font-size-body-md)', color: 'var(--fg-secondary)' }}>{h.text}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
-        {blocks.map((b, i) => {
-          if (b.type === 'heading') {
-            const Tag = `h${b.level}`; // level is normalized to 2, 3 or 4
-            const size = b.level === 2 ? 'clamp(26px, 2.6vw, 34px)' : b.level === 3 ? 'clamp(19px, 1.5vw, 22px)' : 'var(--font-size-body-xl)';
-            return (
-              <Tag key={i} id={b.level === 2 ? csSlug(b.text) : undefined} style={{
-                ...CS_TEXT_WIDTH, scrollMarginTop: 88, fontSize: size,
-                fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)',
-                letterSpacing: '-0.02em', color: 'var(--fg-primary)',
-                margin: b.level === 2 ? 'var(--space-6) 0 0' : 0,
-              }}>{b.text}</Tag>
-            );
-          }
-          if (b.type === 'paragraph') {
-            return <p key={i} style={{ ...CS_TEXT_WIDTH, fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', margin: 0 }}>{b.text}</p>;
-          }
-          if (b.type === 'list') {
-            return (
-              <ul key={i} style={{ ...CS_TEXT_WIDTH, margin: 0, paddingLeft: '1.2em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)' }}>
-                {b.items.map((it, j) => <li key={j}>{it}</li>)}
-              </ul>
-            );
-          }
-          if (b.type === 'quote') {
-            return (
-              <blockquote key={i} style={{ ...CS_TEXT_WIDTH, margin: 0, paddingLeft: 'var(--space-5)', borderLeft: `2px solid ${accent}` }}>
-                <p style={{ fontSize: 'clamp(18px, 1.5vw, 22px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-primary)', margin: 0 }}>{`“${b.text}”`}</p>
-                {b.attribution && (
-                  <cite style={{ display: 'block', marginTop: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', fontStyle: 'normal', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{b.attribution}</cite>
-                )}
-              </blockquote>
-            );
-          }
-          if (b.type === 'callout') {
-            return (
-              <aside key={i} style={{ ...CS_TEXT_WIDTH, padding: 'var(--space-5)', borderRadius: 'var(--radius-standard)', background: 'var(--bg-subtle)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{b.title}</div>
-                <ul style={{ margin: 0, paddingLeft: '1.2em', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-primary)' }}>
-                  {b.items.map((it, j) => <li key={j}>{it}</li>)}
-                </ul>
-              </aside>
-            );
-          }
-          if (b.type === 'gallery') {
-            return (
-              <div key={i} style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: 'var(--space-4)',
-                margin: 'var(--space-4) 0',
-              }}>
-                {b.images.map((img, j) => (
-                  <figure key={j} style={{ margin: 0 }}>
-                    <img src={img.src} alt={img.alt} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', aspectRatio: '4 / 3', display: 'block', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }} />
-                    {img.caption && (
-                      <figcaption style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)' }}>{img.caption}</figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            );
-          }
-          if (b.type === 'image') {
-            return (
-              <figure key={i} style={{ width: '100%', margin: 'var(--space-4) 0' }}>
-                <img src={b.src} alt={b.alt} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }} />
-                {b.caption && (
-                  <figcaption style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)' }}>{b.caption}</figcaption>
-                )}
-              </figure>
-            );
-          }
-          return null;
-        })}
-      </div>
-    </div>
-  );
-};
-
 // ============================================================
 // CaseStudyPage — individual case study page
 // ============================================================
@@ -1699,44 +1152,44 @@ const CaseStudyPage = ({ c, onBack }) => {
   const next = CASE_STUDIES[(idx + 1) % CASE_STUDIES.length];
 
   return (
-    <article style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px 96px' }}>
-      <a href="/work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
+    <article style={{ maxWidth: 'var(--content-about-width)', margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--layout-3)' }}>
+      <LinkButton variant="portfolio" href="/work" onClick={(e) => { e.preventDefault(); onBack(); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
-        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
-        marginBottom: 40, transition: 'color var(--duration-fast)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)',
+        marginBottom: 'var(--space-8)', transition: 'color var(--duration-fast)',
       }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
       >
         <AppIcon icon={ArrowLeft} size={12} />
         Back to work
-      </a>
+      </LinkButton>
 
       {/*
         A citation in the Ask panel lands here, and until this link existed the
         assistant simply disappeared at that point — the reader had to know to
         scroll the homepage to find it again.
       */}
-      <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'case_study', case_study_id: c.id })} style={{
+      <LinkButton variant="portfolio" href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'case_study', case_study_id: c.id })} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
-        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
-        marginBottom: 40, marginLeft: 'var(--space-6)', transition: 'color var(--duration-fast)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)',
+        marginBottom: 'var(--space-8)', marginLeft: 'var(--space-6)', transition: 'color var(--duration-fast)',
       }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
       >
         Ask about this work
         <AppIcon icon={ArrowUpRight} size={12} />
-      </a>
+      </LinkButton>
 
       {/* Cover */}
       <div className="cs-cover" style={{
         position: 'relative', width: '100%',
         background: caseAccentGradient(accent),
         borderRadius: 'var(--radius-xl)', overflow: 'hidden',
-        boxShadow: 'var(--shadow-card-subtle)', marginBottom: 48,
+        boxShadow: 'var(--shadow-card-subtle)', marginBottom: 'var(--layout-1)',
       }}>
         {(c.coverImage || c.coverVideo) && (
           <div style={{
@@ -1746,8 +1199,8 @@ const CaseStudyPage = ({ c, onBack }) => {
             boxShadow: '0 18px 48px rgba(0, 0, 0, var(--opacity-28)), inset 0 0 0 1px rgba(255, 255, 255, var(--opacity-8))',
           }}>
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              height: 34, padding: '0 12px',
+              display: 'flex', alignItems: 'center', gap: 'var(--space-compact)',
+              height: 34, padding: '0 var(--space-3)',
               background: 'color-mix(in oklab, var(--bg-page) 86%, white 14%)',
               borderBottom: '1px solid color-mix(in oklab, var(--color-gray-100) 88%, transparent)',
             }}>
@@ -1755,7 +1208,7 @@ const CaseStudyPage = ({ c, onBack }) => {
               <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-circle)', background: 'rgba(255, 189, 46, var(--opacity-95))', display: 'inline-block' }} />
               <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-circle)', background: 'rgba(39, 201, 63, var(--opacity-95))', display: 'inline-block' }} />
               <div style={{
-                marginLeft: 10, flex: 1, height: 12, borderRadius: 'var(--radius-circle)',
+                marginLeft: 'var(--control-padding-block)', flex: 1, height: 12, borderRadius: 'var(--radius-circle)',
                 background: 'color-mix(in oklab, var(--color-gray-100) 92%, transparent)',
                 opacity: 0.78,
               }} />
@@ -1772,26 +1225,26 @@ const CaseStudyPage = ({ c, onBack }) => {
           </div>
         )}
         <div style={{
-          position: 'absolute', top: 20, left: 22,
+          position: 'absolute', top: 'var(--space-5)', left: 22,
           fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)',
-          color: 'var(--color-white)', textTransform: 'uppercase', letterSpacing: '0.08em',
-          background: 'rgba(0, 0, 0, var(--opacity-32))', padding: '5px 10px', borderRadius: 'var(--radius-subtle)',
+          color: 'var(--color-white)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)',
+          background: 'rgba(0, 0, 0, var(--opacity-32))', padding: 'var(--space-tag-cover-block) var(--control-padding-block)', borderRadius: 'var(--radius-subtle)',
           backdropFilter: 'var(--blur-base)', WebkitBackdropFilter: 'var(--blur-base)',
         }}>{c.num} · {c.year} · {c.client}</div>
       </div>
 
       {/* Title + meta */}
-      <div style={{ marginBottom: 48 }}>
+      <div style={{ marginBottom: 'var(--layout-1)' }}>
         <h1 style={{
-          fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)',
-          lineHeight: 'var(--line-height-solid)', letterSpacing: '-0.04em',
-          color: 'var(--fg-primary)', margin: '0 0 20px',
+          fontSize: 'var(--font-size-case-title)', fontWeight: 'var(--font-weight-semibold)',
+          lineHeight: 'var(--line-height-solid)', letterSpacing: 'var(--tracking-display)',
+          color: 'var(--fg-primary)', margin: '0 0 var(--space-5)',
         }}>{c.title}</h1>
-        <p style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>{c.subtitle}</p>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{c.role}</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <p style={{ fontSize: 'var(--font-size-case-lede)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-6)' }}>{c.subtitle}</p>
+        <CaseStudyMetadata>{c.role}</CaseStudyMetadata>
+        <div style={{ display: 'flex', gap: 'var(--space-compact)', flexWrap: 'wrap' }}>
           {c.tags.map(t => (
-            <span key={t} style={{ fontSize: 'var(--font-size-label-sm)', fontWeight: 'var(--font-weight-medium)', padding: '3px 10px', borderRadius: 'var(--radius-circle)', color: 'var(--fg-secondary)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>{t}</span>
+            <CaseStudyTag key={t}>{t}</CaseStudyTag>
           ))}
         </div>
       </div>
@@ -1800,31 +1253,31 @@ const CaseStudyPage = ({ c, onBack }) => {
       <div className="cs-metrics-grid" style={{
         borderRadius: 'var(--radius-image)', overflow: 'hidden',
         boxShadow: 'var(--shadow-card-subtle)',
-        background: 'var(--bg-page)', marginBottom: 64,
+        background: 'var(--bg-page)', marginBottom: 'var(--layout-2)',
       }}>
         {c.metrics.map((m, i) => (
           <div key={i} style={{
-            padding: '32px 24px', textAlign: 'center',
+            padding: 'var(--space-7) var(--space-6)', textAlign: 'center',
           }}>
-            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: '-0.04em', color: accent, lineHeight: 1 }}>{m.value}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
+            <div style={{ fontSize: 'clamp(28px, 3.2vw, 44px)', fontWeight: 'var(--font-weight-bold)', letterSpacing: 'var(--tracking-display)', color: accent, lineHeight: 1 }}>{m.value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 'var(--control-padding-block)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)' }}>{m.label}</div>
             {m.qualifier && (
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.72 }}>{m.qualifier}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', marginTop: 'var(--space-compact)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)', opacity: 0.72 }}>{m.qualifier}</div>
             )}
           </div>
         ))}
       </div>
 
       {/* Challenge / Approach / Outcome */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 640, margin: '0 auto', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-2)', maxWidth: 'var(--content-reading-width)', margin: '0 auto', width: '100%' }}>
         {[
           { label: 'Challenge', body: c.challenge },
           { label: 'Approach', body: c.approach },
           { label: 'Outcome', body: c.outcome },
         ].map(({ label, body }) => (
           <div key={label}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>{label}</div>
-            <p style={{ fontSize: 'clamp(16px, 1.25vw, 19px)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: accent, textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)', marginBottom: 'var(--space-4)' }}>{label}</div>
+            <p style={{ fontSize: 'var(--font-size-prose)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-primary)', margin: 0 }}>{body}</p>
           </div>
         ))}
       </div>
@@ -1832,21 +1285,21 @@ const CaseStudyPage = ({ c, onBack }) => {
       <CaseStudyBody blocks={c.body} accent={accent} />
 
       {c.relatedLink && (
-        <div style={{ maxWidth: 640, margin: '0 auto', width: '100%', marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
+        <div style={{ maxWidth: 'var(--content-reading-width)', margin: '0 auto', width: '100%', marginTop: 'var(--layout-2)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-gray-100)' }}>
           <p style={{ fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)' }}>{c.relatedLink.note}</p>
-          <a href={c.relatedLink.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
+          <LinkButton variant="portfolio" href={c.relatedLink.href} className="text-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
             {c.relatedLink.label}
             <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
+          </LinkButton>
         </div>
       )}
 
       {/* Prev / Next */}
       <div className="cs-prevnext" style={{
-        marginTop: 96, paddingTop: 32,
+        marginTop: 'var(--layout-3)', paddingTop: 'var(--space-7)',
         borderTop: '1px solid var(--color-gray-100)',
       }}>
-        <a
+        <LinkButton variant="portfolio"
           href={`/work/${prev.id}/`}
           onClick={() => trackPortfolioEvent('case_study_next_previous_click', {
             direction: 'previous',
@@ -1855,11 +1308,11 @@ const CaseStudyPage = ({ c, onBack }) => {
           })}
           style={{ textDecoration: 'none', color: 'inherit' }}
         >
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>← Previous</div>
-          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{prev.title}</div>
-          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{prev.client}</div>
-        </a>
-        <a
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)', marginBottom: 'var(--control-padding-block)' }}>← Previous</div>
+          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: 'var(--tracking-card)', color: 'var(--fg-primary)' }}>{prev.title}</div>
+          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 'var(--space-1)' }}>{prev.client}</div>
+        </LinkButton>
+        <LinkButton variant="portfolio"
           href={`/work/${next.id}/`}
           onClick={() => trackPortfolioEvent('case_study_next_previous_click', {
             direction: 'next',
@@ -1868,10 +1321,10 @@ const CaseStudyPage = ({ c, onBack }) => {
           })}
           style={{ textDecoration: 'none', color: 'inherit' }}
         >
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Next →</div>
-          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '-0.025em', color: 'var(--fg-primary)' }}>{next.title}</div>
-          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 4 }}>{next.client}</div>
-        </a>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-micro)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)', marginBottom: 'var(--control-padding-block)' }}>Next →</div>
+          <div style={{ fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: 'var(--tracking-card)', color: 'var(--fg-primary)' }}>{next.title}</div>
+          <div style={{ fontSize: 'var(--font-size-body-xs)', color: 'var(--fg-tertiary)', marginTop: 'var(--space-1)' }}>{next.client}</div>
+        </LinkButton>
       </div>
     </article>
   );
@@ -1880,93 +1333,6 @@ const CaseStudyPage = ({ c, onBack }) => {
 // ============================================================
 // Contact + Footer
 // ============================================================
-const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEventName, copyTarget }) => {
-  const [copied, setCopied] = React.useState(false);
-  const resetTimerRef = React.useRef(null);
-
-  React.useEffect(() => () => {
-    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
-  }, []);
-
-  const handleCopy = async () => {
-    if (!copyValue) return;
-
-    try {
-      await navigator.clipboard.writeText(copyValue);
-      setCopied(true);
-      if (copyEventName) {
-        trackPortfolioEvent(copyEventName, {
-          section: section || 'contact',
-          copy_target: copyTarget,
-        });
-      }
-      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
-      resetTimerRef.current = window.setTimeout(() => setCopied(false), 1200);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  const hasCopyButton = Boolean(copyValue);
-
-  return (
-    <div className="contact-card" style={{
-      position: 'relative',
-      display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 'var(--radius-comfort)',
-      background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
-      transition: 'transform var(--duration-fast-mid) ease',
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
-    >
-      <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card-link" aria-label={`${label} ${value}`}
-        style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', zIndex: 2 }}
-        onClick={() => {
-          if (window.trackAnalyticsEvent && eventName) {
-            window.trackAnalyticsEvent(eventName, { link_url: href, ...(section && { section }) });
-          }
-        }}
-      />
-      {copyValue && (
-        <button
-          type="button"
-          data-copy-button="true"
-          aria-label={copied ? `Copied ${label}` : `Copy ${label}`}
-          title={copied ? 'Copied' : 'Copy'}
-          onClick={handleCopy}
-          style={{
-            position: 'absolute', top: 8, right: 8,
-            width: 36, height: 36, borderRadius: 'var(--radius-circle)',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            border: 'none', cursor: 'pointer',
-            background: 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)',
-            color: copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
-            boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            opacity: 1,
-            pointerEvents: 'auto',
-            zIndex: 3,
-            transition: 'opacity var(--duration-fast) ease, color var(--duration-fast) ease, background var(--duration-fast) ease',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.opacity = '1';
-            e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-primary)';
-            e.currentTarget.style.background = 'var(--bg-subtle)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.opacity = '1';
-            e.currentTarget.style.color = copied ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)';
-            e.currentTarget.style.background = 'color-mix(in oklab, var(--bg-page) 76%, var(--bg-subtle) 24%)';
-          }}
-        >
-          <AppIcon icon={copied ? Check : Copy} size={13} />
-        </button>
-      )}
-      <span aria-hidden="true" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
-      <span aria-hidden="true" style={{ fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
-    </div>
-  );
-};
-
 // ============================================================
 // Key Facts (AEO Section)
 // ============================================================
@@ -2064,7 +1430,7 @@ const KeyFacts = () => {
         position: 'absolute', inset: 0, pointerEvents: 'none',
         opacity: 1,
       }} />
-      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', position: 'relative', zIndex: 'var(--z-component-cover)' }}>
         <Reveal className="work-head" variant="section" style={{
           display: 'grid',
           gridTemplateColumns: viewportWidth <= TABLET_BREAKPOINT ? '1fr' : LAYOUT.GRID_DESKTOP,
@@ -2077,11 +1443,11 @@ const KeyFacts = () => {
             fontSize: 'var(--font-size-body-sm)',
             color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)',
             textTransform: 'uppercase',
-            letterSpacing: '0.08em'
+            letterSpacing: 'var(--tracking-label)'
           }}>
             <span style={{ color: 'color-mix(in srgb, var(--color-develop-blue) 48%, var(--fg-on-dark) 52%)' }}>03 — </span>At a Glance
           </div>
-          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
+          <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-on-dark)', margin: 0, maxWidth: 760 }}>
             The short version: <span style={{ color: 'color-mix(in srgb, var(--fg-on-dark) 74%, transparent)' }}>I design systems, workflows, and products that scale.</span>
           </h2>
         </Reveal>
@@ -2105,15 +1471,15 @@ const KeyFacts = () => {
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               <AppIcon icon={f.icon} size={24} stroke="url(#fact-icon-gradient)" style={{ marginBottom: 'var(--space-4)', display: 'block', flexShrink: 0 }} />
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-3)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)', marginBottom: 'var(--space-3)' }}>
                 {f.label}
               </div>
               {f.custom ? (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
                   Sharing insights on design and product strategy via{' '}
-                  <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'at_a_glance' }); }}>LinkedIn</a>
+                  <LinkButton variant="portfolio" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-develop-blue)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'at_a_glance' }); }}>LinkedIn</LinkButton>
                   {' '}and{' '}
-                  <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'at_a_glance' }); }}>Substack</a>
+                  <LinkButton variant="portfolio" href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-preview-pink)', textDecoration: 'none', borderBottom: '1px solid currentColor' }} onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'at_a_glance' }); }}>Substack</LinkButton>
                 </div>
               ) : (
                 <div style={{ fontSize: 'var(--font-size-body-xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
@@ -2188,62 +1554,11 @@ const loadAskAnswers = async () => {
   return doc.answers ?? [];
 };
 
-const usePrefersReducedMotion = () => {
-  const [reduced, setReduced] = React.useState(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setReduced(mq.matches);
-    return onMediaChange(mq, sync);
-  }, []);
-  return reduced;
-};
-
 // Body paragraphs of an answer, with the first mention of each cited case study
 // turned into a link to its page. `citedIds` is the same set the citation chips
 // use, so nothing links that the answer was not grounded in, and each study
 // links once across the whole answer — `remaining` shrinks as studies are used,
 // so a later paragraph does not re-link one an earlier paragraph already did.
-const ANSWER_PARAGRAPH_STYLE = { margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 };
-const ANSWER_LINK_STYLE = { color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'color-mix(in srgb, var(--fg-primary) 40%, transparent)' };
-const ASK_RESPONSE_MIN_HEIGHT = 288;
-const ASK_RESPONSE_CARD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--space-4)',
-  minHeight: ASK_RESPONSE_MIN_HEIGHT,
-  padding: 'var(--space-5) var(--space-6)',
-  borderRadius: 'var(--radius-comfort)',
-  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)',
-};
-
-const AnswerBody = ({ text, citedIds = [], answerId }) => {
-  const remaining = new Set(citedIds);
-  return (text ?? '').split('\n\n').map((paragraph, i) => {
-    const tokens = tokenizeAnswer(paragraph, CASE_STUDIES, [...remaining]);
-    for (const token of tokens) if (token.type === 'link') remaining.delete(token.id);
-    return (
-      <p key={i} style={ANSWER_PARAGRAPH_STYLE}>
-        {tokens.map((token, j) => (token.type === 'link'
-          ? (
-            <a
-              key={j}
-              href={token.href}
-              onClick={() => trackPortfolioEvent('ask_inline_link_click', { answer_id: answerId, case_study_id: token.id })}
-              style={ANSWER_LINK_STYLE}
-            >
-              {token.value}
-            </a>
-          )
-          : <React.Fragment key={j}>{token.value}</React.Fragment>))}
-      </p>
-    );
-  });
-};
-
 /**
  * `linkable` is set when the panel is the page rather than a section of one.
  * It turns the answer on screen into part of the URL, so an answer can be sent
@@ -2631,327 +1946,10 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
   if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
 
-  const sourcesFor = (answer) => (answer.sources ?? [])
-    .map(id => CASE_STUDIES.find(c => c.id === id))
-    .filter(Boolean);
-  const responseActive = Boolean(result || phase || drafted || missed);
-
-  return (
-    <div ref={sentinelRef} style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--space-4)',
-    }}>
-      <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        {/*
-          The wrapper carries the gradient ring. An input is a replaced element
-          and cannot host ::before/::after, so the ring has nowhere to live
-          without it — see .ask-field in index.html.
-        */}
-        {/* 200px, not 260: at 375 the wider basis pushed the Ask button onto
-            its own line, where it sat orphaned under a full-width field. */}
-        <div className="ask-field" style={{ flex: '1 1 200px', minWidth: 0, display: 'flex' }}>
-          <input
-            type="text"
-            aria-label="Ask a question about Omar's work"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Ask about a project, a skill, a role…"
-            autoComplete="off"
-            style={{
-              flex: '1 1 auto',
-              minWidth: 0,
-              minHeight: 44,
-              padding: '10px 14px',
-              fontFamily: 'inherit',
-              fontSize: 'var(--font-size-body-md)',
-              color: 'var(--fg-primary)',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 'var(--radius-standard)',
-            }}
-          />
-        </div>
-        {/* Disabled and primary both match .ds-button in design-system-page.css. */}
-        <button type="submit" disabled={!canSubmit} style={{
-          minHeight: 44,
-          padding: '10px 18px',
-          fontFamily: 'inherit',
-          fontSize: 'var(--font-size-body-md)',
-          fontWeight: 'var(--font-weight-medium)',
-          color: canSubmit ? 'var(--bg-page)' : 'var(--fg-disabled)',
-          background: canSubmit ? 'var(--fg-primary)' : 'var(--bg-subtle)',
-          opacity: canSubmit ? 1 : 0.72,
-          border: 'none',
-          borderRadius: 'var(--radius-standard)',
-          cursor: canSubmit ? 'pointer' : 'not-allowed',
-          transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast)',
-        }}
-          onMouseEnter={e => { if (canSubmit) e.currentTarget.style.opacity = '0.86'; }}
-          onMouseLeave={e => { if (canSubmit) e.currentTarget.style.opacity = '1'; }}
-        >
-          Ask
-        </button>
-      </form>
-
-      {/*
-        Directly under the input, because this is what a visitor wants to know
-        at the moment they are about to type — not after scrolling past an
-        answer. Both tiers still stated: written and reviewed, or drafted and
-        labelled.
-      */}
-      <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-        Written and reviewed in advance. When published work supports something new, a drafted reply is clearly labelled.
-      </p>
-
-      <div
-        aria-live="polite"
-        data-ask-response-region="true"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-4)',
-          minHeight: responseActive ? ASK_RESPONSE_MIN_HEIGHT : 0,
-        }}
-      >
-        {result && (
-          <div style={ASK_RESPONSE_CARD_STYLE}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-              <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-snug)', color: 'var(--fg-primary)' }}>
-                {result.question}
-              </p>
-              {linkable && (
-                <button
-                  type="button"
-                  data-ask-share="true"
-                  onClick={() => copyLink(result)}
-                  aria-label={{
-                    copied: 'Link copied',
-                    failed: 'Copying failed — the link is in the address bar',
-                  }[copyState] ?? 'Copy a link to this answer'}
-                  style={{
-                    flexShrink: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    minHeight: 44,
-                    padding: '10px 14px',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 'var(--font-size-body-sm)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: copyState === 'copied' ? 'var(--color-develop-blue)' : 'var(--fg-tertiary)',
-                    background: 'transparent',
-                    border: 'none',
-                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                    borderRadius: 'var(--radius-standard)',
-                    cursor: 'pointer',
-                    transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
-                  }}
-                >
-                  <AppIcon icon={copyState === 'copied' ? Check : Copy} size={13} />
-                  {{ copied: 'Copied', failed: 'Use the address bar' }[copyState] ?? 'Copy link'}
-                </button>
-              )}
-            </div>
-            <AnswerBody text={result.answer} citedIds={result.sources ?? []} answerId={result.id} />
-            {sourcesFor(result).length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                {sourcesFor(result).map(caseStudy => (
-                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: result.id, case_study_id: caseStudy.id })} style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    minHeight: 44,
-                    padding: '10px 14px',
-                    fontSize: 'var(--font-size-body-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: 'var(--fg-primary)',
-                    textDecoration: 'none',
-                    borderRadius: 'var(--radius-standard)',
-                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                  }}>
-                    {caseStudy.title}
-                    <AppIcon icon={ArrowUpRight} size={12} />
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {phase === 'looking' && (
-          <div data-ask-state="loading" style={{ ...ASK_RESPONSE_CARD_STYLE, justifyContent: 'center' }}>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
-              Looking for a written answer…
-            </p>
-          </div>
-        )}
-
-        {phase === 'drafting' && !drafted && (
-          <div data-ask-state="loading" style={{ ...ASK_RESPONSE_CARD_STYLE, justifyContent: 'center' }}>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', color: 'var(--fg-tertiary)' }}>
-              Nothing written covers that one — drafting from relevant published work…
-            </p>
-          </div>
-        )}
-
-        {drafted && (() => {
-          // The chips and the inline links must cite the same studies. The chips
-          // show at most three, so the inline linker is given exactly that set —
-          // otherwise a fourth cited study could be linked in the prose with no
-          // matching chip beneath it.
-          const visibleSourceIds = phase === 'drafting'
-            ? []
-            : mentionedStudyIds(drafted.text, CASE_STUDIES, drafted.sources ?? []);
-          const citedStudies = visibleSourceIds
-            .map(id => CASE_STUDIES.find(c => c.id === id))
-            .filter(Boolean)
-            .slice(0, 3);
-          return (
-          <div style={ASK_RESPONSE_CARD_STYLE}>
-            <div style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: 'var(--font-size-body-sm)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--fg-tertiary)',
-            }}>
-              Drafted, not reviewed
-            </div>
-            <AnswerBody text={drafted.text} citedIds={citedStudies.map(c => c.id)} answerId="drafted" />
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--fg-tertiary)', maxWidth: 720 }}>
-              There is no written answer to that question, so this was drafted from relevant published
-              work and has not been reviewed. For anything that matters, email Omar.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              {citedStudies
-                .map(caseStudy => (
-                  <a key={caseStudy.id} href={`/work/${caseStudy.id}/`} onClick={() => trackPortfolioEvent('ask_citation_click', { answer_id: 'drafted', case_study_id: caseStudy.id })} style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
-                    padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
-                    color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
-                    boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-                  }}>
-                    {caseStudy.title}
-                    <AppIcon icon={ArrowUpRight} size={12} />
-                  </a>
-                ))}
-              <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
-                padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
-                color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
-                boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              }}>
-                Email Omar
-                <AppIcon icon={ArrowUpRight} size={12} />
-              </a>
-            </div>
-          </div>
-          );
-        })()}
-
-        {missed && (
-          <div style={{ ...ASK_RESPONSE_CARD_STYLE, gap: 'var(--space-3)' }}>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 720 }}>
-              I couldn&apos;t safely match that to a reviewed answer or clearly relevant published work. Rather than guess, email is the faster route.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              <a href="mailto:omar@designedbyomar.com" onClick={() => trackPortfolioEvent('ask_contact_click', { question: query.trim() })} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 44,
-                padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
-                color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
-                boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              }}>
-                Email Omar
-                <AppIcon icon={ArrowUpRight} size={12} />
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        {showingFollowUps ? 'Related' : 'Try one of these'}
-      </div>
-
-      <div id="ask-suggestions" ref={suggestionListRef} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-        {suggestions.map(answer => (
-          <button
-            key={answer.id}
-            type="button"
-            data-ask-suggestion="true"
-            onClick={() => {
-              trackPortfolioEvent('ask_suggested_click', {
-                answer_id: answer.id,
-                context: showingFollowUps ? 'related' : 'opening',
-              });
-              setQuery('');
-              show(answer);
-            }}
-            style={{
-              minHeight: 44,
-              padding: '10px 14px',
-              fontFamily: 'inherit',
-              fontSize: 'var(--font-size-body-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              color: 'var(--fg-secondary)',
-              background: 'transparent',
-              border: 'none',
-              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              borderRadius: 'var(--radius-standard)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: prefersReducedMotion ? 'none' : 'background var(--duration-fast), color var(--duration-fast)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--fg-secondary)'; }}
-          >
-            {answer.question}
-          </button>
-        ))}
-      </div>
-
-      {collapsible && (
-        <button
-          type="button"
-          data-ask-expand="true"
-          aria-expanded={suggestionsExpanded}
-          aria-controls="ask-suggestions"
-          onClick={() => {
-            // The revealed prompts are inserted *before* this control, so a
-            // keyboard user's next Tab would move past everything they just
-            // asked for. Focus follows the disclosure instead.
-            if (!suggestionsExpanded) {
-              focusRevealedRef.current = true;
-              trackPortfolioEvent('ask_suggestions_expand', { shown: fullSet.length });
-            }
-            setSuggestionsExpanded(open => !open);
-          }}
-          style={{
-            alignSelf: 'flex-start',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            minHeight: 44,
-            padding: '10px 4px',
-            fontFamily: 'inherit',
-            fontSize: 'var(--font-size-body-sm)',
-            fontWeight: 'var(--font-weight-medium)',
-            color: 'var(--fg-tertiary)',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            transition: prefersReducedMotion ? 'none' : 'color var(--duration-fast)',
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
-          onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
-        >
-          {suggestionsExpanded ? 'Fewer questions' : `More questions (${fullSet.length - ASK_COLLAPSED_SUGGESTIONS})`}
-        </button>
-      )}
-    </div>
-  );
+  return <AskPanel {...{ query, setQuery, submit, canSubmit, prefersReducedMotion, result, linkable,
+    copyState, copyLink, phase, drafted, missed, suggestions, showingFollowUps, collapsible,
+    suggestionsExpanded, setSuggestionsExpanded, focusRevealedRef, fullSet, show, sentinelRef,
+    suggestionListRef }} studies={CASE_STUDIES} onEvent={trackPortfolioEvent} />;
 };
 
 const AskSection = ({ scrollToSection }) => {
@@ -2961,7 +1959,7 @@ const AskSection = ({ scrollToSection }) => {
   const faqColumns = isStacked ? '1fr' : 'minmax(340px, 440px) minmax(0, 1fr)';
 
   const contactCta = (
-    <a href="#contact" onClick={(event) => {
+    <LinkButton variant="portfolio" href="#contact" onClick={(event) => {
       event.preventDefault();
       scrollToSection('contact', 'faq_cta');
     }} style={{
@@ -2969,11 +1967,11 @@ const AskSection = ({ scrollToSection }) => {
       display: 'inline-flex',
       alignItems: 'center',
       gap: 'var(--space-2)',
-      minHeight: 44,
+      minHeight: 'var(--control-hit-area)',
       fontSize: 'var(--font-size-body-md)',
       fontWeight: 'var(--font-weight-medium)',
       color: 'var(--fg-primary)',
-      padding: '10px 16px',
+      padding: 'var(--control-padding-block) var(--space-4)',
       borderRadius: 'var(--radius-standard)',
       background: 'transparent',
       boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
@@ -2985,7 +1983,7 @@ const AskSection = ({ scrollToSection }) => {
     >
       Start a conversation
       <AppIcon icon={ArrowUpRight} size={12} />
-    </a>
+    </LinkButton>
   );
 
   return (
@@ -3010,10 +2008,10 @@ const AskSection = ({ scrollToSection }) => {
           maxWidth: isStacked ? 760 : 440,
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', paddingBottom: isStacked ? 'var(--space-4)' : 0 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)' }}>
               <span style={{ color: 'var(--color-preview-pink)' }}>04 — </span>Ask
             </div>
-            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: 0 }}>
+            <h2 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
               Ask about the work.
             </h2>
             <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: 0 }}>
@@ -3032,19 +2030,19 @@ const AskSection = ({ scrollToSection }) => {
             column, where it does not compete.
           */}
           {isStacked && contactCta}
-          <a href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'faq_section' })} className="text-link" style={{
+          <LinkButton variant="portfolio" href="/ask" onClick={() => trackPortfolioEvent('ask_page_click', { ui_location: 'faq_section' })} className="text-link" style={{
             alignSelf: 'flex-start',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 'var(--space-2)',
-            minHeight: 44,
+            minHeight: 'var(--control-hit-area)',
             fontSize: 'var(--font-size-body-sm)',
             fontWeight: 'var(--font-weight-medium)',
             color: 'var(--fg-secondary)',
           }}>
             See every answer
             <AppIcon icon={ArrowUpRight} size={12} />
-          </a>
+          </LinkButton>
         </div>
       </Reveal>
     </section>
@@ -3064,24 +2062,24 @@ const AskPage = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <article style={{ maxWidth: 880, margin: '0 auto', padding: '40px 24px 96px' }}>
-      <a href="/" onClick={(e) => { e.preventDefault(); history.pushState(null, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} style={{
+    <article style={{ maxWidth: 880, margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--layout-3)' }}>
+      <LinkButton variant="portfolio" href="/" onClick={(e) => { e.preventDefault(); history.pushState(null, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} style={{
         display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
         fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)',
-        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em',
-        marginBottom: 40, transition: 'color var(--duration-fast)',
+        textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)',
+        marginBottom: 'var(--space-8)', transition: 'color var(--duration-fast)',
       }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--fg-primary)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--fg-tertiary)'}
       >
         <AppIcon icon={ArrowLeft} size={12} />
         Back to home
-      </a>
+      </LinkButton>
 
-      <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-5)' }}>
+      <h1 style={{ fontSize: 'clamp(32px, 4.2vw, 56px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-compact)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: '0 0 var(--space-5)' }}>
         Ask about the work.
       </h1>
-      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 720 }}>
+      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 'var(--content-answer-width)' }}>
         Pick a question or type your own. Every answer here has its own link, so you can send one on.
       </p>
 
@@ -3100,21 +2098,21 @@ const Contact = () => {
   return (
     <section id="contact" style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-4) var(--space-6) var(--layout-3)' }}>
       <Reveal className="contact-grid" variant="section" style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', display: 'grid', gridTemplateColumns: contactGridColumns, gap: viewportWidth <= TABLET_BREAKPOINT ? 'var(--space-6)' : 'var(--layout-2)', alignItems: 'start' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label)' }}>
           <span style={{ color: 'var(--color-ship-red)' }}>05 — </span>Contact
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', maxWidth: 820 }}>
-          <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-secondary)', margin: 0 }}>
+          <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-secondary)', margin: 0 }}>
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
-            <ContactCard label="Book a call" value="20 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
-            <ContactCard label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
-            <ContactCard label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
-            <ContactCard label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
-            <ContactCard label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
-            <ContactCard label="Substack" value="@designedbyomar" href={SUBSTACK_URL} eventName="contact_click_substack" section="contact" />
-            <ContactCard label="Behance" value="omartavarez" href={BEHANCE_URL} eventName="contact_click_behance" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Book a call" value="20 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
+            <ContactCard onEvent={trackPortfolioEvent} label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Substack" value="@designedbyomar" href={SUBSTACK_URL} eventName="contact_click_substack" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Behance" value="omartavarez" href={BEHANCE_URL} eventName="contact_click_behance" section="contact" />
           </div>
         </div>
       </Reveal>
@@ -3125,199 +2123,6 @@ const Contact = () => {
 // ============================================================
 // Alien pixel icon + retro arrival animation
 // ============================================================
-const FooterAlien = () => {
-  const ref = React.useRef(null);
-  const [played, setPlayed] = React.useState(false);
-
-  React.useEffect(() => {
-    if (played) return;
-    if (typeof window === 'undefined') return;
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce || typeof IntersectionObserver === 'undefined') {
-      setPlayed(true);
-      return;
-    }
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        setPlayed(true);
-        obs.disconnect();
-      }
-    }, { threshold: 0.6 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [played]);
-
-  return <div ref={ref} style={{ display: 'inline-block' }}><FooterArrival played={played} /></div>;
-};
-
-const SiteFooter = ({ onHome, scrollToSection }) => {
-  const footerLabelStyle = {
-    fontFamily: 'var(--font-mono)',
-    fontSize: 'var(--font-size-body-sm)',
-    color: 'var(--fg-tertiary)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
-  };
-
-  const goSection = (id) => (event) => {
-    event.preventDefault();
-    scrollToSection(id, 'footer');
-  };
-
-  return (
-    <footer style={{ borderTop: '1px solid var(--color-gray-100)', padding: 'var(--layout-2) var(--space-6)' }}>
-      <style dangerouslySetInnerHTML={{
-        __html: footerAlienStyles + `
-        .site-footer-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr) minmax(180px, 0.85fr);
-          gap: var(--layout-1) var(--layout-2);
-        }
-        .site-footer-block {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-4);
-          min-width: 0;
-        }
-        @media (max-width: 900px) {
-          .site-footer-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: var(--layout-1) var(--layout-1);
-          }
-          .site-footer-brand {
-            grid-column: 1 / -1;
-          }
-        }
-        @media (max-width: 600px) {
-          .site-footer-grid {
-            grid-template-columns: minmax(0, 1fr);
-            gap: var(--layout-1);
-          }
-        }
-      `}} />
-      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto' }}>
-        <div className="site-footer-grid">
-          <div className="site-footer-block site-footer-brand" style={{ gap: 'var(--space-8)' }}>
-            <div style={{ display: 'inline-flex', width: 'fit-content' }}>
-              <NavLogo onClick={(event) => { event.preventDefault(); trackSectionNavigation('top', 'footer_logo'); onHome(); }} />
-            </div>
-            <p style={{ maxWidth: 360, margin: 0, fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-tertiary)' }}>
-              Product design for AI workflows, enterprise systems, fintech, and healthcare SaaS.
-            </p>
-            <span className="footer-signoff" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              flexWrap: 'wrap',
-              width: 'fit-content',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 'var(--font-size-body-sm)',
-              lineHeight: 'var(--line-height-relaxed-plus)',
-              color: 'var(--fg-tertiary)',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-            }}>
-              <span>Designed by Omar. Built with AI-native coding tools.</span>
-              <FooterAlien />
-            </span>
-          </div>
-
-          <div className="site-footer-block">
-            <h3 style={{ ...footerLabelStyle, margin: 0 }}>Site Links</h3>
-            <a
-              href="/work"
-              className="text-link site-footer-link"
-              onClick={goSection('work')}
-            >
-              Work
-            </a>
-            <a
-              href="/about"
-              className="text-link site-footer-link"
-              onClick={() => trackPortfolioEvent('about_page_open', { ui_location: 'footer' })}
-            >
-              About
-            </a>
-            <a
-              href="#faq"
-              className="text-link site-footer-link"
-              onClick={goSection('faq')}
-            >
-              FAQ
-            </a>
-            <a
-              href="#contact"
-              className="text-link site-footer-link"
-              onClick={goSection('contact')}
-            >
-              Contact
-            </a>
-            <a
-              href="/privacy"
-              className="text-link site-footer-link"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="/design-system"
-              className="text-link site-footer-link"
-              aria-label="See Design System"
-            >
-              Design System
-            </a>
-          </div>
-
-          <div className="site-footer-block">
-            <h3 style={{ ...footerLabelStyle, margin: 0 }}>Social</h3>
-            <a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_linkedin', { link_url: LINKEDIN_URL, section: 'footer' }); }}
-            >
-              LinkedIn
-            </a>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_github', { link_url: GITHUB_URL, section: 'footer' }); }}
-            >
-              GitHub
-            </a>
-            <a
-              href={SUBSTACK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_substack', { link_url: SUBSTACK_URL, section: 'footer' }); }}
-            >
-              Substack
-            </a>
-            <a
-              href={BEHANCE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link site-footer-link"
-              onClick={() => { if (window.trackAnalyticsEvent) window.trackAnalyticsEvent('contact_click_behance', { link_url: BEHANCE_URL, section: 'footer' }); }}
-            >
-              Behance
-            </a>
-            <span style={{ paddingTop: 8, fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              © 2026 Omar Tavarez
-            </span>
-          </div>
-
-        </div>
-      </div>
-    </footer>
-  );
-};
-
 // ============================================================
 // Privacy Policy Page
 // ============================================================
@@ -3354,17 +2159,17 @@ const PrivacyPolicyPage = ({ onBack }) => {
     return (
       <p key={key} style={{ margin: 0 }}>
         {block.text}
-        {block.link && <a href={block.link.href} style={privacyLinkStyle}>{block.link.label}</a>}
+        {block.link && <LinkButton variant="portfolio" href={block.link.href} style={privacyLinkStyle}>{block.link.label}</LinkButton>}
         {block.suffix || ''}
       </p>
     );
   };
 
   return (
-    <div style={{ maxWidth: 820, margin: '0 auto', padding: '120px 24px', minHeight: '100vh' }}>
-      <a href="#" className="text-link" onClick={(e) => { e.preventDefault(); onBack(); }} style={{ marginBottom: 48 }}>← Back to home</a>
-      <div style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: '-0.04em', color: 'var(--fg-primary)', margin: '0 0 var(--space-4)' }}>{PRIVACY_POLICY.title}</h1>
+    <div style={{ maxWidth: 820, margin: '0 auto', padding: 'var(--layout-4) var(--space-6)', minHeight: '100vh' }}>
+      <LinkButton variant="portfolio" href="#" className="text-link" onClick={(e) => { e.preventDefault(); onBack(); }} style={{ marginBottom: 'var(--layout-1)' }}>← Back to home</LinkButton>
+      <div style={{ marginBottom: 'var(--space-8)' }}>
+        <h1 style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: '0 0 var(--space-4)' }}>{PRIVACY_POLICY.title}</h1>
         <p style={{ fontSize: 'var(--font-size-heading-lg)', lineHeight: 'var(--line-height-snug-plus)', color: 'var(--fg-secondary)', margin: 0 }}>{PRIVACY_POLICY.subtitle}</p>
       </div>
 
@@ -3407,91 +2212,8 @@ const CookieBanner = ({ onAccept, onDecline, onPrivacy }) => {
     return onMediaChange(mediaQuery, onChange);
   }, []);
 
-  const baseButtonStyle = {
-    minHeight: 44,
-    padding: '10px 16px',
-    borderRadius: 'var(--radius-comfort)',
-    fontSize: 'var(--font-size-body-xs)',
-    fontWeight: 'var(--font-weight-semibold)',
-    border: 'none',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    fontFamily: 'inherit',
-    transition: prefersReducedMotion ? 'none' : 'transform var(--duration-fast) ease, opacity var(--duration-fast) ease, background var(--duration-fast) ease',
-  };
-
-  return (
-    <div style={{
-      position: 'fixed',
-      bottom: 24,
-      left: 24,
-      right: 24,
-      zIndex: 10000,
-      display: 'flex',
-      justifyContent: 'center',
-      pointerEvents: 'none',
-    }}>
-      <div style={{
-        maxWidth: 580,
-        width: '100%',
-        background: 'color-mix(in oklab, var(--bg-page) 82%, transparent)',
-        backdropFilter: 'var(--blur-heavy)',
-        WebkitBackdropFilter: 'var(--blur-heavy)',
-        boxShadow: 'var(--shadow-card-full)',
-        borderRadius: 'var(--radius-xl)',
-        padding: '18px 24px',
-        display: 'flex',
-        flexDirection: isNarrow ? 'column' : 'row',
-        alignItems: isNarrow ? 'flex-start' : 'center',
-        justifyContent: 'space-between',
-        gap: isNarrow ? 'var(--space-4)' : 'var(--space-6)',
-        pointerEvents: 'auto',
-        opacity: isVisible ? 1 : 0,
-        transform: prefersReducedMotion || isVisible ? 'none' : 'translateY(24px) scale(0.98)',
-        transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1), transform var(--duration-slowest-xxl) cubic-bezier(0.16, 1, 0.3, 1)',
-        border: '1px solid var(--color-gray-100)',
-      }}>
-        <p style={{ fontSize: 'var(--font-size-body-md)', color: 'var(--fg-secondary)', lineHeight: 'var(--line-height-relaxed)', margin: 0 }}>
-          This site uses simple analytics cookies to improve the experience. No ads, no creepy tracking, no selling your data. <a href="#" onClick={(e) => { e.preventDefault(); onPrivacy(); }} style={{ color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Privacy Policy</a>
-        </p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: isNarrow ? 'flex-end' : 'center', gap: 'var(--space-3)', width: isNarrow ? '100%' : 'auto' }}>
-          <button
-            type="button"
-            onClick={onDecline}
-            style={{
-              ...baseButtonStyle,
-              background: 'transparent',
-              color: 'var(--fg-primary)',
-              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-subtle)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-          >
-            Decline
-          </button>
-          <button
-            type="button"
-            onClick={onAccept}
-            style={{
-              ...baseButtonStyle,
-              background: 'var(--fg-primary)',
-              color: 'var(--bg-page)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.opacity = '0.9';
-              if (!prefersReducedMotion) e.currentTarget.style.transform = 'scale(1.02)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          >
-            Accept
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <ConsentBanner onAccept={onAccept} onDecline={onDecline} onPrivacy={onPrivacy}
+    isVisible={isVisible} isNarrow={isNarrow} prefersReducedMotion={prefersReducedMotion} />;
 };
 
 // ============================================================
@@ -3815,20 +2537,20 @@ const syncSentryContext = (route, currentCase, theme) => {
 };
 
 const AppShellErrorFallback = () => (
-  <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '32px 24px', background: 'var(--bg-page)', color: 'var(--fg-primary)' }}>
-    <div style={{ width: '100%', maxWidth: 720, borderRadius: 'var(--radius-xl)', padding: '32px 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 14 }}>
+  <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 'var(--space-7) var(--space-6)', background: 'var(--bg-page)', color: 'var(--fg-primary)' }}>
+    <div style={{ width: '100%', maxWidth: 'var(--content-answer-width)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-7) 28px', background: 'color-mix(in oklab, var(--bg-subtle) 72%, transparent)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', color: 'var(--fg-tertiary)', marginBottom: 'var(--control-padding-inline)' }}>
         Unexpected error
       </div>
-      <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1, letterSpacing: '-0.04em', margin: '0 0 16px' }}>
+      <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1, letterSpacing: 'var(--tracking-display)', margin: '0 0 var(--space-4)' }}>
         This view failed to load.
       </h1>
-      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-6)' }}>
         Refresh the page or head back home. The issue has been logged for review.
       </p>
-      <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: '10px 16px', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none' }}>
+      <LinkButton variant="portfolio" href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--control-padding-block) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none' }}>
         Back home
-      </a>
+      </LinkButton>
     </div>
   </div>
 );
@@ -4206,7 +2928,7 @@ const App = () => {
             </>
           )}
         </main>
-        <SiteFooter onHome={goHome} scrollToSection={scrollToSection} />
+        <SiteFooter onEvent={trackPortfolioEvent} onLogoClick={() => trackSectionNavigation('top', 'footer_logo')} onHome={goHome} scrollToSection={scrollToSection} />
       </div>
       {showCookieBanner && <CookieBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} onPrivacy={showPrivacy} />}
       {analyticsAccepted && (

@@ -603,7 +603,7 @@ test('the block model is normalized identically for both renderers', async () =>
 });
 
 test('both renderers share the block normalizer rather than guarding separately', () => {
-  const react = fs.readFileSync(path.join(ROOT, 'src', 'main.jsx'), 'utf8');
+  const react = fs.readFileSync(path.join(ROOT, 'src', 'ui', 'case-study-body.jsx'), 'utf8');
   const staticRenderer = fs.readFileSync(path.join(ROOT, 'postbuild.js'), 'utf8');
 
   assert.match(react, /normalizeBlocks/, 'React renderer normalizes blocks');

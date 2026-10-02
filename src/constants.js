@@ -37,3 +37,9 @@ export const ASPECT_RATIOS = {
   THUMBNAIL: '4/3',
   WIDE: '16/8',
 };
+
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
+export const GITHUB_URL = 'https://github.com/designedbyomar';
+export const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
+export const BEHANCE_URL = 'https://www.behance.net/omartavarez';
+export const BOOKING_URL = 'https://calendar.app.google/4NcXLDoniazZ5VT78';
