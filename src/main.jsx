@@ -728,6 +728,7 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
     return () => document.removeEventListener('keydown', onKey);
   }, [isMobileMenuOpen]);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const handleLogoClick = (e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); };
   const goSection = (id) => (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -774,8 +775,13 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
               <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
             </button>
           )}
-          <NavLogo onClick={(e) => { e.preventDefault(); trackSectionNavigation('top', 'nav_logo'); onHome(); }} />
+          {!isMobile && <NavLogo onClick={handleLogoClick} />}
         </div>
+        {isMobile && (
+          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+            <NavLogo onClick={handleLogoClick} />
+          </div>
+        )}
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
             <a href="/work" onClick={goSection('work')} style={navLink}
