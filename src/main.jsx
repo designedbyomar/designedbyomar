@@ -682,7 +682,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
   );
 };
 
-const NavLogo = ({ onClick }) => {
+const NavLogo = ({ onClick, style }) => {
   const [key, setKey] = React.useState(0);
   const shapeStyle = (delay) => ({
     transformBox: 'fill-box',
@@ -693,7 +693,7 @@ const NavLogo = ({ onClick }) => {
   return (
     <a href="#" onClick={onClick}
       onMouseEnter={() => setKey(k => k + 1)}
-      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer' }}
+      style={{ display: 'flex', alignItems: 'center', minHeight: 44, textDecoration: 'none', cursor: 'pointer', ...style }}
       aria-label="designedbyomar"
     >
       <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -775,13 +775,11 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
               <AppIcon icon={isMobileMenuOpen ? X : Menu} size={17} />
             </button>
           )}
-          {!isMobile && <NavLogo onClick={handleLogoClick} />}
+          <NavLogo
+            onClick={handleLogoClick}
+            style={isMobile ? { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' } : undefined}
+          />
         </div>
-        {isMobile && (
-          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-            <NavLogo onClick={handleLogoClick} />
-          </div>
-        )}
         {!isMobile && (
           <nav style={{ display: 'flex', gap: 2 }}>
             <a href="/work" onClick={goSection('work')} style={navLink}
