@@ -727,7 +727,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)',
           minHeight: 'var(--control-hit-area)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
         }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
+          onMouseEnter={e => e.currentTarget.style.opacity = 'var(--opacity-control-hover)'}
           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
           View case studies
@@ -757,7 +757,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           <AppIcon icon={ArrowUpRight} size={12} />
         </LinkButton>
       </div>
-      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <div style={{ fontSize: 'var(--font-size-body-xs)', fontFamily: 'var(--font-mono)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-impact)' }}>
         Recent impact: <span style={{ color: 'var(--fg-secondary)', textTransform: 'none', letterSpacing: 'normal' }}>~40% faster workflows • 1,600+ enterprise users • $20M+ revenue-driving workflows</span>
       </div>
     </div>

@@ -16,10 +16,10 @@ export const ConsentBanner = ({ onAccept, onDecline, onPrivacy, isVisible = true
   return (
     <div style={{
       position: embedded ? 'relative' : 'fixed',
-      bottom: embedded ? undefined : 24,
-      left: embedded ? undefined : 24,
-      right: embedded ? undefined : 24,
-      zIndex: embedded ? undefined : 10000,
+      bottom: embedded ? undefined : 'var(--space-6)',
+      left: embedded ? undefined : 'var(--space-6)',
+      right: embedded ? undefined : 'var(--space-6)',
+      zIndex: embedded ? undefined : 'var(--z-consent)',
       display: 'flex',
       justifyContent: 'center',
       pointerEvents: 'none',

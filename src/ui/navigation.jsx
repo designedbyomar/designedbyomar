@@ -22,7 +22,7 @@ export const SiteNavigation = ({ theme, setTheme, scrolled = false, isMobile = f
     }}>
       {/* Padding lives on the full-width header, not the max-width row, so the row
           aligns with the content sections' inner containers at every width. */}
-      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+      <div style={{ maxWidth: LAYOUT.MAX_WIDTH, margin: '0 auto', minHeight: 'var(--layout-2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
         {/* Menu trigger sits left of the logo, matching the design-system header. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           {isMobile && (
@@ -80,7 +80,7 @@ export const SiteNavigation = ({ theme, setTheme, scrolled = false, isMobile = f
               fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-2) var(--space-3)',
               borderRadius: 'var(--radius-standard)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
             }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.86'}
+              onMouseEnter={e => e.currentTarget.style.opacity = 'var(--opacity-control-hover)'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >Get in touch</LinkButton>
           )}
@@ -102,7 +102,7 @@ export const SiteNavigation = ({ theme, setTheme, scrolled = false, isMobile = f
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--control-hit-area)',
                 fontSize: 'var(--font-size-body-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--bg-page)', padding: 'var(--space-3) var(--space-4)', marginTop: 'var(--space-compact)',
                 borderRadius: 'var(--radius-comfort)', background: 'var(--fg-primary)', textDecoration: 'none', transition: 'opacity var(--duration-fast)',
-              }} onMouseEnter={e => e.currentTarget.style.opacity = '0.86'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</LinkButton>
+              }} onMouseEnter={e => e.currentTarget.style.opacity = 'var(--opacity-control-hover)'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>Get in touch</LinkButton>
             </div>
           </div>
         )}

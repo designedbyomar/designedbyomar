@@ -100,7 +100,7 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
           cursor: canSubmit ? 'pointer' : 'not-allowed',
           transition: prefersReducedMotion ? 'none' : 'opacity var(--duration-fast)',
         }}
-          onMouseEnter={e => { if (canSubmit) e.currentTarget.style.opacity = '0.86'; }}
+          onMouseEnter={e => { if (canSubmit) e.currentTarget.style.opacity = 'var(--opacity-control-hover)'; }}
           onMouseLeave={e => { if (canSubmit) e.currentTarget.style.opacity = '1'; }}
         >
           Ask

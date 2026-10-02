@@ -77,7 +77,7 @@ export const CaseStudyBody = ({ blocks: rawBlocks, accent, idPrefix = '' }) => {
             return (
               <div key={i} style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(var(--size-gallery-column-min), 1fr))',
                 gap: 'var(--space-4)',
                 margin: 'var(--space-4) 0',
               }}>

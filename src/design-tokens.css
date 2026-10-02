@@ -1,4 +1,12 @@
 :root {
+  --size-gallery-column-min: 240px;
+  --control-compact-height: 34px;
+  --content-footer-column-min: 180px;
+  --radius-signature: 9.5px;
+  --duration-border-spin: 3s;
+  --tracking-impact: 0.04em;
+  --opacity-control-disabled: 0.72;
+
   --content-photo-width: 480px;
   --content-lightbox-width: 1000px;
   --font-size-hero-title: clamp(44px, 7vw, 88px);
