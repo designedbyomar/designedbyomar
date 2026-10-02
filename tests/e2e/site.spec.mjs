@@ -2038,3 +2038,64 @@ test.describe('case-card media delivery', () => {
     expect(videoRequests).toEqual([]);
   });
 });
+
+
+test('contact email link and copy control are independent keyboard targets', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__contactEvents = [];
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
+      writeText: async (value) => { window.__contactCopied = value; },
+    } });
+  });
+  await page.goto('/');
+  await page.evaluate(() => {
+    window.trackAnalyticsEvent = (eventName) => window.__contactEvents.push(eventName);
+  });
+  const card = page.locator('#contact .contact-card').filter({ has: page.locator('[data-copy-button]') });
+  const link = card.getByRole('link', { name: 'Email omar@designedbyomar.com', exact: true });
+  const copy = card.locator('[data-copy-button]');
+  await expect(link).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
+  await expect(card.locator('a button')).toHaveCount(0);
+  await link.focus();
+  await expect(link).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(copy).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect.poll(() => page.evaluate(() => window.__contactCopied)).toBe('omar@designedbyomar.com');
+  await expect(copy).toHaveAccessibleName('Copied Email');
+  expect(await page.evaluate(() => window.__contactEvents)).toEqual(['copy_email_click']);
+  await expect(copy).toHaveAccessibleName('Copy Email');
+  await page.evaluate(() => {
+    navigator.clipboard.writeText = async () => { throw new Error('Clipboard denied'); };
+  });
+  await copy.click();
+  await expect(copy).toHaveAccessibleName('Copy Email');
+  expect(await page.evaluate(() => window.__contactEvents)).toEqual(['copy_email_click']);
+  await link.evaluate((node) => node.addEventListener('click', (event) => event.preventDefault()));
+  await link.click();
+  expect(await page.evaluate(() => window.__contactEvents)).toEqual(['copy_email_click', 'contact_click_email']);
+});
+
+
+for (const width of [390, 820, 1440]) {
+  test(`contact controls remain aligned and visible at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    const contact = page.locator('#contact');
+    await contact.scrollIntoViewIfNeeded();
+    const cards = contact.locator('.contact-card');
+    for (const card of await cards.all()) {
+      const [bounds, linkBounds] = await card.evaluate((node) => [
+        node.getBoundingClientRect().toJSON(),
+        node.querySelector('a').getBoundingClientRect().toJSON(),
+      ]);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      expect(linkBounds).toEqual(bounds);
+    }
+    const copy = contact.getByRole('button', { name: 'Copy Email', exact: true });
+    await copy.focus();
+    expect(await copy.evaluate((node) => getComputedStyle(node).outlineStyle)).not.toBe('none');
+    await contact.screenshot({ path: testInfo.outputPath(`contact-${width}.png`) });
+  });
+}

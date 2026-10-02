@@ -738,3 +738,30 @@ test('every case-card cover has correctly mapped responsive WebP variants', asyn
     }
   }
 });
+
+
+test('legacy case-study URLs permanently redirect to indexable canonical destinations', () => {
+  const redirects = JSON.parse(readText('vercel.json')).redirects;
+  const urls = sitemapUrls();
+  const pairs = [
+    ['plastiq-marketing-site', 'plastiq-mktg'],
+    ['page-builder-2-0', 'page-builder'],
+    ['cct', 'disney-cct'],
+    ['connect-api-payments', 'connect-api'],
+  ];
+  for (const [oldSlug, slug] of pairs) {
+    const destination = `/work/${slug}/`;
+    for (const suffix of ['', '/']) {
+      const source = `/work/${oldSlug}${suffix}`;
+      const matches = redirects.filter((redirect) => redirect.source === source);
+      assert.equal(matches.length, 1, `${source} has exactly one redirect`);
+      assert.equal(matches[0].destination, destination);
+      assert.equal(matches[0].permanent, true);
+      assert.ok(!urls.includes(`${SITE_ORIGIN}${source}`), `${source} is excluded from sitemap`);
+    }
+    assert.ok(urls.includes(`${SITE_ORIGIN}${destination}`));
+    const html = readDist('work', slug, 'index.html');
+    assert.equal(getCanonical(html), `${SITE_ORIGIN}${destination}`);
+    assert.equal(getMetaByName(html, 'robots'), 'index,follow,max-image-preview:large');
+  }
+});

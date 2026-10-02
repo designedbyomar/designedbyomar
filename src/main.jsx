@@ -1888,9 +1888,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEv
     if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
   }, []);
 
-  const handleCopy = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleCopy = async () => {
     if (!copyValue) return;
 
     try {
@@ -1912,20 +1910,23 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEv
   const hasCopyButton = Boolean(copyValue);
 
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card" style={{
+    <div className="contact-card" style={{
       position: 'relative',
       display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: hasCopyButton ? '18px 56px 18px 20px' : '18px 20px', borderRadius: 'var(--radius-comfort)',
       background: 'var(--bg-page)', boxShadow: 'var(--shadow-card-subtle)', textDecoration: 'none',
       transition: 'transform var(--duration-fast-mid) ease',
     }}
-      onClick={() => {
-        if (window.trackAnalyticsEvent && eventName) {
-          window.trackAnalyticsEvent(eventName, { link_url: href, ...(section && { section }) });
-        }
-      }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
     >
+      <a href={href} target="_blank" rel="noopener noreferrer" className="contact-card-link" aria-label={`${label} ${value}`}
+        style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', zIndex: 2 }}
+        onClick={() => {
+          if (window.trackAnalyticsEvent && eventName) {
+            window.trackAnalyticsEvent(eventName, { link_url: href, ...(section && { section }) });
+          }
+        }}
+      />
       {copyValue && (
         <button
           type="button"
@@ -1943,7 +1944,7 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEv
             boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
             opacity: 1,
             pointerEvents: 'auto',
-            zIndex: 2,
+            zIndex: 3,
             transition: 'opacity var(--duration-fast) ease, color var(--duration-fast) ease, background var(--duration-fast) ease',
           }}
           onMouseEnter={e => {
@@ -1960,9 +1961,9 @@ const ContactCard = ({ label, value, href, eventName, copyValue, section, copyEv
           <AppIcon icon={copied ? Check : Copy} size={13} />
         </button>
       )}
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
-      <span style={{ fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
-    </a>
+      <span aria-hidden="true" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-label-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      <span aria-hidden="true" style={{ fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', letterSpacing: '-0.01em' }}>{value}</span>
+    </div>
   );
 };
 

@@ -3,6 +3,14 @@
     "api/ask.mjs": { "maxDuration": 25 }
   },
   "redirects": [
+    { "source": "/work/plastiq-marketing-site", "destination": "/work/plastiq-mktg/", "permanent": true },
+    { "source": "/work/plastiq-marketing-site/", "destination": "/work/plastiq-mktg/", "permanent": true },
+    { "source": "/work/page-builder-2-0", "destination": "/work/page-builder/", "permanent": true },
+    { "source": "/work/page-builder-2-0/", "destination": "/work/page-builder/", "permanent": true },
+    { "source": "/work/cct", "destination": "/work/disney-cct/", "permanent": true },
+    { "source": "/work/cct/", "destination": "/work/disney-cct/", "permanent": true },
+    { "source": "/work/connect-api-payments", "destination": "/work/connect-api/", "permanent": true },
+    { "source": "/work/connect-api-payments/", "destination": "/work/connect-api/", "permanent": true },
     { "source": "/design-system.html", "destination": "/design-system", "permanent": true },
     { "source": "/ask/", "destination": "/ask", "permanent": true },
     { "source": "/about/", "destination": "/about", "permanent": true },

@@ -500,6 +500,7 @@ button:focus-visible, a:focus-visible {
 }
 /* gradient layer — extends 1.5px beyond card edge */
 .contact-card::before {
+  pointer-events: none;
   content: '';
   position: absolute;
   inset: -1.5px;
@@ -518,6 +519,7 @@ button:focus-visible, a:focus-visible {
 }
 /* solid cover punches out the center — only the 1.5px ring remains */
 .contact-card::after {
+  pointer-events: none;
   content: '';
   position: absolute;
   inset: 0;
@@ -527,6 +529,7 @@ button:focus-visible, a:focus-visible {
 }
 /* card content must sit above the cover layer */
 .contact-card > span {
+  pointer-events: none;
   position: relative;
   z-index: 2;
 }
