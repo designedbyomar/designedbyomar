@@ -1,4 +1,10 @@
+import { COMPONENT_TOKEN_ROLES } from './design-system-token-roles.mjs';
 import React from 'react';
+import { NavLogo as SharedNavLogo, ThemeToggle } from './ui/brand.jsx';
+import './ui/components.css';
+const NavLogo = (props) => <SharedNavLogo href="/" className="ds-nav-logo" {...props} />;
+const ProductionSpecimen = React.lazy(() => import('./design-system-specimens.jsx'));
+const Specimen = ({ kind }) => <React.Suspense fallback={<p>Loading component example…</p>}><ProductionSpecimen kind={kind} /></React.Suspense>;
 import ReactDOM from 'react-dom/client';
 import './design-system-page.css';
 import './github-contributions.css';
@@ -10,12 +16,10 @@ import {
   Box,
   ChevronDown,
   Menu,
-  Moon,
   Palette,
   RefreshCcw,
   Search,
   ShieldCheck,
-  Sun,
   Type,
   X,
   Zap,
@@ -66,10 +70,12 @@ const NAV_GROUPS = [
       { id: 'buttons', label: 'Buttons' },
       { id: 'cards-accordions', label: 'Cards and accordions' },
       { id: 'copy-actions', label: 'Copy actions' },
-      { id: 'navigation-drawers', label: 'Navigation and drawers' },
+      { id: 'navigation-drawers', label: 'Navigation and mobile menu' },
       { id: 'cookie-banner', label: 'Cookie banner' },
       { id: 'ask', label: 'Ask' },
       { id: 'github-activity', label: 'GitHub activity' },
+      { id: 'case-study-blocks', label: 'Case-study blocks' },
+      { id: 'about-media', label: 'About media' },
     ],
   },
   {
@@ -299,32 +305,6 @@ const useActiveSection = () => {
   return activeId;
 };
 
-const NavLogo = ({ href = '/' }) => {
-  const [key, setKey] = React.useState(0);
-  const shapeStyle = (delay) => ({
-    transformBox: 'fill-box',
-    transformOrigin: 'bottom center',
-    animation: key > 0 ? `navShapeBounce var(--duration-nav) var(--easing-ease-out-bouncy) ${delay}ms both` : 'none',
-    fill: 'var(--fg-primary)',
-  });
-
-  return (
-    <a
-      href={href}
-      className="ds-nav-logo"
-      onMouseEnter={() => setKey((value) => value + 1)}
-      aria-label="designedbyomar"
-    >
-      <svg key={key} width="86" height="18" viewBox="0 0 86 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.21429 18C14.3032 18 18.4286 13.9706 18.4286 9C18.4286 4.02944 14.3032 0 9.21429 0C4.12538 0 0 4.02944 0 9C0 13.9706 4.12538 18 9.21429 18Z" style={shapeStyle(0)} />
-        <path d="M39.9286 0H21.5V18H39.9286V0Z" style={shapeStyle(55)} />
-        <path d="M53.75 0L64.5 18H43L53.75 0Z" style={shapeStyle(110)} />
-        <path d="M66.0357 0H72.4643C79.0917 0 84.4643 5.37258 84.4643 12V18H72.0357C68.722 18 66.0357 15.3137 66.0357 12V0Z" style={shapeStyle(165)} />
-      </svg>
-    </a>
-  );
-};
-
 const SignalGradientDefs = () => (
   <svg width="0" height="0" className="ds-signal-gradient-defs" aria-hidden="true" focusable="false">
     <defs>
@@ -346,7 +326,7 @@ const SignalGradientIcon = ({ icon, size = 24, className = '' }) => (
   />
 );
 
-const ContactSurfaceCard = ({ href, label, body, icon }) => (
+const DocShortcutCard = ({ href, label, body, icon }) => (
   <a href={href} className="ds-contact-surface-card">
     <span className="ds-contact-surface-card__icon">
       <SignalGradientIcon icon={icon} size={24} />
@@ -355,17 +335,6 @@ const ContactSurfaceCard = ({ href, label, body, icon }) => (
     <span className="ds-contact-surface-card__body">{body}</span>
   </a>
 );
-
-const ThemeToggle = ({ theme, setTheme }) => {
-  const isDark = theme === 'dark';
-  return (
-    <IconButton
-      icon={isDark ? Moon : Sun}
-      label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-    />
-  );
-};
 
 const SideNavigation = ({ activeId, onNavigate, testId }) => {
   const [openGroups, setOpenGroups] = React.useState(() => (
@@ -720,8 +689,8 @@ const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
         <nav className="ds-site-header__nav" aria-label="Site">
           <a href="/work">Work</a>
           <a href="/design-system" aria-current="page">Design System</a>
-          <a href="/#about">About</a>
-          <a href="/#faq">FAQ</a>
+          <a href="/about">About</a>
+          <a href="/#faq">Ask</a>
           <a href="/#contact">Contact</a>
         </nav>
         <div className="ds-site-header__actions">
@@ -824,6 +793,7 @@ const FoundationSpecimens = () => (
 
 const PatternPreview = ({ kind }) => (
   <div className={`ds-pattern-preview ds-pattern-preview--${kind}`} data-audit-example={`${kind}-pattern`}>
+    <p className="mono-label">Documentation-only composition sketch</p>
     {kind === 'hero' && (
       <>
         <div className="mono-label">Hero system</div>
@@ -831,33 +801,10 @@ const PatternPreview = ({ kind }) => (
         <p>Editorial type, proof copy, and signature motion stay in balance.</p>
       </>
     )}
-    {kind === 'case' && (
-      <>
-        <span className="ds-pattern-preview__chip">01 · 2025 · Wisdom</span>
-        <div className="ds-pattern-preview__browser">
-          <span />
-          <span />
-          <span />
-        </div>
-      </>
-    )}
-    {kind === 'footer' && (
-      <>
-        <NavLogo href="/" />
-        <div className="ds-pattern-preview__links">
-          <span>Work</span>
-          <span>About</span>
-          <span>Contact</span>
-        </div>
-      </>
-    )}
     {kind === 'privacy' && (
       <>
         <p>This site uses simple analytics cookies to improve the experience.</p>
-        <div className="ds-pattern-preview__actions">
-          <Button variant="secondary">Decline</Button>
-          <Button>Accept</Button>
-        </div>
+        <a href="/privacy">Read the production privacy policy</a>
       </>
     )}
   </div>
@@ -887,7 +834,7 @@ const FAQAccordionDemo = () => {
   const reducedMotion = usePrefersReducedMotion();
   const items = [
     ['When should this accordion pattern be used?', 'Use it for short, scan-friendly groups where each label clearly predicts the hidden content.'],
-    ['How does it match production?', 'It mirrors the FAQ rhythm: rounded item shell, full-width button, chevron rotation, and grid-row reveal.'],
+    ['Is this used on the portfolio?', 'This is a documentation-only accordion utility. Production Ask uses the shared AskPanel specimen below.'],
   ];
 
   return (
@@ -946,7 +893,7 @@ const HomeSection = ({ theme }) => (
       </div>
       <div id="quick-links" className="ds-quick-links" aria-label="Quick links">
         {QUICK_LINK_CARDS.map(([label, href, body, icon]) => (
-          <ContactSurfaceCard key={label} href={href} label={label} body={body} icon={icon} />
+          <DocShortcutCard key={label} href={href} label={label} body={body} icon={icon} />
         ))}
       </div>
     </section>
@@ -985,6 +932,10 @@ const FoundationsSection = () => (
       </div>
     </section>
 
+      <DocCard title="Exact component roles" meta="Semantic tokens">
+        <p>These roles preserve existing computed dimensions, typography, layering and motion without rounding to the scale.</p>
+        <dl>{COMPONENT_TOKEN_ROLES.map(([name, value]) => <div key={name}><dt><code>{name}</code></dt><dd><code>{value}</code></dd></div>)}</dl>
+      </DocCard>
     <section id="color" className="ds-section" aria-labelledby="color-title">
       <SectionHeader id="color" eyebrow="Foundations" title="Color">
         Semantic neutrals carry most of the interface. Develop blue, preview pink, and ship red mark workflow states and signature motion.
@@ -1062,7 +1013,7 @@ const FoundationsSection = () => (
 
     <section id="blur" className="ds-section" aria-labelledby="blur-title">
       <SectionHeader id="blur" eyebrow="Foundations" title="Blur">
-        Blur tokens are used for sticky headers, overlays, drawers, and polished glassy surfaces where the content underneath should remain implied.
+        Blur tokens are used for sticky headers, overlays, mobile menus, and polished glassy surfaces where the content underneath should remain implied.
       </SectionHeader>
       <div className="ds-card-grid">
         {BLUR_TOKENS.map(([token, value]) => (
@@ -1135,19 +1086,17 @@ const ComponentsSection = () => (
             <li>Body copy that explains the decision or usage.</li>
           </ul>
         </DocCard>
-        <ExampleFrame label="Accordion behavior">
+        <ExampleFrame label="Documentation-only accordion · not used on the portfolio">
           <FAQAccordionDemo />
         </ExampleFrame>
       </div>
       <div className="ds-two-column ds-component-pattern-docs">
         <DocCard title="Contact Surface Card" meta="Production card">
           <p>
-            Contact Surface Cards use a quiet surface, subtle shadow, 2px lift, and animated gradient hover ring
-            that matches the production contact section. Focus-visible receives the same
-            ring and lift, while reduced motion keeps the ring static and removes the lift.
+            The shared ContactCard renders the production surface, full-card link, and independent copy control. It accepts link and successful-copy callbacks; focus remains visible and reduced motion stops animated decoration.
           </p>
           <ExampleFrame label="Contact-style link">
-            <ContactSurfaceCard href="#cards-accordions" label="Resources" body="A framed link surface with spatial hover." icon={BookOpen} />
+            <Specimen kind="contact" />
           </ExampleFrame>
         </DocCard>
         <DocCard title="Signal Gradient Icon" meta="Icon style">
@@ -1164,6 +1113,14 @@ const ComponentsSection = () => (
       </div>
     </section>
 
+    <section id="case-study-blocks" className="ds-section" aria-labelledby="case-study-blocks-title">
+      <SectionHeader id="case-study-blocks" eyebrow="Components" title="Case-study blocks">Shared metadata, tags, headings, paragraphs, images, galleries, quotes, and callouts preserve authored content and semantics.</SectionHeader>
+      <Specimen kind="body" />
+    </section>
+    <section id="about-media" className="ds-section" aria-labelledby="about-media-title">
+      <SectionHeader id="about-media" eyebrow="Components" title="About photos and lightbox">Tiles accept photo records with descriptive alt text and dimensions. Stacks flatten on mobile. The lightbox closes with Escape, traps keyboard focus, and returns focus to the trigger; reduced motion disables photo float.</SectionHeader>
+      <Specimen kind="about" />
+    </section>
     <section id="copy-actions" className="ds-section" aria-labelledby="copy-actions-title">
       <SectionHeader id="copy-actions" eyebrow="Components" title="Copy actions">
         Copy controls are used for tokens, source paths, and contact details. The copied state is temporary and does not resize the control.
@@ -1175,18 +1132,18 @@ const ComponentsSection = () => (
     </section>
 
     <section id="navigation-drawers" className="ds-section" aria-labelledby="navigation-drawers-title">
-      <SectionHeader id="navigation-drawers" eyebrow="Components" title="Navigation and drawers">
-        Production navigation stays sparse. Drawers are reserved for dense work lists and long-form about content.
+      <SectionHeader id="navigation-drawers" eyebrow="Components" title="Navigation and mobile menu">
+        Production navigation links to standalone Work and About pages. The mobile menu exposes the same destinations; the documentation sidebar belongs only to this reference page.
       </SectionHeader>
       <div className="ds-two-column">
-        <ExampleFrame label="Header mark">
-          <NavLogo />
+        <ExampleFrame label="Production navigation · local callbacks">
+          <Specimen kind="navigation" />
         </ExampleFrame>
         <DocCard title="Interaction notes" meta="Navigation">
           <ul>
-            <li>Desktop keeps Work, About, Contact, and a direct CTA.</li>
+            <li>Desktop keeps Work, Design System, About, Ask, Contact, and a direct CTA.</li>
             <li>Mobile collapses into theme toggle plus menu trigger.</li>
-            <li>Drawers need focus trap, escape close, and focus restore.</li>
+            <li>The mobile menu closes with Escape and when a destination is selected; the About lightbox traps focus and restores it on close.</li>
           </ul>
         </DocCard>
       </div>
@@ -1196,16 +1153,8 @@ const ComponentsSection = () => (
       <SectionHeader id="cookie-banner" eyebrow="Components" title="Cookie banner">
         Consent copy should be direct and calm. The banner must never block the core portfolio experience.
       </SectionHeader>
-      <ExampleFrame label="Consent shell">
-        <div style={{ maxWidth: 520, padding: 20, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card-full)', background: 'var(--bg-page)' }}>
-          <p style={{ margin: '0 0 16px', color: 'var(--fg-secondary)', lineHeight: 1.6 }}>
-            This site uses simple analytics cookies to improve the experience. No ads, no creepy tracking, no selling your data.
-          </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Button variant="secondary">Decline</Button>
-            <Button>Accept</Button>
-          </div>
-        </div>
+      <ExampleFrame label="Production consent banner · local callbacks">
+        <Specimen kind="consent" />
       </ExampleFrame>
     </section>
 
@@ -1221,40 +1170,8 @@ const ComponentsSection = () => (
         between a hiring question and the case study that answers it, so every part of it either
         answers or hands off.
       </SectionHeader>
-      <ExampleFrame label="Suggested prompts">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {['Has Omar built design systems at scale?', "What's Omar's fintech and payments experience?"].map(label => (
-            <button key={label} type="button" style={{
-              minHeight: 44,
-              padding: '10px 14px',
-              fontFamily: 'inherit',
-              fontSize: 'var(--font-size-body-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              color: 'var(--fg-secondary)',
-              background: 'transparent',
-              border: 'none',
-              boxShadow: 'inset 0 0 0 1px var(--color-gray-100)',
-              borderRadius: 'var(--radius-standard)',
-              textAlign: 'left',
-            }}>{label}</button>
-          ))}
-        </div>
-      </ExampleFrame>
-      <ExampleFrame label="Answer with citation">
-        <div style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', gap: 16, padding: 20, borderRadius: 'var(--radius-comfort)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent)' }}>
-          <p style={{ margin: 0, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)' }}>
-            Has Omar built design systems at scale?
-          </p>
-          <p style={{ margin: 0, color: 'var(--fg-secondary)', lineHeight: 1.6 }}>
-            Yes — four, and he treats them as infrastructure for a team rather than a personal artifact.
-          </p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '10px 14px', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--fg-primary)', borderRadius: 'var(--radius-standard)', boxShadow: 'inset 0 0 0 1px var(--color-gray-100)' }}>
-              Athena Design System 2.0
-              <AppIcon icon={ArrowUpRight} size={12} />
-            </span>
-          </div>
-        </div>
+      <ExampleFrame label="Production Ask panel · labelled fixture states">
+        <Specimen kind="ask" />
       </ExampleFrame>
       <div className="ds-card-grid">
         <DocCard title="Prompts follow the reader" meta="Suggestions">
@@ -1322,29 +1239,8 @@ const ComponentsSection = () => (
         falls back to a quiet message rather than inventing data, so the section never shows numbers it
         cannot source.
       </SectionHeader>
-      <ExampleFrame label="Intensity scale">
-        <div className="github-contributions" style={{ marginTop: 0 }}>
-          <div className="github-contributions-meta">
-            <span>Rolling year</span>
-            <div className="github-contributions-legend" aria-label="Contribution intensity from less to more">
-              <span>Less</span>
-              {[0, 1, 2, 3, 4].map((level) => (
-                <span key={level} className="github-contributions-day" data-level={level} aria-hidden="true" />
-              ))}
-              <span>More</span>
-            </div>
-          </div>
-        </div>
-      </ExampleFrame>
-      <ExampleFrame label="Profile link">
-        <a
-          className="github-contributions-link"
-          href="https://github.com/designedbyomar"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View GitHub profile <AppIcon icon={ArrowUpRight} size={15} />
-        </a>
+      <ExampleFrame label="Production activity · deterministic fixture">
+        <Specimen kind="github" />
       </ExampleFrame>
     </section>
   </>
@@ -1378,7 +1274,7 @@ const PatternsSection = () => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
         <SectionHeader id={id} eyebrow="Patterns" title={title}>{body}</SectionHeader>
         <ExampleFrame label={`${title} specimen`}>
-          <PatternPreview kind={kind} />
+          {kind === 'case' ? <Specimen kind="case" /> : kind === 'footer' ? <Specimen kind="footer" /> : <PatternPreview kind={kind} />}
         </ExampleFrame>
       </section>
     ))}
@@ -1478,7 +1374,7 @@ const ContentAccessibilityResources = () => (
       </SectionHeader>
       <div className="ds-card-grid">
         {[
-          ['Focus and keyboard', 'Every interactive element needs visible focus. Drawers and accordions require explicit state.'],
+          ['Focus and keyboard', 'Every interactive element needs visible focus. Mobile menus, lightboxes and documentation accordions expose their interaction state.'],
           ['Contrast and touch', 'Body text must meet AA contrast. Controls keep a 44px minimum target.'],
           ['Reduced motion', 'All animation, canvas, and scroll-driven behaviors need non-motion equivalents.'],
         ].map(([title, body]) => (
@@ -1490,7 +1386,7 @@ const ContentAccessibilityResources = () => (
     </section>
 
     {[
-      ['focus-keyboard', 'Focus and keyboard', 'The side nav uses real links, while production drawers should trap focus, close on Escape, and restore focus to the trigger.', 'focus'],
+      ['focus-keyboard', 'Focus and keyboard', 'The side nav uses real links, while the mobile menu closes on Escape; the About lightbox traps focus and restores it to its trigger.', 'focus'],
       ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.', 'contrast'],
     ].map(([id, title, body, kind]) => (
       <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
@@ -1529,16 +1425,12 @@ const ContentAccessibilityResources = () => (
         <DocCard title="Documented now" meta="Audit result">
           <ul>
             <li>Color, typography, spacing, radius, elevation, opacity, layering, breakpoints, blur, motion, and theme foundations.</li>
-            <li>Buttons, icon buttons, cards, FAQ-style accordions, copy controls, navigation, drawers, and cookie consent.</li>
+            <li>Buttons, icon buttons, cards, FAQ-style accordions, copy controls, navigation, lightboxes, and cookie consent.</li>
             <li>Alien arrival, pixel orbit, loader mark, reveal behavior, hover treatments, and reduced-motion expectations.</li>
           </ul>
         </DocCard>
-        <DocCard title="Future work" meta="Remaining gaps">
-          <ul>
-            <li>Extract production nav, footer, contact cards, drawers, cookie banner, and case-card components into a shared library.</li>
-            <li>Add prop tables and usage constraints once production primitives are shared instead of documented only.</li>
-            <li>Add visual regression snapshots for the design-system route across desktop, tablet, and mobile.</li>
-          </ul>
+        <DocCard title="Shared production coverage" meta="Implementation inventory">
+          <Specimen kind="inventory" />
         </DocCard>
       </div>
     </section>
@@ -1579,8 +1471,8 @@ const DesignSystem = () => {
         <nav className="ds-site-header__nav ds-mobile-site-nav" aria-label="Site">
           <a href="/work">Work</a>
           <a href="/design-system" aria-current="page">Design System</a>
-          <a href="/#about">About</a>
-          <a href="/#faq">FAQ</a>
+          <a href="/about">About</a>
+          <a href="/#faq">Ask</a>
           <a href="/#contact">Contact</a>
           <a className="ds-header-cta" href="/#contact">Get in touch</a>
         </nav>

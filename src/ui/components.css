@@ -1,0 +1,301 @@
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  font-family: inherit;
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-medium);
+  color: var(--fg-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease;
+}
+.text-link:hover {
+  color: var(--fg-primary);
+  transform: translateX(4px);
+}
+
+@keyframes navShapeBounce {
+  0%   { transform: translateY(0); }
+  22%  { transform: translateY(-52%); animation-timing-function: cubic-bezier(.755,.05,.855,.06); }
+  40%  { transform: translateY(0);   animation-timing-function: cubic-bezier(.215,.61,.355,1); }
+  54%  { transform: translateY(-22%); animation-timing-function: cubic-bezier(.755,.05,.855,.06); }
+  68%  { transform: translateY(0);   animation-timing-function: cubic-bezier(.215,.61,.355,1); }
+  79%  { transform: translateY(-8%); animation-timing-function: cubic-bezier(.755,.05,.855,.06); }
+  88%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+
+@property --contact-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes contact-border-spin {
+  to { --contact-angle: 360deg; }
+}
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.5; }
+}
+.contact-card {
+  position: relative;
+}
+/* gradient layer — extends 1.5px beyond card edge */
+.contact-card::before {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--border-signature-width));
+  border-radius: var(--radius-signature);
+  background: conic-gradient(
+    from var(--contact-angle),
+    var(--color-ship-red),
+    var(--color-preview-pink),
+    var(--color-develop-blue),
+    var(--color-ship-red)
+  );
+  opacity: 0;
+  transition: opacity var(--duration-slow) ease;
+  animation: contact-border-spin var(--duration-border-spin) linear infinite;
+  z-index: var(--z-base);
+}
+/* solid cover punches out the center — only the 1.5px ring remains */
+.contact-card::after {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-comfort);
+  background: var(--bg-page);
+  z-index: var(--z-component-cover);
+}
+/* card content must sit above the cover layer */
+.contact-card > span {
+  pointer-events: none;
+  position: relative;
+  z-index: var(--z-component-content);
+}
+.contact-card:hover::before { opacity: 1; }
+
+/*
+  The Ask input's gradient ring.
+  Same construction as .contact-card — a conic-gradient layer punched out by a
+  solid cover, so only the 1.5px edge shows — with two differences. It is
+  visible at rest rather than on hover, because the input is the one thing in
+  the section a visitor has to find. And it holds still until hovered or
+  focused: this sits beside an answer the reader is reading, and a ring
+  rotating in their periphery the whole time competes with the text.
+
+  The ring lives on a wrapper because an input is a replaced element and cannot
+  host ::before or ::after. It does not touch outline, so the focus-visible
+  ring at the top of this file still renders outside it, unchanged.
+*/
+.ask-field {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius-standard);
+}
+.ask-field::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--border-signature-width));
+  border-radius: calc(var(--radius-standard) + var(--border-signature-width));
+  background: conic-gradient(
+    from var(--contact-angle),
+    var(--color-ship-red),
+    var(--color-preview-pink),
+    var(--color-develop-blue),
+    var(--color-ship-red)
+  );
+  z-index: var(--z-base);
+}
+/*
+  Punches the centre out, leaving only the 1.5px edge. It has to be opaque:
+  with a transparent cover the gradient fills the whole field instead of
+  ringing it. --bg-page, the same token .contact-card::after uses, because it
+  is the colour actually behind this.
+*/
+.ask-field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-standard);
+  background: var(--bg-page);
+  z-index: var(--z-component-cover);
+}
+.ask-field > input {
+  position: relative;
+  z-index: var(--z-component-content);
+}
+.ask-field:hover::before,
+.ask-field:focus-within::before {
+  animation: contact-border-spin var(--duration-border-spin) linear infinite;
+}
+
+
+.case-card { transition: transform var(--duration-base) ease; }
+.case-card-media { isolation: isolate; }
+.case-card-screen {
+  transition: transform var(--duration-slowest-xl) var(--easing-case-cover), box-shadow var(--duration-slowest-xl) ease, filter var(--duration-filter) ease;
+  will-change: transform;
+}
+.case-card-line,
+.case-card-tag,
+.case-card-sheen {
+  transition: transform var(--duration-slower) var(--easing-case-cover), opacity var(--duration-base) ease, background var(--duration-fast-plus) ease;
+}
+.case-card-sheen {
+  position: absolute;
+  inset: -10% 30% 0 -34%;
+  z-index: var(--z-component-cover);
+  opacity: 0;
+  background: linear-gradient(110deg, transparent 8%, rgba(255,255,255,0.0) 36%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.0) 64%, transparent 92%);
+  transform: translateX(-12%) rotate(-8deg);
+  pointer-events: none;
+}
+.case-card:hover { transform: translateY(-3px); }
+.case-card:hover .case-card-screen {
+  transform: translateY(-9px) scale(1.025);
+  box-shadow: 0 -1px 0 0 rgba(255,255,255,0.12), 0 30px 70px rgba(0,0,0,0.42);
+  filter: saturate(1.06);
+}
+.case-card:hover .case-card-sheen {
+  opacity: 1;
+  transform: translateX(34%) rotate(-8deg);
+}
+.case-card:hover .case-card-line--full { transform: translateX(10px); }
+.case-card:hover .case-card-line--left { transform: translateX(16px); }
+.case-card:hover .case-card-line--right { transform: translateX(8px); }
+.case-card:hover .case-card-tag {
+  transform: translateY(-2px);
+  background: rgba(0,0,0,0.42);
+}
+
+
+.ds-button,
+.ds-icon-button,
+.ds-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-hit-area);
+  border: 0;
+  border-radius: var(--radius-standard);
+  font-family: inherit;
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease, opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.ds-button {
+  padding: var(--control-padding-block) var(--space-4);
+}
+
+.ds-button--primary {
+  background: var(--fg-primary);
+  color: var(--bg-page);
+}
+
+.ds-button--secondary {
+  background: transparent;
+  color: var(--fg-primary);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
+}
+
+.ds-button--quiet {
+  background: transparent;
+  color: var(--fg-secondary);
+}
+
+.ds-button:hover,
+.ds-icon-button:hover,
+.ds-copy-button:hover {
+  transform: translateY(-1px);
+}
+
+.ds-button--primary:hover {
+  opacity: var(--opacity-control-hover);
+}
+
+.ds-button--secondary:hover,
+.ds-icon-button:hover,
+.ds-copy-button:hover {
+  background: var(--bg-subtle);
+}
+
+.ds-button[disabled] {
+  color: var(--fg-disabled);
+  background: var(--bg-subtle);
+  cursor: not-allowed;
+  opacity: var(--opacity-control-disabled);
+}
+
+.ds-icon-button {
+  width: var(--control-hit-area);
+  min-width: var(--control-hit-area);
+  padding: 0;
+  border-radius: var(--radius-circle);
+  background: transparent;
+  color: var(--fg-primary);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
+}
+
+.ds-copy-button {
+  min-height: var(--control-compact-height);
+  padding: var(--space-compact) var(--control-padding-block);
+  background: transparent;
+  color: var(--fg-secondary);
+  box-shadow: inset 0 0 0 1px var(--color-gray-100);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card *, .case-card *, .ds-button, .ds-icon-button, .ds-copy-button { animation: none !important; transition: none !important; }
+  .contact-card::before, .ask-field::before { animation: none !important; }
+  .case-card:hover, .case-card:hover .case-card-screen, .case-card:hover .case-card-line,
+  .case-card:hover .case-card-tag, .case-card:hover .case-card-sheen, .ds-button:hover,
+  .ds-icon-button:hover, .ds-copy-button:hover, .text-link:hover { transform: none; }
+  .case-card:hover .case-card-sheen { opacity: 0; }
+}
+
+
+
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(var(--content-footer-column-min), 0.85fr) minmax(var(--content-footer-column-min), 0.85fr);
+  gap: var(--layout-1) var(--layout-2);
+}
+.site-footer-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .site-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--layout-1) var(--layout-1);
+  }
+  .site-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 600px) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--layout-1);
+  }
+}

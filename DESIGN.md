@@ -69,3 +69,19 @@ For design-facing work, review the result as an experience, not only as code:
 - Does it work across mobile, tablet, and desktop?
 - Does it preserve accessibility and reduced-motion behavior?
 - Does it avoid adding visual clutter or unneeded dependencies?
+
+## Shared production components
+
+`src/ui/` contains the presentation modules imported by both application entries. `src/design-system-specimens.jsx` renders these components with labelled, deterministic fixtures. The reference entry never imports `main.jsx`. Production adapters retain routing, analytics, consent storage, and Ask/GitHub requests; presentation modules receive content, state, and callbacks.
+
+Navigation uses standalone `/work` and `/about` pages. Its mobile menu closes on Escape and on selection. Contact links and copy buttons are sibling controls; copying reports success only after the clipboard operation succeeds. Icon buttons require accessible labels. Ask distinguishes reviewed answers, model drafts, loading, and unavailable states.
+
+About tiles and stacks share their layout and open callback. The lightbox uses Escape, a focus trap, and restores focus to the opening tile. Stacks respond to viewport width; reduced-motion preference disables their motion. Page controllers retain scroll choreography.
+
+The homepage hero, About page arrangement, and individual case-study compositions remain page-specific because they express editorial hierarchy and project-specific storytelling. They assemble shared navigation, controls, cards, body blocks, media, and footer. Documentation navigation, token cards, shortcut cards, and the demonstration accordion are explicitly documentation utilities. See the reference-page coverage inventory for component-to-specimen links and callback contracts.
+
+Existing exact dimensions that do not fit the scale use semantic tokens in `src/design-tokens.css`, including fluid About/body typography, control hit areas, content widths, component layering, and Ask response height. SVG geometry, image dimensions, aspect ratios, and calculated animation geometry remain implementation data.
+
+## Portrait delivery
+
+The portrait image occupies 88% of its square wrapper. Below 639px its slot is `0.88 × (viewport − 48px)`; through 820px it is capped at 519.2px. Above 820px the hero's second grid column gives `0.88 × (viewport − 96px) / 2.1`, capped at approximately 482.743px when the content reaches 1200px. The intrinsic transparent artwork stays contained within that slot. `src/portrait-media.mjs` specifies matching responsive candidates and sizes; regression assertions keep the homepage-only head preload in sync. Light candidates stop at the original 557px width; dark candidates stop at 1230px.
