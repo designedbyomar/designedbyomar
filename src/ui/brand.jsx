@@ -1,5 +1,6 @@
 import { Button } from './controls.jsx';
 import React from 'react';
+import { usePrefersReducedMotion } from './hooks.js';
 import { AppIcon, Moon, Sun } from '../ui-icons.jsx';
 export const ThemeToggle = ({ theme, setTheme }) => {
   const isDark = theme === 'dark';
@@ -23,15 +24,16 @@ export const ThemeToggle = ({ theme, setTheme }) => {
 
 export const NavLogo = ({ onClick, style, href = '#', className }) => {
   const [key, setKey] = React.useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const shapeStyle = (delay) => ({
     transformBox: 'fill-box',
     transformOrigin: 'bottom center',
-    animation: key > 0 ? `navShapeBounce var(--duration-nav) var(--easing-ease-out-bouncy) ${delay}ms both` : 'none',
+    animation: !prefersReducedMotion && key > 0 ? `navShapeBounce var(--duration-nav) var(--easing-ease-out-bouncy) ${delay}ms both` : 'none',
     fill: 'var(--fg-primary)',
   });
   return (
     <a href={href} className={className} onClick={onClick}
-      onMouseEnter={() => setKey(k => k + 1)}
+      onMouseEnter={() => { if (!prefersReducedMotion) setKey(k => k + 1); }}
       style={{ display: 'flex', alignItems: 'center', minHeight: 'var(--control-hit-area)', textDecoration: 'none', cursor: 'pointer', ...style }}
       aria-label="designedbyomar"
     >

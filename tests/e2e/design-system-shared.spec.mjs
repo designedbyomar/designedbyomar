@@ -97,3 +97,28 @@ test('portrait preload and rendered image agree at DPR 1, 2 and 3 in both themes
     await context.close();
   }
 });
+
+test('every shared logo respects reduced motion and live preference changes', async ({ page }) => {
+  for (const route of ['/', '/design-system']) {
+    await page.goto(route);
+    const logos = page.getByRole('link', { name: 'designedbyomar', exact: true });
+    await expect(logos.first()).toBeVisible();
+    if (route === '/design-system') {
+      await expect(page.locator('[data-production-specimen="footer"]')).toBeVisible();
+      await expect(logos).toHaveCount(3);
+    } else {
+      await expect(logos).toHaveCount(2);
+    }
+    for (const logo of await logos.all()) {
+      await logo.hover();
+      await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'none'))).toBe(true);
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      // Leave and re-enter to exercise the actual hover trigger.
+      await page.mouse.move(0, 0);
+      await logo.hover();
+      await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'navShapeBounce'))).toBe(true);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'none'))).toBe(true);
+    }
+  }
+});
