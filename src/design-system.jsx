@@ -76,6 +76,7 @@ const NAV_GROUPS = [
       { id: 'github-activity', label: 'GitHub activity' },
       { id: 'case-study-blocks', label: 'Case-study blocks' },
       { id: 'about-media', label: 'About media' },
+      { id: 'service-lists', label: 'Service lists' },
     ],
   },
   {
@@ -1116,6 +1117,10 @@ const ComponentsSection = () => (
     <section id="case-study-blocks" className="ds-section" aria-labelledby="case-study-blocks-title">
       <SectionHeader id="case-study-blocks" eyebrow="Components" title="Case-study blocks">Shared metadata, tags, headings, paragraphs, images, galleries, quotes, and callouts preserve authored content and semantics.</SectionHeader>
       <Specimen kind="body" />
+    </section>
+    <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Content-only editorial rows show service names, prices, timing, descriptions, best-fit clients, inclusions, and scope limits. Groups accept a heading level and unique ID prefix. Desktop columns stack in reading order below 640px; no disclosure, motion, or callbacks are required.</SectionHeader>
+      <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">
       <SectionHeader id="about-media" eyebrow="Components" title="About photos and lightbox">Tiles accept photo records with descriptive alt text and dimensions. Stacks flatten on mobile. The lightbox closes with Escape, traps keyboard focus, and returns focus to the trigger; reduced motion disables photo float.</SectionHeader>

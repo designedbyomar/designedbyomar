@@ -1,6 +1,8 @@
 const fs = require('fs');
 let normalizeBlocks = (body) => (Array.isArray(body) ? body : []); // replaced below by the shared module
 let PRIVACY_POLICY;
+let RATE_CARD;
+let rateCardStructuredData;
 let HOME_PAGE_COPY;
 let WORK_PAGE_COPY;
 let DESIGN_SYSTEM_PAGE_COPY;
@@ -95,6 +97,7 @@ const setMeta = (html, {
   imageWidth = 1200,
   imageHeight = 630,
   imageAlt = title,
+  robots = 'index,follow,max-image-preview:large',
 }) => {
   const ogImage = toAbsoluteUrl(image);
   const escapedTitle = escapeAttr(title);
@@ -104,6 +107,7 @@ const setMeta = (html, {
   const escapedImageAlt = escapeAttr(imageAlt);
 
   let next = html;
+  next = replaceTag(next, /<meta name="robots" content=".*?">/, `<meta name="robots" content="${escapeAttr(robots)}">`);
   next = replaceTag(next, /<title>.*?<\/title>/, `<title>${escapedTitle}</title>`);
   next = replaceTag(next, /<meta name="description" content=".*?">/, `<meta name="description" content="${escapedDescription}">`);
   next = replaceTag(next, /<meta property="og:title" content=".*?">/, `<meta property="og:title" content="${escapedTitle}">`);
@@ -690,6 +694,27 @@ function generateRoutes() {
     injectRootContent(indexHtml, homepageContentHtml(), HOME_TITLE),
   );
 
+  const rateDir = `${distDir}/ratecard`;
+  fs.mkdirSync(rateDir, { recursive: true });
+  const rateBody = [
+    '<main><article>', `<h1>${escapeText(RATE_CARD.title)}</h1>`,
+    `<p>${escapeText(RATE_CARD.introduction)}</p><p>${escapeText(RATE_CARD.pricingNote)}</p>`,
+    ...RATE_CARD.groups.map(group => `<section><h2>${escapeText(group.title)}</h2><p>${escapeText(group.description)}</p>${group.services.map(service =>
+      `<article><h3>${escapeText(service.name)}</h3><p>${escapeText(service.price)}</p><p>${escapeText(service.timing)}</p><p>${escapeText(service.description)}</p><dl>${[['Best for', service.bestFor], ['Includes', service.includes], ['Scope & limits', service.limits]].map(([label, text]) => `<dt>${escapeText(label)}</dt><dd>${escapeText(text)}</dd>`).join('')}</dl></article>`
+    ).join('')}</section>`),
+    '<section><h2>How engagements work</h2><dl>',
+    ...RATE_CARD.terms.map(term => `<dt>${escapeText(term.title)}</dt><dd>${escapeText(term.text)}</dd>`),
+    '</dl></section>', `<section><h2>${escapeText(RATE_CARD.contactTitle)}</h2><p>${escapeText(RATE_CARD.contactDescription)}</p><a href="mailto:${escapeAttr(RATE_CARD.email)}">${escapeText(RATE_CARD.email)}</a></section>`,
+    '</article></main>',
+  ].join('');
+  const rateUrl = `${SITE_ORIGIN}/ratecard`;
+  fs.writeFileSync(`${rateDir}/index.html`, injectRootContent(
+    setStructuredData(setMeta(indexHtml, {
+      title: RATE_CARD.metaTitle, description: RATE_CARD.description,
+      url: rateUrl, image: DEFAULT_OG_IMAGE, robots: 'noindex,follow',
+    }), rateCardStructuredData(rateUrl)), rateBody, RATE_CARD.metaTitle,
+  ));
+
   const workDir = `${distDir}/work`;
   fs.mkdirSync(workDir, { recursive: true });
   const workHtml = injectRootContent(
@@ -821,14 +846,16 @@ function generateRoutes() {
 }
 
 if (require.main === module) (async () => {
-  const [blockModule, privacyModule, staticPageCopyModule] = await Promise.all([
+  const [blockModule, privacyModule, staticPageCopyModule, rateCardModule] = await Promise.all([
     import('./src/content/case-study-blocks.mjs'),
     import('./src/content/privacy-policy.mjs'),
     import('./src/content/static-page-copy.mjs'),
+    import('./src/content/rate-card.mjs'),
   ]);
   ({ normalizeBlocks } = blockModule);
   ({ PRIVACY_POLICY } = privacyModule);
   ({ HOME_PAGE_COPY, WORK_PAGE_COPY, DESIGN_SYSTEM_PAGE_COPY } = staticPageCopyModule);
+  ({ RATE_CARD, rateCardStructuredData } = rateCardModule);
   generateRoutes();
 })();
 

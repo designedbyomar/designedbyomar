@@ -780,3 +780,30 @@ test('portrait preload exactly matches rendered candidate contracts with alpha a
     }
   }
 });
+
+test('rate card is complete static sales content with canonical noindex and no incoming discovery links', async () => {
+  const { RATE_CARD } = await import('../src/content/rate-card.mjs');
+  const html = readDist('ratecard', 'index.html');
+  assert.equal(getTitle(html), escapeAttr(RATE_CARD.metaTitle));
+  assert.equal(getCanonical(html), `${SITE_ORIGIN}/ratecard`);
+  assert.equal(getMetaByName(html, 'robots'), 'noindex,follow');
+  assert.equal(getMetaByName(html, 'description'), escapeAttr(RATE_CARD.description));
+  assert.equal(getMetaByProperty(html, 'og:url'), `${SITE_ORIGIN}/ratecard`);
+  assert.equal(getMetaByProperty(html, 'og:title'), escapeAttr(RATE_CARD.metaTitle));
+  assert.equal(getMetaByName(html, 'twitter:title'), escapeAttr(RATE_CARD.metaTitle));
+  const content = getRootContent(html);
+  for (const service of RATE_CARD.groups.flatMap(group => group.services)) {
+    for (const key of ['name', 'price', 'timing', 'description', 'bestFor', 'includes', 'limits']) assert.ok(content.includes(escapeText(service[key])), `${service.name}: ${key}`);
+  }
+  for (const term of RATE_CARD.terms) assert.ok(content.includes(escapeText(term.text)));
+  assert.equal((content.match(/<h3>/g) || []).length, 9);
+  assert.ok(!sitemapUrls().some(url => url.includes('/ratecard')));
+  for (const url of sitemapUrls()) assert.ok(!getRootLinks(fs.readFileSync(pagePathForUrl(url), 'utf8'), url).some(link => link.includes('/ratecard')));
+  assert.doesNotMatch(readText('public', 'robots.txt'), /Disallow:.*ratecard/i);
+  assert.doesNotMatch(readText('public', 'llms.txt'), /ratecard/);
+  const { parsePortfolioRoute, isPortfolioRoutePath } = await import('../src/routes.js');
+  for (const path of ['/ratecard', '/ratecard/']) {
+    assert.equal(parsePortfolioRoute(path).type, 'ratecard');
+    assert.equal(isPortfolioRoutePath(path), true);
+  }
+});

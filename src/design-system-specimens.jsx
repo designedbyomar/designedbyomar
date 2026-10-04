@@ -1,3 +1,4 @@
+import { ServiceRateGroup } from './ui/service-list.jsx';
 import React from 'react';
 import { Button, IconButton, LinkButton, CopyButton } from './ui/controls.jsx';
 import { SiteNavigation } from './ui/navigation.jsx';
@@ -116,12 +117,20 @@ const COVERAGE = [
   ['Ask panel', '#ask', 'Controlled query, response state, refs and interaction callbacks'],
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
+  ['Service rows and groups', '#service-lists', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];
 
 export default function ProductionSpecimen({ kind }) {
   let content;
   switch (kind) {
+    case 'services': content = <ServiceRateGroup idPrefix="ds-service-" headingLevel={3} group={{
+      id: 'example', title: 'Example services', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
+      services: [
+        { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: 'Review, findings, and a walkthrough.', limits: 'One agreed flow; implementation excluded.' },
+        { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: 'Agreed design work and handoff.', limits: 'Deliverables and revisions agreed in a proposal.' },
+      ],
+    }} />; break;
     case 'navigation': content = <NavigationSpecimen />; break;
     case 'consent': content = <ConsentSpecimen />; break;
     case 'about': content = <AboutSpecimen />; break;
@@ -142,7 +151,7 @@ export default function ProductionSpecimen({ kind }) {
     case 'controls': content = <><Button>Primary</Button><Button variant="secondary">Secondary</Button><Button variant="quiet">Quiet</Button><Button disabled>Disabled</Button><LinkButton href="#buttons">Link action</LinkButton><IconButton icon={ArrowUpRight} label="Example external action" /><CopyButton value="--space-4" label="Copy spacing token" /></>; break;
     case 'inventory': content = <>
       <ul>{COVERAGE.map(([name, href, contract]) => <li key={name}><a href={href}>{name}</a>: {contract}.</li>)}</ul>
-      <p>The homepage hero, About page arrangement and individual case-study page layouts stay page-specific compositions of shared building blocks. Their storytelling and placement are unique, not additional component variants.</p>
+      <p>The homepage hero, About page arrangement, services page composition and individual case-study page layouts stay page-specific compositions of shared building blocks. Their storytelling and placement are unique, not additional component variants.</p>
       <p>DocCard, SectionHeader, token swatches, shortcut cards and the legacy accordion are documentation utilities. They are not presented as production components.</p>
     </>; break;
     default: return null;

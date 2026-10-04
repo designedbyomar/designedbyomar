@@ -13,6 +13,7 @@ Ask model requests, or GitHub requests.
 | NavLogo / ThemeToggle | Logo destination, click callback and optional layout style; toggle current theme and setTheme callback. | `#navigation-drawers` |
 | SiteNavigation | Controlled menu/theme/scroll state, logo/menu/close callbacks, section-handler factory and event callback. Desktop and mobile variants share labels and destinations. App adapter handles Escape, routing and analytics. | `#navigation-drawers` |
 | ContactCard | Label, value, destination, optional copy value and event names; `onEvent` receives link or successful-copy event and payload. Full-card link and copy button remain sibling keyboard targets. | `#cards-accordions` |
+| ServiceRateRow / ServiceRateGroup | Authored service/group records with name, price, timing, description, bestFor, includes and limits; headingLevel and unique idPrefix control semantic context. Fixed and starting prices use the same editorial treatment; mobile stacks in DOM order. No callbacks or effects. | `#service-lists` |
 | SiteFooter | Home/logo/section callbacks, optional root prefix for cross-page fragment links, event callback. Responsive three/two/one-column layout. | `#footer-system` |
 | ConsentBanner | Accept/decline/privacy callbacks, controlled visibility, narrow-layout and reduced-motion flags. Embedded variant is used only for specimens. | `#cookie-banner` |
 | CaseCard | Study record, featured/wide-media variants, optional video enablement. Media scheduling is local UI behavior; specimens disable video. | `#case-study-covers` |
@@ -25,3 +26,5 @@ The hero, About editorial arrangement and individual case-study layouts remain
 page-specific compositions. Documentation shell/navigation, token swatches,
 DocCard, SectionHeader, shortcut cards, accordion and composition sketches are
 reference utilities, explicitly separate from production specimens.
+
+The services page is a page-specific composition of shared service groups and a ContactCard. Its approved content also feeds static HTML; specimens use labelled fixtures without linking to the sales page.
