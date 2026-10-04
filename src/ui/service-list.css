@@ -5,11 +5,19 @@
 .service-rate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
 .service-rate-card { padding: var(--space-6); border-radius: var(--radius-image); background: var(--bg-page); box-shadow: var(--shadow-card-subtle); min-width: 0; }
 .service-rate-card__identity { margin-bottom: var(--space-6); }
-.service-rate-card__price-panel { margin-top: var(--space-5); padding: var(--space-5); border: var(--border-signature-width) solid transparent; border-radius: var(--radius-comfort); background: linear-gradient(var(--bg-subtle), var(--bg-subtle)) padding-box, var(--gradient-rate-projects) border-box; }
-.service-rate-card--audits .service-rate-card__price-panel { background: linear-gradient(color-mix(in srgb, var(--color-preview-pink) 5%, var(--bg-page)), color-mix(in srgb, var(--color-ship-red) 5%, var(--bg-page))) padding-box, var(--gradient-rate-audits) border-box; }
-.service-rate-card--projects .service-rate-card__price-panel { background: linear-gradient(color-mix(in srgb, var(--color-develop-blue) 5%, var(--bg-page)), color-mix(in srgb, var(--color-preview-pink) 5%, var(--bg-page))) padding-box, var(--gradient-rate-projects) border-box; }
-.service-rate-card--ongoing .service-rate-card__price-panel { background: linear-gradient(color-mix(in srgb, var(--color-develop-blue) 5%, var(--bg-page)), color-mix(in srgb, var(--color-ship-red) 5%, var(--bg-page))) padding-box, var(--gradient-rate-ongoing) border-box; }
-.service-rate-card h3, .service-rate-card h4 { margin: 0; font-size: var(--font-size-heading-md); font-weight: var(--font-weight-medium); line-height: var(--line-height-card); letter-spacing: var(--tracking-heading); }
+.service-rate-card--audits { --rate-gradient: var(--gradient-rate-audits); --rate-start: var(--color-ship-red); --rate-end: var(--color-preview-pink); }
+.service-rate-card--projects { --rate-gradient: var(--gradient-rate-projects); --rate-start: var(--color-preview-pink); --rate-end: var(--color-develop-blue); }
+.service-rate-card--ongoing { --rate-gradient: var(--gradient-rate-ongoing); --rate-start: var(--color-develop-blue); --rate-end: var(--color-ship-red); }
+.service-rate-card__divider { height: var(--border-signature-width); margin: var(--space-5) 0; background: var(--rate-gradient); }
+.service-rate-card__price-panel { padding: var(--space-5); border-radius: var(--radius-comfort); background: linear-gradient(135deg, color-mix(in srgb, var(--rate-start) calc(var(--opacity-5) * 100%), var(--bg-page)), color-mix(in srgb, var(--rate-end) calc(var(--opacity-5) * 100%), var(--bg-page))); }
+.service-rate-card h3, .service-rate-card h4 { margin: 0; font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); line-height: var(--line-height-card); letter-spacing: var(--tracking-heading); }
+@supports (background-clip: text) {
+  .service-rate-card h3, .service-rate-card h4 { background: linear-gradient(135deg, color-mix(in srgb, var(--rate-start) var(--rate-title-color-share), var(--fg-primary)), color-mix(in srgb, var(--rate-end) var(--rate-title-color-share), var(--fg-primary))); background-clip: text; color: transparent; width: fit-content; max-width: 100%; }
+}
+@media (forced-colors: active) {
+  .service-rate-card h3, .service-rate-card h4 { background: none; color: CanvasText; }
+  .service-rate-card__divider { background: CanvasText; }
+}
 .service-rate-card__price { margin: 0 0 var(--space-2); font-family: var(--font-mono); font-size: var(--font-size-heading-lg); line-height: var(--line-height-medium); }
 .service-rate-card__timing { margin: 0; font-size: var(--font-size-body-md); color: var(--fg-secondary); line-height: var(--line-height-relaxed); }
 .service-rate-card__description { margin: 0 0 var(--space-5); font-size: var(--font-size-body-xl); line-height: var(--line-height-relaxed); }

@@ -81,6 +81,39 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
     if (width < 900) expect(second.y).toBeGreaterThan(first.y);
     else expect(second.x).toBeGreaterThan(first.x);
     await expect(page.locator('a[href="/ratecard"], a[href="/ratecard/"], a[href$="rate-card.pdf"]')).toHaveCount(0);
+    const style = await cards.first().evaluate(card => {
+      const heading = getComputedStyle(card.querySelector('h3'));
+      const panel = getComputedStyle(card.querySelector('.service-rate-card__price-panel'));
+      const divider = getComputedStyle(card.querySelector('.service-rate-card__divider'));
+      return { titleSize: heading.fontSize, titleGradient: heading.backgroundImage, panelBorder: panel.borderTopWidth, panelGradient: panel.backgroundImage, dividerGradient: divider.backgroundImage };
+    });
+    expect(style.titleSize).toBe('24px');
+    expect(style.titleGradient).toContain('linear-gradient');
+    expect(style.panelBorder).toBe('0px');
+    expect(style.panelGradient).toContain('linear-gradient');
+    expect(style.dividerGradient).toContain('linear-gradient');
+    // Sample every category gradient: 24px titles qualify as large text (3:1).
+    const contrast = await page.locator('.service-rate-card').evaluateAll(cards => {
+      const rgb = hex => {
+        const digits = hex.trim().slice(1);
+        const expanded = digits.length === 3 ? [...digits].map(char => char + char).join('') : digits;
+        return expanded.match(/../g).map(part => parseInt(part, 16) / 255);
+      };
+      const luminance = channels => channels.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+        .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
+      return cards.map(card => {
+        const css = getComputedStyle(card);
+        const background = luminance(rgb(css.getPropertyValue('--bg-page')));
+        const foreground = rgb(css.getPropertyValue('--fg-primary'));
+        const share = parseFloat(css.getPropertyValue('--rate-title-color-share')) / 100;
+        const ends = ['--rate-start', '--rate-end'].map(token => rgb(css.getPropertyValue(token)).map((value, index) => value * share + foreground[index] * (1 - share)));
+        return { tokens: ['--bg-page', '--fg-primary', '--rate-title-color-share', '--rate-start', '--rate-end'].map(token => [token, css.getPropertyValue(token)]), ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
+          const text = luminance(ends[0].map((value, index) => value * (1 - step / 100) + ends[1][index] * step / 100));
+          return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05);
+        })) };
+      });
+    });
+    for (const sample of contrast) expect(sample.ratio, JSON.stringify(sample.tokens)).toBeGreaterThanOrEqual(3);
     await page.screenshot({ path: testInfo.outputPath(`ratecard-${theme}-${width}.png`), fullPage: true });
     const contact = page.locator('.rate-card-page__contact');
     await contact.scrollIntoViewIfNeeded();

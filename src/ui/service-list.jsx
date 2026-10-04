@@ -6,6 +6,7 @@ export const ServiceRateCard = ({ service, headingLevel = 3, variant = 'projects
   return <article className={`service-rate-card service-rate-card--${variant}`}>
     <div className="service-rate-card__identity">
       <Heading>{service.name}</Heading>
+      <div className="service-rate-card__divider" aria-hidden="true" />
       <div className="service-rate-card__price-panel"><p className="service-rate-card__price">{service.price}</p>
       <p className="service-rate-card__timing">{service.timing}</p></div>
     </div>

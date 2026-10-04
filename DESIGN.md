@@ -88,4 +88,4 @@ The portrait image occupies 88% of its square wrapper. Below 639px its slot is `
 
 ## Service lists
 
-`ServiceRateCard` and `ServiceRateGroup` render content-only editorial cards with static category gradient price panels with visible best-fit, inclusion, and scope details. Fixed and starting prices use the same treatment. Two desktop columns stack below 900px in reading order; there is no animation or disclosure state. The services page remains a bespoke composition of shared groups and a ContactCard. Its content also feeds static HTML; reference specimens use labelled fixtures.
+`ServiceRateCard` and `ServiceRateGroup` render content-only editorial cards with static category gradients on 24px titles and decorative dividers, subtle borderless price backgrounds, and visible best-fit, inclusion, and scope details. Fixed and starting prices use the same treatment. Two desktop columns stack below 900px in reading order; there is no animation or disclosure state. The services page remains a bespoke composition of shared groups and a ContactCard. Its content also feeds static HTML; reference specimens use labelled fixtures.
