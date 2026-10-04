@@ -3,9 +3,9 @@
    subtle scroll float, and an accessible lightbox. Design-system tokens only. */
 
 .about-page {
-  max-width: 1040px;
+  max-width: var(--content-about-width);
   margin: 0 auto;
-  padding: 40px 24px 96px;
+  padding: var(--space-8) var(--space-6) var(--layout-3);
 }
 
 /* ---- Rows: text one side, image cluster the other, alternating ---- */
@@ -30,7 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: 560px;
+  max-width: var(--content-about-column);
   min-width: 0;
 }
 
@@ -40,22 +40,22 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-body-sm);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   color: var(--fg-tertiary);
 }
 
 .about-hero__lede h1 {
   margin: 0;
-  font-size: clamp(32px, 4.6vw, 56px);
+  font-size: var(--font-size-page-title);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-compact);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--tracking-display);
   color: var(--fg-primary);
 }
 
 .about-lede {
   margin: 0;
-  font-size: clamp(17px, 1.6vw, 21px);
+  font-size: var(--font-size-lede);
   line-height: var(--line-height-relaxed-plus);
   color: var(--fg-secondary);
 }
@@ -64,13 +64,13 @@
   margin: 0;
   font-size: var(--font-size-heading-md);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-heading);
   color: var(--fg-primary);
 }
 
 .about-row__text p {
   margin: 0;
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--font-size-prose);
   line-height: var(--line-height-loose);
   color: var(--fg-secondary);
 }
@@ -91,106 +91,11 @@
 /* ---- Text-only interlude (Tools & craft) ---- */
 .about-interlude,
 .about-section {
-  max-width: 640px;
+  max-width: var(--content-reading-width);
   margin: 0 auto var(--layout-2);
 }
 
 .about-interlude .about-row__text { max-width: none; }
-
-/* ---- Framed photo primitive ---- */
-/* Two transform layers: the figure carries the scroll-float; the inner button
-   carries the placement rotation + the deal→fan intro (all via CSS vars, so
-   clearing intro state never jumps and parallax keeps working). */
-.about-tile {
-  margin: 0;
-  transform: translate3d(0, var(--parallax-y, 0px), 0);
-}
-
-.about-tile__btn {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
-  transform: rotate(var(--tile-rot, 0deg));
-}
-
-.about-frame {
-  display: block;
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-image);
-  background: var(--bg-subtle);
-  box-shadow: var(--shadow-card-subtle);
-}
-
-.about-frame__img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
-  transition: transform var(--duration-slow, 600ms) var(--easing-standard, ease);
-}
-
-.about-tile__btn:hover .about-frame__img { transform: scale(1.04); }
-
-/* ---- Stack: a loose overlapping pile (hero + multi-image sections) ---- */
-.about-stack {
-  position: relative;
-  display: grid;
-  width: 100%;
-}
-
-.about-stack .about-frame { aspect-ratio: 1 / 1; }
-
-/* Multi-image piles: graduated sizes with a tight, alternating-corner overlap,
-   so the cluster reads as a compact pile and barely adds height — faces stay
-   clear because each card sits to the opposite side of the one it overlaps. */
-.about-stack--2 .about-tile:nth-child(odd),
-.about-stack--3 .about-tile:nth-child(odd) { justify-self: start; }
-.about-stack--2 .about-tile:nth-child(even),
-.about-stack--3 .about-tile:nth-child(even) { justify-self: end; }
-.about-stack--2 .about-tile:nth-child(1),
-.about-stack--3 .about-tile:nth-child(1) { width: 72%; --tile-rot: -3deg; z-index: 1; }
-.about-stack--2 .about-tile:nth-child(2),
-.about-stack--3 .about-tile:nth-child(2) { width: 60%; --tile-rot: 2.5deg; z-index: 2; margin-top: -30%; }
-.about-stack--3 .about-tile:nth-child(3) { width: 52%; --tile-rot: -2deg; z-index: 3; margin-top: -28%; }
-
-/* Single image — natural ratio, centered, no cascade. */
-.about-stack--1 { justify-items: center; }
-.about-stack--1 .about-tile { width: 100%; max-width: 480px; --tile-rot: 0deg; }
-.about-stack--1 .about-frame { aspect-ratio: auto; }
-.about-stack--1 .about-frame__img { height: auto; }
-
-/* Hero: portrait + boxing square, DJ landscape. */
-.about-collage .about-collage__tile--portrait .about-frame,
-.about-collage .about-collage__tile--boxing .about-frame { aspect-ratio: 1 / 1; }
-.about-collage .about-collage__tile--dj .about-frame { aspect-ratio: 16 / 10; }
-
-/* Mobile: flatten every stack — full width, no overlap, no rotation. Matches
-   the graduated rules' specificity so these actually win. */
-@media (max-width: 640px) {
-  .about-stack--2 .about-tile:nth-child(1),
-  .about-stack--2 .about-tile:nth-child(2),
-  .about-stack--3 .about-tile:nth-child(1),
-  .about-stack--3 .about-tile:nth-child(2),
-  .about-stack--3 .about-tile:nth-child(3) {
-    width: 100%;
-    justify-self: stretch;
-    --tile-rot: 0deg;
-    margin-top: 0;
-  }
-  .about-stack--2 .about-tile:nth-child(2),
-  .about-stack--3 .about-tile:nth-child(2),
-  .about-stack--3 .about-tile:nth-child(3) { margin-top: var(--space-3); }
-}
-
-/* Reduced motion: no float, no hover zoom transition. */
-@media (prefers-reduced-motion: reduce) {
-  .about-frame__img { transition: none; }
-}
 
 /* ---- Closing CTA ---- */
 .about-cta {
@@ -199,60 +104,4 @@
   gap: var(--space-3);
   align-items: center;
   justify-content: center;
-}
-
-/* ---- Lightbox ---- */
-.about-lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal, 100);
-  display: grid;
-  place-items: center;
-  padding: var(--space-6);
-  background: color-mix(in oklab, var(--bg-page) 82%, rgba(0, 0, 0, 0.7));
-  backdrop-filter: var(--blur-subtle);
-  -webkit-backdrop-filter: var(--blur-subtle);
-}
-
-.about-lightbox__figure {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-/* Size the image to its own aspect so the radius/shadow hug the picture, not a
-   letterboxed box. */
-.about-lightbox__figure img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: min(1000px, 92vw);
-  max-height: 78vh;
-  border-radius: var(--radius-image);
-  box-shadow: var(--shadow-card-full);
-}
-
-.about-lightbox__caption {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-body-sm);
-  color: var(--fg-on-dark, var(--fg-primary));
-  text-align: center;
-}
-
-.about-lightbox__close {
-  position: absolute;
-  top: var(--space-5);
-  right: var(--space-5);
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: var(--radius-circle);
-  background: color-mix(in oklab, var(--bg-page) 70%, transparent);
-  color: var(--fg-primary);
-  box-shadow: inset 0 0 0 1px var(--color-gray-100);
-  cursor: pointer;
 }

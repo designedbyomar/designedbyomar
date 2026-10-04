@@ -684,8 +684,8 @@ test('design system route exposes the public header and intro content', async ({
   const banner = page.getByRole('banner');
   await expect(banner.getByRole('link', { name: /Back to site/i })).toHaveCount(0);
   await expect(banner.getByRole('link', { name: /^Work$/ })).toHaveAttribute('href', '/work');
-  await expect(banner.getByRole('link', { name: /^About$/ })).toHaveAttribute('href', '/#about');
-  await expect(banner.getByRole('link', { name: /^FAQ$/ })).toHaveAttribute('href', '/#faq');
+  await expect(banner.getByRole('link', { name: /^About$/ })).toHaveAttribute('href', '/about');
+  await expect(banner.getByRole('link', { name: /^Ask$/ })).toHaveAttribute('href', '/#faq');
   await expect(banner.getByRole('link', { name: /^Contact$/ })).toHaveAttribute('href', '/#contact');
   await expect(banner.getByRole('link', { name: /^Get in touch$/ })).toHaveAttribute('href', '/#contact');
   // Marks the current section for assistive tech.
@@ -821,8 +821,8 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('#blur').getByRole('heading', { name: /^Blur$/ })).toBeVisible();
   await expect(page.locator('#blur').getByRole('heading', { name: '--blur-heavy' })).toBeVisible();
   await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Contact Surface Card' })).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByText(/quiet surface, subtle shadow, 2px lift, and animated gradient hover ring/i)).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByText(/reduced motion keeps the ring static/i)).toBeVisible();
+  await expect(page.locator('#cards-accordions').getByText(/shared ContactCard renders the production surface/i)).toBeVisible();
+  await expect(page.locator('#cards-accordions').getByText(/reduced motion stops animated decoration/i)).toBeVisible();
   await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Signal Gradient Icon' })).toBeVisible();
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
   await expect(page.locator('#github-activity').getByRole('heading', { name: 'GitHub activity' })).toBeVisible();
@@ -878,8 +878,8 @@ test('design system displays visual audit specimens for foundations, patterns, a
 
   await expect(page.locator('[data-audit-example="foundation-specimens"]')).toBeVisible();
   await expect(page.locator('[data-audit-example="hero-pattern"]')).toBeVisible();
-  await expect(page.locator('[data-audit-example="case-pattern"]')).toBeVisible();
-  await expect(page.locator('[data-audit-example="footer-pattern"]')).toBeVisible();
+  await expect(page.locator('[data-production-specimen="case"]')).toBeVisible();
+  await expect(page.locator('[data-production-specimen="footer"]')).toBeVisible();
   await expect(page.locator('[data-audit-example="privacy-pattern"]')).toBeVisible();
   await expect(page.locator('[data-audit-example="reduced-motion-pattern"]')).toBeVisible();
   await expect(page.locator('[data-audit-example="focus-accessibility"]')).toBeVisible();
@@ -1022,6 +1022,7 @@ test.describe('mobile navigation', () => {
     }
 
     await page.setViewportSize({ width: 1280, height: 900 });
+    await expect(header.getByRole('button', { name: 'Open navigation menu' })).toHaveCount(0);
     const [logoBox, headerBox] = [await logo.boundingBox(), await header.boundingBox()];
     const logoCenter = logoBox.x + logoBox.width / 2;
     const headerCenter = headerBox.x + headerBox.width / 2;
@@ -1934,9 +1935,9 @@ test.describe('case-card media delivery', () => {
     await page.waitForTimeout(250);
 
     const portraitSrc = await page.locator('[data-hero-portrait]').evaluate((image) => image.currentSrc);
-    expect(portraitSrc).toContain('/Images/omar-mobile.webp');
-    expect(requestedPaths).toContain('/Images/omar-mobile.webp');
-    expect(requestedPaths).not.toContain('/Images/omar.webp');
+    expect(portraitSrc).toContain('/Images/portrait-dark-432.webp');
+    expect(requestedPaths).toContain('/Images/portrait-dark-432.webp');
+    expect(requestedPaths).not.toContain('/Images/portrait-dark-1230.webp');
     expect(requestedPaths.some((pathname) => pathname.endsWith('.mp4'))).toBe(false);
   });
 
