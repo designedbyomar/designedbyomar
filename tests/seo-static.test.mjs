@@ -808,11 +808,17 @@ test('rate card is complete static sales content with canonical noindex and no i
   }
 });
 
-test('inquiry CSP only adds Cloudflare script and frame access, not client-side email access', () => {
+test('inquiry CSP allows Cloudflare scripts, frames, and connections without client-side email access', () => {
   const config = JSON.parse(readText('vercel.json'));
   const csp = config.headers.flatMap(rule => rule.headers).find(header => header.key === 'Content-Security-Policy').value;
   assert.match(csp, /script-src[^;]*https:\/\/challenges\.cloudflare\.com/);
   assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com;/);
+  const connections = csp.split(';').map(directive => directive.trim()).find(directive => directive.startsWith('connect-src ')).split(/\s+/).slice(1);
+  assert.deepEqual(connections, [
+    "'self'", 'https://challenges.cloudflare.com', 'https://www.google-analytics.com',
+    'https://region1.google-analytics.com', 'https://www.googletagmanager.com',
+    'https://www.google.com', 'https://*.ingest.us.sentry.io', 'https://vitals.vercel-insights.com',
+  ]);
   assert.doesNotMatch(csp, /api\.resend\.com/);
   assert.match(csp, /frame-ancestors 'none'/);
 });
