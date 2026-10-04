@@ -9,5 +9,5 @@
 .rate-card-page__terms dl { margin: 0; display: grid; gap: var(--space-6); max-width: var(--content-answer-width); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
 .rate-card-page__terms dt { color: var(--fg-primary); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1); }
 .rate-card-page__terms dd { margin: 0; color: var(--fg-secondary); }
-.rate-card-page__contact { max-width: var(--content-reading-width); }
+.rate-card-page__contact { max-width: var(--content-answer-width); scroll-margin-top: var(--scroll-margin-heading); }
 .rate-card-page__contact > p { margin: 0 0 var(--space-7); color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }

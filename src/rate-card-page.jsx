@@ -1,3 +1,4 @@
+import { InquiryController } from './inquiry-controller.jsx';
 import { RATE_CARD } from './content/rate-card.mjs';
 import { ServiceRateGroup } from './ui/service-list.jsx';
 import { ContactCard } from './ui/contact-card.jsx';
@@ -18,6 +19,8 @@ const RateCardPage = ({ onEvent }) => <article className="rate-card-page">
   <section className="rate-card-page__contact" aria-labelledby="rate-contact-title">
     <h2 id="rate-contact-title">{RATE_CARD.contactTitle}</h2>
     <p>{RATE_CARD.contactDescription}</p>
+    <InquiryController />
+    <p>Prefer email? Use the link or copy the address below.</p>
     <ContactCard label="Email" value={RATE_CARD.email} href={`mailto:${RATE_CARD.email}`} copyValue={RATE_CARD.email} eventName="contact_click_email" copyEventName="copy_email_click" copyTarget="email" section="ratecard" onEvent={onEvent} />
   </section>
 </article>;

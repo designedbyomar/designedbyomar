@@ -807,3 +807,12 @@ test('rate card is complete static sales content with canonical noindex and no i
     assert.equal(isPortfolioRoutePath(path), true);
   }
 });
+
+test('inquiry CSP only adds Cloudflare script and frame access, not client-side email access', () => {
+  const config = JSON.parse(readText('vercel.json'));
+  const csp = config.headers.flatMap(rule => rule.headers).find(header => header.key === 'Content-Security-Policy').value;
+  assert.match(csp, /script-src[^;]*https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com;/);
+  assert.doesNotMatch(csp, /api\.resend\.com/);
+  assert.match(csp, /frame-ancestors 'none'/);
+});

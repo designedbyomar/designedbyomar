@@ -1,3 +1,5 @@
+import { InquiryForm } from './ui/inquiry-form.jsx';
+import { emptyInquiry, validateInquiry } from './content/inquiry.mjs';
 import { ServiceRateGroup } from './ui/service-list.jsx';
 import React from 'react';
 import { Button, IconButton, LinkButton, CopyButton } from './ui/controls.jsx';
@@ -106,6 +108,22 @@ const GitHubSpecimen = () => {
   </>;
 };
 
+const InquirySpecimen = () => {
+  const id = React.useId();
+  const [values, setValues] = React.useState(emptyInquiry);
+  const [status, setStatus] = React.useState('idle');
+  const [errors, setErrors] = React.useState({});
+  const summaryRef = React.useRef(null);
+  return <>
+    <StatePicker value={status} onChange={setStatus} states={['idle', 'sending', 'sent', 'error']} />
+    <InquiryForm idPrefix={`ds-inquiry-${id}`} values={values} errors={errors} status={status}
+      message={status === 'error' ? 'Example failure. Nothing was sent.' : ''} ready summaryRef={summaryRef}
+      onChange={(name, value) => { setValues(previous => ({ ...previous, [name]: value })); setErrors({}); setStatus('idle'); }}
+      onSubmit={event => { event.preventDefault(); const checked = validateInquiry(values); setErrors(checked.errors); setStatus(checked.valid ? 'sent' : 'error'); if (!checked.valid) requestAnimationFrame(() => summaryRef.current?.focus()); }}
+      verification={<p className="mono-label">Verification fixture · no Cloudflare request</p>} />
+  </>;
+};
+
 const COVERAGE = [
   ['Buttons, icon buttons, links and copy controls', '#buttons', 'Variant, label, disabled state and interaction callbacks'],
   ['Logo and theme toggle', '#navigation-drawers', 'Destination, current theme and theme callback'],
@@ -118,6 +136,7 @@ const COVERAGE = [
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
   ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
+  ['Inquiry form and labelled fields', '#inquiry-form', 'Controlled values, errors, status, verification slot and change/submit callbacks; no requests'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];
 
@@ -133,6 +152,7 @@ export default function ProductionSpecimen({ kind }) {
         { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: 'Agreed design work and handoff.', limits: 'Deliverables and revisions agreed in a proposal.' },
       ],
     }} /></>; break;
+    case 'inquiry': content = <InquirySpecimen />; break;
     case 'navigation': content = <NavigationSpecimen />; break;
     case 'consent': content = <ConsentSpecimen />; break;
     case 'about': content = <AboutSpecimen />; break;

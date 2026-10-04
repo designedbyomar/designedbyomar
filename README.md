@@ -215,3 +215,11 @@ Bump **minor** when the release adds capability or changes how something is rend
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+## Rate-card inquiries
+
+The unlinked services page can send inquiries to Omar’s inbox through `POST /api/contact`. Configure `RESEND_API_KEY` (sending-only), `CONTACT_FROM_EMAIL` (for example `Website inquiries <inquiries@designedbyomar.com>`), and `TURNSTILE_SECRET_KEY` server-side, plus `VITE_TURNSTILE_SITE_KEY` at build time. The Resend domain must be verified. Use Turnstile managed mode with the exact production and approved preview hostnames. Vercel’s `VERCEL_URL` and `VERCEL_BRANCH_URL` are accepted as exact preview hosts; `CONTACT_PREVIEW_HOST` can specify one additional exact test alias. No wildcard preview host is accepted.
+
+Configure preview variables first and rebuild the preview after changing the public site key. Confirm an inquiry arrives in `omar@designedbyomar.com` before enabling production sending. Never use Cloudflare test keys or bypass verification on a deployed preview or production site; the test build uses a public fixture key only with intercepted browser requests. Missing configuration or failed discovery leaves direct email available.
+
+The endpoint fixes the recipient and uses the visitor’s address only for reply-to. It sends plain text, uses Resend idempotency for retries, and sends no automatic acknowledgment. Its five-attempt/ten-minute per-instance limiter is supplemental to server-validated Turnstile and a honeypot; it is not a global distributed quota. Form values are kept in memory, are excluded from analytics, and are not logged by the handler.

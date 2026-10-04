@@ -6,7 +6,7 @@ export const RATE_CARD = {
   introduction: 'Senior product design for startups and established businesses. Choose a focused review, a defined project, or ongoing support.',
   pricingNote: 'All prices are in USD. Starting prices depend on scope. We agree the final scope and price before work begins.',
   contactTitle: 'Tell me what you’re working on',
-  contactDescription: 'Email me your goals, timing, and budget. We can work out which engagement fits and what the scope should include.',
+  contactDescription: 'Share your goals, timing, and budget. We can work out which engagement fits and what the scope should include.',
   email: 'omar@designedbyomar.com',
   groups: [
     { id: 'audits', title: 'Audits', description: 'Understand what needs attention before committing to a redesign.', services: [

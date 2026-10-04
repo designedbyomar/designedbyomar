@@ -77,6 +77,7 @@ const NAV_GROUPS = [
       { id: 'case-study-blocks', label: 'Case-study blocks' },
       { id: 'about-media', label: 'About media' },
       { id: 'service-lists', label: 'Service lists' },
+      { id: 'inquiry-form', label: 'Inquiry form' },
     ],
   },
   {
@@ -1118,6 +1119,10 @@ const ComponentsSection = () => (
     <section id="case-study-blocks" className="ds-section" aria-labelledby="case-study-blocks-title">
       <SectionHeader id="case-study-blocks" eyebrow="Components" title="Case-study blocks">Shared metadata, tags, headings, paragraphs, images, galleries, quotes, and callouts preserve authored content and semantics.</SectionHeader>
       <Specimen kind="body" />
+    </section>
+    <section id="inquiry-form" className="ds-section" aria-labelledby="inquiry-form-title">
+      <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled input, textarea, and select fields accept values, errors, and callbacks. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
+      <Specimen kind="inquiry" />
     </section>
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
       <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Content-only service cards show service names, prices, timing, descriptions, best-fit clients, inclusions, and scope limits. Groups accept a heading level and unique ID prefix. Two desktop columns stack in reading order below 900px; no disclosure, motion, or callbacks are required.</SectionHeader>
