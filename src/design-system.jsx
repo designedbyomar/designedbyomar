@@ -1077,8 +1077,9 @@ const ComponentsSection = () => (
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
       <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Cards frame repeated items. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
+        Service cards use static audit, project, and ongoing gradient variants around the price panel, with neutral readable text. Decorative gradients do not intercept interactions. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
+      <Specimen kind="services" />
       <div className="ds-two-column">
         <DocCard title="Card anatomy" meta="Structure">
           <ul>
@@ -1119,7 +1120,7 @@ const ComponentsSection = () => (
       <Specimen kind="body" />
     </section>
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Content-only editorial rows show service names, prices, timing, descriptions, best-fit clients, inclusions, and scope limits. Groups accept a heading level and unique ID prefix. Desktop columns stack in reading order below 640px; no disclosure, motion, or callbacks are required.</SectionHeader>
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Content-only service cards show service names, prices, timing, descriptions, best-fit clients, inclusions, and scope limits. Groups accept a heading level and unique ID prefix. Two desktop columns stack in reading order below 900px; no disclosure, motion, or callbacks are required.</SectionHeader>
       <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">

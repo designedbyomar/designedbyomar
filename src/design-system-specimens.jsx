@@ -117,20 +117,22 @@ const COVERAGE = [
   ['Ask panel', '#ask', 'Controlled query, response state, refs and interaction callbacks'],
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
-  ['Service rows and groups', '#service-lists', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
+  ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];
 
 export default function ProductionSpecimen({ kind }) {
+  const specimenId = React.useId();
+  const [serviceVariant, setServiceVariant] = React.useState('projects');
   let content;
   switch (kind) {
-    case 'services': content = <ServiceRateGroup idPrefix="ds-service-" headingLevel={3} group={{
-      id: 'example', title: 'Example services', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
+    case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} group={{
+      id: serviceVariant, title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
       services: [
         { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: 'Review, findings, and a walkthrough.', limits: 'One agreed flow; implementation excluded.' },
         { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: 'Agreed design work and handoff.', limits: 'Deliverables and revisions agreed in a proposal.' },
       ],
-    }} />; break;
+    }} /></>; break;
     case 'navigation': content = <NavigationSpecimen />; break;
     case 'consent': content = <ConsentSpecimen />; break;
     case 'about': content = <AboutSpecimen />; break;

@@ -16,9 +16,9 @@ for (const route of ['/ratecard', '/ratecard/']) {
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.designedbyomar.com/ratecard');
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', 'https://www.designedbyomar.com/ratecard');
     await expect(page.locator('link[rel="preload"][as="image"]')).toHaveCount(0);
-    await expect(page.locator('.service-rate-row')).toHaveCount(9);
+    await expect(page.locator('.service-rate-card')).toHaveCount(9);
     for (const service of RATE_CARD.groups.flatMap(group => group.services)) {
-      const row = page.locator('.service-rate-row').filter({ has: page.getByRole('heading', { name: service.name, exact: true }) });
+      const row = page.locator('.service-rate-card').filter({ has: page.getByRole('heading', { name: service.name, exact: true }) });
       for (const text of [service.price, service.description, service.bestFor, service.includes, service.limits, service.timing]) {
         await expect(row).toContainText(text);
       }
@@ -75,11 +75,11 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
     await page.goto('/ratecard');
     await expect(page.getByRole('heading', { name: 'Services & rates', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    const row = page.locator('.service-rate-row').first();
-    const identity = await row.locator('.service-rate-row__identity').boundingBox();
-    const detail = await row.locator('.service-rate-row__details').boundingBox();
-    if (width < 640) expect(detail.y).toBeGreaterThan(identity.y + identity.height);
-    else expect(detail.x).toBeGreaterThan(identity.x + identity.width);
+    const cards = page.locator('.service-rate-group').first().locator('.service-rate-card');
+    const first = await cards.nth(0).boundingBox();
+    const second = await cards.nth(1).boundingBox();
+    if (width < 900) expect(second.y).toBeGreaterThan(first.y);
+    else expect(second.x).toBeGreaterThan(first.x);
     await expect(page.locator('a[href="/ratecard"], a[href="/ratecard/"], a[href$="rate-card.pdf"]')).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath(`ratecard-${theme}-${width}.png`), fullPage: true });
     const contact = page.locator('.rate-card-page__contact');
@@ -94,9 +94,13 @@ test('service specimens use shared rows without production side effects', async 
   page.on('request', request => { if (/\/api\/(ask|github-contributions)/.test(request.url())) requests.push(request.url()); });
   await page.addInitScript(() => { window.rateEvents = []; window.trackAnalyticsEvent = (...args) => window.rateEvents.push(args); });
   await page.goto('/design-system#service-lists');
-  const specimen = page.locator('[data-production-specimen="services"]');
-  await expect(specimen.locator('.service-rate-row')).toHaveCount(2);
+  const specimen = page.locator('#service-lists [data-production-specimen="services"]');
+  await expect(specimen.locator('.service-rate-card')).toHaveCount(2);
   await expect(specimen).toContainText('fixture demonstration');
+  for (const variant of ['audits', 'projects', 'ongoing']) {
+    await specimen.getByLabel('Example state').selectOption(variant);
+    await expect(specimen.locator(`.service-rate-card--${variant}`)).toHaveCount(2);
+  }
   expect(await page.evaluate(() => localStorage.getItem('omar.analyticsConsent'))).toBe('declined');
   expect(await page.evaluate(() => window.rateEvents)).toEqual([]);
   expect(requests).toEqual([]);

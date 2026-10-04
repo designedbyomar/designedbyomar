@@ -1,4 +1,7 @@
 export const COMPONENT_TOKEN_ROLES = [
+  ['--gradient-rate-audits', 'linear-gradient(135deg, var(--color-ship-red), var(--color-preview-pink))'],
+  ['--gradient-rate-projects', 'linear-gradient(135deg, var(--color-preview-pink), var(--color-develop-blue))'],
+  ['--gradient-rate-ongoing', 'linear-gradient(135deg, var(--color-develop-blue), var(--color-ship-red))'],
   [
     "--size-gallery-column-min",
     "240px"
