@@ -6,6 +6,7 @@
 .inquiry-field label span { color: var(--fg-tertiary); font-weight: var(--font-weight-regular); }
 .inquiry-field input, .inquiry-field select, .inquiry-field textarea { scroll-margin-top: var(--scroll-margin-heading); box-sizing: border-box; width: 100%; min-height: var(--control-hit-area); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-gray-100); border-radius: var(--radius-comfort); background: var(--bg-page); color: var(--fg-primary); font: inherit; font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
 .inquiry-field textarea { resize: vertical; }
+.inquiry-field input::placeholder, .inquiry-field textarea::placeholder { color: var(--fg-secondary); opacity: 1; }
 .inquiry-field input:focus-visible, .inquiry-field select:focus-visible, .inquiry-field textarea:focus-visible, .inquiry-form__summary:focus { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-1); }
 .inquiry-field [aria-invalid="true"] { border-color: var(--color-ship-red); }
 .inquiry-field__help, .inquiry-field__error, .inquiry-form__privacy, .inquiry-form > [role="status"] { margin: 0; font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); color: var(--fg-secondary); }

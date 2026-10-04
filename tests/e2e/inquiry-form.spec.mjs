@@ -1,4 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { INQUIRY_FIELDS } from '../../src/content/inquiry.mjs';
+
+const choose = async (form, label, option) => {
+  await form.getByRole('combobox', { name: label, exact: true }).click();
+  await form.getByRole('option', { name: option, exact: true }).click();
+};
 
 const installForm = async (page, submit) => {
   await page.addInitScript(() => {
@@ -20,9 +26,9 @@ const fill = async page => {
   await form.getByLabel('Name (required)', { exact: true }).fill('Example Client');
   await form.getByLabel('Email (required)', { exact: true }).fill('client@example.com');
   await form.getByLabel('Goals (required)', { exact: true }).fill('Review our checkout flow.');
-  await form.getByLabel('Timing (required)', { exact: true }).selectOption('Not sure yet');
-  await form.getByLabel('Budget in USD (required)', { exact: true }).selectOption('Not sure yet');
-  await form.getByLabel('Budget basis (required)', { exact: true }).selectOption('Monthly');
+  await choose(form, 'Timing (required)', 'Not sure yet');
+  await choose(form, 'Budget in USD (required)', 'Not sure yet');
+  await choose(form, 'Budget basis (required)', 'Monthly');
   return form;
 };
 
@@ -36,6 +42,8 @@ test('valid inquiries confirm provider acceptance and block duplicate clicks', a
   await page.evaluate(() => { window.trackAnalyticsEvent = (...args) => window.inquiryEvents.push(args); });
   await form.getByRole('button', { name: 'Send inquiry', exact: true }).click();
   await expect(form.getByRole('button', { name: 'Sending…' })).toBeDisabled();
+  for (const control of await form.getByRole('combobox').all()) await expect(control).toBeDisabled();
+  await expect(form.getByRole('listbox')).toHaveCount(0);
   await expect(form.getByRole('status')).toContainText('Sending your inquiry');
   expect(calls).toBe(1);
   expect(sent.email).toBe('client@example.com');
@@ -54,6 +62,11 @@ test('validation focuses the summary and ties errors to labelled fields', async 
   await expect(form.locator('.inquiry-form__summary')).toBeFocused();
   await expect(form.getByLabel('Email (required)', { exact: true })).toHaveAttribute('aria-invalid', 'true');
   await expect(form.getByLabel('Email (required)', { exact: true })).toHaveAttribute('aria-describedby', /email-error/);
+  const timing = form.getByRole('combobox', { name: 'Timing (required)', exact: true });
+  await expect(timing).toHaveAttribute('aria-invalid', 'true');
+  await expect(timing).toHaveAttribute('aria-describedby', /timing-error/);
+  await form.locator('.inquiry-form__summary').getByRole('link', { name: 'Enter timing.', exact: true }).click();
+  await expect(timing).toBeFocused();
   expect(sends).toBe(0);
 });
 
@@ -136,3 +149,105 @@ test('inquiry specimens are isolated from sending, verification, consent, and pr
   expect(await page.evaluate(() => window.specimenEvents)).toEqual([]);
   expect(await page.evaluate(() => localStorage.getItem('omar.analyticsConsent'))).toBe('declined');
 });
+
+
+test('shared dropdown supports navigation, selection, cancellation, typeahead and dismissal', async ({ page }) => {
+  await page.goto('/design-system#inquiry-form');
+  const specimen = page.locator('[data-production-specimen="inquiry"]');
+  const timing = specimen.getByRole('combobox', { name: 'Timing (required)', exact: true });
+  await timing.focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(timing).toHaveAttribute('aria-expanded', 'true');
+  const activeOption = async () => specimen.locator(`[id="${await timing.getAttribute('aria-activedescendant')}"]`);
+  await expect(await activeOption()).toHaveText('ASAP');
+  await page.keyboard.press('End');
+  await expect(await activeOption()).toHaveText('Not sure yet');
+  await page.keyboard.press('Home');
+  await expect(await activeOption()).toHaveText('Choose your timing');
+  await page.keyboard.press('w');
+  await expect(await activeOption()).toHaveText('Within a month');
+  await page.keyboard.press('Enter');
+  await expect(timing).toHaveText('Within a month');
+  await expect(timing).toBeFocused();
+  await expect(timing).toHaveAttribute('aria-expanded', 'false');
+  await page.keyboard.press('Space');
+  await expect(specimen.getByRole('option', { name: 'Within a month', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Escape');
+  await expect(timing).toHaveText('Within a month');
+  await expect(timing).toBeFocused();
+  await page.keyboard.press('Space');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Tab');
+  await expect(timing).toHaveText('1–3 months');
+  await expect(specimen.getByRole('combobox', { name: 'Budget in USD (required)', exact: true })).toBeFocused();
+  await timing.click();
+  await page.keyboard.press('End');
+  await specimen.getByLabel('Name (required)', { exact: true }).click();
+  await expect(timing).toHaveAttribute('aria-expanded', 'false');
+  await expect(timing).toHaveText('1–3 months');
+  await timing.focus();
+  await page.keyboard.press('l');
+  await page.keyboard.press('Enter');
+  await expect(timing).toHaveText('Later');
+  await timing.click();
+  await page.keyboard.press('Home');
+  await page.keyboard.press('Space');
+  await expect(timing).toHaveText('Choose your timing');
+  await specimen.getByLabel('Example state').selectOption('sending');
+  await expect(timing).toBeDisabled();
+  await expect(specimen.getByRole('listbox')).toHaveCount(0);
+});
+
+test('all inquiry fields have prompts without replacing labels or introducing values', async ({ page }) => {
+  await page.goto('/design-system#inquiry-form');
+  const specimen = page.locator('[data-production-specimen="inquiry"]');
+  for (const field of INQUIRY_FIELDS) {
+    const control = specimen.getByLabel(`${field.label} (${field.required ? 'required' : 'optional'})`, { exact: true });
+    if (field.options) {
+      await expect(control).toHaveText(field.placeholder);
+      await expect(specimen.locator(`input[type="hidden"][name="${field.name}"]`)).toHaveValue('');
+    } else {
+      await expect(control).toHaveAttribute('placeholder', field.placeholder);
+      await expect(control).toHaveValue('');
+    }
+  }
+  await expect(specimen.locator('.inquiry-field__help')).toHaveText('Include https:// if you have a website.');
+});
+
+for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
+  test(`dropdown menu ${theme} ${width} fits, scrolls and insets its icon`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.addInitScript(value => localStorage.setItem('omar.theme', value), theme);
+    await installForm(page, route => route.fulfill({ json: { sent: true } }));
+    await page.goto('/ratecard');
+    const form = page.locator('.rate-card-page .inquiry-form');
+    const service = form.getByRole('combobox', { name: 'Service interest (optional)', exact: true });
+    await service.scrollIntoViewIfNeeded();
+    await service.click();
+    await page.keyboard.press('End');
+    const menu = form.getByRole('listbox');
+    const active = form.locator(`[id="${await service.getAttribute('aria-activedescendant')}"]`);
+    const menuBox = await menu.boundingBox();
+    const optionBox = await active.boundingBox();
+    expect(menuBox.y).toBeGreaterThanOrEqual(0);
+    expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(900);
+    expect(optionBox.y).toBeGreaterThanOrEqual(menuBox.y);
+    expect(optionBox.y + optionBox.height).toBeLessThanOrEqual(menuBox.y + menuBox.height + 1);
+    const inset = await service.evaluate(node => node.getBoundingClientRect().right - node.querySelector('svg').getBoundingClientRect().right);
+    expect(inset).toBeGreaterThanOrEqual(16);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`dropdown-${theme}-${width}.png`) });
+    await page.keyboard.press('Enter');
+    await expect(service).toHaveText('Website + Design Support');
+    await service.evaluate(node => node.scrollIntoView({ block: 'end', behavior: 'instant' }));
+    await service.click();
+    await expect(menu).toHaveClass(/select-field__menu--above/);
+    const aboveBox = await menu.boundingBox();
+    const triggerBox = await service.boundingBox();
+    expect(aboveBox.y).toBeGreaterThanOrEqual(0);
+    expect(aboveBox.y + aboveBox.height).toBeLessThan(triggerBox.y);
+    await page.keyboard.press('Escape');
+  });
+}

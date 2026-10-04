@@ -136,6 +136,7 @@ const COVERAGE = [
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
   ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
+  ['Select-only dropdown', '#inquiry-form', 'Controlled value, options, placeholder, label ID, required/disabled/error state and change callback; keyboard navigation and themed popup'],
   ['Inquiry form and labelled fields', '#inquiry-form', 'Controlled values, errors, status, verification slot and change/submit callbacks; no requests'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];

@@ -1121,7 +1121,7 @@ const ComponentsSection = () => (
       <Specimen kind="body" />
     </section>
     <section id="inquiry-form" className="ds-section" aria-labelledby="inquiry-form-title">
-      <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled input, textarea, and select fields accept values, errors, and callbacks. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
+      <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled inputs, textareas, and select-only comboboxes accept values, placeholders, errors, and callbacks. Dropdowns use inset chevrons, themed menus, selected checkmarks, and active-option focus; arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, and outside dismissal are supported. Escape cancels the pending selection; Tab commits it. The select-menu-max-height token caps the popup at 288px; available viewport space can shorten it or place it above the field. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
       <Specimen kind="inquiry" />
     </section>
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">

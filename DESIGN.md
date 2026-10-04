@@ -86,6 +86,10 @@ Existing exact dimensions that do not fit the scale use semantic tokens in `src/
 
 The portrait image occupies 88% of its square wrapper. Below 639px its slot is `0.88 × (viewport − 48px)`; through 820px it is capped at 519.2px. Above 820px the hero's second grid column gives `0.88 × (viewport − 96px) / 2.1`, capped at approximately 482.743px when the content reaches 1200px. The intrinsic transparent artwork stays contained within that slot. `src/portrait-media.mjs` specifies matching responsive candidates and sizes; regression assertions keep the homepage-only head preload in sync. Light candidates stop at the original 557px width; dark candidates stop at 1230px.
 
+## Select-only dropdowns
+
+`SelectField` is the shared controlled dropdown used by production inquiry fields and their reference specimens. It accepts an ID with an associated `<id>-label`, name, value, option strings, placeholder, required/disabled state, error associations, and a value callback. It owns popup visibility and active-option navigation only. Arrow keys, Home/End, and typeahead navigate; Enter/Space select; Escape cancels; Tab commits and continues navigation. Outside dismissal leaves the previous value intact. The popup fits above or below the trigger and scrolls its active option into view without moving the page. Menus and chevrons use theme and spacing tokens and introduce no motion or service requests. Placeholders supplement permanent labels; essential format hints remain visible.
+
 ## Service lists
 
 `ServiceRateCard` and `ServiceRateGroup` render content-only editorial cards with static category gradients on 24px titles and decorative dividers, subtle borderless price backgrounds, and visible best-fit, inclusion, and scope details. Fixed and starting prices use the same treatment. Two desktop columns stack below 900px in reading order; there is no animation or disclosure state. The services page remains a bespoke composition of shared groups and a ContactCard. Its content also feeds static HTML; reference specimens use labelled fixtures.
