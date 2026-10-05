@@ -107,7 +107,7 @@ test('network timeout retains content and never reports success', async ({ page 
 
 test('missing server configuration leaves direct email and never loads verification', async ({ page }) => {
   const verification = [];
-  page.on('request', request => { if (request.url().includes('challenges.cloudflare.com')) verification.push(request.url()); });
+  page.on('request', request => { if (new URL(request.url()).hostname === 'challenges.cloudflare.com') verification.push(request.url()); });
   await page.route('**/api/contact', route => route.fulfill({ json: { available: false } }));
   await page.goto('/ratecard');
   await expect(page.locator('.rate-card-page .inquiry-form')).toHaveCount(0);
@@ -137,7 +137,10 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
 
 test('inquiry specimens are isolated from sending, verification, consent, and production events', async ({ page }) => {
   const requests = [];
-  page.on('request', request => { if (/\/api\/contact|challenges.cloudflare.com/.test(request.url())) requests.push(request.url()); });
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if (url.pathname === '/api/contact' || url.hostname === 'challenges.cloudflare.com') requests.push(request.url());
+  });
   await page.addInitScript(() => { localStorage.setItem('omar.analyticsConsent', 'declined'); window.specimenEvents = []; window.trackAnalyticsEvent = (...args) => window.specimenEvents.push(args); });
   await page.goto('/design-system#inquiry-form');
   const specimen = page.locator('[data-production-specimen="inquiry"]');

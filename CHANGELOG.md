@@ -34,6 +34,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-28 — Management Portal case study now reads as shipped: the "in development / Q1–Q2 2026 rollout" language (three months past) is replaced with "shipped and rolled out to the operations org in 2026." The three metrics stay labelled as design targets — measured results are not in yet — so the page makes no unearned claim. The 13 Ask answers that cite the study were re-fingerprinted; none needed a wording change, since they already describe those numbers as projected rather than measured
 
 ### Fixed
+- 2026-10-05 — Inquiry-form e2e tests now check the Turnstile request's exact hostname and `/api/contact`'s exact pathname instead of a substring/regex match on the full URL, closing a CodeQL-flagged incomplete-sanitization pattern that could have matched unintended hosts (e.g. `challenges.cloudflare.com.evil.com`)
 - 2026-10-04 — Allow Turnstile browser connections to its exact Cloudflare origin in the site CSP.
 - 2026-10-02 — Shared navigation and footer logos now suppress hover bounce for reduced-motion preferences, including live preference changes.
 - 2026-10-02 — Legacy Plastiq marketing, Page Builder, Disney CCT, and Connect API case-study URLs now permanently redirect to their canonical replacements with either trailing-slash form
