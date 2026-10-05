@@ -19,7 +19,7 @@ for (const route of ['/ratecard', '/ratecard/']) {
     await expect(page.locator('.service-rate-card')).toHaveCount(9);
     for (const service of RATE_CARD.groups.flatMap(group => group.services)) {
       const row = page.locator('.service-rate-card').filter({ has: page.getByRole('heading', { name: service.name, exact: true }) });
-      for (const text of [service.price, service.description, service.bestFor, service.includes, service.limits, service.timing]) {
+      for (const text of [service.price, service.description, service.bestFor, ...service.includes, service.limits, service.timing]) {
         await expect(row).toContainText(text);
       }
     }
@@ -66,7 +66,7 @@ test('rate card copy confirms completion, isolates events, and handles clipboard
   expect(await page.evaluate(() => window.rateEvents.at(-1))).toEqual(['contact_click_email', { link_url: 'mailto:omar@designedbyomar.com', section: 'ratecard' }]);
 });
 
-for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
+for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]) {
   test(`rate card layout ${theme} ${width}`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.addInitScript(value => localStorage.setItem('omar.theme', value), theme);
@@ -75,45 +75,40 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
     await page.goto('/ratecard');
     await expect(page.getByRole('heading', { name: 'Services & rates', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.locator('.service-rate-card').evaluateAll(cards => cards.every(card => card.scrollWidth <= card.clientWidth))).toBe(true);
     const cards = page.locator('.service-rate-group').first().locator('.service-rate-card');
     const first = await cards.nth(0).boundingBox();
     const second = await cards.nth(1).boundingBox();
     if (width < 900) expect(second.y).toBeGreaterThan(first.y);
     else expect(second.x).toBeGreaterThan(first.x);
     await expect(page.locator('a[href="/ratecard"], a[href="/ratecard/"], a[href$="rate-card.pdf"]')).toHaveCount(0);
-    const style = await cards.first().evaluate(card => {
-      const heading = getComputedStyle(card.querySelector('h3'));
-      const panel = getComputedStyle(card.querySelector('.service-rate-card__price-panel'));
-      const divider = getComputedStyle(card.querySelector('.service-rate-card__divider'));
-      return { titleSize: heading.fontSize, titleGradient: heading.backgroundImage, panelBorder: panel.borderTopWidth, panelGradient: panel.backgroundImage, dividerGradient: divider.backgroundImage };
-    });
-    expect(style.titleSize).toBe('24px');
-    expect(style.titleGradient).toContain('linear-gradient');
-    expect(style.panelBorder).toBe('0px');
-    expect(style.panelGradient).toContain('linear-gradient');
-    expect(style.dividerGradient).toContain('linear-gradient');
-    // Sample every category gradient: 24px titles qualify as large text (3:1).
     const contrast = await page.locator('.service-rate-card').evaluateAll(cards => {
-      const rgb = hex => {
-        const digits = hex.trim().slice(1);
-        const expanded = digits.length === 3 ? [...digits].map(char => char + char).join('') : digits;
-        return expanded.match(/../g).map(part => parseInt(part, 16) / 255);
-      };
+      const rgb = hex => hex.trim().slice(1).match(/../g).map(part => parseInt(part, 16) / 255);
       const luminance = channels => channels.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
         .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
       return cards.map(card => {
         const css = getComputedStyle(card);
-        const background = luminance(rgb(css.getPropertyValue('--bg-page')));
-        const foreground = rgb(css.getPropertyValue('--fg-primary'));
-        const share = parseFloat(css.getPropertyValue('--rate-title-color-share')) / 100;
-        const ends = ['--rate-start', '--rate-end'].map(token => rgb(css.getPropertyValue(token)).map((value, index) => value * share + foreground[index] * (1 - share)));
-        return { tokens: ['--bg-page', '--fg-primary', '--rate-title-color-share', '--rate-start', '--rate-end'].map(token => [token, css.getPropertyValue(token)]), ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
-          const text = luminance(ends[0].map((value, index) => value * (1 - step / 100) + ends[1][index] * step / 100));
-          return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05);
+        const header = getComputedStyle(card.querySelector('.service-rate-card__header'));
+        const foreground = luminance(header.color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => value / 255));
+        const overlayValue = css.getPropertyValue('--rate-header-overlay').trim();
+        const overlay = overlayValue.startsWith('#')
+          ? overlayValue.slice(1).match(/../g).map(part => parseInt(part, 16))
+          : overlayValue.match(/[\d.]+/g).map(Number);
+        if (overlayValue.startsWith('#')) overlay[3] /= 255;
+        else if (overlayValue.includes('%')) overlay[3] /= 100;
+        const ends = ['--rate-start', '--rate-end'].map(token => rgb(css.getPropertyValue(token)));
+        return { background: header.backgroundImage, ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
+          const background = luminance(ends[0].map((value, index) => (value * (1 - step / 100) + ends[1][index] * step / 100) * (1 - overlay[3]) + overlay[index] / 255 * overlay[3]));
+          return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
         })) };
       });
     });
-    for (const sample of contrast) expect(sample.ratio, JSON.stringify(sample.tokens)).toBeGreaterThanOrEqual(3);
+    for (const sample of contrast) {
+      expect(sample.background).toContain('linear-gradient');
+      expect(sample.ratio).toBeGreaterThanOrEqual(4.5);
+    }
+    await expect(cards.first().locator('.service-rate-card__includes li')).toHaveCount(RATE_CARD.groups[0].services[0].includes.length);
+    await expect(cards.first().getByRole('button', { name: 'Discuss Product Audit', exact: true })).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath(`ratecard-${theme}-${width}.png`), fullPage: true });
     const contact = page.locator('.rate-card-page__contact');
     await contact.scrollIntoViewIfNeeded();
@@ -133,8 +128,39 @@ test('service specimens use shared rows without production side effects', async 
   for (const variant of ['audits', 'projects', 'ongoing']) {
     await specimen.getByLabel('Example state').selectOption(variant);
     await expect(specimen.locator(`.service-rate-card--${variant}`)).toHaveCount(2);
+    await specimen.getByRole('button', { name: 'Discuss Example review', exact: true }).click();
+    await expect(specimen.getByRole('status')).toContainText('Selected Example review');
   }
   expect(await page.evaluate(() => localStorage.getItem('omar.analyticsConsent'))).toBe('declined');
   expect(await page.evaluate(() => window.rateEvents)).toEqual([]);
   expect(requests).toEqual([]);
+});
+
+
+test('service inquiry fallback focuses contact and prepares an email subject', async ({ page }) => {
+  await page.route('**/api/contact', route => route.fulfill({ json: { available: false } }));
+  await page.goto('/ratecard');
+  await page.getByRole('button', { name: 'Discuss Product Audit', exact: true }).click();
+  await expect(page.locator('#rate-contact')).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Email omar@designedbyomar.com' })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com?subject=Inquiry%3A%20Product%20Audit');
+});
+
+test('service cards remain readable in forced colors', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' });
+  await page.goto('/ratecard');
+  const header = page.locator('.service-rate-card__header').first();
+  expect(await header.evaluate(element => getComputedStyle(element).backgroundImage)).toBe('none');
+  await expect(header.getByRole('heading', { name: 'Product Audit', exact: true })).toBeVisible();
+});
+
+
+test('service gradient gallery documents and copies all category tokens', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { window.copiedGradient = value; } } }));
+  await page.goto('/design-system#service-gradients');
+  const gallery = page.locator('#service-gradients');
+  await expect(gallery.locator('.ds-rate-gradient-swatch')).toHaveCount(3);
+  for (const [category, label] of [['audits', 'Audits'], ['projects', 'Projects'], ['ongoing', 'Ongoing support']]) {
+    await gallery.getByRole('button', { name: `Copy ${label} gradient token`, exact: true }).click();
+    expect(await page.evaluate(() => window.copiedGradient)).toBe(`var(--gradient-rate-${category})`);
+  }
 });

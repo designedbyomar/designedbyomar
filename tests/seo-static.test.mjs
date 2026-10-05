@@ -793,7 +793,8 @@ test('rate card is complete static sales content with canonical noindex and no i
   assert.equal(getMetaByName(html, 'twitter:title'), escapeAttr(RATE_CARD.metaTitle));
   const content = getRootContent(html);
   for (const service of RATE_CARD.groups.flatMap(group => group.services)) {
-    for (const key of ['name', 'price', 'timing', 'description', 'bestFor', 'includes', 'limits']) assert.ok(content.includes(escapeText(service[key])), `${service.name}: ${key}`);
+    for (const key of ['name', 'price', 'timing', 'description', 'bestFor', 'limits']) assert.ok(content.includes(escapeText(service[key])), `${service.name}: ${key}`);
+    for (const item of service.includes) assert.ok(content.includes(`<li>${escapeText(item)}</li>`), `${service.name}: ${item}`);
   }
   for (const term of RATE_CARD.terms) assert.ok(content.includes(escapeText(term.text)));
   assert.equal((content.match(/<h3>/g) || []).length, 9);

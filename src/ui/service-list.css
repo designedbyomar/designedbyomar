@@ -3,27 +3,26 @@
 .service-rate-group > header h2, .service-rate-group > header h3 { margin: 0 0 var(--space-3); font-size: var(--font-size-case-heading); font-weight: var(--font-weight-medium); letter-spacing: var(--tracking-heading); }
 .service-rate-group > header p { margin: 0; color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
 .service-rate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
-.service-rate-card { padding: var(--space-6); border-radius: var(--radius-image); background: var(--bg-page); box-shadow: var(--shadow-card-subtle); min-width: 0; }
-.service-rate-card__identity { margin-bottom: var(--space-6); }
+.service-rate-card { border-radius: var(--radius-image); background: var(--bg-page); box-shadow: var(--shadow-card-subtle); min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; overflow: hidden; }
 .service-rate-card--audits { --rate-gradient: var(--gradient-rate-audits); --rate-start: var(--color-ship-red); --rate-end: var(--color-preview-pink); }
 .service-rate-card--projects { --rate-gradient: var(--gradient-rate-projects); --rate-start: var(--color-preview-pink); --rate-end: var(--color-develop-blue); }
 .service-rate-card--ongoing { --rate-gradient: var(--gradient-rate-ongoing); --rate-start: var(--color-develop-blue); --rate-end: var(--color-ship-red); }
-.service-rate-card__divider { height: var(--border-signature-width); margin: var(--space-5) 0; background: var(--rate-gradient); }
-.service-rate-card__price-panel { padding: var(--space-5); border-radius: var(--radius-comfort); background: linear-gradient(135deg, color-mix(in srgb, var(--rate-start) calc(var(--opacity-5) * 100%), var(--bg-page)), color-mix(in srgb, var(--rate-end) calc(var(--opacity-5) * 100%), var(--bg-page))); }
+.service-rate-card__header { padding: var(--space-6); background: linear-gradient(var(--rate-header-overlay), var(--rate-header-overlay)), var(--rate-gradient); color: var(--rate-header-foreground); }
+.service-rate-card__category { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
 .service-rate-card h3, .service-rate-card h4 { margin: 0; font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); line-height: var(--line-height-card); letter-spacing: var(--tracking-heading); }
-@supports (background-clip: text) {
-  .service-rate-card h3, .service-rate-card h4 { background: linear-gradient(135deg, color-mix(in srgb, var(--rate-start) var(--rate-title-color-share), var(--fg-primary)), color-mix(in srgb, var(--rate-end) var(--rate-title-color-share), var(--fg-primary))); background-clip: text; color: transparent; width: fit-content; max-width: 100%; }
-}
-@media (forced-colors: active) {
-  .service-rate-card h3, .service-rate-card h4 { background: none; color: CanvasText; }
-  .service-rate-card__divider { background: CanvasText; }
-}
-.service-rate-card__price { margin: 0 0 var(--space-2); font-family: var(--font-mono); font-size: var(--font-size-heading-lg); line-height: var(--line-height-medium); }
-.service-rate-card__timing { margin: 0; font-size: var(--font-size-body-md); color: var(--fg-secondary); line-height: var(--line-height-relaxed); }
-.service-rate-card__description { margin: 0 0 var(--space-5); font-size: var(--font-size-body-xl); line-height: var(--line-height-relaxed); }
-.service-rate-card dl { display: grid; gap: var(--space-4); margin: 0; font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
-.service-rate-card dt { font-weight: var(--font-weight-medium); color: var(--fg-primary); margin-bottom: var(--space-1); }
+.service-rate-card__body { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.service-rate-card__price-panel { padding-bottom: var(--space-5); border-bottom: var(--border-signature-width) solid var(--color-gray-100); }
+.service-rate-card__price { margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-heading-xl); line-height: var(--line-height-medium); color: var(--fg-primary); }
+.service-rate-card__price-label { font-size: var(--font-size-body-md); }
+.service-rate-card__timing { display: flex; align-items: baseline; gap: var(--space-2); margin: 0; font-size: var(--font-size-body-md); color: var(--fg-secondary); line-height: var(--line-height-relaxed); }
+.service-rate-card svg { flex-shrink: 0; }
+.service-rate-card__description { margin: 0; font-size: var(--font-size-body-xl); line-height: var(--line-height-relaxed); }
+.service-rate-card dl { display: grid; gap: var(--space-5); margin: 0; font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
+.service-rate-card dt { font-weight: var(--font-weight-medium); color: var(--fg-primary); margin-bottom: var(--space-2); }
 .service-rate-card dd { margin: 0; color: var(--fg-secondary); }
-.service-rate-card > div { min-width: 0; overflow-wrap: anywhere; }
+.service-rate-card__includes { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+.service-rate-card__includes li { display: flex; align-items: baseline; gap: var(--space-2); }
+.service-rate-card__action { margin-top: auto; align-self: stretch; white-space: normal; }
+@media (forced-colors: active) { .service-rate-card__header { background: Canvas; color: CanvasText; } .service-rate-card { outline: var(--border-signature-width) solid CanvasText; } }
 @media (max-width: 899px) { .service-rate-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 639px) { .service-rate-group { margin-top: var(--layout-1); } }

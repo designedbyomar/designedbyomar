@@ -1,5 +1,6 @@
 :root {
-  --rate-title-color-share: 85%;
+  --rate-header-overlay: rgb(0 0 0 / 35%);
+  --rate-header-foreground: var(--color-white);
   --select-menu-max-height: 288px;
   --gradient-rate-audits: linear-gradient(135deg, var(--color-ship-red), var(--color-preview-pink));
   --gradient-rate-projects: linear-gradient(135deg, var(--color-preview-pink), var(--color-develop-blue));
@@ -236,7 +237,6 @@
 }
 
 [data-theme="dark"] {
-  --rate-title-color-share: 100%;
   --color-gray-900: #ededed;
   --color-gray-600: #a1a1a1;
   --color-gray-500: #8f8f8f;

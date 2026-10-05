@@ -1366,3 +1366,6 @@
 .ds-specimen-about { padding: var(--space-6); }
 .ds-production-specimen--contact .contact-card { max-width: 100%; }
 .ds-production-specimen--footer .site-footer-grid { grid-template-columns: minmax(0, 1fr); }
+
+.ds-rate-gradient-swatch { height: var(--space-8); border-radius: var(--radius-comfort); margin-bottom: var(--space-3); }
+.ds-rate-header-example { padding: var(--space-5); border-radius: var(--radius-comfort); color: var(--rate-header-foreground); font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); }

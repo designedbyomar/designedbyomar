@@ -144,15 +144,16 @@ const COVERAGE = [
 export default function ProductionSpecimen({ kind }) {
   const specimenId = React.useId();
   const [serviceVariant, setServiceVariant] = React.useState('projects');
+  const [serviceInterest, setServiceInterest] = React.useState('');
   let content;
   switch (kind) {
-    case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} group={{
+    case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} onInquiry={service => setServiceInterest(service.name)} group={{
       id: serviceVariant, title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
       services: [
-        { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: 'Review, findings, and a walkthrough.', limits: 'One agreed flow; implementation excluded.' },
-        { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: 'Agreed design work and handoff.', limits: 'Deliverables and revisions agreed in a proposal.' },
+        { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: ['Review', 'Findings', 'Walkthrough'], limits: 'One agreed flow; implementation excluded.' },
+        { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: ['Agreed design work', 'Handoff'], limits: 'Deliverables and revisions agreed in a proposal.' },
       ],
-    }} /></>; break;
+    }} /><p role="status">{serviceInterest ? `Selected ${serviceInterest}. Fixture only; no inquiry sent.` : 'Select a service to preview the inquiry action.'}</p></>; break;
     case 'inquiry': content = <InquirySpecimen />; break;
     case 'navigation': content = <NavigationSpecimen />; break;
     case 'consent': content = <ConsentSpecimen />; break;

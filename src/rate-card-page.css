@@ -11,3 +11,5 @@
 .rate-card-page__terms dd { margin: 0; color: var(--fg-secondary); }
 .rate-card-page__contact { max-width: var(--content-answer-width); scroll-margin-top: var(--scroll-margin-heading); }
 .rate-card-page__contact > p { margin: 0 0 var(--space-7); color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
+
+.rate-card-page__contact:focus-visible { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-2); }

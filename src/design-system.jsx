@@ -76,6 +76,7 @@ const NAV_GROUPS = [
       { id: 'github-activity', label: 'GitHub activity' },
       { id: 'case-study-blocks', label: 'Case-study blocks' },
       { id: 'about-media', label: 'About media' },
+      { id: 'service-gradients', label: 'Service gradients' },
       { id: 'service-lists', label: 'Service lists' },
       { id: 'inquiry-form', label: 'Inquiry form' },
     ],
@@ -1078,7 +1079,7 @@ const ComponentsSection = () => (
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
       <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Service cards use static audit, project, and ongoing gradients on 24px titles and decorative dividers, with subtle borderless price backgrounds and solid price text. The rate-title-color-share token uses 85% category color in light theme and 100% in dark theme for readable gradient titles. Decorative gradients do not intercept interactions. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
+        Service cards use filled category-gradient headers with solid titles and a contrast overlay. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
       <Specimen kind="services" />
       <div className="ds-two-column">
@@ -1124,8 +1125,24 @@ const ComponentsSection = () => (
       <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled inputs, textareas, and select-only comboboxes accept values, placeholders, errors, and callbacks. Dropdowns use inset chevrons, themed menus, selected checkmarks, and active-option focus; arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, and outside dismissal are supported. Escape cancels the pending selection; Tab commits it. The select-menu-max-height token caps the popup at 288px; available viewport space can shorten it or place it above the field. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
       <Specimen kind="inquiry" />
     </section>
+    <section id="service-gradients" className="ds-section" aria-labelledby="service-gradients-title">
+      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. A shared 35% dark overlay and fixed light foreground keep header labels readable in both themes.</SectionHeader>
+      <div className="ds-token-grid">
+        {[
+          ['audits', 'Audits', 'Red → pink'],
+          ['projects', 'Projects', 'Pink → blue'],
+          ['ongoing', 'Ongoing support', 'Blue → red'],
+        ].map(([category, label, colors]) => <DocCard key={category} title={label} meta={colors}>
+          <div className="ds-rate-gradient-swatch" style={{ background: `var(--gradient-rate-${category})` }} aria-hidden="true" />
+          <div className="ds-rate-header-example" style={{ background: `linear-gradient(var(--rate-header-overlay), var(--rate-header-overlay)), var(--gradient-rate-${category})` }}>{label}</div>
+          <p><code>{`--gradient-rate-${category}`}</code></p>
+          <CopyButton value={`var(--gradient-rate-${category})`} label={`Copy ${label} gradient token`} />
+        </DocCard>)}
+      </div>
+    </section>
+
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Content-only service cards show service names, prices, timing, descriptions, best-fit clients, inclusions, and scope limits. Groups accept a heading level and unique ID prefix. Category gradients connect the title, divider, and softly tinted price panel; titles use heading-lg beneath case-heading section titles. Two desktop columns stack in reading order below 900px; no disclosure, motion, or callbacks are required.</SectionHeader>
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Two desktop columns stack below 900px. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
       <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">

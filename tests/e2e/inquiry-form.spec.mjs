@@ -254,3 +254,48 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1440]) {
     await page.keyboard.press('Escape');
   });
 }
+
+
+test('card actions select services repeatedly and preserve entered fields', async ({ page }) => {
+  await installForm(page, route => route.fulfill({ json: { sent: true } }));
+  await page.goto('/ratecard');
+  const form = await fill(page);
+  const interest = form.getByRole('combobox', { name: 'Service interest (optional)', exact: true });
+  await page.getByRole('button', { name: 'Discuss Product Audit', exact: true }).click();
+  await expect(interest).toContainText('Product Audit');
+  await expect(form.getByLabel('Name (required)', { exact: true })).toBeFocused();
+  await choose(form, 'Service interest (optional)', 'Help me choose');
+  await page.getByRole('button', { name: 'Discuss Product Audit', exact: true }).click();
+  await expect(interest).toContainText('Product Audit');
+  await page.getByRole('button', { name: 'Discuss Design Day', exact: true }).click();
+  await expect(interest).toContainText('Design Day');
+  await expect(form.getByLabel('Goals (required)', { exact: true })).toHaveValue('Review our checkout flow.');
+  await expect(form.getByLabel('Email (required)', { exact: true })).toHaveValue('client@example.com');
+  await form.getByRole('button', { name: 'Send inquiry', exact: true }).click();
+  await expect(form.getByRole('status')).toContainText('Your inquiry has been sent');
+  await page.getByRole('button', { name: 'Discuss Product Audit', exact: true }).click();
+  await expect(interest).toContainText('Design Day');
+  await expect(form.getByRole('status')).toContainText('Your inquiry has been sent');
+});
+
+
+test('service actions cannot alter an inquiry during submission', async ({ page }) => {
+  let release;
+  let payload;
+  await installForm(page, async route => {
+    payload = route.request().postDataJSON();
+    await new Promise(resolve => { release = resolve; });
+    await route.fulfill({ json: { sent: true } });
+  });
+  await page.goto('/ratecard');
+  const form = await fill(page);
+  await page.getByRole('button', { name: 'Discuss Product Audit', exact: true }).click();
+  await form.getByRole('button', { name: 'Send inquiry', exact: true }).click();
+  await expect(form.getByRole('button', { name: 'Sending…' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Discuss Design Day', exact: true }).click();
+  await expect(form.getByRole('combobox', { name: 'Service interest (optional)', exact: true })).toContainText('Product Audit');
+  expect(payload.service).toBe('Product Audit');
+  release();
+  await expect(form.getByRole('status')).toContainText('Your inquiry has been sent');
+  await expect(form.getByRole('combobox', { name: 'Service interest (optional)', exact: true })).toContainText('Product Audit');
+});

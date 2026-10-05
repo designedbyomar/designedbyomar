@@ -17,7 +17,7 @@ const loadTurnstile = () => {
   return turnstilePromise;
 };
 
-export const InquiryController = () => {
+export const InquiryController = ({ selectionRequest, contactRef }) => {
   const [available, setAvailable] = React.useState(false);
   const [values, setValues] = React.useState(emptyInquiry);
   const [errors, setErrors] = React.useState({});
@@ -31,6 +31,7 @@ export const InquiryController = () => {
   const widgetRef = React.useRef(null);
   const submissionRef = React.useRef(null);
   const inflightRef = React.useRef(null);
+  const appliedSelectionRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!SITE_KEY) return;
@@ -60,6 +61,18 @@ export const InquiryController = () => {
 
   React.useEffect(() => { if (status === 'error') summaryRef.current?.focus(); }, [status, errors]);
   React.useEffect(() => () => inflightRef.current?.abort(), []);
+
+  React.useEffect(() => {
+    if (!selectionRequest || appliedSelectionRef.current === selectionRequest.requestId) return;
+    appliedSelectionRef.current = selectionRequest.requestId;
+    if (inflightRef.current || status === 'sent') return;
+    setValues(previous => ({ ...previous, service: selectionRequest.service }));
+    setErrors(previous => { const next = { ...previous }; delete next.service; return next; });
+    setStatus('idle'); setMessage(''); submissionRef.current = null;
+    const target = available ? document.getElementById('inquiry-name') : contactRef?.current;
+    target?.focus({ preventScroll: true });
+    contactRef?.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }, [selectionRequest, available, status, contactRef]);
 
   const change = (name, value) => {
     if (inflightRef.current) return;

@@ -700,7 +700,7 @@ function generateRoutes() {
     '<main><article>', `<h1>${escapeText(RATE_CARD.title)}</h1>`,
     `<p>${escapeText(RATE_CARD.introduction)}</p><p>${escapeText(RATE_CARD.pricingNote)}</p>`,
     ...RATE_CARD.groups.map(group => `<section><h2>${escapeText(group.title)}</h2><p>${escapeText(group.description)}</p>${group.services.map(service =>
-      `<article><h3>${escapeText(service.name)}</h3><p>${escapeText(service.price)}</p><p>${escapeText(service.timing)}</p><p>${escapeText(service.description)}</p><dl>${[['Best for', service.bestFor], ['Includes', service.includes], ['Scope & limits', service.limits]].map(([label, text]) => `<dt>${escapeText(label)}</dt><dd>${escapeText(text)}</dd>`).join('')}</dl></article>`
+      `<article><h3>${escapeText(service.name)}</h3><p>${escapeText(service.price)}</p><p>${escapeText(service.timing)}</p><p>${escapeText(service.description)}</p><dl><dt>Best for</dt><dd>${escapeText(service.bestFor)}</dd><dt>What’s included</dt><dd><ul>${service.includes.map(item => `<li>${escapeText(item)}</li>`).join('')}</ul></dd><dt>Scope &amp; limits</dt><dd>${escapeText(service.limits)}</dd></dl></article>`
     ).join('')}</section>`),
     '<section><h2>How engagements work</h2><dl>',
     ...RATE_CARD.terms.map(term => `<dt>${escapeText(term.title)}</dt><dd>${escapeText(term.text)}</dd>`),
