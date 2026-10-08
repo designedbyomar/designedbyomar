@@ -2,17 +2,17 @@
 .service-rate-group > header { margin-bottom: var(--space-7); }
 .service-rate-group > header h2, .service-rate-group > header h3 { margin: 0 0 var(--space-3); font-size: var(--font-size-case-heading); font-weight: var(--font-weight-medium); letter-spacing: var(--tracking-heading); }
 .service-rate-group > header p { margin: 0; color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
-.service-rate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+.service-rate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); }
 .service-rate-card { border-radius: var(--radius-image); background: var(--bg-page); box-shadow: var(--shadow-card-subtle); min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; overflow: hidden; }
 .service-rate-card--audits { --rate-gradient: var(--gradient-rate-audits); --rate-start: var(--color-ship-red); --rate-end: var(--color-preview-pink); }
-.service-rate-card--projects { --rate-gradient: var(--gradient-rate-projects); --rate-start: var(--color-preview-pink); --rate-end: var(--color-develop-blue); }
+.service-rate-card--projects { --rate-header-foreground: var(--rate-header-project-foreground); --rate-gradient: var(--gradient-rate-projects); --rate-start: var(--color-preview-pink); --rate-end: var(--color-develop-blue); }
 .service-rate-card--ongoing { --rate-gradient: var(--gradient-rate-ongoing); --rate-start: var(--color-develop-blue); --rate-end: var(--color-ship-red); }
-.service-rate-card__header { padding: var(--space-6); background: linear-gradient(var(--rate-header-overlay), var(--rate-header-overlay)), var(--rate-gradient); color: var(--rate-header-foreground); }
-.service-rate-card__category { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
+.service-rate-card__header { padding: var(--space-6); background: var(--rate-gradient); color: var(--rate-header-foreground); }
+.service-rate-card__category { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-tag-block) var(--control-padding-block); border-radius: var(--radius-circle); background: var(--rate-badge-background); color: var(--rate-badge-foreground); margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
 .service-rate-card h3, .service-rate-card h4 { margin: 0; font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); line-height: var(--line-height-card); letter-spacing: var(--tracking-heading); }
 .service-rate-card__body { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .service-rate-card__price-panel { padding-bottom: var(--space-5); border-bottom: var(--border-signature-width) solid var(--color-gray-100); }
-.service-rate-card__price { margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-heading-xl); line-height: var(--line-height-medium); color: var(--fg-primary); }
+.service-rate-card__price { margin: 0 0 var(--space-3); font-family: var(--font-mono); font-size: var(--font-size-display-sm); line-height: var(--line-height-medium); color: var(--fg-primary); }
 .service-rate-card__price-label { font-size: var(--font-size-body-md); }
 .service-rate-card__timing { display: flex; align-items: baseline; gap: var(--space-2); margin: 0; font-size: var(--font-size-body-md); color: var(--fg-secondary); line-height: var(--line-height-relaxed); }
 .service-rate-card svg { flex-shrink: 0; }
@@ -21,8 +21,17 @@
 .service-rate-card dt { font-weight: var(--font-weight-medium); color: var(--fg-primary); margin-bottom: var(--space-2); }
 .service-rate-card dd { margin: 0; color: var(--fg-secondary); }
 .service-rate-card__includes { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+.service-rate-card__includes svg { color: var(--color-status-online); }
 .service-rate-card__includes li { display: flex; align-items: baseline; gap: var(--space-2); }
 .service-rate-card__action { margin-top: auto; align-self: stretch; white-space: normal; }
-@media (forced-colors: active) { .service-rate-card__header { background: Canvas; color: CanvasText; } .service-rate-card { outline: var(--border-signature-width) solid CanvasText; } }
-@media (max-width: 899px) { .service-rate-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (forced-colors: active) { .service-rate-card__header { background: Canvas; color: CanvasText; } .service-rate-card { outline: var(--border-signature-width) solid CanvasText; } .service-rate-card__category { background: Canvas; color: CanvasText; outline: var(--border-signature-width) solid CanvasText; } }
+.service-rate-group__browse { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+.service-rate-group__browse p { margin: 0; font-size: var(--font-size-body-md); color: var(--fg-secondary); }
+.service-rate-group__controls { display: flex; gap: var(--space-2); flex-shrink: 0; }
+.service-rate-group__controls button:disabled { opacity: var(--opacity-control-disabled); cursor: default; transform: none; }
+.service-rate-grid--scroll { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - var(--space-6) * 2) / 3); overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--space-1); padding: var(--space-1) var(--space-1) var(--space-4); margin: calc(-1 * var(--space-1)); }
+.service-rate-grid--scroll .service-rate-card { scroll-snap-align: start; }
+.service-rate-grid--scroll:focus-visible { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-1); }
+@media (max-width: 1053px) { .service-rate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .service-rate-grid--scroll { grid-template-columns: none; grid-auto-columns: calc((100% - var(--space-6)) / 2); } }
+@media (max-width: 639px) { .service-rate-grid { grid-template-columns: minmax(0, 1fr); } .service-rate-grid--scroll { grid-template-columns: none; grid-auto-columns: calc(100% - var(--space-5)); } }
 @media (max-width: 639px) { .service-rate-group { margin-top: var(--layout-1); } }

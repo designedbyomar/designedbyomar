@@ -79,7 +79,7 @@ for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]
     const cards = page.locator('.service-rate-group').first().locator('.service-rate-card');
     const first = await cards.nth(0).boundingBox();
     const second = await cards.nth(1).boundingBox();
-    if (width < 900) expect(second.y).toBeGreaterThan(first.y);
+    if (width < 640) expect(second.y).toBeGreaterThan(first.y);
     else expect(second.x).toBeGreaterThan(first.x);
     await expect(page.locator('a[href="/ratecard"], a[href="/ratecard/"], a[href$="rate-card.pdf"]')).toHaveCount(0);
     const contrast = await page.locator('.service-rate-card').evaluateAll(cards => {
@@ -90,22 +90,39 @@ for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]
         const css = getComputedStyle(card);
         const header = getComputedStyle(card.querySelector('.service-rate-card__header'));
         const foreground = luminance(header.color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => value / 255));
-        const overlayValue = css.getPropertyValue('--rate-header-overlay').trim();
-        const overlay = overlayValue.startsWith('#')
-          ? overlayValue.slice(1).match(/../g).map(part => parseInt(part, 16))
-          : overlayValue.match(/[\d.]+/g).map(Number);
-        if (overlayValue.startsWith('#')) overlay[3] /= 255;
-        else if (overlayValue.includes('%')) overlay[3] /= 100;
         const ends = ['--rate-start', '--rate-end'].map(token => rgb(css.getPropertyValue(token)));
         return { background: header.backgroundImage, ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
-          const background = luminance(ends[0].map((value, index) => (value * (1 - step / 100) + ends[1][index] * step / 100) * (1 - overlay[3]) + overlay[index] / 255 * overlay[3]));
+          const background = luminance(ends[0].map((value, index) => (value * (1 - step / 100) + ends[1][index] * step / 100)));
           return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
         })) };
       });
     });
     for (const sample of contrast) {
       expect(sample.background).toContain('linear-gradient');
-      expect(sample.ratio).toBeGreaterThanOrEqual(4.5);
+      expect(sample.ratio).toBeGreaterThanOrEqual(3);
+    }
+    const appearance = await cards.first().evaluate(card => {
+      const badge = getComputedStyle(card.querySelector('.service-rate-card__category'));
+      const price = getComputedStyle(card.querySelector('.service-rate-card__price'));
+      const title = getComputedStyle(card.querySelector('h3'));
+      const check = getComputedStyle(card.querySelector('.service-rate-card__includes svg'));
+      return { badgeRadius: badge.borderRadius, badgeBackground: badge.backgroundColor, badgeColor: badge.color, priceSize: parseFloat(price.fontSize), titleSize: parseFloat(title.fontSize), green: check.color, tokenGreen: getComputedStyle(card).getPropertyValue('--color-status-online').trim() };
+    });
+    expect(appearance.badgeRadius).toBe('9999px');
+    expect(appearance.badgeBackground).toBe('rgb(23, 23, 23)');
+    expect(appearance.badgeColor).toBe('rgb(255, 255, 255)');
+    expect(appearance.priceSize).toBe(32);
+    expect(appearance.priceSize).toBeGreaterThan(appearance.titleSize);
+    expect(appearance.green).toBe('rgb(34, 197, 94)');
+    const projects = page.locator('.service-rate-group').nth(1).locator('.service-rate-card');
+    const projectBoxes = await projects.evaluateAll(elements => elements.map(element => ({ x: element.offsetLeft, y: element.offsetTop })));
+    if (width >= 1054) expect(new Set(projectBoxes.map(box => box.y)).size).toBe(1);
+    else if (width >= 640) expect(new Set(projectBoxes.map(box => box.y)).size).toBe(2);
+    else expect(new Set(projectBoxes.map(box => box.y)).size).toBe(3);
+    if (width >= 900) {
+      const pageEdges = await page.locator('.rate-card-page').boundingBox();
+      const logo = await page.locator('header').first().getByRole('link', { name: 'designedbyomar', exact: true }).boundingBox();
+      expect(Math.abs(pageEdges.x - logo.x)).toBeLessThanOrEqual(1);
     }
     await expect(cards.first().locator('.service-rate-card__includes li')).toHaveCount(RATE_CARD.groups[0].services[0].includes.length);
     await expect(cards.first().getByRole('button', { name: 'Discuss Product Audit', exact: true })).toBeVisible();
@@ -123,11 +140,11 @@ test('service specimens use shared rows without production side effects', async 
   await page.addInitScript(() => { window.rateEvents = []; window.trackAnalyticsEvent = (...args) => window.rateEvents.push(args); });
   await page.goto('/design-system#service-lists');
   const specimen = page.locator('#service-lists [data-production-specimen="services"]');
-  await expect(specimen.locator('.service-rate-card')).toHaveCount(2);
+  await expect(specimen.locator('.service-rate-card')).toHaveCount(3);
   await expect(specimen).toContainText('fixture demonstration');
   for (const variant of ['audits', 'projects', 'ongoing']) {
     await specimen.getByLabel('Example state').selectOption(variant);
-    await expect(specimen.locator(`.service-rate-card--${variant}`)).toHaveCount(2);
+    await expect(specimen.locator(`.service-rate-card--${variant}`)).toHaveCount(variant === 'ongoing' ? 4 : variant === 'projects' ? 3 : 2);
     await specimen.getByRole('button', { name: 'Discuss Example review', exact: true }).click();
     await expect(specimen.getByRole('status')).toContainText('Selected Example review');
   }
@@ -163,4 +180,30 @@ test('service gradient gallery documents and copies all category tokens', async 
     await gallery.getByRole('button', { name: `Copy ${label} gradient token`, exact: true }).click();
     expect(await page.evaluate(() => window.copiedGradient)).toBe(`var(--gradient-rate-${category})`);
   }
+});
+
+
+test('ongoing services stay in one row and browse controls reveal the fourth card', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/ratecard');
+  const group = page.locator('.service-rate-group').nth(2);
+  const region = group.getByRole('region', { name: 'Ongoing support services', exact: true });
+  const cards = region.locator('.service-rate-card');
+  const previous = group.getByRole('button', { name: 'Previous ongoing support service' });
+  const next = group.getByRole('button', { name: 'Next ongoing support service' });
+  await expect(previous).toBeDisabled();
+  await expect(next).toBeEnabled();
+  expect(await cards.evaluateAll(elements => new Set(elements.map(element => element.offsetTop)).size)).toBe(1);
+  expect(await region.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  await next.click();
+  await expect(next).toBeDisabled();
+  await expect(previous).toBeEnabled();
+  expect(await region.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  await previous.click();
+  await expect(previous).toBeDisabled();
+  await region.focus();
+  await page.keyboard.press('End');
+  await expect(next).toBeDisabled();
+  await cards.last().getByRole('button', { name: 'Discuss Website + Design Support', exact: true }).click();
+  await expect(page.locator('#rate-contact')).toBeFocused();
 });

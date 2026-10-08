@@ -152,6 +152,8 @@ export default function ProductionSpecimen({ kind }) {
       services: [
         { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: ['Review', 'Findings', 'Walkthrough'], limits: 'One agreed flow; implementation excluded.' },
         { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: ['Agreed design work', 'Handoff'], limits: 'Deliverables and revisions agreed in a proposal.' },
+        ...(serviceVariant !== 'audits' ? [{ id: 'third', name: 'Example website service', price: '$2,500/month', timing: 'Up to 12 hours/month.', description: 'A fixture showing reserved website capacity.', bestFor: 'An example business with a defined backlog.', includes: ['Website updates', 'Agreed reviews'], limits: 'All work counts toward monthly capacity.' }] : []),
+        ...(serviceVariant === 'ongoing' ? [{ id: 'fourth', name: 'Example design support', price: '$4,000/month', timing: 'Up to 20 hours/month.', description: 'A fixture showing shared website and design capacity.', bestFor: 'An example team with regular updates.', includes: ['Website work', 'Supporting design'], limits: 'Deliverables stay within monthly capacity.' }] : []),
       ],
     }} /><p role="status">{serviceInterest ? `Selected ${serviceInterest}. Fixture only; no inquiry sent.` : 'Select a service to preview the inquiry action.'}</p></>; break;
     case 'inquiry': content = <InquirySpecimen />; break;

@@ -1,4 +1,5 @@
-.rate-card-page { max-width: var(--content-about-width); margin: 0 auto; padding: var(--space-8) var(--space-6) var(--layout-3); }
+.rate-card-page-shell { padding: var(--space-8) var(--space-6) var(--layout-3); }
+.rate-card-page { margin: 0 auto; }
 .rate-card-page__intro { max-width: var(--content-reading-width); }
 .rate-card-page__eyebrow { margin: 0 0 var(--space-5); font-family: var(--font-mono); font-size: var(--font-size-label-md); text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--fg-tertiary); }
 .rate-card-page h1 { margin: 0 0 var(--space-6); font-size: var(--font-size-page-title); font-weight: var(--font-weight-semibold); line-height: var(--line-height-compact); letter-spacing: var(--tracking-display); color: var(--fg-primary); }

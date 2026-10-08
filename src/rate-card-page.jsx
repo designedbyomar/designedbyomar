@@ -1,4 +1,5 @@
 import React from 'react';
+import { LAYOUT } from './constants.js';
 import { InquiryController } from './inquiry-controller.jsx';
 import { RATE_CARD } from './content/rate-card.mjs';
 import { ServiceRateGroup } from './ui/service-list.jsx';
@@ -10,7 +11,7 @@ const RateCardPage = ({ onEvent }) => {
   const contactRef = React.useRef(null);
   const selectService = service => setSelectionRequest({ service: service.name, requestId: crypto.randomUUID() });
   const emailHref = `mailto:${RATE_CARD.email}${selectionRequest ? `?subject=${encodeURIComponent(`Inquiry: ${selectionRequest.service}`)}` : ''}`;
-  return <article className="rate-card-page">
+  return <div className="rate-card-page-shell"><article className="rate-card-page" style={{ maxWidth: LAYOUT.MAX_WIDTH }}>
   <header className="rate-card-page__intro">
     <p className="rate-card-page__eyebrow">Working together</p>
     <h1>{RATE_CARD.title}</h1>
@@ -29,7 +30,7 @@ const RateCardPage = ({ onEvent }) => {
     <p>Prefer email? Use the link or copy the address below.</p>
     <ContactCard label="Email" value={RATE_CARD.email} href={emailHref} copyValue={RATE_CARD.email} eventName="contact_click_email" copyEventName="copy_email_click" copyTarget="email" section="ratecard" onEvent={onEvent} />
   </section>
-</article>;
+</article></div>;
 };
 
 export default RateCardPage;

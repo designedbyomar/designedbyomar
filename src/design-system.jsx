@@ -1079,7 +1079,7 @@ const ComponentsSection = () => (
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
       <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Service cards use filled category-gradient headers with solid titles and a contrast overlay. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
+        Service cards use vibrant category-gradient headers with solid contrast-tested titles and pill category badges. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
       <Specimen kind="services" />
       <div className="ds-two-column">
@@ -1126,7 +1126,7 @@ const ComponentsSection = () => (
       <Specimen kind="inquiry" />
     </section>
     <section id="service-gradients" className="ds-section" aria-labelledby="service-gradients-title">
-      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. A shared 35% dark overlay and fixed light foreground keep header labels readable in both themes.</SectionHeader>
+      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. Gradients render at full strength with no overlay. Category-specific title colors and solid category badges keep text readable in both themes.</SectionHeader>
       <div className="ds-token-grid">
         {[
           ['audits', 'Audits', 'Red → pink'],
@@ -1134,7 +1134,7 @@ const ComponentsSection = () => (
           ['ongoing', 'Ongoing support', 'Blue → red'],
         ].map(([category, label, colors]) => <DocCard key={category} title={label} meta={colors}>
           <div className="ds-rate-gradient-swatch" style={{ background: `var(--gradient-rate-${category})` }} aria-hidden="true" />
-          <div className="ds-rate-header-example" style={{ background: `linear-gradient(var(--rate-header-overlay), var(--rate-header-overlay)), var(--gradient-rate-${category})` }}>{label}</div>
+          <div className="ds-rate-header-example" style={{ background: `var(--gradient-rate-${category})`, color: category === 'projects' ? 'var(--rate-header-project-foreground)' : 'var(--rate-header-foreground)' }}>{label}</div>
           <p><code>{`--gradient-rate-${category}`}</code></p>
           <CopyButton value={`var(--gradient-rate-${category})`} label={`Copy ${label} gradient token`} />
         </DocCard>)}
@@ -1142,7 +1142,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Two desktop columns stack below 900px. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Groups with more than three cards use a keyboard-accessible horizontal row with browse controls and a visible scrollbar. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
       <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">
