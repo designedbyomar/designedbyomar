@@ -1,4 +1,11 @@
 export const COMPONENT_TOKEN_ROLES = [
+  ['--rate-header-project-foreground', 'var(--color-white)'],
+  ['--rate-badge-background', 'color-mix(in srgb, var(--color-white) 35%, transparent)'],
+  ['--rate-badge-foreground', 'var(--color-omar-black)'],
+  ['--rate-header-foreground', 'var(--color-omar-black)'],
+  ['--gradient-rate-audits', 'linear-gradient(135deg, var(--color-ship-red), var(--color-preview-pink))'],
+  ['--gradient-rate-projects', 'linear-gradient(135deg, var(--color-preview-pink), var(--color-develop-blue))'],
+  ['--gradient-rate-ongoing', 'linear-gradient(135deg, var(--color-develop-blue), var(--color-ship-red))'],
   [
     "--size-gallery-column-min",
     "240px"

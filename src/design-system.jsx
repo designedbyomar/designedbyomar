@@ -1,3 +1,4 @@
+import { Disclosure } from './ui/disclosure.jsx';
 import { COMPONENT_TOKEN_ROLES } from './design-system-token-roles.mjs';
 import React from 'react';
 import { NavLogo as SharedNavLogo, ThemeToggle } from './ui/brand.jsx';
@@ -76,6 +77,9 @@ const NAV_GROUPS = [
       { id: 'github-activity', label: 'GitHub activity' },
       { id: 'case-study-blocks', label: 'Case-study blocks' },
       { id: 'about-media', label: 'About media' },
+      { id: 'service-gradients', label: 'Service gradients' },
+      { id: 'service-lists', label: 'Service lists' },
+      { id: 'inquiry-form', label: 'Inquiry form' },
     ],
   },
   {
@@ -829,46 +833,10 @@ const AccessibilityPreview = ({ kind }) => (
   </div>
 );
 
-const FAQAccordionDemo = () => {
-  const [openIndex, setOpenIndex] = React.useState(0);
-  const reducedMotion = usePrefersReducedMotion();
-  const items = [
-    ['When should this accordion pattern be used?', 'Use it for short, scan-friendly groups where each label clearly predicts the hidden content.'],
-    ['Is this used on the portfolio?', 'This is a documentation-only accordion utility. Production Ask uses the shared AskPanel specimen below.'],
-  ];
-
-  return (
-    <div className="ds-faq-demo" style={{ width: '100%' }}>
-      {items.map(([question, answer], index) => {
-        const isOpen = openIndex === index;
-        const answerId = `ds-accordion-answer-${index}`;
-        const buttonId = `ds-accordion-question-${index}`;
-        return (
-          <div key={question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'}>
-            <button
-              id={buttonId}
-              type="button"
-              aria-expanded={isOpen}
-              aria-controls={answerId}
-              onClick={() => setOpenIndex(isOpen ? -1 : index)}
-            >
-              <span>{question}</span>
-              <AppIcon icon={ChevronDown} size={18} />
-            </button>
-            <div className="ds-faq-demo__panel" style={{
-              gridTemplateRows: isOpen ? '1fr' : '0fr',
-              transition: reducedMotion ? 'none' : undefined,
-            }}>
-              <div id={answerId} role="region" aria-labelledby={buttonId} className="faq-answer" style={{ opacity: isOpen ? 1 : 0, transition: reducedMotion ? 'none' : undefined }}>
-                <p>{answer}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+const FAQAccordionDemo = () => <div className="ds-faq-demo">
+  <Disclosure heading="When should this accordion pattern be used?" headingLevel={3} defaultExpanded><p>Use it for scan-friendly sections where each heading clearly predicts the hidden content.</p></Disclosure>
+  <Disclosure heading="Is this used on the portfolio?" headingLevel={3}><p>The services page uses this shared disclosure for engagement terms. Production Ask uses the shared AskPanel specimen below.</p></Disclosure>
+</div>;
 
 const HomeSection = ({ theme }) => (
   <>
@@ -1076,8 +1044,9 @@ const ComponentsSection = () => (
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
       <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Cards frame repeated items. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
+        Service cards use vibrant category-gradient headers with solid contrast-tested titles and quiet translucent category badges. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
+      <Specimen kind="services" />
       <div className="ds-two-column">
         <DocCard title="Card anatomy" meta="Structure">
           <ul>
@@ -1086,7 +1055,7 @@ const ComponentsSection = () => (
             <li>Body copy that explains the decision or usage.</li>
           </ul>
         </DocCard>
-        <ExampleFrame label="Documentation-only accordion · not used on the portfolio">
+        <ExampleFrame label="Shared disclosure · engagement terms">
           <FAQAccordionDemo />
         </ExampleFrame>
       </div>
@@ -1116,6 +1085,30 @@ const ComponentsSection = () => (
     <section id="case-study-blocks" className="ds-section" aria-labelledby="case-study-blocks-title">
       <SectionHeader id="case-study-blocks" eyebrow="Components" title="Case-study blocks">Shared metadata, tags, headings, paragraphs, images, galleries, quotes, and callouts preserve authored content and semantics.</SectionHeader>
       <Specimen kind="body" />
+    </section>
+    <section id="inquiry-form" className="ds-section" aria-labelledby="inquiry-form-title">
+      <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled inputs, textareas, and select-only comboboxes accept values, placeholders, errors, and callbacks. Dropdowns use inset chevrons, themed menus, selected checkmarks, and active-option focus; arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, and outside dismissal are supported. Escape cancels the pending selection; Tab commits it. The select-menu-max-height token caps the popup at 288px; available viewport space can shorten it or place it above the field. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
+      <Specimen kind="inquiry" />
+    </section>
+    <section id="service-gradients" className="ds-section" aria-labelledby="service-gradients-title">
+      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. Gradients render at full strength with no overlay. Category-specific title colors and translucent category badges keep text readable in both themes.</SectionHeader>
+      <div className="ds-token-grid">
+        {[
+          ['audits', 'Audits', 'Red → pink'],
+          ['projects', 'Projects', 'Pink → blue'],
+          ['ongoing', 'Ongoing support', 'Blue → red'],
+        ].map(([category, label, colors]) => <DocCard key={category} title={label} meta={colors}>
+          <div className="ds-rate-gradient-swatch" style={{ background: `var(--gradient-rate-${category})` }} aria-hidden="true" />
+          <div className="ds-rate-header-example" style={{ background: `var(--gradient-rate-${category})`, color: category === 'projects' ? 'var(--rate-header-project-foreground)' : 'var(--rate-header-foreground)' }}>{label}</div>
+          <p><code>{`--gradient-rate-${category}`}</code></p>
+          <CopyButton value={`var(--gradient-rate-${category})`} label={`Copy ${label} gradient token`} />
+        </DocCard>)}
+      </div>
+    </section>
+
+    <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Ongoing support uses two stacked subsections with two cards per row. Header and pricing tracks align dividers within each row. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
+      <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">
       <SectionHeader id="about-media" eyebrow="Components" title="About photos and lightbox">Tiles accept photo records with descriptive alt text and dimensions. Stacks flatten on mobile. The lightbox closes with Escape, traps keyboard focus, and returns focus to the trigger; reduced motion disables photo float.</SectionHeader>

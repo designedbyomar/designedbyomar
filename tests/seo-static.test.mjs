@@ -780,3 +780,47 @@ test('portrait preload exactly matches rendered candidate contracts with alpha a
     }
   }
 });
+
+test('rate card is complete static sales content with canonical noindex and no incoming discovery links', async () => {
+  const { RATE_CARD } = await import('../src/content/rate-card.mjs');
+  const html = readDist('ratecard', 'index.html');
+  assert.equal(getTitle(html), escapeAttr(RATE_CARD.metaTitle));
+  assert.equal(getCanonical(html), `${SITE_ORIGIN}/ratecard`);
+  assert.equal(getMetaByName(html, 'robots'), 'noindex,follow');
+  assert.equal(getMetaByName(html, 'description'), escapeAttr(RATE_CARD.description));
+  assert.equal(getMetaByProperty(html, 'og:url'), `${SITE_ORIGIN}/ratecard`);
+  assert.equal(getMetaByProperty(html, 'og:title'), escapeAttr(RATE_CARD.metaTitle));
+  assert.equal(getMetaByName(html, 'twitter:title'), escapeAttr(RATE_CARD.metaTitle));
+  const content = getRootContent(html);
+  for (const service of RATE_CARD.groups.flatMap(group => group.services)) {
+    for (const key of ['name', 'price', 'timing', 'description', 'bestFor', 'limits']) assert.ok(content.includes(escapeText(service[key])), `${service.name}: ${key}`);
+    for (const item of service.includes) assert.ok(content.includes(`<li>${escapeText(item)}</li>`), `${service.name}: ${item}`);
+  }
+  for (const term of RATE_CARD.terms) assert.ok(content.includes(escapeText(term.text)));
+  assert.equal((content.match(/<article><h[34]>/g) || []).length, 9);
+  for (const title of ['Fractional Design', 'Website Support']) assert.ok(content.includes(`<h3>${title}</h3>`));
+  assert.ok(!sitemapUrls().some(url => url.includes('/ratecard')));
+  for (const url of sitemapUrls()) assert.ok(!getRootLinks(fs.readFileSync(pagePathForUrl(url), 'utf8'), url).some(link => link.includes('/ratecard')));
+  assert.doesNotMatch(readText('public', 'robots.txt'), /Disallow:.*ratecard/i);
+  assert.doesNotMatch(readText('public', 'llms.txt'), /ratecard/);
+  const { parsePortfolioRoute, isPortfolioRoutePath } = await import('../src/routes.js');
+  for (const path of ['/ratecard', '/ratecard/']) {
+    assert.equal(parsePortfolioRoute(path).type, 'ratecard');
+    assert.equal(isPortfolioRoutePath(path), true);
+  }
+});
+
+test('inquiry CSP allows Cloudflare scripts, frames, and connections without client-side email access', () => {
+  const config = JSON.parse(readText('vercel.json'));
+  const csp = config.headers.flatMap(rule => rule.headers).find(header => header.key === 'Content-Security-Policy').value;
+  assert.match(csp, /script-src[^;]*https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com;/);
+  const connections = csp.split(';').map(directive => directive.trim()).find(directive => directive.startsWith('connect-src ')).split(/\s+/).slice(1);
+  assert.deepEqual(connections, [
+    "'self'", 'https://challenges.cloudflare.com', 'https://www.google-analytics.com',
+    'https://region1.google-analytics.com', 'https://www.googletagmanager.com',
+    'https://www.google.com', 'https://*.ingest.us.sentry.io', 'https://vitals.vercel-insights.com',
+  ]);
+  assert.doesNotMatch(csp, /api\.resend\.com/);
+  assert.match(csp, /frame-ancestors 'none'/);
+});

@@ -1,0 +1,19 @@
+.inquiry-form { margin-bottom: var(--space-7); color: var(--fg-primary); }
+.inquiry-form__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6); }
+.inquiry-field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.inquiry-field--wide { grid-column: 1 / -1; }
+.inquiry-field label { font-size: var(--font-size-body-md); font-weight: var(--font-weight-medium); }
+.inquiry-field label span { color: var(--fg-tertiary); font-weight: var(--font-weight-regular); }
+.inquiry-field input, .inquiry-field select, .inquiry-field textarea { scroll-margin-top: var(--scroll-margin-heading); box-sizing: border-box; width: 100%; min-height: var(--control-hit-area); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-gray-100); border-radius: var(--radius-comfort); background: var(--bg-page); color: var(--fg-primary); font: inherit; font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
+.inquiry-field textarea { resize: vertical; }
+.inquiry-field input::placeholder, .inquiry-field textarea::placeholder { color: var(--fg-secondary); opacity: 1; }
+.inquiry-field input:focus-visible, .inquiry-field select:focus-visible, .inquiry-field textarea:focus-visible, .inquiry-form__summary:focus { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-1); }
+.inquiry-field [aria-invalid="true"] { border-color: var(--color-ship-red); }
+.inquiry-field__help, .inquiry-field__error, .inquiry-form__privacy, .inquiry-form > [role="status"] { margin: 0; font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); color: var(--fg-secondary); }
+.inquiry-field__error { color: var(--fg-primary); }
+.inquiry-form__summary { padding: var(--space-4); border: 1px solid var(--color-ship-red); border-radius: var(--radius-comfort); margin-bottom: var(--space-6); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
+.inquiry-form__summary p { margin-top: 0; }
+.inquiry-form__trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.inquiry-form__privacy { margin: var(--space-4) 0 var(--space-6); }
+.inquiry-form > [role="status"] { margin-top: var(--space-4); }
+@media (max-width: 639px) { .inquiry-form__fields { grid-template-columns: minmax(0, 1fr); } }

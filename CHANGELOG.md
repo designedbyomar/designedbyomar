@@ -4,7 +4,14 @@ All notable changes to designedbyomar.com are documented here.
 
 ## [Unreleased]
 
+### Fixed
+- 2026-10-08 — Authorize the exact failing Turnstile preview hostname and document the stable branch alias for verification reviews.
+- 2026-10-08 — Add recoverable verification retries without losing inquiry details and update vulnerable build dependencies to restore the CI audit.
+
 ### Added
+- 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
+- 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.
+- 2026-10-04 — Add an unlinked, noindex services and rates page with nine scoped USD offers, engagement terms, email contact, and shared editorial service-list specimens.
 - 2026-09-30 — Standalone `/about` page that replaces the About drawer: an alternating editorial layout where each section is a two-column row — text on one side, a photo cluster on the other, alternating left/right down the page. Multi-image clusters are compact, graduated overlapping stacks (largest card first, each next one smaller, alternating corners) so faces stay clear and sections stay tight; on mobile the stacks flatten to full width, and every photo does a subtle vanilla scroll "float". Photos are placed by theme (portrait/boxing/DJ in the hero, drawings + flyers under Background, a reading portrait under How I work, the Athena 2.0 design system under Currently, a family/outdoors/night-out trio under Off the clock); Tools & craft is a deliberate text-only interlude. Motion is skipped under reduced motion. Includes an accessible photo lightbox (Esc, focus trap, focus return, alt caption) and a centered See-the-work / Ask / Email me close. It is an indexable static route (`ProfilePage` + Person JSON-LD, own title/description/canonical/OG, sitemap entry); `/about/` redirects to `/about`
 - 2026-09-29 — Ask: an approved 62nd answer documents Omar's verified formal management scope at Plastiq — one designer across Connect and Athena, including hiring and formal performance reviews — with matching evidence added to both case studies and deterministic aliases for management and direct-report questions
 - 2026-09-29 — Design system now documents the GitHub activity component: a `#github-activity` section in Components (and the sidebar) covering the rolling-year calendar, its GraphQL/CDN-cached endpoint and fallback, with a live intensity-scale legend and the on-system profile link
@@ -15,6 +22,12 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-28 — A local `npm run ask:rundown` script that ranks the questions visitors asked with no written answer, so recurring gaps can be written up as reviewed answers and drafted less by the model. It reads the `ask_no_match` and `ask_contact_click` events the site already sends to GA4 — no site, endpoint, or privacy-policy change — drops `(not set)` rows from before the custom dimensions existed, paginates the full result set, points at the nearest existing answer to branch from, and escapes everything Markdown reads as syntax in a table cell, the backslash included, so a question is shown as it was typed and cannot break the report open. Zero new dependencies: it mints a service-account token with Node's built-in crypto and calls the GA4 Data API over `fetch`. One-time GA4 setup (custom dimensions + a read-only service account) and a ready-to-run command are documented in the script header and `docs/ai-workflow.md`; report logic is unit-tested against mocked rows (`tests/ask-rundown.test.mjs`)
 
 ### Changed
+- 2026-10-08 — Soften pricing badges, align category-gradient dividers, split ongoing support into two-card subsections, and make engagement terms a shared default-open disclosure.
+- 2026-10-07 — Brighten service gradients, add category badges and green checks, align pricing with the homepage, and show three columns with a scrollable ongoing-support row.
+- 2026-10-05 — Clarify service pricing with category-gradient headers, readable inclusion checklists, reusable gradient examples, and service-specific inquiry actions.
+- 2026-10-04 — Refresh README's project-layout tree to match the current repo (adds `api/`, the full `scripts/` list, `src/content/`, `src/ui/`, and `tests/`, which had drifted out of sync since launch) and link `PRODUCT.md` into the README doc index so it's discoverable alongside `DESIGN.md` and `docs/ai-workflow.md`
+- 2026-10-04 — Refine service cards with larger category-gradient titles, matching dividers, and subtle borderless price backgrounds.
+- 2026-10-04 — Present services as responsive cards with static category gradient price panels and clearer section-heading hierarchy.
 - 2026-10-02 — Deliver theme-specific transparent portrait candidates with matched homepage preload sizing, reducing transferred image bytes without changing the hero layout.
 - 2026-10-02 — Replace simulated design-system surfaces with real component fixtures, current standalone navigation guidance, semantic token documentation, a coverage inventory, and explicit documentation-only utility labels.
 - 2026-10-02 — Consolidate exact spacing, fluid type, component dimensions, layering, and motion into shared semantic tokens while preserving computed values.
@@ -28,6 +41,8 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-28 — Management Portal case study now reads as shipped: the "in development / Q1–Q2 2026 rollout" language (three months past) is replaced with "shipped and rolled out to the operations org in 2026." The three metrics stay labelled as design targets — measured results are not in yet — so the page makes no unearned claim. The 13 Ask answers that cite the study were re-fingerprinted; none needed a wording change, since they already describe those numbers as projected rather than measured
 
 ### Fixed
+- 2026-10-05 — Inquiry-form e2e tests now check the Turnstile request's exact hostname and `/api/contact`'s exact pathname instead of a substring/regex match on the full URL, closing a CodeQL-flagged incomplete-sanitization pattern that could have matched unintended hosts (e.g. `challenges.cloudflare.com.evil.com`)
+- 2026-10-04 — Allow Turnstile browser connections to its exact Cloudflare origin in the site CSP.
 - 2026-10-02 — Shared navigation and footer logos now suppress hover bounce for reduced-motion preferences, including live preference changes.
 - 2026-10-02 — Legacy Plastiq marketing, Page Builder, Disney CCT, and Connect API case-study URLs now permanently redirect to their canonical replacements with either trailing-slash form
 - 2026-10-02 — Contact cards now expose separate link and email-copy controls, removing nested interactive elements while preserving appearance and analytics

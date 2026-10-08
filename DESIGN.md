@@ -78,10 +78,22 @@ Navigation uses standalone `/work` and `/about` pages. Its mobile menu closes on
 
 About tiles and stacks share their layout and open callback. The lightbox uses Escape, a focus trap, and restores focus to the opening tile. Stacks respond to viewport width; reduced-motion preference disables their motion. Page controllers retain scroll choreography.
 
-The homepage hero, About page arrangement, and individual case-study compositions remain page-specific because they express editorial hierarchy and project-specific storytelling. They assemble shared navigation, controls, cards, body blocks, media, and footer. Documentation navigation, token cards, shortcut cards, and the demonstration accordion are explicitly documentation utilities. See the reference-page coverage inventory for component-to-specimen links and callback contracts.
+The homepage hero, About page arrangement, and individual case-study compositions remain page-specific because they express editorial hierarchy and project-specific storytelling. They assemble shared navigation, controls, cards, body blocks, media, and footer. Documentation navigation, token cards, shortcut cards are explicitly documentation utilities. See the reference-page coverage inventory for component-to-specimen links and callback contracts.
 
 Existing exact dimensions that do not fit the scale use semantic tokens in `src/design-tokens.css`, including fluid About/body typography, control hit areas, content widths, component layering, and Ask response height. SVG geometry, image dimensions, aspect ratios, and calculated animation geometry remain implementation data.
 
 ## Portrait delivery
 
 The portrait image occupies 88% of its square wrapper. Below 639px its slot is `0.88 × (viewport − 48px)`; through 820px it is capped at 519.2px. Above 820px the hero's second grid column gives `0.88 × (viewport − 96px) / 2.1`, capped at approximately 482.743px when the content reaches 1200px. The intrinsic transparent artwork stays contained within that slot. `src/portrait-media.mjs` specifies matching responsive candidates and sizes; regression assertions keep the homepage-only head preload in sync. Light candidates stop at the original 557px width; dark candidates stop at 1230px.
+
+## Select-only dropdowns
+
+`SelectField` is the shared controlled dropdown used by production inquiry fields and their reference specimens. It accepts an ID with an associated `<id>-label`, name, value, option strings, placeholder, required/disabled state, error associations, and a value callback. It owns popup visibility and active-option navigation only. Arrow keys, Home/End, and typeahead navigate; Enter/Space select; Escape cancels; Tab commits and continues navigation. Outside dismissal leaves the previous value intact. The popup fits above or below the trigger and scrolls its active option into view without moving the page. Menus and chevrons use theme and spacing tokens and introduce no motion or service requests. Placeholders supplement permanent labels; essential format hints remain visible.
+
+## Service lists
+
+`ServiceRateCard` and `ServiceRateGroup` render full-strength category-gradient headers with solid contrast-tested titles, regular-weight translucent category badges, 32px prices, DS-green inclusion checks, timing, inclusion checklists, and visible best-fit and scope details. Fixed and starting prices use the same treatment. Three desktop columns become two below 1054px and one below 640px. Ongoing support has stacked Fractional Design and Website Support subsections with two cards per row. Shared grid tracks align headers, pricing dividers, and description starts within each row. Dividers reuse the category gradient. The services page aligns with the homepage’s 1200px content width. Optional inquiry callbacks stay in production adapters, which select a service and focus contact without losing other form fields. The content also feeds static HTML; reference specimens use labelled fixtures and local actions. `/design-system#service-gradients` documents the three reusable gradients and accessible header treatment.
+
+## Disclosure
+
+`Disclosure` is shared by engagement terms and the design-system reference. It accepts heading, children, heading level, optional ID, and defaultExpanded. Its button exposes expanded state and controls a labelled region; collapsed content is hidden from navigation and accessibility. Engagement terms open by default and use two columns above 640px. Toggling introduces no motion.

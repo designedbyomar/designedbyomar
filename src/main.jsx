@@ -1,7 +1,9 @@
+import { RATE_CARD_META, rateCardStructuredData } from './content/rate-card-meta.mjs';
 import { LinkButton } from './ui/controls.jsx';
 import { CaseStudyTag, CaseStudyMetadata } from './ui/case-study-meta.jsx';
 import { PORTRAIT_SIZES, PORTRAIT_DARK_SRCSET, PORTRAIT_LIGHT_SRCSET } from './portrait-media.mjs';
 import React from 'react';
+const RateCardPage = React.lazy(() => import('./rate-card-page.jsx'));
 import { SiteNavigation } from './ui/navigation.jsx';
 import { ContactCard } from './ui/contact-card.jsx';
 import { AboutLightbox, AboutStack } from './ui/about-media.jsx';
@@ -2317,6 +2319,7 @@ const buildAskStructuredData = () => ({
 });
 
 const buildRouteStructuredData = (route, currentCase) => {
+  if (route.type === 'ratecard') return rateCardStructuredData(`${SITE_ORIGIN}/ratecard`);
   if (currentCase) {
     const url = `${SITE_ORIGIN}/work/${currentCase.id}/`;
     return {
@@ -2411,6 +2414,12 @@ const syncStructuredData = (route, currentCase) => {
 };
 
 const getRouteMeta = (route, currentCase) => {
+  if (route.type === 'ratecard') return {
+    title: RATE_CARD_META.metaTitle, description: RATE_CARD_META.description,
+    url: `${SITE_ORIGIN}/ratecard`, robots: 'noindex,follow',
+    image: DEFAULT_OG_IMAGE, imageType: imageType(DEFAULT_OG_IMAGE),
+    imageWidth: 1200, imageHeight: 630, imageAlt: RATE_CARD_META.metaTitle,
+  };
   if (route.type === 'ask') {
     return {
       title: ASK_TITLE,
@@ -2908,7 +2917,11 @@ const App = () => {
       <div style={{ opacity: loading ? 0 : 1, transition: 'opacity var(--duration-very-slow) ease var(--duration-fastest)' }}>
         <Nav theme={theme} setTheme={setTheme} onHome={goHome} scrollToSection={scrollToSection} />
         <main>
-          {route.type === 'privacy' ? (
+          {route.type === 'ratecard' ? (
+            <React.Suspense fallback={<p role="status" style={{ padding: 'var(--space-8) var(--space-6)' }}>Loading services &amp; rates…</p>}>
+              <RateCardPage onEvent={trackPortfolioEvent} />
+            </React.Suspense>
+          ) : route.type === 'privacy' ? (
             <PrivacyPolicyPage theme={theme} onBack={goHome} />
           ) : route.type === 'about' ? (
             <AboutPage />

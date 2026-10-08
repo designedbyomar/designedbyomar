@@ -1,0 +1,18 @@
+.rate-card-page-shell { padding: var(--space-8) var(--space-6) var(--layout-3); }
+.rate-card-page { margin: 0 auto; }
+.rate-card-page__intro { max-width: var(--content-reading-width); }
+.rate-card-page__eyebrow { margin: 0 0 var(--space-5); font-family: var(--font-mono); font-size: var(--font-size-label-md); text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--fg-tertiary); }
+.rate-card-page h1 { margin: 0 0 var(--space-6); font-size: var(--font-size-page-title); font-weight: var(--font-weight-semibold); line-height: var(--line-height-compact); letter-spacing: var(--tracking-display); color: var(--fg-primary); }
+.rate-card-page__lede { font-size: var(--font-size-lede); line-height: var(--line-height-relaxed-plus); color: var(--fg-secondary); margin: 0 0 var(--space-5); }
+.rate-card-page__note { font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); color: var(--fg-tertiary); margin: 0; }
+.rate-card-page__terms, .rate-card-page__contact { margin-top: var(--layout-2); padding-top: var(--space-8); border-top: 1px solid var(--color-gray-100); }
+.rate-card-page__terms h2, .rate-card-page__contact h2 { margin: 0 0 var(--space-6); font-size: var(--font-size-case-heading); font-weight: var(--font-weight-medium); line-height: var(--line-height-card); letter-spacing: var(--tracking-heading); color: var(--fg-primary); }
+.rate-card-page__terms dl { margin: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: var(--font-size-body-md); line-height: var(--line-height-relaxed); }
+.rate-card-page__terms dt { color: var(--fg-primary); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1); }
+.rate-card-page__terms dd { margin: 0; color: var(--fg-secondary); }
+.rate-card-page__contact { max-width: var(--content-answer-width); scroll-margin-top: var(--scroll-margin-heading); }
+.rate-card-page__contact > p { margin: 0 0 var(--space-7); color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
+
+.rate-card-page__contact:focus-visible { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-2); }
+
+@media (max-width: 639px) { .rate-card-page__terms dl { grid-template-columns: minmax(0, 1fr); } }

@@ -18,6 +18,7 @@ If you're a hiring manager or founder, the things to look at are:
 2. The case studies in [`src/content/case-studies.json`](./src/content/case-studies.json) — shared by the app and static route generator so each gets its own crawlable, SEO-tagged route.
 3. The design-system guide in [`DESIGN.md`](./DESIGN.md) and the public reference page at [`/design-system`](https://www.designedbyomar.com/design-system).
 4. The AI-assisted workflow notes in [`docs/ai-workflow.md`](./docs/ai-workflow.md).
+5. The brand and product intent in [`PRODUCT.md`](./PRODUCT.md) — target users, product purpose, anti-references, and the design principles every decision is checked against.
 
 ## Screenshots
 
@@ -182,11 +183,21 @@ Bump **minor** when the release adds capability or changes how something is rend
 .
 ├── index.html                      # main app entry
 ├── DESIGN.md                       # agent-readable design system guide
+├── PRODUCT.md                      # brand personality, product purpose, design principles
 ├── design-system.html              # design system source entry, served publicly at /design-system
 ├── 404.html                        # static 404
 ├── postbuild.js                    # per-case-study route generation
 ├── vite.config.js                  # multi-entry rollup config
 ├── vercel.json                     # security headers + SPA rewrite
+├── playwright.config.mjs           # e2e test runner config
+├── eslint.config.mjs               # lint rules
+├── CHANGELOG.md                    # dated, categorized release notes
+├── VERSION                         # semver, kept in sync with package.json + CHANGELOG
+├── SECURITY.md                     # vulnerability disclosure policy
+├── api/                            # Vercel serverless functions
+│   ├── ask.mjs                     # Ask box routing + answer drafting
+│   ├── contact.mjs                 # contact form submission (Resend)
+│   └── github-contributions.mjs    # cached GitHub activity endpoint
 ├── public/
 │   ├── Images/                     # portrait, OG, share assets
 │   ├── Videos/                     # case study cover videos
@@ -194,20 +205,39 @@ Bump **minor** when the release adds capability or changes how something is rend
 │   ├── llms.txt                    # AI crawler directive
 │   └── robots.txt                  # references generated /sitemap.xml
 ├── scripts/
-│   └── optimize-image.mjs          # sharp-based image optimizer
+│   ├── optimize-image.mjs          # sharp-based image optimizer
+│   ├── generate-responsive-case-images.mjs # responsive WebP case-card covers
+│   ├── generate-social-images.mjs  # 1200×627 JPEG social previews
+│   ├── ask-fingerprint.mjs         # content-hash guard for reviewed Ask answers
+│   ├── build-ask-corpus.mjs        # case-study corpus for Ask drafting
+│   ├── ask-rundown.mjs             # GA4 report of unanswered Ask questions
+│   └── smoke-github-contributions.mjs # prod smoke check for the GitHub endpoint
 ├── src/
 │   ├── main.jsx                    # main site app shell and homepage experience
 │   ├── case-studies.js             # normalized case-study content exports
 │   ├── routes.js                   # route parsing and route metadata helpers
-│   ├── content/
-│   │   └── case-studies.json       # canonical case-study content source
+│   ├── ask.mjs                     # Ask matching/answer logic (shared with api/ask.mjs)
+│   ├── analytics-env.mjs           # production-host + build-mode GA gating
 │   ├── design-system.jsx           # design system reference page
-│   ├── design-system-primitives.jsx # extracted design system documentation primitives
-│   ├── design-system-page.css      # design system page layout and responsive behavior
 │   ├── design-tokens.css           # shared token source for app entries
-│   ├── footer-alien.jsx
-│   ├── ui-icons.jsx
-│   └── constants.js                # nav / route / breakpoint constants
+│   ├── galaxy.jsx                  # hero canvas animation
+│   ├── constants.js                # nav / route / breakpoint constants
+│   ├── content/                    # canonical content sources
+│   │   ├── case-studies.json       # canonical case-study content
+│   │   ├── ask-answers.json        # reviewed Ask answers
+│   │   ├── rate-card.mjs           # rate-card service/pricing content
+│   │   └── privacy-policy.mjs      # privacy policy copy
+│   └── ui/                         # shared UI components
+│       ├── navigation.jsx
+│       ├── ask-panel.jsx
+│       ├── case-card.jsx
+│       ├── inquiry-form.jsx
+│       └── site-footer.jsx
+├── tests/
+│   ├── seo-static.test.mjs         # static-route SEO regression checks
+│   ├── ask-answers.test.mjs        # Ask content fingerprint + evidence checks
+│   ├── analytics-env.test.mjs      # GA host/build gating unit tests
+│   └── e2e/                        # Playwright end-to-end suite
 └── docs/
     └── ai-workflow.md              # how AI is used in this repo
 ```
@@ -215,3 +245,13 @@ Bump **minor** when the release adds capability or changes how something is rend
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+## Rate-card inquiries
+
+The unlinked services page can send inquiries to Omar’s inbox through `POST /api/contact`. Configure `RESEND_API_KEY` (sending-only), `CONTACT_FROM_EMAIL` (for example `Website inquiries <inquiries@designedbyomar.com>`), and `TURNSTILE_SECRET_KEY` server-side, plus `VITE_TURNSTILE_SITE_KEY` at build time. The Resend domain must be verified. Use Turnstile managed mode with the exact production and approved preview hostnames. Vercel’s `VERCEL_URL` and `VERCEL_BRANCH_URL` are accepted as exact preview hosts; `CONTACT_PREVIEW_HOST` can specify one additional exact test alias. No wildcard preview host is accepted.
+
+Review PR #101 through its [stable branch preview](https://designedbyomar-git-feat-ratecard-bklynsouljahs-projects.vercel.app/ratecard). Deployment-specific preview URLs need their own exact hostname in the Turnstile widget; error `110200` indicates an unauthorized hostname. Recoverable verification errors offer a manual retry that preserves entered fields.
+
+Configure preview variables first and rebuild the preview after changing the public site key. Confirm an inquiry arrives in `omar@designedbyomar.com` before enabling production sending. Never use Cloudflare test keys or bypass verification on a deployed preview or production site; the test build uses a public fixture key only with intercepted browser requests. Missing configuration or failed discovery leaves direct email available.
+
+The endpoint fixes the recipient and uses the visitor’s address only for reply-to. It sends plain text, uses Resend idempotency for retries, and sends no automatic acknowledgment. Its five-attempt/ten-minute per-instance limiter is supplemental to server-validated Turnstile and a honeypot; it is not a global distributed quota. Form values are kept in memory, are excluded from analytics, and are not logged by the handler.

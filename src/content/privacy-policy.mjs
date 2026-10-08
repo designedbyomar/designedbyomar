@@ -1,7 +1,7 @@
 export const PRIVACY_POLICY = {
   title: 'Privacy Policy',
   subtitle: 'No creepy tracking',
-  lastUpdated: 'May 8, 2026',
+  lastUpdated: 'October 4, 2026',
   blocks: [
     {
       type: 'paragraph',
@@ -102,6 +102,10 @@ export const PRIVACY_POLICY = {
       type: 'paragraph',
       text: 'That information is only used to respond to your inquiry and any related follow-up. I do not sell or share contact messages with advertisers. Messages may be stored in my email inbox or related communication tools for as long as needed to manage the conversation.',
     },
+    {
+      type: 'paragraph',
+      text: 'The inquiry form sends your contact details, goals, timing, budget, and any optional company, website, or service information through Vercel to Resend for delivery to my inbox. Cloudflare Turnstile checks the form for abuse and processes verification and technical data, including your IP address; it does not receive the inquiry fields from this site. These services support responding to your inquiry and preventing spam, independently of your analytics choice. Form contents are not stored in browser storage or sent to analytics. Messages may remain in my inbox and email delivery records as needed to handle the conversation.',
+    },
     { type: 'heading', text: 'Legal Basis' },
     {
       type: 'paragraph',
@@ -110,7 +114,7 @@ export const PRIVACY_POLICY = {
     { type: 'heading', text: 'Sharing And Selling Data' },
     {
       type: 'paragraph',
-      text: 'I do not sell your personal data. I do not share your personal data with advertisers. The third-party services currently used for analytics, performance measurement, and error monitoring are Google Analytics 4, Vercel Analytics, Vercel Speed Insights, and Sentry.',
+      text: 'I do not sell your personal data. I do not share your personal data with advertisers. The third-party services currently used for analytics, performance measurement, and error monitoring are Google Analytics 4, Vercel Analytics, Vercel Speed Insights, and Sentry. Vercel, Resend, and Cloudflare also process inquiry delivery or verification as described above.',
     },
     { type: 'heading', text: 'Your Rights' },
     {
