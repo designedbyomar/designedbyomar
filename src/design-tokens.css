@@ -1,6 +1,6 @@
 :root {
-  --rate-badge-background: var(--color-omar-black);
-  --rate-badge-foreground: var(--color-white);
+  --rate-badge-background: color-mix(in srgb, var(--color-white) 35%, transparent);
+  --rate-badge-foreground: var(--color-omar-black);
   --rate-header-project-foreground: var(--color-white);
   --rate-header-foreground: var(--color-omar-black);
   --select-menu-max-height: 288px;

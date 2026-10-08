@@ -4,6 +4,10 @@ All notable changes to designedbyomar.com are documented here.
 
 ## [Unreleased]
 
+### Fixed
+- 2026-10-08 — Authorize the exact failing Turnstile preview hostname and document the stable branch alias for verification reviews.
+- 2026-10-08 — Add recoverable verification retries without losing inquiry details and update vulnerable build dependencies to restore the CI audit.
+
 ### Added
 - 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
 - 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.
@@ -18,6 +22,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-28 — A local `npm run ask:rundown` script that ranks the questions visitors asked with no written answer, so recurring gaps can be written up as reviewed answers and drafted less by the model. It reads the `ask_no_match` and `ask_contact_click` events the site already sends to GA4 — no site, endpoint, or privacy-policy change — drops `(not set)` rows from before the custom dimensions existed, paginates the full result set, points at the nearest existing answer to branch from, and escapes everything Markdown reads as syntax in a table cell, the backslash included, so a question is shown as it was typed and cannot break the report open. Zero new dependencies: it mints a service-account token with Node's built-in crypto and calls the GA4 Data API over `fetch`. One-time GA4 setup (custom dimensions + a read-only service account) and a ready-to-run command are documented in the script header and `docs/ai-workflow.md`; report logic is unit-tested against mocked rows (`tests/ask-rundown.test.mjs`)
 
 ### Changed
+- 2026-10-08 — Soften pricing badges, align category-gradient dividers, split ongoing support into two-card subsections, and make engagement terms a shared default-open disclosure.
 - 2026-10-07 — Brighten service gradients, add category badges and green checks, align pricing with the homepage, and show three columns with a scrollable ongoing-support row.
 - 2026-10-05 — Clarify service pricing with category-gradient headers, readable inclusion checklists, reusable gradient examples, and service-specific inquiry actions.
 - 2026-10-04 — Refresh README's project-layout tree to match the current repo (adds `api/`, the full `scripts/` list, `src/content/`, `src/ui/`, and `tests/`, which had drifted out of sync since launch) and link `PRODUCT.md` into the README doc index so it's discoverable alongside `DESIGN.md` and `docs/ai-workflow.md`

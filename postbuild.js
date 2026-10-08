@@ -699,9 +699,13 @@ function generateRoutes() {
   const rateBody = [
     '<main><article>', `<h1>${escapeText(RATE_CARD.title)}</h1>`,
     `<p>${escapeText(RATE_CARD.introduction)}</p><p>${escapeText(RATE_CARD.pricingNote)}</p>`,
-    ...RATE_CARD.groups.map(group => `<section><h2>${escapeText(group.title)}</h2><p>${escapeText(group.description)}</p>${group.services.map(service =>
-      `<article><h3>${escapeText(service.name)}</h3><p>${escapeText(service.price)}</p><p>${escapeText(service.timing)}</p><p>${escapeText(service.description)}</p><dl><dt>Best for</dt><dd>${escapeText(service.bestFor)}</dd><dt>What’s included</dt><dd><ul>${service.includes.map(item => `<li>${escapeText(item)}</li>`).join('')}</ul></dd><dt>Scope &amp; limits</dt><dd>${escapeText(service.limits)}</dd></dl></article>`
-    ).join('')}</section>`),
+    ...RATE_CARD.groups.map(group => {
+      const renderServices = (services, level) => services.map(service =>
+        `<article><h${level}>${escapeText(service.name)}</h${level}><p>${escapeText(service.price)}</p><p>${escapeText(service.timing)}</p><p>${escapeText(service.description)}</p><dl><dt>Best for</dt><dd>${escapeText(service.bestFor)}</dd><dt>What’s included</dt><dd><ul>${service.includes.map(item => `<li>${escapeText(item)}</li>`).join('')}</ul></dd><dt>Scope &amp; limits</dt><dd>${escapeText(service.limits)}</dd></dl></article>`
+      ).join('');
+      const cards = group.subgroups ? group.subgroups.map(subgroup => `<section><h3>${escapeText(subgroup.title)}</h3>${renderServices(group.services.filter(service => subgroup.serviceIds.includes(service.id)), 4)}</section>`).join('') : renderServices(group.services, 3);
+      return `<section><h2>${escapeText(group.title)}</h2><p>${escapeText(group.description)}</p>${cards}</section>`;
+    }),
     '<section><h2>How engagements work</h2><dl>',
     ...RATE_CARD.terms.map(term => `<dt>${escapeText(term.title)}</dt><dd>${escapeText(term.text)}</dd>`),
     '</dl></section>', `<section><h2>${escapeText(RATE_CARD.contactTitle)}</h2><p>${escapeText(RATE_CARD.contactDescription)}</p><a href="mailto:${escapeAttr(RATE_CARD.email)}">${escapeText(RATE_CARD.email)}</a></section>`,

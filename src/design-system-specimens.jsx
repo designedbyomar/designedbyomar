@@ -135,6 +135,7 @@ const COVERAGE = [
   ['Ask panel', '#ask', 'Controlled query, response state, refs and interaction callbacks'],
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
+  ['Disclosure', '#cards-accordions', 'Heading, content, semantic heading level, optional ID and defaultExpanded; local expansion state'],
   ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
   ['Select-only dropdown', '#inquiry-form', 'Controlled value, options, placeholder, label ID, required/disabled/error state and change callback; keyboard navigation and themed popup'],
   ['Inquiry form and labelled fields', '#inquiry-form', 'Controlled values, errors, status, verification slot and change/submit callbacks; no requests'],
@@ -148,7 +149,8 @@ export default function ProductionSpecimen({ kind }) {
   let content;
   switch (kind) {
     case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} onInquiry={service => setServiceInterest(service.name)} group={{
-      id: serviceVariant, title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
+      id: serviceVariant,
+      ...(serviceVariant === 'ongoing' ? { subgroups: [{ id: 'fractional', title: 'Fractional Design', serviceIds: ['fixed', 'starting'] }, { id: 'website', title: 'Website Support', serviceIds: ['third', 'fourth'] }] } : {}), title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
       services: [
         { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: ['Review', 'Findings', 'Walkthrough'], limits: 'One agreed flow; implementation excluded.' },
         { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: ['Agreed design work', 'Handoff'], limits: 'Deliverables and revisions agreed in a proposal.' },
@@ -178,7 +180,7 @@ export default function ProductionSpecimen({ kind }) {
     case 'inventory': content = <>
       <ul>{COVERAGE.map(([name, href, contract]) => <li key={name}><a href={href}>{name}</a>: {contract}.</li>)}</ul>
       <p>The homepage hero, About page arrangement, services page composition and individual case-study page layouts stay page-specific compositions of shared building blocks. Their storytelling and placement are unique, not additional component variants.</p>
-      <p>DocCard, SectionHeader, token swatches, shortcut cards and the legacy accordion are documentation utilities. They are not presented as production components.</p>
+      <p>DocCard, SectionHeader, token swatches, and shortcut cards are documentation utilities. They are not presented as production components.</p>
     </>; break;
     default: return null;
   }

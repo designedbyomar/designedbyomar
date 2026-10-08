@@ -91,7 +91,12 @@ for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]
         const header = getComputedStyle(card.querySelector('.service-rate-card__header'));
         const foreground = luminance(header.color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => value / 255));
         const ends = ['--rate-start', '--rate-end'].map(token => rgb(css.getPropertyValue(token)));
-        return { background: header.backgroundImage, ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
+        const badgeForeground = luminance([23, 23, 23].map(value => value / 255));
+        const badgeRatio = Math.min(...Array.from({ length: 101 }, (_, step) => {
+          const bg = luminance(ends[0].map((value, index) => 0.35 + 0.65 * (value * (1 - step / 100) + ends[1][index] * step / 100)));
+          return (Math.max(badgeForeground, bg) + 0.05) / (Math.min(badgeForeground, bg) + 0.05);
+        }));
+        return { badgeRatio, background: header.backgroundImage, ratio: Math.min(...Array.from({ length: 101 }, (_, step) => {
           const background = luminance(ends[0].map((value, index) => (value * (1 - step / 100) + ends[1][index] * step / 100)));
           return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
         })) };
@@ -100,17 +105,19 @@ for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]
     for (const sample of contrast) {
       expect(sample.background).toContain('linear-gradient');
       expect(sample.ratio).toBeGreaterThanOrEqual(3);
+      expect(sample.badgeRatio).toBeGreaterThanOrEqual(4.5);
     }
     const appearance = await cards.first().evaluate(card => {
       const badge = getComputedStyle(card.querySelector('.service-rate-card__category'));
       const price = getComputedStyle(card.querySelector('.service-rate-card__price'));
-      const title = getComputedStyle(card.querySelector('h3'));
+      const title = getComputedStyle(card.querySelector('h3, h4'));
       const check = getComputedStyle(card.querySelector('.service-rate-card__includes svg'));
       return { badgeRadius: badge.borderRadius, badgeBackground: badge.backgroundColor, badgeColor: badge.color, priceSize: parseFloat(price.fontSize), titleSize: parseFloat(title.fontSize), green: check.color, tokenGreen: getComputedStyle(card).getPropertyValue('--color-status-online').trim() };
     });
     expect(appearance.badgeRadius).toBe('9999px');
-    expect(appearance.badgeBackground).toBe('rgb(23, 23, 23)');
-    expect(appearance.badgeColor).toBe('rgb(255, 255, 255)');
+    expect(appearance.badgeBackground).toContain('0.35');
+    expect(appearance.badgeColor).toBe('rgb(23, 23, 23)');
+    await expect(page.locator('.service-rate-card__category svg')).toHaveCount(0);
     expect(appearance.priceSize).toBe(32);
     expect(appearance.priceSize).toBeGreaterThan(appearance.titleSize);
     expect(appearance.green).toBe('rgb(34, 197, 94)');
@@ -183,27 +190,33 @@ test('service gradient gallery documents and copies all category tokens', async 
 });
 
 
-test('ongoing services stay in one row and browse controls reveal the fourth card', async ({ page }) => {
+test('ongoing support has stacked two-card subsections with aligned dividers', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/ratecard');
   const group = page.locator('.service-rate-group').nth(2);
-  const region = group.getByRole('region', { name: 'Ongoing support services', exact: true });
-  const cards = region.locator('.service-rate-card');
-  const previous = group.getByRole('button', { name: 'Previous ongoing support service' });
-  const next = group.getByRole('button', { name: 'Next ongoing support service' });
-  await expect(previous).toBeDisabled();
-  await expect(next).toBeEnabled();
-  expect(await cards.evaluateAll(elements => new Set(elements.map(element => element.offsetTop)).size)).toBe(1);
-  expect(await region.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
-  await next.click();
-  await expect(next).toBeDisabled();
-  await expect(previous).toBeEnabled();
-  expect(await region.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-  await previous.click();
-  await expect(previous).toBeDisabled();
-  await region.focus();
-  await page.keyboard.press('End');
-  await expect(next).toBeDisabled();
-  await cards.last().getByRole('button', { name: 'Discuss Website + Design Support', exact: true }).click();
-  await expect(page.locator('#rate-contact')).toBeFocused();
+  await expect(group.locator('.service-rate-subgroup')).toHaveCount(2);
+  for (const title of ['Fractional Design', 'Website Support']) {
+    const section = group.getByRole('region', { name: title, exact: true });
+    await expect(section.locator('.service-rate-card')).toHaveCount(2);
+  }
+  for (const grid of await page.locator('.service-rate-grid').all()) {
+    const positions = await grid.locator('.service-rate-card__price-panel').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().bottom));
+    expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
+  }
+  await expect(group.locator('.service-rate-group__browse')).toHaveCount(0);
+});
+
+test('engagement terms open by default and hide accessibly when collapsed', async ({ page }) => {
+  await page.goto('/ratecard');
+  const toggle = page.getByRole('button', { name: 'How engagements work', exact: true });
+  const panel = page.locator('#rate-terms-title-panel');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(panel).toBeVisible();
+  await toggle.focus();
+  await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(panel).toBeHidden();
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(panel).toBeVisible();
 });

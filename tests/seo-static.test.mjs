@@ -797,7 +797,8 @@ test('rate card is complete static sales content with canonical noindex and no i
     for (const item of service.includes) assert.ok(content.includes(`<li>${escapeText(item)}</li>`), `${service.name}: ${item}`);
   }
   for (const term of RATE_CARD.terms) assert.ok(content.includes(escapeText(term.text)));
-  assert.equal((content.match(/<h3>/g) || []).length, 9);
+  assert.equal((content.match(/<article><h[34]>/g) || []).length, 9);
+  for (const title of ['Fractional Design', 'Website Support']) assert.ok(content.includes(`<h3>${title}</h3>`));
   assert.ok(!sitemapUrls().some(url => url.includes('/ratecard')));
   for (const url of sitemapUrls()) assert.ok(!getRootLinks(fs.readFileSync(pagePathForUrl(url), 'utf8'), url).some(link => link.includes('/ratecard')));
   assert.doesNotMatch(readText('public', 'robots.txt'), /Disallow:.*ratecard/i);

@@ -299,3 +299,21 @@ test('service actions cannot alter an inquiry during submission', async ({ page 
   await expect(form.getByRole('status')).toContainText('Your inquiry has been sent');
   await expect(form.getByRole('combobox', { name: 'Service interest (optional)', exact: true })).toContainText('Product Audit');
 });
+
+for (const [code, retryable] of [['110200', false], ['110600', true]]) {
+  test(`verification error ${code} preserves fields and ${retryable ? 'allows' : 'prevents'} retry`, async ({ page }) => {
+    await installForm(page, route => route.fulfill({ json: { sent: true } }));
+    await page.goto('/ratecard');
+    await page.getByLabel('Name (required)', { exact: true }).fill('Example Client');
+    await page.evaluate(value => window.verificationOptions['error-callback'](value), code);
+    await expect(page.getByRole('alert')).toContainText('Verification is unavailable');
+    await expect(page.getByRole('button', { name: 'Send inquiry', exact: true })).toBeDisabled();
+    expect(await page.evaluate(() => window.verificationOptions.retry)).toBe('never');
+    const retry = page.getByRole('button', { name: 'Retry verification', exact: true });
+    if (retryable) {
+      await retry.click();
+      await expect(page.getByRole('alert')).toHaveCount(0);
+    } else await expect(retry).toHaveCount(0);
+    await expect(page.getByLabel('Name (required)', { exact: true })).toHaveValue('Example Client');
+  });
+}

@@ -3,6 +3,7 @@ import { LAYOUT } from './constants.js';
 import { InquiryController } from './inquiry-controller.jsx';
 import { RATE_CARD } from './content/rate-card.mjs';
 import { ServiceRateGroup } from './ui/service-list.jsx';
+import { Disclosure } from './ui/disclosure.jsx';
 import { ContactCard } from './ui/contact-card.jsx';
 import './rate-card-page.css';
 
@@ -20,8 +21,9 @@ const RateCardPage = ({ onEvent }) => {
   </header>
   {RATE_CARD.groups.map(group => <ServiceRateGroup key={group.id} group={group} onInquiry={selectService} />)}
   <section className="rate-card-page__terms" aria-labelledby="rate-terms-title">
-    <h2 id="rate-terms-title">How engagements work</h2>
+    <Disclosure id="rate-terms-title" heading="How engagements work" defaultExpanded>
     <dl>{RATE_CARD.terms.map(term => <div key={term.title}><dt>{term.title}</dt><dd>{term.text}</dd></div>)}</dl>
+    </Disclosure>
   </section>
   <section ref={contactRef} tabIndex={-1} id="rate-contact" className="rate-card-page__contact" aria-labelledby="rate-contact-title">
     <h2 id="rate-contact-title">{RATE_CARD.contactTitle}</h2>

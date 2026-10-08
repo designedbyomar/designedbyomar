@@ -1,3 +1,4 @@
+import { Disclosure } from './ui/disclosure.jsx';
 import { COMPONENT_TOKEN_ROLES } from './design-system-token-roles.mjs';
 import React from 'react';
 import { NavLogo as SharedNavLogo, ThemeToggle } from './ui/brand.jsx';
@@ -832,46 +833,10 @@ const AccessibilityPreview = ({ kind }) => (
   </div>
 );
 
-const FAQAccordionDemo = () => {
-  const [openIndex, setOpenIndex] = React.useState(0);
-  const reducedMotion = usePrefersReducedMotion();
-  const items = [
-    ['When should this accordion pattern be used?', 'Use it for short, scan-friendly groups where each label clearly predicts the hidden content.'],
-    ['Is this used on the portfolio?', 'This is a documentation-only accordion utility. Production Ask uses the shared AskPanel specimen below.'],
-  ];
-
-  return (
-    <div className="ds-faq-demo" style={{ width: '100%' }}>
-      {items.map(([question, answer], index) => {
-        const isOpen = openIndex === index;
-        const answerId = `ds-accordion-answer-${index}`;
-        const buttonId = `ds-accordion-question-${index}`;
-        return (
-          <div key={question} className={`faq-item${isOpen ? ' is-open' : ''}`} data-open={isOpen ? 'true' : 'false'}>
-            <button
-              id={buttonId}
-              type="button"
-              aria-expanded={isOpen}
-              aria-controls={answerId}
-              onClick={() => setOpenIndex(isOpen ? -1 : index)}
-            >
-              <span>{question}</span>
-              <AppIcon icon={ChevronDown} size={18} />
-            </button>
-            <div className="ds-faq-demo__panel" style={{
-              gridTemplateRows: isOpen ? '1fr' : '0fr',
-              transition: reducedMotion ? 'none' : undefined,
-            }}>
-              <div id={answerId} role="region" aria-labelledby={buttonId} className="faq-answer" style={{ opacity: isOpen ? 1 : 0, transition: reducedMotion ? 'none' : undefined }}>
-                <p>{answer}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+const FAQAccordionDemo = () => <div className="ds-faq-demo">
+  <Disclosure heading="When should this accordion pattern be used?" headingLevel={3} defaultExpanded><p>Use it for scan-friendly sections where each heading clearly predicts the hidden content.</p></Disclosure>
+  <Disclosure heading="Is this used on the portfolio?" headingLevel={3}><p>The services page uses this shared disclosure for engagement terms. Production Ask uses the shared AskPanel specimen below.</p></Disclosure>
+</div>;
 
 const HomeSection = ({ theme }) => (
   <>
@@ -1079,7 +1044,7 @@ const ComponentsSection = () => (
 
     <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
       <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Service cards use vibrant category-gradient headers with solid contrast-tested titles and pill category badges. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
+        Service cards use vibrant category-gradient headers with solid contrast-tested titles and quiet translucent category badges. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
       </SectionHeader>
       <Specimen kind="services" />
       <div className="ds-two-column">
@@ -1090,7 +1055,7 @@ const ComponentsSection = () => (
             <li>Body copy that explains the decision or usage.</li>
           </ul>
         </DocCard>
-        <ExampleFrame label="Documentation-only accordion · not used on the portfolio">
+        <ExampleFrame label="Shared disclosure · engagement terms">
           <FAQAccordionDemo />
         </ExampleFrame>
       </div>
@@ -1126,7 +1091,7 @@ const ComponentsSection = () => (
       <Specimen kind="inquiry" />
     </section>
     <section id="service-gradients" className="ds-section" aria-labelledby="service-gradients-title">
-      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. Gradients render at full strength with no overlay. Category-specific title colors and solid category badges keep text readable in both themes.</SectionHeader>
+      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. Gradients render at full strength with no overlay. Category-specific title colors and translucent category badges keep text readable in both themes.</SectionHeader>
       <div className="ds-token-grid">
         {[
           ['audits', 'Audits', 'Red → pink'],
@@ -1142,7 +1107,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Groups with more than three cards use a keyboard-accessible horizontal row with browse controls and a visible scrollbar. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Ongoing support uses two stacked subsections with two cards per row. Header and pricing tracks align dividers within each row. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
       <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">

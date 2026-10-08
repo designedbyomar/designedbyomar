@@ -1,0 +1,9 @@
+.disclosure { border-radius: var(--radius-comfort); box-shadow: var(--shadow-card-subtle); color: var(--fg-primary); }
+.disclosure .disclosure__heading { margin: 0; font-size: var(--font-size-body-lg); }
+.disclosure__heading button { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); width: 100%; padding: var(--space-5) var(--space-6); min-height: var(--control-hit-area); border: 0; background: transparent; color: inherit; font: inherit; font-weight: var(--font-weight-medium); text-align: left; cursor: pointer; }
+.disclosure__heading button:focus-visible { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-1); border-radius: var(--radius-comfort); }
+.disclosure__heading svg { flex-shrink: 0; }
+.disclosure[data-expanded="true"] .disclosure__heading svg { transform: rotate(180deg); }
+.disclosure__panel { padding: 0 var(--space-6) var(--space-6); }
+.disclosure__panel p { margin: 0; font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); }
+@media (forced-colors: active) { .disclosure { border: var(--border-signature-width) solid CanvasText; } }
