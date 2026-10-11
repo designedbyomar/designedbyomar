@@ -1107,7 +1107,7 @@ const ComponentsSection = () => (
     </section>
 
     <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Ongoing support uses two stacked subsections with two cards per row. Header and pricing tracks align dividers within each row. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
+      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Ongoing support uses two stacked subsections with two cards occupying the first two grid columns, matching the widths of other service cards. Header and pricing tracks align dividers within each row. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
       <Specimen kind="services" />
     </section>
     <section id="about-media" className="ds-section" aria-labelledby="about-media-title">

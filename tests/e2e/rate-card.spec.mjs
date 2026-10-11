@@ -131,6 +131,26 @@ for (const theme of ['light', 'dark']) for (const width of [320, 390, 820, 1440]
       const logo = await page.locator('header').first().getByRole('link', { name: 'designedbyomar', exact: true }).boundingBox();
       expect(Math.abs(pageEdges.x - logo.x)).toBeLessThanOrEqual(1);
     }
+    const layout = await page.evaluate(() => {
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      const contact = rect('.rate-card-page__contact');
+      const container = rect('.rate-card-page');
+      const sectionTitle = getComputedStyle(document.querySelector('.service-rate-group > header h2'));
+      const termsTitle = getComputedStyle(document.querySelector('.rate-card-page__terms .disclosure__heading'));
+      return {
+        cardWidths: [...document.querySelectorAll('.service-rate-card')].map(card => card.getBoundingClientRect().width),
+        contactWidth: contact.width,
+        contactCenter: contact.x + contact.width / 2,
+        pageCenter: container.x + container.width / 2,
+        borders: ['.rate-card-page__terms', '.rate-card-page__contact'].map(selector => getComputedStyle(document.querySelector(selector)).borderTopWidth),
+        titleStyles: [sectionTitle, termsTitle].map(style => [style.fontSize, style.fontWeight, style.letterSpacing]),
+      };
+    });
+    expect(Math.max(...layout.cardWidths) - Math.min(...layout.cardWidths)).toBeLessThanOrEqual(1);
+    expect(Math.abs(layout.contactCenter - layout.pageCenter)).toBeLessThanOrEqual(1);
+    expect(layout.contactWidth).toBeLessThanOrEqual(720);
+    expect(layout.borders).toEqual(['0px', '0px']);
+    expect(layout.titleStyles[1]).toEqual(layout.titleStyles[0]);
     await expect(cards.first().locator('.service-rate-card__includes li')).toHaveCount(RATE_CARD.groups[0].services[0].includes.length);
     await expect(cards.first().getByRole('button', { name: 'Discuss Product Audit', exact: true })).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath(`ratecard-${theme}-${width}.png`), fullPage: true });
