@@ -7,6 +7,7 @@
   --gradient-rate-audits: linear-gradient(135deg, var(--color-ship-red), var(--color-preview-pink));
   --gradient-rate-projects: linear-gradient(135deg, var(--color-preview-pink), var(--color-develop-blue));
   --gradient-rate-ongoing: linear-gradient(135deg, var(--color-develop-blue), var(--color-ship-red));
+  --gradient-inquiry-form: linear-gradient(90deg, var(--color-ship-red), var(--color-preview-pink), var(--color-develop-blue));
   --size-gallery-column-min: 240px;
   --control-compact-height: 34px;
   --content-footer-column-min: 180px;

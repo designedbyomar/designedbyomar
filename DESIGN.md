@@ -97,3 +97,7 @@ The portrait image occupies 88% of its square wrapper. Below 639px its slot is `
 ## Disclosure
 
 `Disclosure` is shared by engagement terms and the design-system reference. It accepts heading, children, heading level, optional ID, and defaultExpanded. Its button exposes expanded state and controls a labelled region; collapsed content is hidden from navigation and accessibility. Engagement terms open by default and use two columns above 640px. Its pricing-page heading uses the same responsive section-heading token as the service categories. The terms and contact sections use spacing without horizontal separators; contact is centered at its existing 720px maximum width. Toggling introduces no motion.
+
+## Inquiry form
+
+The inquiry form is an elevated card (`--shadow-card-full`, `--radius-xl`) with a `--gradient-inquiry-form` top edge, a full-width submit button, and a privacy link that opens in a new tab with an accessible hint.

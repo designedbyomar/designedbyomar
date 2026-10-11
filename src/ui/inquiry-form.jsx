@@ -14,8 +14,8 @@ export const InquiryForm = ({ values, errors = {}, status = 'idle', message = ''
     <div className="inquiry-form__fields">{INQUIRY_FIELDS.map(field => <FormField key={field.name} field={field} value={values[field.name]} error={errors[field.name]} onChange={onChange} idPrefix={idPrefix} disabled={busy} />)}</div>
     <div className="inquiry-form__trap" aria-hidden="true"><label htmlFor={`${idPrefix}-trap`}>Leave this field empty</label><input id={`${idPrefix}-trap`} name="websiteTrap" value={trapValue} onChange={event => onTrapChange?.(event.target.value)} tabIndex={-1} autoComplete="off" /></div>
     {verification}
-    <p className="inquiry-form__privacy">Your details are used to respond to this inquiry. <LinkButton variant="text" href="/privacy">Privacy policy</LinkButton></p>
-    <Button type="submit" disabled={busy || !ready || status === 'sent'}>{busy ? 'Sending…' : status === 'sent' ? 'Inquiry sent' : 'Send inquiry'}</Button>
+    <p className="inquiry-form__privacy">Your details are used to respond to this inquiry. <LinkButton variant="text" href="/privacy" target="_blank" rel="noopener noreferrer" aria-label="Privacy policy (opens in new tab)">Privacy policy</LinkButton></p>
+    <Button type="submit" className="inquiry-form__submit" disabled={busy || !ready || status === 'sent'}>{busy ? 'Sending…' : status === 'sent' ? 'Inquiry sent' : 'Send inquiry'}</Button>
     <p role="status" aria-live="polite">{status === 'sent' ? INQUIRY_SUCCESS : busy ? 'Sending your inquiry…' : !ready ? 'Complete verification to send your inquiry.' : ''}</p>
   </form>;
 };
