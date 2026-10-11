@@ -1122,74 +1122,6 @@
   gap: var(--space-4);
 }
 
-.ds-faq-demo .faq-item {
-  border-radius: var(--radius-comfort);
-  box-shadow: inset 0 0 0 1px var(--color-gray-100), var(--shadow-card-subtle);
-  transition: box-shadow var(--duration-fast-mid) ease, transform var(--duration-fast-mid) ease;
-}
-
-.ds-faq-demo .faq-item[data-open="true"] {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gray-100) 72%, transparent);
-}
-
-.ds-faq-demo .faq-item > button {
-  width: 100%;
-  min-height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  background: transparent;
-  border: none;
-  color: var(--fg-primary);
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-.ds-faq-demo .faq-item > button span {
-  color: var(--fg-secondary);
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-snug);
-  transition: color var(--duration-fast-mid) ease;
-}
-
-.ds-faq-demo .faq-item[data-open="true"] > button span {
-  color: var(--fg-primary);
-}
-
-.ds-faq-demo .faq-item > button svg {
-  flex-shrink: 0;
-  color: var(--fg-tertiary);
-  transition: transform var(--duration-fast-mid) ease, color var(--duration-fast-mid) ease;
-}
-
-.ds-faq-demo .faq-item[data-open="true"] > button svg {
-  color: var(--fg-primary);
-  transform: rotate(180deg);
-}
-
-.ds-faq-demo__panel {
-  display: grid;
-  transition: grid-template-rows var(--duration-base-plus) ease;
-}
-
-.ds-faq-demo .faq-answer {
-  overflow: hidden;
-  transition: opacity var(--duration-fast-mid) ease;
-}
-
-.ds-faq-demo .faq-answer p {
-  max-width: 720px;
-  margin: 0;
-  padding: 0 var(--space-6) var(--space-6);
-  color: var(--fg-secondary);
-  font-size: var(--font-size-body-lg);
-  line-height: var(--line-height-loose);
-}
-
 .ds-mobile-panel {
   display: none;
 }
@@ -1322,11 +1254,6 @@
   .ds-contact-surface-card::before,
   .ds-nav-logo path,
   .ds-nav-category__chevron,
-  .ds-faq-demo .faq-item,
-  .ds-faq-demo .faq-item > button span,
-  .ds-faq-demo .faq-item > button svg,
-  .ds-faq-demo__panel,
-  .ds-faq-demo .faq-answer,
   .ds-back-to-top {
     transition: none !important;
     animation: none !important;
@@ -1366,3 +1293,6 @@
 .ds-specimen-about { padding: var(--space-6); }
 .ds-production-specimen--contact .contact-card { max-width: 100%; }
 .ds-production-specimen--footer .site-footer-grid { grid-template-columns: minmax(0, 1fr); }
+
+.ds-rate-gradient-swatch { height: var(--space-8); border-radius: var(--radius-comfort); margin-bottom: var(--space-3); }
+.ds-rate-header-example { padding: var(--space-5); border-radius: var(--radius-comfort); color: var(--rate-header-foreground); font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); }

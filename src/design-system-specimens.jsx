@@ -1,3 +1,6 @@
+import { InquiryForm } from './ui/inquiry-form.jsx';
+import { emptyInquiry, validateInquiry } from './content/inquiry.mjs';
+import { ServiceRateGroup } from './ui/service-list.jsx';
 import React from 'react';
 import { Button, IconButton, LinkButton, CopyButton } from './ui/controls.jsx';
 import { SiteNavigation } from './ui/navigation.jsx';
@@ -105,6 +108,22 @@ const GitHubSpecimen = () => {
   </>;
 };
 
+const InquirySpecimen = () => {
+  const id = React.useId();
+  const [values, setValues] = React.useState(emptyInquiry);
+  const [status, setStatus] = React.useState('idle');
+  const [errors, setErrors] = React.useState({});
+  const summaryRef = React.useRef(null);
+  return <>
+    <StatePicker value={status} onChange={setStatus} states={['idle', 'sending', 'sent', 'error']} />
+    <InquiryForm idPrefix={`ds-inquiry-${id}`} values={values} errors={errors} status={status}
+      message={status === 'error' ? 'Example failure. Nothing was sent.' : ''} ready summaryRef={summaryRef}
+      onChange={(name, value) => { setValues(previous => ({ ...previous, [name]: value })); setErrors({}); setStatus('idle'); }}
+      onSubmit={event => { event.preventDefault(); const checked = validateInquiry(values); setErrors(checked.errors); setStatus(checked.valid ? 'sent' : 'error'); if (!checked.valid) requestAnimationFrame(() => summaryRef.current?.focus()); }}
+      verification={<p className="mono-label">Verification fixture · no Cloudflare request</p>} />
+  </>;
+};
+
 const COVERAGE = [
   ['Buttons, icon buttons, links and copy controls', '#buttons', 'Variant, label, disabled state and interaction callbacks'],
   ['Logo and theme toggle', '#navigation-drawers', 'Destination, current theme and theme callback'],
@@ -116,12 +135,30 @@ const COVERAGE = [
   ['Ask panel', '#ask', 'Controlled query, response state, refs and interaction callbacks'],
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
+  ['Disclosure', '#cards-accordions', 'Heading, content, semantic heading level, optional ID and defaultExpanded; local expansion state'],
+  ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
+  ['Select-only dropdown', '#inquiry-form', 'Controlled value, options, placeholder, label ID, required/disabled/error state and change callback; keyboard navigation and themed popup'],
+  ['Inquiry form and labelled fields', '#inquiry-form', 'Controlled values, errors, status, verification slot and change/submit callbacks; no requests'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];
 
 export default function ProductionSpecimen({ kind }) {
+  const specimenId = React.useId();
+  const [serviceVariant, setServiceVariant] = React.useState('projects');
+  const [serviceInterest, setServiceInterest] = React.useState('');
   let content;
   switch (kind) {
+    case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} onInquiry={service => setServiceInterest(service.name)} group={{
+      id: serviceVariant,
+      ...(serviceVariant === 'ongoing' ? { subgroups: [{ id: 'fractional', title: 'Fractional Design', serviceIds: ['fixed', 'starting'] }, { id: 'website', title: 'Website Support', serviceIds: ['third', 'fourth'] }] } : {}), title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
+      services: [
+        { id: 'fixed', name: 'Example review', price: '$2,500', timing: 'Approximately 3 business days.', description: 'A fixture showing a focused review.', bestFor: 'An example team with one defined flow.', includes: ['Review', 'Findings', 'Walkthrough'], limits: 'One agreed flow; implementation excluded.' },
+        { id: 'starting', name: 'Example project', price: 'From $12,000', timing: 'Approximately 2 weeks.', description: 'A fixture showing a scoped project.', bestFor: 'An example team with a defined problem.', includes: ['Agreed design work', 'Handoff'], limits: 'Deliverables and revisions agreed in a proposal.' },
+        ...(serviceVariant !== 'audits' ? [{ id: 'third', name: 'Example website service', price: '$2,500/month', timing: 'Up to 12 hours/month.', description: 'A fixture showing reserved website capacity.', bestFor: 'An example business with a defined backlog.', includes: ['Website updates', 'Agreed reviews'], limits: 'All work counts toward monthly capacity.' }] : []),
+        ...(serviceVariant === 'ongoing' ? [{ id: 'fourth', name: 'Example design support', price: '$4,000/month', timing: 'Up to 20 hours/month.', description: 'A fixture showing shared website and design capacity.', bestFor: 'An example team with regular updates.', includes: ['Website work', 'Supporting design'], limits: 'Deliverables stay within monthly capacity.' }] : []),
+      ],
+    }} /><p role="status">{serviceInterest ? `Selected ${serviceInterest}. Fixture only; no inquiry sent.` : 'Select a service to preview the inquiry action.'}</p></>; break;
+    case 'inquiry': content = <InquirySpecimen />; break;
     case 'navigation': content = <NavigationSpecimen />; break;
     case 'consent': content = <ConsentSpecimen />; break;
     case 'about': content = <AboutSpecimen />; break;
@@ -142,8 +179,8 @@ export default function ProductionSpecimen({ kind }) {
     case 'controls': content = <><Button>Primary</Button><Button variant="secondary">Secondary</Button><Button variant="quiet">Quiet</Button><Button disabled>Disabled</Button><LinkButton href="#buttons">Link action</LinkButton><IconButton icon={ArrowUpRight} label="Example external action" /><CopyButton value="--space-4" label="Copy spacing token" /></>; break;
     case 'inventory': content = <>
       <ul>{COVERAGE.map(([name, href, contract]) => <li key={name}><a href={href}>{name}</a>: {contract}.</li>)}</ul>
-      <p>The homepage hero, About page arrangement and individual case-study page layouts stay page-specific compositions of shared building blocks. Their storytelling and placement are unique, not additional component variants.</p>
-      <p>DocCard, SectionHeader, token swatches, shortcut cards and the legacy accordion are documentation utilities. They are not presented as production components.</p>
+      <p>The homepage hero, About page arrangement, services page composition and individual case-study page layouts stay page-specific compositions of shared building blocks. Their storytelling and placement are unique, not additional component variants.</p>
+      <p>DocCard, SectionHeader, token swatches, and shortcut cards are documentation utilities. They are not presented as production components.</p>
     </>; break;
     default: return null;
   }

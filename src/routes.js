@@ -1,4 +1,5 @@
 export const parsePortfolioRoute = (path) => {
+  if (path.match(/^\/ratecard\/?$/)) return { type: 'ratecard' };
   if (path.match(/^\/privacy\/?$/)) return { type: 'privacy' };
   if (path.match(/^\/about\/?$/)) return { type: 'about' };
   if (path.match(/^\/ask\/?$/)) return { type: 'ask' };
@@ -9,6 +10,7 @@ export const parsePortfolioRoute = (path) => {
 
 export const isPortfolioRoutePath = (path) => (
   path === '/'
+  || /^\/ratecard\/?$/.test(path)
   || path === '/privacy'
   || path === '/about'
   || path === '/ask'

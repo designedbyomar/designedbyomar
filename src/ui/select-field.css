@@ -1,0 +1,14 @@
+.select-field { position: relative; min-width: 0; }
+.select-field__trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); box-sizing: border-box; width: 100%; min-height: var(--control-hit-area); padding: var(--space-3) var(--space-4); border: var(--border-signature-width) solid var(--color-gray-100); border-radius: var(--radius-comfort); background: var(--bg-page); color: var(--fg-primary); font: inherit; font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); text-align: left; cursor: pointer; scroll-margin-top: var(--scroll-margin-heading); }
+.select-field__trigger > span { min-width: 0; overflow-wrap: anywhere; }
+.select-field__trigger > svg, .select-field__option > svg { flex-shrink: 0; pointer-events: none; }
+.select-field__placeholder { color: var(--fg-secondary); }
+.select-field__trigger:hover:not(:disabled) { border-color: var(--fg-secondary); }
+.select-field__trigger:focus-visible { outline: var(--border-signature-width) solid var(--color-focus); outline-offset: var(--space-1); }
+.select-field__trigger:disabled { opacity: var(--opacity-control-disabled); cursor: default; }
+.select-field__menu { position: absolute; z-index: var(--z-dropdown); inset-inline: 0; top: calc(100% + var(--space-2)); box-sizing: border-box; max-height: min(var(--select-menu-max-height), var(--select-menu-available-height)); overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: var(--space-2); list-style: none; border-radius: var(--radius-comfort); background: var(--bg-page); color: var(--fg-primary); box-shadow: var(--shadow-card-full); }
+.select-field__menu--above { top: auto; bottom: calc(100% + var(--space-2)); }
+.select-field__option { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: var(--control-hit-area); box-sizing: border-box; padding: var(--space-3) var(--space-2); border-radius: var(--radius-comfort); font-size: var(--font-size-body-lg); line-height: var(--line-height-relaxed); cursor: pointer; overflow-wrap: anywhere; }
+.select-field__option[data-active="true"] { background: var(--bg-subtle); outline: var(--border-signature-width) solid var(--color-focus); outline-offset: calc(-1 * var(--border-signature-width)); }
+.select-field__option[aria-selected="true"] { font-weight: var(--font-weight-medium); }
+@media (forced-colors: active) { .select-field__menu { border: var(--border-signature-width) solid CanvasText; } }
