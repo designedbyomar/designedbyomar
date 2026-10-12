@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHandler, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, ROUTER_TIMEOUT_MS, SUPPORTED_EFFORT } from '../api/ask.mjs';
+import { createHandler, trustedOrigin, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, ROUTER_TIMEOUT_MS, SUPPORTED_EFFORT } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
 
@@ -1173,4 +1173,13 @@ test('a multi-byte character survives the encoding', async () => {
     text += value;
   }
   assert.equal(text, 'Omar — “embedded payments” — Plastiq');
+});
+
+test('corpus origin is only trusted for known hosts', () => {
+  const env = { VERCEL_URL: 'designedbyomar-abc123.vercel.app' };
+  assert.equal(trustedOrigin('https://www.designedbyomar.com/api/ask', env), 'https://www.designedbyomar.com');
+  assert.equal(trustedOrigin('http://localhost:3000/api/ask', env), 'http://localhost:3000');
+  assert.equal(trustedOrigin('https://designedbyomar-abc123.vercel.app/api/ask', env), 'https://designedbyomar-abc123.vercel.app');
+  assert.equal(trustedOrigin('https://evil.example/api/ask', env), 'https://www.designedbyomar.com');
+  assert.equal(trustedOrigin('not a url', env), 'https://www.designedbyomar.com');
 });
