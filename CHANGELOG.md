@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Fixed
+- 2026-10-11 — Restrict the Ask endpoint's corpus fetch to known hosts and stop CI checkout persisting Git credentials, resolving two Aikido findings.
 - 2026-10-08 — Authorize the exact failing Turnstile preview hostname and document the stable branch alias for verification reviews.
 - 2026-10-08 — Add recoverable verification retries without losing inquiry details and update vulnerable build dependencies to restore the CI audit.
 
