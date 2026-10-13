@@ -24,6 +24,7 @@ All notable changes to designedbyomar.com are documented here.
 
 ### Changed
 - 2026-10-12 — Point the Book a call card, llms.txt, and the Ask contact answer at the Koalendar booking page and update the call length from 20 to 30 minutes.
+- 2026-10-12 — Pin Node to 24.x in `engines` and `.nvmrc` so CI, local development, and Vercel builds run the same major version and the Vercel auto-upgrade warning is gone.
 - 2026-10-11 — Frame the inquiry form as an elevated card with a three-color gradient top edge, stretch Send inquiry to the full form width, and open the privacy policy in a new tab; engagement terms now flow in two columns without row gaps.
 - 2026-10-11 — Match ongoing-support card widths to the service grid, center contact, and give engagement terms a full-size section heading without surrounding separators.
 - 2026-10-08 — Soften pricing badges, align category-gradient dividers, split ongoing support into two-card subsections, and make engagement terms a shared default-open disclosure.
