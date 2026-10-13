@@ -524,8 +524,8 @@ test('contact section exposes the primary conversion links', async ({ page }) =>
   await expect(contact.getByRole('link', { name: /Email\s+omar@designedbyomar\.com/i })).toHaveAttribute('href', 'mailto:omar@designedbyomar.com');
   await expect(contact.getByRole('link', { name: /Resume \/ CV\s+Open PDF/i })).toHaveAttribute('href', '/Omar%20Tavarez%20Resume.pdf');
   // Booking is the highest-intent action, so it leads the grid.
-  const booking = contact.getByRole('link', { name: /Book a call\s+20 minutes/i });
-  await expect(booking).toHaveAttribute('href', 'https://calendar.app.google/4NcXLDoniazZ5VT78');
+  const booking = contact.getByRole('link', { name: /Book a call\s+30 minutes/i });
+  await expect(booking).toHaveAttribute('href', 'https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE');
   await expect(contact.locator('.contact-card').first()).toContainText('Book a call');
 });
 
@@ -597,12 +597,12 @@ test('tracks deeper portfolio interaction analytics after consent', async ({ pag
   // Booking is the highest-intent contact action. Its destination and grid position are
   // asserted in the contact-links test; only a real click proves the event name and its
   // metadata are wired, which is what would silently break if the props were mistyped.
-  await page.context().route('https://calendar.app.google/**', (route) => route.abort());
+  await page.context().route('https://koalendar.com/**', (route) => route.abort());
   const bookingPopup = page.waitForEvent('popup');
-  await page.locator('#contact').getByRole('link', { name: /Book a call\s+20 minutes/i }).click();
+  await page.locator('#contact').getByRole('link', { name: /Book a call\s+30 minutes/i }).click();
   await expectLatestAnalyticsEvent(page, 'contact_click_booking', {
     section: 'contact',
-    link_url: 'https://calendar.app.google/4NcXLDoniazZ5VT78',
+    link_url: 'https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE',
   });
   await (await bookingPopup).close();
 

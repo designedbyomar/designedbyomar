@@ -42,4 +42,4 @@ export const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
 export const GITHUB_URL = 'https://github.com/designedbyomar';
 export const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
 export const BEHANCE_URL = 'https://www.behance.net/omartavarez';
-export const BOOKING_URL = 'https://calendar.app.google/4NcXLDoniazZ5VT78';
+export const BOOKING_URL = 'https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE';

@@ -2109,7 +2109,7 @@ const Contact = () => {
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
-            <ContactCard onEvent={trackPortfolioEvent} label="Book a call" value="20 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
+            <ContactCard onEvent={trackPortfolioEvent} label="Book a call" value="30 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
             <ContactCard onEvent={trackPortfolioEvent} label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
             <ContactCard onEvent={trackPortfolioEvent} label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
             <ContactCard onEvent={trackPortfolioEvent} label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
