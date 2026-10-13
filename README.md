@@ -54,7 +54,7 @@ If you're a hiring manager or founder, the things to look at are:
 ## Local development
 
 ```bash
-nvm use            # uses .nvmrc → Node 20+
+nvm use            # uses .nvmrc → Node 24
 npm install
 npm run dev
 ```
