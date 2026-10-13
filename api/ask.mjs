@@ -232,9 +232,29 @@ const clientKey = (request) => {
  */
 let cache = null;
 
+const PRODUCTION_ORIGIN = 'https://www.designedbyomar.com';
+
+/**
+ * The origin the corpus is fetched from. The request URL is derived from the
+ * Host header, so it is only trusted when it names a production, local, or
+ * this deployment's own host; anything else falls back to production, so a
+ * forged host can neither redirect the fetch nor poison the module cache.
+ */
+export const trustedOrigin = (requestUrl, env = process.env) => {
+  try {
+    const url = new URL(requestUrl);
+    const allowed = new Set([
+      'designedbyomar.com', 'www.designedbyomar.com', 'localhost', '127.0.0.1',
+      env.VERCEL_URL, env.VERCEL_BRANCH_URL, env.VERCEL_PROJECT_PRODUCTION_URL,
+    ].filter(Boolean));
+    if (allowed.has(url.hostname)) return url.origin;
+  } catch { /* fall through to production */ }
+  return PRODUCTION_ORIGIN;
+};
+
 const fetchAnswers = async (origin) => {
   if (cache) return cache;
-  const response = await fetch(new URL('/ask-answers.json', origin));
+  const response = await fetch(new URL('/ask-answers.json', trustedOrigin(origin)));
   if (!response.ok) throw new Error(`ask-answers.json: ${response.status}`);
   const doc = await response.json();
   cache = {
@@ -258,7 +278,7 @@ let sourceCache = null;
 
 const fetchSources = async (origin) => {
   if (sourceCache) return sourceCache;
-  const response = await fetch(new URL('/ask-sources.json', origin));
+  const response = await fetch(new URL('/ask-sources.json', trustedOrigin(origin)));
   if (!response.ok) throw new Error(`ask-sources.json: ${response.status}`);
   const doc = await response.json();
   const sections = doc.sections ?? [];
