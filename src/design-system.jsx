@@ -146,7 +146,7 @@ const COLOR_GROUPS = [
       ['Ship Red', '--color-ship-red', 'Ship workflow accent'],
       ['Link', '--color-link', 'Inline and navigational links'],
       ['Focus', '--color-focus', 'Keyboard focus outline'],
-      ['Status Online', '--color-status-online', 'Availability status dot'],
+      ['Status Online', '--color-status-online', 'Positive status: inclusion checks and contribution levels'],
     ],
   },
   {
