@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Fixed
+- 2026-11-02 — Update transitive `undici` (6.29.1) and `zod` (4.6.7) to resolve new high-severity advisories that failed the CI audit.
 - 2026-10-11 — Restrict the Ask endpoint's corpus fetch to known hosts and stop CI checkout persisting Git credentials, resolving two Aikido findings.
 - 2026-10-08 — Authorize the exact failing Turnstile preview hostname and document the stable branch alias for verification reviews.
 - 2026-10-08 — Add recoverable verification retries without losing inquiry details and update vulnerable build dependencies to restore the CI audit.
@@ -23,6 +24,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-28 — A local `npm run ask:rundown` script that ranks the questions visitors asked with no written answer, so recurring gaps can be written up as reviewed answers and drafted less by the model. It reads the `ask_no_match` and `ask_contact_click` events the site already sends to GA4 — no site, endpoint, or privacy-policy change — drops `(not set)` rows from before the custom dimensions existed, paginates the full result set, points at the nearest existing answer to branch from, and escapes everything Markdown reads as syntax in a table cell, the backslash included, so a question is shown as it was typed and cannot break the report open. Zero new dependencies: it mints a service-account token with Node's built-in crypto and calls the GA4 Data API over `fetch`. One-time GA4 setup (custom dimensions + a read-only service account) and a ready-to-run command are documented in the script header and `docs/ai-workflow.md`; report logic is unit-tested against mocked rows (`tests/ask-rundown.test.mjs`)
 
 ### Changed
+- 2026-10-30 — Restore the hero status line with a neutral dot ("Currently designing tools for venture investors"), and update About, At a Glance, Ask answers and the README to reflect the Standard Metrics role, past Welcome Lend work, and not seeking new roles.
 - 2026-10-12 — Point the Book a call card, llms.txt, and the Ask contact answer at the Koalendar booking page and update the call length from 20 to 30 minutes.
 - 2026-10-12 — Pin Node to 24.x in `engines` and `.nvmrc` so CI, local development, and Vercel builds run the same major version and the Vercel auto-upgrade warning is gone.
 - 2026-10-11 — Frame the inquiry form as an elevated card with a three-color gradient top edge, stretch Send inquiry to the full form width, and open the privacy policy in a new tab; engagement terms now flow in two columns without row gaps.

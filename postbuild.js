@@ -787,8 +787,9 @@ function generateRoutes() {
       "I've led workshops, shaped product direction, built design systems, and partnered closely with engineers to ship. Not for process theater — for speed, consistency, and better product quality.",
     ]],
     ['Currently', [
-      "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
-      "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
+      "I'm a Product Designer at Standard Metrics, designing tools for venture investors.",
+      "Alongside that I keep a small independent practice for freelance work — equal parts consulting and building, as likely to be a design system as a feature shipped to production.",
+      "Most recently that meant embedded work with Welcome Lend, a fintech lending platform: rebuilding their design system and shipping tools their brokers used every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
       "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
       "Previously: Plastiq, Disney, Simplero, GoNation.",
     ]],

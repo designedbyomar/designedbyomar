@@ -159,7 +159,7 @@
         "how long at each job",
         "resume summary"
       ],
-      "answer": "Five roles, most recent first.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice, embedded with Welcome Lend plus a few companies he keeps private.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Lead designer, 0→1, on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
+      "answer": "Six roles, most recent first.\n\n**Standard Metrics** — Product Designer, present. Designing tools for venture investors.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice for freelance work; past engagements include embedded work with Welcome Lend.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Lead designer, 0→1, on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
       "sources": [
         "mgmt-portal",
         "connect-api",
@@ -180,7 +180,7 @@
         "can we hire him",
         "is he open to opportunities"
       ],
-      "answer": "He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nThe work he's drawn to is consistent: hard product problems with messy data, edge cases, operational constraints and users whose job depends on the thing working. Complex B2B, AI workflows, fintech, healthcare SaaS, enterprise platforms.\n\nHe currently runs an independent practice and is embedded with Welcome Lend, so fractional and consulting engagements are live options alongside full-time.\n\nThe fastest way to find out whether it's a fit is to ask him — there's a 30-minute intro call link in the contact section.",
+      "answer": "He isn't looking for a new role right now. He's a Product Designer at Standard Metrics, designing tools for venture investors.\n\nThe work he's drawn to is consistent: hard product problems with messy data, edge cases, operational constraints and users whose job depends on the thing working. Complex B2B, AI workflows, fintech, healthcare SaaS, enterprise platforms.\n\nHe still takes on select freelance work through his independent practice. If that's what you have in mind, there's a 30-minute intro call link in the contact section.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -637,7 +637,7 @@
         "is he free",
         "capacity"
       ],
-      "answer": "He currently runs an independent practice and is embedded with Welcome Lend plus a few companies he keeps private, so availability depends on what you're asking for.\n\nFractional and consulting engagements are live options alongside full-time roles.\n\nRather than guessing at timing here, the honest answer is to ask him — there's a 30-minute intro call link in the contact section, or omar@designedbyomar.com.",
+      "answer": "He isn't available for full-time roles right now — he's a Product Designer at Standard Metrics.\n\nHe still takes on a small amount of freelance work through his independent practice, so for a scoped project it's worth asking.\n\nThe contact section has a 30-minute intro call link, or email omar@designedbyomar.com.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -654,7 +654,7 @@
         "part time",
         "full time only"
       ],
-      "answer": "Both. He's open to Head of Design, Principal Product Designer, and senior, staff or fractional product design and design-engineering roles.\n\nHis current practice is consulting and embedded work — at Welcome Lend he's an embedded senior design lead, rebuilding their design system and shipping work brokers use daily.\n\nSo a fractional or contract engagement isn't a fallback for him; it's what he's doing now.",
+      "answer": "He's full-time at Standard Metrics as a Product Designer and isn't looking for another role.\n\nHe also keeps a small independent practice for freelance work. Past engagements include embedded work at Welcome Lend, where he rebuilt their design system and shipped tools their brokers used daily.\n\nSo a scoped contract project is still possible; full-time roles aren't on the table right now.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"

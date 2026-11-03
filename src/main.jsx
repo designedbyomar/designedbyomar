@@ -696,13 +696,13 @@ const Nav = ({ theme, setTheme, onHome, scrollToSection }) => {
 // Hero
 // ============================================================
 const Dot = () => (
-  <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-    <span style={{ width: 'var(--size-window-dot)', height: 'var(--size-window-dot)', borderRadius: 'var(--radius-circle)', background: 'var(--color-status-online)', boxShadow: '0 0 0 3px color-mix(in srgb, var(--color-status-online) 22%, transparent)', display: 'inline-block' }} />
+  <span style={{ display: 'inline-flex', alignItems: 'center', height: '1lh', flexShrink: 0 }}>
+    <span style={{ width: 'var(--size-window-dot)', height: 'var(--size-window-dot)', borderRadius: 'var(--radius-circle)', background: 'var(--fg-tertiary)', boxShadow: '0 0 0 3px color-mix(in srgb, var(--fg-tertiary) 22%, transparent)', display: 'inline-block' }} />
   </span>
 );
 
-const SHOW_ROLE_STATUS = false;
-const ROLE_STATUS_COPY = 'CURRENTLY LOOKING FOR MY NEXT ROLE.';
+const SHOW_ROLE_STATUS = true;
+const ROLE_STATUS_COPY = 'CURRENTLY DESIGNING TOOLS FOR VENTURE INVESTORS.';
 
 const Hero = ({ galaxy, theme, scrollToSection }) => (
   <section id="top" className="hero-editorial-outer" style={{ padding: 'var(--space-7) var(--space-6) var(--layout-2)' }}>
@@ -714,7 +714,7 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
     }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       {SHOW_ROLE_STATUS && (
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--font-size-body-sm)', color: 'var(--fg-tertiary)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-label-compact)' }}>
           <Dot /> <span>{ROLE_STATUS_COPY}</span>
         </div>
       )}
@@ -810,8 +810,9 @@ const ABOUT_SECTIONS = [
     heading: 'Currently',
     side: 'left',
     paras: [
-      "I run an independent product design practice. My engagements are equal parts consulting and building — I'm as likely to be rebuilding a design system as shipping a feature to production — for a mix of companies I keep private.",
-      "Lately that's meant embedded work with a fintech lending platform: rebuilding their design system and shipping tools their brokers use every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
+      "I'm a Product Designer at Standard Metrics, designing tools for venture investors.",
+      "Alongside that I keep a small independent practice for freelance work — equal parts consulting and building, as likely to be a design system as a feature shipped to production.",
+      "Most recently that meant embedded work with Welcome Lend, a fintech lending platform: rebuilding their design system and shipping tools their brokers used every day. One was a lender comparison tool — brokers weigh quotes to find the right fit for a borrower, and the matrix they'd inherited had become something you decoded rather than read. Another was sponsor expiration: designing how records lapse on a schedule instead of quietly going stale.",
       "Before this I spent two years as the founding designer at Wisdom, an early-stage healthcare SaaS platform, leading design across Management Portal, Reporting, Insurance Verification, and Posting Assistant — including an AI-assisted payment posting workflow that cut manual posting time by about 40%.",
       "Previously: Plastiq, Disney, Simplero, GoNation.",
     ],
@@ -1400,8 +1401,8 @@ const KeyFacts = () => {
 
   const facts = [
     { label: 'Core Expertise', value: 'AI workflows, design systems, enterprise UX, fintech, healthcare SaaS.', icon: Sparkles },
-    { label: 'Role Focus', value: 'Principal, Lead, and Design Manager roles across 0→1 product delivery.', icon: Target },
-    { label: 'Experience', value: 'Welcome Lend, Wisdom, Plastiq, Disney — AI workflows to enterprise platforms.', icon: Rocket },
+    { label: 'Role Focus', value: 'Principal- and lead-level product design across 0→1 delivery.', icon: Target },
+    { label: 'Experience', value: 'Standard Metrics, Welcome Lend, Wisdom, Plastiq, Disney — AI workflows to enterprise platforms.', icon: Rocket },
     { label: 'Writing', value: null, custom: true, icon: NotebookPen },
   ];
 
