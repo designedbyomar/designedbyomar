@@ -157,7 +157,7 @@ for (const kind of ['fallback', 'generated']) {
 
 for (const theme of ['light', 'dark']) {
   for (const width of [375, 820, 1440]) {
-    test(`Ask recovery and contact hierarchy fit ${theme} at ${width}px`, async ({ page }, testInfo) => {
+    test(`Ask recovery and contact grid fit ${theme} at ${width}px`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width, height: 900 });
       await page.addInitScript(theme => localStorage.setItem('omar.theme', theme), theme);
       await page.route('**/api/ask', route => fallback(route, 'unavailable'));
@@ -168,12 +168,16 @@ for (const theme of ['light', 'dark']) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({ path: testInfo.outputPath(`ask-${theme}-${width}.png`), fullPage: true });
       await page.goto('/#contact');
-      const primary = page.getByRole('group', { name: 'Start a conversation' });
-      const secondary = page.getByRole('group', { name: 'Explore my work and profiles' });
-      await primary.scrollIntoViewIfNeeded();
-      await expect(primary.getByRole('link')).toHaveCount(2);
-      await expect(secondary.getByRole('link')).toHaveCount(5);
-      expect((await secondary.boundingBox()).y).toBeGreaterThan((await primary.boundingBox()).y + (await primary.boundingBox()).height);
+      const cards = page.locator('#contact .contact-card');
+      await expect(cards).toHaveCount(7);
+      await cards.first().scrollIntoViewIfNeeded();
+      const layout = await cards.evaluateAll(nodes => ({
+        sharedParent: nodes.every(node => node.parentElement === nodes[0].parentElement),
+        boxes: nodes.map(node => { const { x, width } = node.getBoundingClientRect(); return { x, width }; }),
+      }));
+      expect(layout.sharedParent).toBe(true);
+      expect(new Set(layout.boxes.map(box => Math.round(box.x))).size).toBe(width <= 600 ? 1 : width <= 1200 ? 2 : 3);
+      expect(Math.max(...layout.boxes.map(box => box.width)) - Math.min(...layout.boxes.map(box => box.width))).toBeLessThan(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.locator('#contact').screenshot({ path: testInfo.outputPath(`contact-${theme}-${width}.png`) });
     });

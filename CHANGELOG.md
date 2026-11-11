@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Fixed
+- 2026-11-10 — Restore the homepage contact section’s original unified grid and consistent card widths and spacing.
 - 2026-11-10 — Unify documentation container borders, radii, and padding; prevent clipped usage outlines and balance the radius examples.
 - 2026-11-10 — Keep documentation navigation surfaces and indicators legible in forced colors.
 - 2026-11-10 — Align design-system navigation and content through one section registry; preserve anchors and add accessible menu dismissal, focus, and active-section tracking.

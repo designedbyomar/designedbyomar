@@ -106,7 +106,7 @@ The inquiry form is an elevated card (`--shadow-card-full`, `--radius-xl`) with 
 
 Ask keeps the full question editable and validates the shared 400-character limit before submission. Initial loading, failed downloads, unavailable replies, unsupported questions, and usage limits have distinct states. Manual retries preserve input; suggested questions and direct email remain available. Only reviewed answers are shareable. Analytics contain catalogue IDs and outcome categories, never question text. The design-system specimens demonstrate loading and recovery locally.
 
-Contact gives booking and email a primary two-column row (one column on mobile), followed by the existing responsive grid of resume and profile links. All controls retain their existing tokens and analytics events.
+Contact places booking, email, resume, and profile links in one responsive grid with equal-width cards and consistent gaps: three columns on wide screens, two on tablet, and one on mobile. All controls retain their existing tokens and analytics events.
 
 ## Reference organization
 

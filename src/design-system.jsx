@@ -661,7 +661,7 @@ const SECTION_RENDERERS = {
 <ExampleFrame label="Shared disclosure · engagement terms"><FAQAccordionDemo /></ExampleFrame><Details><p>Disclosure accepts a heading, content, heading level, optional ID, and defaultExpanded. Its button controls a labelled region; hidden content is removed from keyboard and accessibility navigation. Toggling introduces no motion.</p></Details>
   </>,
   'contact-cards': () => <>
-<Specimen kind="contact" /><Details><p>ContactCard accepts label, value, destination, optional copy value, and interaction callbacks. The shared ContactCard renders the production surface; reduced motion stops animated decoration. Booking and email have priority in the homepage contact layout, followed by profile and resume links.</p></Details>
+<Specimen kind="contact" /><Details><p>ContactCard accepts label, value, destination, optional copy value, and interaction callbacks. The shared ContactCard renders the production surface; reduced motion stops animated decoration. The homepage places booking, email, resume, and profile links in one responsive grid with consistent card widths and gaps.</p></Details>
   </>,
   'case-study-covers': () => <>
 <ExampleFrame label="Production case-study card"><Specimen kind="case" /></ExampleFrame><Details><p>CaseCard accepts a study record, featured or wide presentation, optional video, and interaction callbacks. Metadata and tags remain readable on narrow screens. Video is disabled in this deterministic example.</p></Details>
