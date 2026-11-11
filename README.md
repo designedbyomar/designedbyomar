@@ -97,7 +97,7 @@ Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](
 - Output directory: `dist`
 - Environment variables (every one is optional; the site builds and degrades gracefully without them):
   - `GITHUB_CONTRIBUTIONS_TOKEN` enables the live contribution calendar. Use a minimally scoped fine-grained personal access token with public-resource access only, store it in Vercel rather than the client, and rotate it before its expiration date.
-  - `GROQ_API_KEY` enables Ask routing and drafting. `GROQ_MODEL` and `GROQ_ROUTER_MODEL` override the drafting and routing models, so a model retirement is a dashboard change. `ASK_DETAILED_REASONS=1` adds failure detail to responses on preview or local runs only.
+  - `GROQ_API_KEY` enables Ask routing and drafting. `GROQ_MODEL` and `GROQ_ROUTER_MODEL` override the drafting and routing models, so a model retirement is a dashboard change. `ASK_DETAILED_REASONS=1` adds failure detail to responses. Set it only for preview or local runs; leave it unset in production.
   - `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, `TURNSTILE_SECRET_KEY`, and build-time `VITE_TURNSTILE_SITE_KEY` enable the inquiry form; `CONTACT_PREVIEW_HOST` allows one extra exact preview host. See [Rate-card inquiries](#rate-card-inquiries).
   - `VITE_SENTRY_DSN` enables Sentry.
   - `VITE_GA_ALLOWED_HOSTS` overrides the built-in GA4 production-host allowlist. Only the test build sets it; do not set it in Vercel.
