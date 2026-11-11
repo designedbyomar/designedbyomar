@@ -1339,6 +1339,7 @@
   .ds-shell, .ds-shell *, .ds-shell *::before, .ds-shell *::after { scroll-behavior: auto; }
 }
 @media (forced-colors: active) {
+  .ds-site-header, .ds-site-header.is-scrolled, .ds-sidebar { background: Canvas; backdrop-filter: none; -webkit-backdrop-filter: none; transition: none; }
   .ds-shell a[aria-label="designedbyomar"] path { fill: LinkText !important; }
   .ds-shell .ds-nav-category .ds-nav-category__chevron { color: ButtonText; }
   .ds-sidebar, .ds-surface-example, .ds-example-frame, .ds-token-swatch, .ds-doc-card { border: var(--border-signature-width) solid CanvasText; }

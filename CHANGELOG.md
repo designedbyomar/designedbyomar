@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Fixed
+- 2026-11-10 — Keep documentation navigation surfaces and indicators legible in forced colors.
 - 2026-11-10 — Align design-system navigation and content through one section registry; preserve anchors and add accessible menu dismissal, focus, and active-section tracking.
 - 2026-11-10 — Remove question text from Ask analytics and reporting; add recoverable loading and reply failures, explicit question limits, safe answer links, and clean work-history formatting.
 - 2026-11-02 — Update transitive `undici` (6.29.1) and `zod` (4.6.7) to resolve new high-severity advisories that failed the CI audit.

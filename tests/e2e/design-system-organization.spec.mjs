@@ -184,6 +184,12 @@ test('skip link, reduced motion, forced colors and zoom retain navigation', asyn
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('auto');
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto('/design-system#service-gradients');
+  await expect(page.locator('.ds-site-header')).toHaveCSS('backdrop-filter', 'none');
+  const canvasColor = await page.evaluate(() => {
+    const sample = document.createElement('span'); sample.style.color = 'Canvas'; document.body.append(sample);
+    const color = getComputedStyle(sample).color; sample.remove(); return color;
+  });
+  await expect(page.locator('.ds-site-header')).toHaveCSS('background-color', canvasColor);
   await page.screenshot({ path: testInfo.outputPath('forced-colors.png') });
   await expect(page.locator('#service-gradients-title')).toBeVisible();
   // CSS zoom checks text and control reflow; a halved viewport checks the layout
