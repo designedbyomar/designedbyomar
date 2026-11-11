@@ -4,7 +4,7 @@ Portfolio site for **Omar Tavarez** — product design for AI workflows, design 
 
 🌐 **Live:** [designedbyomar.com](https://www.designedbyomar.com)
 ✉️ **Contact:** [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
-🧑‍💼 **Currently:** Product Designer at Standard Metrics; not looking for new roles.
+🧑‍💼 **Currently:** Product Designer at Standard Metrics; not looking for new roles. Taking select fractional and freelance work: [book a 30-minute intro call](https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE).
 
 ---
 
@@ -12,7 +12,7 @@ Portfolio site for **Omar Tavarez** — product design for AI workflows, design 
 
 This site is both my portfolio and a public artifact showing how I work today: using AI-assisted tools to move from strategy → design system → production UI, while keeping product judgment, brand, and UX decisions human-led.
 
-If you're a hiring manager or founder, the things to look at are:
+If you're a hiring manager, founder, or product leader weighing a fractional or freelance engagement, the things to look at are:
 
 1. The site itself — [designedbyomar.com](https://www.designedbyomar.com)
 2. The case studies in [`src/content/case-studies.json`](./src/content/case-studies.json) — shared by the app and static route generator so each gets its own crawlable, SEO-tagged route.
@@ -28,14 +28,14 @@ If you're a hiring manager or founder, the things to look at are:
 
 ## What's in here
 
-- **Custom React 19 + Vite 8 single-page app** with multi-entry build (homepage, design-system page, 404).
+- **Custom React 19 + Vite 8 single-page app** with multi-entry build (main app, design-system page, 404). The main app serves the homepage, `/work`, `/about`, `/ask`, `/privacy`, and an unlisted, noindexed `/ratecard` services page.
 - **Shared case-study content** in [`src/content/case-studies.json`](./src/content/case-studies.json), consumed by [`src/case-studies.js`](./src/case-studies.js) and [`postbuild.js`](./postbuild.js) so UI content, route metadata, and generated sitemap entries stay aligned.
 - **Static route generation** in [`postbuild.js`](./postbuild.js) — each case study gets its own URL with unique title, description, OG, Twitter card, canonical, and JSON-LD.
 - **Design system guide** in [`DESIGN.md`](./DESIGN.md), plus a public reference page at `/design-system` documenting tokens, components, patterns, motion, content, accessibility, and theming.
-- **SEO + sharing**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite` + `Person` + `FAQPage`), robots directives, generated `sitemap.xml`, and an [`llms.txt`](./public/llms.txt) for AI crawlers.
+- **SEO + agent discovery**: canonical, Open Graph, Twitter card, JSON-LD (`WebSite`, `Person` with price-free service offers, `ProfilePage`, `CreativeWork`), robots directives, generated `sitemap.xml`, and an [`llms.txt`](./public/llms.txt) that tells AI agents who Omar is and how to work with him. Identity and availability come from one source, [`src/content/identity.mjs`](./src/content/identity.mjs).
 - **Analytics + monitoring**: Vercel Analytics, Vercel Speed Insights, Google Analytics 4 (consent-gated — loaded only after explicit user acceptance), Sentry (gated on `VITE_SENTRY_DSN`).
 - **Live GitHub activity**: a rolling one-year contribution calendar backed by GitHub GraphQL and cached through a same-origin Vercel function.
-- **Security headers** via [`vercel.json`](./vercel.json): `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
+- **Security headers** via [`vercel.json`](./vercel.json): `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Strict-Transport-Security`, `Referrer-Policy`.
 - **Image pipeline**: `sharp`-based [`scripts/optimize-image.mjs`](./scripts/optimize-image.mjs) for image optimization, plus automatic responsive WebP card covers and 1200×627 JPEG social previews for every case study during production builds.
 
 ## Stack
@@ -70,19 +70,18 @@ The build first runs `scripts/generate-responsive-case-images.mjs` and `scripts/
 
 ## Automated tests
 
-`npm test` runs the production build, SEO/static assertions, and Chromium Playwright E2E tests:
+`npm test` runs the production build, SEO/static assertions, content and endpoint unit tests, and Chromium Playwright E2E tests:
 
 ```bash
 npm test            # full automated suite
 npm run test:build  # production build smoke test only
 npm run test:seo    # generated metadata, sitemap, and discovery checks
+npm run test:content # Ask, contact, GitHub endpoint, and analytics unit tests
 npm run test:e2e    # build, preview, and Playwright browser checks
 npm run test:e2e:ui # optional interactive Playwright UI
 ```
 
 GitHub Actions runs the full suite automatically on every pull request and every push to `main`, alongside `npm audit --audit-level=high` and `npm run lint` — a high-severity advisory or a single lint warning fails the build. Playwright's UI mode is local-only and requires user interaction.
-
-Future unit tests should be added when route parsing, metadata generation, or analytics helpers are extracted from `src/main.jsx` / `postbuild.js`.
 
 If Playwright browsers are not installed locally yet, run:
 
@@ -92,13 +91,16 @@ npx playwright install chromium
 
 ## Deploy
 
-Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](./vercel.json) with security headers and a single rewrite to the SPA shell.
+Canonical deploy target is **Vercel**. The repo is wired up via [`vercel.json`](./vercel.json) with security headers, long-lived asset caching, legacy-URL redirects, and the Ask function's duration limit. Static routes are generated files, so no SPA rewrite is needed.
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Environment variables:
+- Environment variables (every one is optional; the site builds and degrades gracefully without them):
   - `GITHUB_CONTRIBUTIONS_TOKEN` enables the live contribution calendar. Use a minimally scoped fine-grained personal access token with public-resource access only, store it in Vercel rather than the client, and rotate it before its expiration date.
-  - `VITE_SENTRY_DSN` enables Sentry. Without it, the site builds and ships normally.
+  - `GROQ_API_KEY` enables Ask routing and drafting. `GROQ_MODEL` and `GROQ_ROUTER_MODEL` override the drafting and routing models, so a model retirement is a dashboard change. `ASK_DETAILED_REASONS=1` adds failure detail to responses on preview or local runs only.
+  - `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, `TURNSTILE_SECRET_KEY`, and build-time `VITE_TURNSTILE_SITE_KEY` enable the inquiry form; `CONTACT_PREVIEW_HOST` allows one extra exact preview host. See [Rate-card inquiries](#rate-card-inquiries).
+  - `VITE_SENTRY_DSN` enables Sentry.
+  - `VITE_GA_ALLOWED_HOSTS` overrides the built-in GA4 production-host allowlist. Only the test build sets it; do not set it in Vercel.
 
 The GitHub widget degrades to a profile link when its token or upstream data is unavailable. The token is read only by `/api/github-contributions` and is never included in the browser bundle or response.
 
@@ -214,30 +216,38 @@ Bump **minor** when the release adds capability or changes how something is rend
 │   └── smoke-github-contributions.mjs # prod smoke check for the GitHub endpoint
 ├── src/
 │   ├── main.jsx                    # main site app shell and homepage experience
+│   ├── rate-card-page.jsx          # unlisted services page
+│   ├── inquiry-controller.jsx      # inquiry form state, verification, and submission
 │   ├── case-studies.js             # normalized case-study content exports
 │   ├── routes.js                   # route parsing and route metadata helpers
 │   ├── ask.mjs                     # Ask matching/answer logic (shared with api/ask.mjs)
 │   ├── analytics-env.mjs           # production-host + build-mode GA gating
 │   ├── design-system.jsx           # design system reference page
+│   ├── design-system-specimens.jsx # production components rendered with fixtures
 │   ├── design-tokens.css           # shared token source for app entries
 │   ├── galaxy.jsx                  # hero canvas animation
-│   ├── constants.js                # nav / route / breakpoint constants
+│   ├── constants.js                # layout breakpoints, aspect ratios, profile links
 │   ├── content/                    # canonical content sources
+│   │   ├── identity.mjs            # Person schema, descriptions, profile links, offers
 │   │   ├── case-studies.json       # canonical case-study content
 │   │   ├── ask-answers.json        # reviewed Ask answers
-│   │   ├── rate-card.mjs           # rate-card service/pricing content
+│   │   ├── static-page-copy.mjs    # copy shared by the app and static HTML
+│   │   ├── rate-card.mjs           # services page content (prices stay on that page)
+│   │   ├── inquiry.mjs             # inquiry form fields and validation
 │   │   └── privacy-policy.mjs      # privacy policy copy
-│   └── ui/                         # shared UI components
-│       ├── navigation.jsx
-│       ├── ask-panel.jsx
-│       ├── case-card.jsx
-│       ├── inquiry-form.jsx
-│       └── site-footer.jsx
+│   └── ui/                         # shared presentation components (see src/ui/README.md)
+│       ├── navigation.jsx, site-footer.jsx, controls.jsx
+│       ├── case-card.jsx, case-study-body.jsx, case-study-meta.jsx
+│       ├── ask-panel.jsx, about-media.jsx, contact-card.jsx
+│       ├── inquiry-form.jsx, form-field.jsx, select-field.jsx
+│       └── service-list.jsx, disclosure.jsx, consent-banner.jsx
 ├── tests/
-│   ├── seo-static.test.mjs         # static-route SEO regression checks
-│   ├── ask-answers.test.mjs        # Ask content fingerprint + evidence checks
+│   ├── seo-static.test.mjs         # static-route SEO and discovery regression checks
+│   ├── ask-*.test.mjs              # Ask answers, matcher, endpoint, links, rundown
+│   ├── contact-endpoint.test.mjs   # inquiry endpoint validation
+│   ├── github-contributions-endpoint.test.mjs
 │   ├── analytics-env.test.mjs      # GA host/build gating unit tests
-│   └── e2e/                        # Playwright end-to-end suite
+│   └── e2e/                        # Playwright suite: site, Ask recovery, rate card, inquiry form, design system
 └── docs/
     └── ai-workflow.md              # how AI is used in this repo
 ```
@@ -248,9 +258,9 @@ MIT — see [LICENSE](./LICENSE).
 
 ## Rate-card inquiries
 
-The unlinked services page can send inquiries to Omar’s inbox through `POST /api/contact`. Configure `RESEND_API_KEY` (sending-only), `CONTACT_FROM_EMAIL` (for example `Website inquiries <inquiries@designedbyomar.com>`), and `TURNSTILE_SECRET_KEY` server-side, plus `VITE_TURNSTILE_SITE_KEY` at build time. The Resend domain must be verified. Use Turnstile managed mode with the exact production and approved preview hostnames. Vercel’s `VERCEL_URL` and `VERCEL_BRANCH_URL` are accepted as exact preview hosts; `CONTACT_PREVIEW_HOST` can specify one additional exact test alias. No wildcard preview host is accepted.
+The unlinked, noindexed services page (`/ratecard`) can send inquiries to Omar’s inbox through `POST /api/contact`. Configure `RESEND_API_KEY` (sending-only), `CONTACT_FROM_EMAIL` (for example `Website inquiries <inquiries@designedbyomar.com>`), and `TURNSTILE_SECRET_KEY` server-side, plus `VITE_TURNSTILE_SITE_KEY` at build time. The Resend domain must be verified. Use Turnstile managed mode with the exact production and approved preview hostnames. Vercel’s `VERCEL_URL` and `VERCEL_BRANCH_URL` are accepted as exact preview hosts; `CONTACT_PREVIEW_HOST` can specify one additional exact test alias. No wildcard preview host is accepted.
 
-Review PR #101 through its [stable branch preview](https://designedbyomar-git-feat-ratecard-bklynsouljahs-projects.vercel.app/ratecard). Deployment-specific preview URLs need their own exact hostname in the Turnstile widget; error `110200` indicates an unauthorized hostname. Recoverable verification errors offer a manual retry that preserves entered fields.
+Deployment-specific preview URLs need their own exact hostname in the Turnstile widget; error `110200` indicates an unauthorized hostname. Recoverable verification errors offer a manual retry that preserves entered fields.
 
 Configure preview variables first and rebuild the preview after changing the public site key. Confirm an inquiry arrives in `omar@designedbyomar.com` before enabling production sending. Never use Cloudflare test keys or bypass verification on a deployed preview or production site; the test build uses a public fixture key only with intercepted browser requests. Missing configuration or failed discovery leaves direct email available.
 
