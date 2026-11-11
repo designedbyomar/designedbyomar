@@ -31,26 +31,7 @@ const STATIC_SITE_LINKS = [
   ['Privacy', '/privacy'],
 ];
 
-const personSchema = {
-  '@type': 'Person',
-  name: 'Omar Tavarez',
-  url: `${SITE_ORIGIN}/`,
-  jobTitle: 'Principal Product Designer',
-  email: 'omar@designedbyomar.com',
-  sameAs: [
-    'https://www.linkedin.com/in/omartavarez/',
-    'https://github.com/designedbyomar',
-    'https://substack.com/@designedbyomar',
-  ],
-  knowsAbout: [
-    'Product Design',
-    'Design Systems',
-    'AI Workflows',
-    'Fintech',
-    'Healthcare SaaS',
-    'Enterprise UX',
-  ],
-};
+let personSchema; // PERSON_SCHEMA from src/content/identity.mjs, loaded below
 
 const toAbsoluteUrl = (pathOrUrl) => {
   if (!pathOrUrl) return DEFAULT_OG_IMAGE;
@@ -851,13 +832,15 @@ function generateRoutes() {
 }
 
 if (require.main === module) (async () => {
-  const [blockModule, privacyModule, staticPageCopyModule, rateCardModule, designSystemModule] = await Promise.all([
+  const [blockModule, privacyModule, staticPageCopyModule, rateCardModule, designSystemModule, identityModule] = await Promise.all([
     import('./src/content/case-study-blocks.mjs'),
     import('./src/content/privacy-policy.mjs'),
     import('./src/content/static-page-copy.mjs'),
     import('./src/content/rate-card.mjs'),
     import('./src/content/design-system.mjs'),
+    import('./src/content/identity.mjs'),
   ]);
+  ({ PERSON_SCHEMA: personSchema } = identityModule);
   ({ normalizeBlocks } = blockModule);
   ({ PRIVACY_POLICY } = privacyModule);
   ({ HOME_PAGE_COPY, WORK_PAGE_COPY } = staticPageCopyModule);

@@ -6,13 +6,17 @@ brand
 
 ## Users
 
-Hiring managers, founders, and design leaders evaluating Omar Tavarez for Head of Design, Principal Product Designer, Senior/Staff, or fractional design-engineering roles. They arrive with high judgment, limited time, and a low tolerance for generic portfolios. They are looking for signal: strategic thinking, production-quality craft, and evidence that he can lead from ambiguity to shipped product.
+Hiring managers, founders, and design leaders judging whether Omar operates at a Head of Design, Principal, or Senior/Staff level. They arrive with high judgment, limited time, and a low tolerance for generic portfolios. They are looking for signal: strategic thinking, production-quality craft, and evidence that he can lead from ambiguity to shipped product. The bar is the same whether they are thinking about a future role or a fractional or freelance engagement.
 
-Secondary: potential collaborators, peers, and recruiters who may forward the site.
+Omar is currently a full-time Product Designer at Standard Metrics and is not seeking a new full-time role. The most likely conversation today is a scoped engagement through his independent practice: a product or website audit, a design sprint, fractional design capacity, or a website build.
+
+Secondary: recruiters, peers, and collaborators who may forward the site, and AI agents or search assistants researching designers on someone's behalf. Those agents read `llms.txt`, structured data, and static HTML, so those surfaces need to say the same thing as the visible site.
 
 ## Product Purpose
 
-Public portfolio and hiring artifact for Omar Tavarez. The site exists to convert qualified visitors into conversations. Success means a hiring manager finishes a case study and reaches out — not because the site was impressive, but because the work was undeniable and the presentation earned their trust.
+Public portfolio and proof of work for Omar Tavarez. The site exists to turn qualified visitors into conversations, mainly about fractional and freelance work while he is not seeking a full-time role. Success means a founder or product leader finishes a case study and reaches out — not because the site was impressive, but because the work was undeniable and the presentation earned their trust.
+
+Services and pricing live on an unlisted, noindexed page that is shared directly. Public surfaces describe the kinds of engagements without publishing prices.
 
 The public repo and open codebase are part of the artifact: they demonstrate AI-assisted design-engineering workflow and production-grade thinking, not just visual output.
 

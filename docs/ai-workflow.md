@@ -37,7 +37,7 @@ The point of this artifact is to be honest about that boundary.
 
 ## How I keep quality up
 
-1. **Small PRs, scoped commits.** Recent history (gradient tokens, typography migration, spacing migration, hero copy refresh) is split across many small commits so each change is reviewable. Branches use explicit prefixes (`fix/...`, `feature/...`, `content/...`, `design/...`, `chore/...`) so the intent is clear before review.
+1. **Small PRs, scoped commits.** Recent history (gradient tokens, typography migration, spacing migration, hero copy refresh) is split across many small commits so each change is reviewable. Branches use explicit prefixes (`feat/...`, `fix/...`, `content/...`, `design/...`, `chore/...`) so the intent is clear before review.
 2. **Token migrations done in phases.** Typography → motion → spacing → gradient — each phase is its own PR so I can verify visual diffs incrementally instead of one monster refactor.
 3. **Visual review on every diff.** Every UI-affecting PR is checked against the live site before merge. No "looks right in code" merges.
 4. **External review passes.** CodeRabbit and Greptile review PRs for issues I may have missed, while human review still owns taste, scope, and final judgment.
