@@ -112,7 +112,7 @@ test('every shared logo respects reduced motion and live preference changes', as
     await expect(logos.first()).toBeVisible();
     if (route === '/design-system') {
       await expect(page.locator('[data-production-specimen="footer"]')).toBeVisible();
-      await expect(logos).toHaveCount(3);
+      await expect(logos).toHaveCount(4);
     } else {
       await expect(logos).toHaveCount(2);
     }
@@ -120,10 +120,13 @@ test('every shared logo respects reduced motion and live preference changes', as
       await logo.hover();
       await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'none'))).toBe(true);
       await page.emulateMedia({ reducedMotion: 'no-preference' });
-      // Leave and re-enter to exercise the actual hover trigger.
-      await page.mouse.move(0, 0);
-      await logo.hover();
-      await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'navShapeBounce'))).toBe(true);
+      // Media changes reach React asynchronously. Re-enter after that update,
+      // instead of leaving a single early hover stuck in the previous state.
+      await expect.poll(async () => {
+        await page.mouse.move(0, 0);
+        await logo.hover();
+        return logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'navShapeBounce'));
+      }).toBe(true);
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await expect.poll(() => logo.locator('path').evaluateAll(paths => paths.every(path => getComputedStyle(path).animationName === 'none'))).toBe(true);
     }

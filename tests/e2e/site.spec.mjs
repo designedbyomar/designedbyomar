@@ -739,9 +739,8 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
     const width = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
     return width <= window.innerWidth;
   })).toBe(true);
-  await expect.poll(() => page.locator('.ds-doc-card').first().evaluate((card) => (
-    getComputedStyle(card).boxShadow.includes('inset')
-  ))).toBe(true);
+  await expect(page.locator('.ds-doc-card').first()).toHaveCSS('border-style', 'solid');
+  await expect(page.locator('.ds-doc-card').first()).toHaveCSS('box-shadow', 'none');
 });
 
 test('design system hero keeps its title clear of the orbit at intermediate desktop widths', async ({ page }) => {
@@ -777,7 +776,8 @@ test('design system sidebar categories collapse and expand', async ({ page }) =>
   await expect(sidebar).toHaveAttribute('data-sidebar-mode', 'collapsible');
   // Category icons use the same gradient stroke as the quick-link cards.
   await expect(sidebar.locator('.ds-nav-category .ds-signal-gradient-icon').first()).toBeVisible();
-  await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'true');
+  await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'false');
+  await sidebar.getByRole('button', { name: /^Components$/ }).click();
   await sidebar.getByRole('button', { name: /Components/i }).click();
   await expect(sidebar.getByRole('button', { name: /Components/i })).toHaveAttribute('aria-expanded', 'false');
   await sidebar.getByRole('button', { name: /Components/i }).click();
@@ -789,13 +789,15 @@ test('design system sidebar links navigate to anchored sections', async ({ page 
 
   const sidebar = page.getByTestId('design-system-sidebar');
 
+  await sidebar.getByRole('button', { name: /^Components$/ }).click();
   await sidebar.getByRole('link', { name: /Buttons/i }).click();
   await expect(page).toHaveURL(/#buttons$/);
-  await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons$/ })).toBeVisible();
+  await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons and links$/ })).toBeVisible();
 
+  await sidebar.getByRole('button', { name: /^Motion$/ }).click();
   await sidebar.getByRole('link', { name: /Motion overview/i }).click();
   await expect(page).toHaveURL(/#motion$/);
-  await expect(page.locator('#motion').getByRole('heading', { name: /^Motion$/ })).toBeVisible();
+  await expect(page.locator('#motion').getByRole('heading', { name: /^Motion overview$/ })).toBeVisible();
 });
 
 test('design system theme toggle updates the pixel orbit theme', async ({ page }) => {
@@ -821,10 +823,10 @@ test('design system documents restored foundations and component flow', async ({
   await expect(page.locator('#spacing').getByText('--layout-4')).toBeVisible();
   await expect(page.locator('#blur').getByRole('heading', { name: /^Blur$/ })).toBeVisible();
   await expect(page.locator('#blur').getByRole('heading', { name: '--blur-heavy' })).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Contact Surface Card' })).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByText(/shared ContactCard renders the production surface/i)).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByText(/reduced motion stops animated decoration/i)).toBeVisible();
-  await expect(page.locator('#cards-accordions').getByRole('heading', { name: 'Signal Gradient Icon' })).toBeVisible();
+  await expect(page.locator('#contact-cards').getByRole('heading', { name: 'Contact cards', exact: true })).toBeVisible();
+  await page.locator('#contact-cards').getByRole('button', { name: 'Usage and behavior' }).click();
+  await expect(page.locator('#contact-cards').getByText(/shared ContactCard renders the production surface/i)).toBeVisible();
+  await expect(page.locator('#icons').getByText('Signal gradient icons', { exact: true })).toBeVisible();
   await expect(page.locator('main').getByRole('heading', { name: /^Copy actions$/ })).toHaveCount(1);
   await expect(page.locator('#github-activity').getByRole('heading', { name: 'GitHub activity' })).toBeVisible();
   await expect(page.locator('#github-activity').getByRole('link', { name: /View GitHub profile/i })).toBeVisible();
@@ -844,16 +846,16 @@ test('design system section titles resolve their aria label and copy a reference
   // The section's aria-labelledby now resolves to a real heading id.
   const section = page.locator('#buttons');
   await expect(section).toHaveAttribute('aria-labelledby', 'buttons-title');
-  await expect(page.locator('#buttons-title')).toHaveText('Buttons');
+  await expect(page.locator('#buttons-title')).toHaveText('Buttons and links');
 
   // The labelled copy control writes the section reference and confirms the copy.
   const copy = section.locator('.ds-section-header__copy');
-  await expect(copy).toHaveAttribute('aria-label', /Copy a reference to the "Buttons" section/);
+  await expect(copy).toHaveAttribute('aria-label', /Copy a reference to the "Buttons and links" section/);
   await copy.click();
 
-  await expect(copy).toHaveAttribute('aria-label', /Copied reference to the "Buttons" section/);
+  await expect(copy).toHaveAttribute('aria-label', /Copied reference to the "Buttons and links" section/);
   const written = await page.evaluate(() => window.__written);
-  expect(written).toEqual(['Design System — "Buttons" (/design-system#buttons)']);
+  expect(written).toEqual(['Design System — "Buttons and links" (/design-system#buttons)']);
 });
 
 test('every design-system aria-labelledby points at an element that exists', async ({ page }) => {
@@ -1035,15 +1037,16 @@ test.describe('mobile navigation', () => {
 
     await expect(page.getByRole('heading', { level: 1, name: /designedbyomar Design System/i })).toBeVisible();
     await page.getByRole('button', { name: /Open design system navigation/i }).click();
-    await page.locator('.ds-mobile-panel').getByRole('link', { name: 'Buttons', exact: true }).click();
+    await page.locator('#ds-section-navigation').getByRole('button', { name: 'Components', exact: true }).click();
+    await page.locator('#ds-section-navigation').getByRole('link', { name: 'Buttons and links', exact: true }).click();
 
     await expect(page).toHaveURL(/#buttons$/);
-    await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons$/ })).toBeVisible();
+    await expect(page.locator('#buttons').getByRole('heading', { name: /^Buttons and links$/ })).toBeVisible();
 
     // The header nav is hidden below 1054px, so the panel is the only route back to the
     // site at this width. Without these the mobile page would offer less than every other.
     await page.getByRole('button', { name: /Open design system navigation/i }).click();
-    const panelNav = page.locator('.ds-mobile-panel .ds-mobile-site-nav');
+    const panelNav = page.locator('#ds-section-navigation .ds-mobile-site-nav');
     await expect(panelNav.getByRole('link', { name: /^Work$/ })).toHaveAttribute('href', '/work');
     await expect(panelNav.getByRole('link', { name: /^Contact$/ })).toHaveAttribute('href', '/#contact');
     await expect(panelNav.getByRole('link', { name: /^Get in touch$/ })).toBeVisible();
@@ -1784,6 +1787,7 @@ test('the design system documents the Ask component', async ({ page }) => {
   await page.goto('/design-system');
   await page.locator('#ask').scrollIntoViewIfNeeded();
   await expect(page.getByRole('heading', { name: 'Ask', exact: true })).toBeVisible();
+  await page.locator('#ask').getByRole('button', { name: 'Answer states and behavior' }).click();
   await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
   await expect(page.getByText(/Only approved/i)).toBeVisible();
 

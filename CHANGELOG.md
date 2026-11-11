@@ -5,6 +5,9 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Fixed
+- 2026-11-10 — Unify documentation container borders, radii, and padding; prevent clipped usage outlines and balance the radius examples.
+- 2026-11-10 — Keep documentation navigation surfaces and indicators legible in forced colors.
+- 2026-11-10 — Align design-system navigation and content through one section registry; preserve anchors and add accessible menu dismissal, focus, and active-section tracking.
 - 2026-11-10 — Remove question text from Ask analytics and reporting; add recoverable loading and reply failures, explicit question limits, safe answer links, and clean work-history formatting.
 - 2026-11-02 — Update transitive `undici` (6.29.1) and `zod` (4.6.7) to resolve new high-severity advisories that failed the CI audit.
 - 2026-10-11 — Restrict the Ask endpoint's corpus fetch to known hosts and stop CI checkout persisting Git credentials, resolving two Aikido findings.
@@ -12,6 +15,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-10-08 — Add recoverable verification retries without losing inquiry details and update vulnerable build dependencies to restore the CI audit.
 
 ### Added
+- 2026-11-10 — Add dedicated badge, field, dropdown, layout, icon, and accessibility examples plus a theme-aware token reference sourced from CSS.
 - 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
 - 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.
 - 2026-10-04 — Add an unlinked, noindex services and rates page with nine scoped USD offers, engagement terms, email contact, and shared editorial service-list specimens.

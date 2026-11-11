@@ -202,7 +202,7 @@ test('service gradient gallery documents and copies all category tokens', async 
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { window.copiedGradient = value; } } }));
   await page.goto('/design-system#service-gradients');
   const gallery = page.locator('#service-gradients');
-  await expect(gallery.locator('.ds-rate-gradient-swatch')).toHaveCount(3);
+  await expect(gallery.locator('.ds-rate-gradient-swatch')).toHaveCount(4);
   for (const [category, label] of [['audits', 'Audits'], ['projects', 'Projects'], ['ongoing', 'Ongoing support']]) {
     await gallery.getByRole('button', { name: `Copy ${label} gradient token`, exact: true }).click();
     expect(await page.evaluate(() => window.copiedGradient)).toBe(`var(--gradient-rate-${category})`);
