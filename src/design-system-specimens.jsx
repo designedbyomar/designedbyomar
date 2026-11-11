@@ -11,7 +11,8 @@ import { CaseStudyTag, CaseStudyMetadata } from './ui/case-study-meta.jsx';
 import { CaseCard } from './ui/case-card.jsx';
 import { CaseStudyBody } from './ui/case-study-body.jsx';
 import { AboutStack, AboutLightbox } from './ui/about-media.jsx';
-import { AskPanel } from './ui/ask-panel.jsx';
+import { AskPanel, AskAvailability } from './ui/ask-panel.jsx';
+import { MAX_QUESTION_CHARS } from './ask-policy.mjs';
 import { GitHubActivity } from './github-contributions.jsx';
 import { useViewportWidth, usePrefersReducedMotion } from './ui/hooks.js';
 import { ABOUT_PHOTOS } from './content/about-photos.js';
@@ -88,15 +89,16 @@ const AskSpecimen = () => {
   const reduced = usePrefersReducedMotion();
   const phase = state === 'loading' ? 'looking' : state === 'drafting' ? 'drafting' : null;
   return <>
-    <StatePicker value={state} onChange={setState} states={['idle', 'reviewed', 'drafted', 'loading', 'drafting', 'unavailable']} />
-    <AskPanel query={query} setQuery={setQuery} canSubmit={Boolean(query.trim())}
+    <StatePicker value={state} onChange={setState} states={['idle', 'reviewed', 'drafted', 'loading', 'drafting', 'unavailable', 'rate-limited', 'no-material', 'loading-answers', 'load-error']} />
+    {['loading-answers', 'load-error'].includes(state) ? <AskAvailability loading={state === 'loading-answers'} onRetry={() => setState('idle')} /> :
+    <AskPanel query={query} setQuery={setQuery} canSubmit={Boolean(query.trim()) && query.trim().length <= MAX_QUESTION_CHARS && !phase}
       submit={event => { event.preventDefault(); setState('reviewed'); }} prefersReducedMotion={reduced}
       result={state === 'reviewed' ? ANSWER_FIXTURE : null} linkable={false} copyState="idle"
       phase={phase} drafted={state === 'drafted' ? { text: 'This is a labelled drafted-state fixture, not a live model response.', sources: [] } : null}
-      missed={state === 'unavailable'} suggestions={PROMPT_FIXTURES} showingFollowUps={false}
+      missed={['unavailable', 'rate-limited', 'no-material'].includes(state)} failureReason={state} suggestions={PROMPT_FIXTURES} showingFollowUps={false}
       collapsible={false} suggestionsExpanded={expanded} setSuggestionsExpanded={setExpanded}
       focusRevealedRef={focusRevealedRef} fullSet={PROMPT_FIXTURES} show={answer => setState(['reviewed', 'drafted', 'loading'][PROMPT_FIXTURES.indexOf(answer)])}
-      sentinelRef={sentinelRef} suggestionListRef={suggestionListRef} studies={CASE_STUDIES} idPrefix="ds-" />
+      sentinelRef={sentinelRef} suggestionListRef={suggestionListRef} studies={CASE_STUDIES} idPrefix="ds-" />}
   </>;
 };
 

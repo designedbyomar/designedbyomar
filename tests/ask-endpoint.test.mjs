@@ -13,6 +13,7 @@ import { readFileSync } from 'node:fs';
 import { createHandler, trustedOrigin, MODEL, ROUTER_MODEL, UNUSABLE_MODELS, DRAFT_TOKENS, ROUTE_TOKENS, REASONING, ROUTER_TIMEOUT_MS, SUPPORTED_EFFORT } from '../api/ask.mjs';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
+import { MAX_QUESTION_CHARS } from '../src/ask-policy.mjs';
 
 /**
  * The detailed reason header is opt-in, because production ships buckets rather
@@ -476,6 +477,24 @@ test('an unreachable answer file degrades instead of erroring', async () => {
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
   assert.equal(calls.length, 0);
+});
+
+test('overlong and non-string questions are rejected before retrieval or provider calls', async () => {
+  let loaded = 0;
+  const handler = createHandler({ loadAnswers: () => { loaded++; throw new Error('must not load'); } });
+  for (const question of ['x'.repeat(MAX_QUESTION_CHARS + 1), 123, { text: 'hello' }]) {
+    const response = await handler(post(question));
+    assert.equal(response.headers.get('X-Ask-Source'), 'fallback');
+    assert.equal(response.headers.get('X-Ask-Reason'), typeof question === 'string' ? 'question-too-long' : 'bad-request');
+  }
+  assert.equal(loaded, 0);
+});
+
+test('a question at the shared limit reaches routing intact', async () => {
+  const { handler, routeCalls } = loadHandler({ routeReturns: 'NONE' });
+  const question = 'x'.repeat(MAX_QUESTION_CHARS);
+  await handler(post(question));
+  assert.equal(routeCalls[0].prompt, question);
 });
 
 test('grounding context is ranked, not padded from the top of the array', () => {

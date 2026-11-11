@@ -1,7 +1,7 @@
 export const PRIVACY_POLICY = {
   title: 'Privacy Policy',
   subtitle: 'No creepy tracking',
-  lastUpdated: 'October 4, 2026',
+  lastUpdated: 'November 10, 2026',
   blocks: [
     {
       type: 'paragraph',
@@ -42,7 +42,7 @@ export const PRIVACY_POLICY = {
         'how long people stay',
         'what devices or browsers are being used',
         'general location, such as country or city-level information',
-        'questions typed into the Ask box that it cannot safely answer, including the wording of the question; when the router identifies relevant published work, the question may also be sent to Groq with excerpts from only those case studies so a reply can be drafted',
+        'Ask answer IDs, nearest reviewed topic IDs, response outcomes, and failure categories; question text is not sent to analytics',
       ],
     },
     {
@@ -52,19 +52,20 @@ export const PRIVACY_POLICY = {
     { type: 'heading', text: 'The Ask Box' },
     {
       type: 'paragraph',
-      text: 'The answers in the Ask section are written in advance and reviewed by hand. Clicking one of the suggested questions, or typing the same reviewed question or alias with ordinary changes in casing, punctuation, apostrophes, or spacing, is answered in your browser: nothing is sent and nothing leaves this site.',
+      text: 'Suggested questions and exact matches to reviewed questions are answered in your browser. Their wording is not sent to a model. Some factual questions about management experience are also answered locally.',
     },
     {
       type: 'paragraph',
-      text: 'Anything else you type is sent to this site to be matched. Word overlap alone picked the wrong answer often enough to be a problem — it once answered “is he a manager” with a refusal to discuss employers — so the question is normally passed on to Groq along with the list of written questions, and a model says which one you are asking for. That list is questions only: no answer text, and nothing about you. If Groq cannot be reached, returns an invalid result, or the allowance is spent, the Ask box shows that it cannot answer rather than substituting a loosely related answer or citation.',
+      text: 'Other questions are sent through this site to Groq to find a relevant reviewed answer. If none fits, Groq may draft a reply using excerpts from relevant published case studies. Drafts are labelled as unreviewed and link to the studies they mention. If there is no supporting material, Ask says so. Connection failures offer a retry; a temporary usage limit asks you to wait or choose a suggested question.',
     },
     {
       type: 'paragraph',
-      text: 'If no written answer fits, Groq may name one or two relevant case studies. Only then is the question sent again with excerpts from those named studies and any reviewed answer grounded entirely in the same studies. If the router says none apply or fails, no draft is attempted. A drafted reply is labelled as drafted and unreviewed wherever it appears, and citation links appear only for named studies the completed reply actually mentions. The wording of a question the Ask box cannot safely answer is also recorded in an analytics event, which is how I can see missing answers and routing failures. A question that does get a written answer is not recorded that way.',
+      text: 'This processing is needed to answer your question and is separate from analytics consent. Please leave out personal or confidential information. This site does not store your questions or use them to train models. Groq processes questions under its cloud-service data terms.',
+      link: { label: 'Groq data processing terms', href: 'https://console.groq.com/docs/legal/customer-data-processing-addendum' },
     },
     {
       type: 'paragraph',
-      text: 'Your question is not stored on this site, is not used to identify you, and is not used to train anything by me. If you declined analytics, no analytics event is sent. If you would rather not send a question anywhere at all, email me instead and it stays between us.',
+      text: 'If you accept analytics, Ask records answer IDs, nearest reviewed topic IDs, outcomes, and failure categories to help improve coverage and reliability. It does not send your question text to analytics. If you decline analytics, these events are not sent. You can email Omar directly if you prefer a personal reply.',
     },
     { type: 'heading', text: 'Google Analytics 4' },
     {

@@ -50,6 +50,7 @@ const expectWorkIndex = async (page) => {
 };
 
 test.beforeEach(async ({ page }) => {
+  await page.route('**/api/ask', route => route.fulfill({ status: 200, headers: { 'X-Ask-Source': 'fallback', 'X-Ask-Reason': 'no-material' }, body: '' }));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('**/api/github-contributions', route => route.fulfill({
     status: 200,
@@ -1261,21 +1262,18 @@ test('Ask reports a missed question so the gap can be closed', async ({ page }) 
 
   const miss = await page.evaluate(() => (window.__omarAnalyticsEvents ?? []).find(e => e.eventName === 'ask_no_match'));
   expect(miss, 'ask_no_match must fire on a miss').toBeTruthy();
-  expect(miss.params.question).toBe('how do penguins pay for parking in antarctica');
+  expect(miss.params.question).toBeUndefined();
+  expect(miss.params.answered_by).toBe('fallback');
+  expect(miss.params.nearest_id).toBeDefined();
 });
 
 test('the privacy policy discloses what the Ask box records and where it goes', async ({ page }) => {
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { name: /The Ask Box/i })).toBeVisible();
-  // All three cases have to be stated, because they differ in what leaves the
-  // browser: a normalized exact question, a routed one, and one nothing covers.
-  await expect(page.getByText(/answered in your browser: nothing is sent/i)).toBeVisible();
-  await expect(page.getByText(/Anything else you type is sent to this site to be matched/i)).toBeVisible();
-  await expect(page.getByText(/Only then is the question sent again with excerpts from those named studies/i)).toBeVisible();
-  await expect(page.getByText(/If the router says none apply or fails, no draft is attempted/i)).toBeVisible();
-  await expect(page.getByText(/shows that it cannot answer rather than substituting a loosely related answer or citation/i)).toBeVisible();
-  await expect(page.getByText(/wording of a question the Ask box cannot safely answer is also recorded/i)).toBeVisible();
-  await expect(page.getByText(/does get a written answer is not recorded that way/i)).toBeVisible();
+  await expect(page.getByText(/Their wording is not sent to a model/i)).toBeVisible();
+  await expect(page.getByText(/Other questions are sent through this site to Groq/i)).toBeVisible();
+  await expect(page.getByText(/separate from analytics consent/i)).toBeVisible();
+  await expect(page.getByText(/does not send your question text to analytics/i)).toBeVisible();
   // Claims that were true before the endpoint existed and must not come back.
   await expect(page.getByText(/Nothing you type is sent to a language model/i)).toHaveCount(0);
   await expect(page.getByText(/nothing you type leaves this site/i)).toHaveCount(0);
@@ -1356,7 +1354,7 @@ test('the Ask box degrades to its written fallback when the endpoint fails', asy
   await askInput(page).fill('how do penguins pay for parking in antarctica');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
+  await expect(askLive(page).getByText(/Ask couldn’t connect or finish the reply/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -1376,7 +1374,7 @@ test('with the endpoint down, a loose word match is not served in its place', as
   await askInput(page).fill('has he worked with react');
   await page.locator('#faq button[type="submit"]').click();
 
-  await expect(askLive(page).getByText(/couldn't safely match that to a reviewed answer/i)).toBeVisible();
+  await expect(askLive(page).getByText(/Ask couldn’t connect or finish the reply/i)).toBeVisible();
   await expect(askLive(page).locator('a[href^="mailto:"]')).toBeVisible();
   await expect(askLive(page).getByText(/Drafted, not reviewed/i)).toHaveCount(0);
 });
@@ -1789,13 +1787,11 @@ test('the design system documents the Ask component', async ({ page }) => {
   await expect(page.getByText(/Refuse rather than guess/i)).toBeVisible();
   await expect(page.getByText(/Only approved/i)).toBeVisible();
 
-  // The governing-rule card and the section intro have to agree about what
-  // decides a match. They did not: the intro said a model, the card still
-  // described below-threshold overlap as the thing that declines.
   const ask = page.locator('#ask');
-  await expect(ask.getByText(/Deciding which written answer a question wants is the model/i)).toBeVisible();
-  await expect(ask.getByText(/normalizing casing, punctuation, apostrophes, and whitespace/i)).toBeVisible();
-  await expect(ask.getByText(/no-answer state with email and no citation chips/i)).toBeVisible();
+  await expect(ask.getByText(/Suggested prompts and exact matches are answered locally/i)).toBeVisible();
+  await expect(ask.getByText(/draft uses only the relevant case studies/i)).toBeVisible();
+  await expect(ask.getByText(/Connection failures offer a manual retry without clearing the question/i)).toBeVisible();
+  await expect(ask.getByText(/endpoint rejects them without truncation/i)).toBeVisible();
 });
 
 test('a routed answer is not reported as a missing one', async ({ page }) => {

@@ -12,7 +12,8 @@ import { CaseCard, caseAccentGradient } from './ui/case-card.jsx';
 import { CaseStudyBody } from './ui/case-study-body.jsx';
 import { SiteFooter } from './ui/site-footer.jsx';
 import { ConsentBanner } from './ui/consent-banner.jsx';
-import { AskPanel } from './ui/ask-panel.jsx';
+import { AskPanel, AskAvailability } from './ui/ask-panel.jsx';
+import { MAX_QUESTION_CHARS } from './ask-policy.mjs';
 import { useViewportWidth, usePrefersReducedMotion } from './ui/hooks.js';
 import './ui/components.css';
 
@@ -1544,7 +1545,7 @@ const ASK_MAX_FOLLOW_UPS = 4;
  */
 const isSuggestable = (answer) => answer.topic !== 'refusal';
 
-const loadAskAnswers = async () => {
+const loadAskAnswers = async (signal) => {
   // Dev reads the source file so drafts are visible while reviewing. The
   // production build writes a filtered copy containing approved answers only,
   // so draft text never ships — see generateAskAnswers in postbuild.js.
@@ -1552,7 +1553,7 @@ const loadAskAnswers = async () => {
     const mod = await import('./content/ask-answers.json');
     return (mod.default ?? mod).answers ?? [];
   }
-  const response = await fetch('/ask-answers.json');
+  const response = await fetch('/ask-answers.json', { signal });
   if (!response.ok) throw new Error(`ask-answers.json: ${response.status}`);
   const doc = await response.json();
   return doc.answers ?? [];
@@ -1572,9 +1573,12 @@ const loadAskAnswers = async () => {
  */
 const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const [answers, setAnswers] = React.useState(null);
+  const [loadState, setLoadState] = React.useState('idle');
+  const [loadAttempt, setLoadAttempt] = React.useState(0);
   const [query, setQuery] = React.useState('');
   const [result, setResult] = React.useState(null);
   const [missed, setMissed] = React.useState(false);
+  const [failureReason, setFailureReason] = React.useState('');
   // A drafted reply, when the written set had no answer. Held apart from
   // `result` so the UI can never present unreviewed text as reviewed.
   const [drafted, setDrafted] = React.useState(null);
@@ -1588,6 +1592,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   const abortRef = React.useRef(null);
   const resolvedHashRef = React.useRef(null);
   const sentinelRef = React.useRef(null);
+  const focusAfterLoadRef = React.useRef(false);
   // 'idle' | 'copied' | 'failed'. A rejected clipboard write used to look
   // identical to never having pressed the button, and clipboard writes are
   // rejected routinely — insecure origin, denied permission, no gesture.
@@ -1602,6 +1607,8 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
 
   React.useEffect(() => () => {
     if (copyResetRef.current) window.clearTimeout(copyResetRef.current);
+    requestRef.current += 1;
+    abortRef.current?.abort();
   }, []);
 
   const settle = (state) => {
@@ -1647,24 +1654,46 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // we know whether there is anything approved to show.
   React.useEffect(() => {
     let cancelled = false;
-    const load = () => loadAskAnswers()
-      .then(loaded => { if (!cancelled) setAnswers(loaded); })
-      .catch(() => { if (!cancelled) setAnswers([]); });
+    const controller = new AbortController();
+    let timeout;
+    const load = () => {
+      setLoadState('loading');
+      timeout = window.setTimeout(() => controller.abort(), 12000);
+      loadAskAnswers(controller.signal)
+        .then(loaded => {
+          if (cancelled) return;
+          setAnswers(loaded);
+          setLoadState(loaded.length ? 'ready' : 'error');
+        })
+        .catch(() => { if (!cancelled) setLoadState('error'); })
+        .finally(() => window.clearTimeout(timeout));
+    };
+    const cleanup = () => {
+      cancelled = true;
+      controller.abort();
+      window.clearTimeout(timeout);
+    };
 
     // On /ask the panel is the page, so there is nothing to scroll to and
     // nothing to protect — a deep-linked answer has to resolve on arrival.
-    if (linkable) { load(); return () => { cancelled = true; }; }
+    if (linkable || loadAttempt || typeof IntersectionObserver === 'undefined') { load(); return cleanup; }
 
     const node = sentinelRef.current;
-    if (!node || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!node) return cleanup;
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
       load();
     }, { rootMargin: '200px' });
     observer.observe(node);
-    return () => { cancelled = true; observer.disconnect(); };
-  }, [linkable]);
+    return () => { cleanup(); observer.disconnect(); };
+  }, [linkable, loadAttempt]);
+
+  React.useEffect(() => {
+    if (!focusAfterLoadRef.current || !['ready', 'error'].includes(loadState)) return;
+    focusAfterLoadRef.current = false;
+    sentinelRef.current?.querySelector('input, button')?.focus();
+  }, [loadState]);
 
   const index = React.useMemo(() => (answers?.length ? buildIndex(answers) : null), [answers]);
 
@@ -1712,7 +1741,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
   // Drives both the submit guard and the button's disabled styling, so the two
   // cannot disagree — a button that looks pressable and does nothing is worse
   // than one that looks disabled.
-  const canSubmit = Boolean(query.trim()) && Boolean(index) && !phase;
+  const canSubmit = Boolean(query.trim()) && query.trim().length <= MAX_QUESTION_CHARS && Boolean(index) && !phase;
 
   /**
    * Every interaction that takes over the answer region claims it first.
@@ -1778,7 +1807,13 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     if (!linkable || !answers?.length) return undefined;
 
     const resolveLocation = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
+      let id;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); }
+      catch {
+        resolvedHashRef.current = null;
+        clearAnswer();
+        return;
+      }
       if (id === resolvedHashRef.current) return;
       resolvedHashRef.current = id;
       if (!id) {
@@ -1805,7 +1840,12 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkable, answers]);
 
-  const fallBack = () => { setResult(null); setDrafted(null); setMissed(true); };
+  const fallBack = () => {
+    setResult(null);
+    setDrafted(null);
+    setFailureReason(reasonRef.current);
+    setMissed(true);
+  };
 
   /**
    * Token overlap could not be trusted with this one. Ask the endpoint, which
@@ -1821,6 +1861,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     const token = requestRef.current;
     const controller = new AbortController();
     abortRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), 25000);
     const current = () => requestRef.current === token;
 
     setPhase('looking');
@@ -1884,6 +1925,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
           : 'client-network-error';
       }
     } finally {
+      window.clearTimeout(timeout);
       if (current()) setPhase(null);
     }
 
@@ -1912,10 +1954,7 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
       return;
     }
 
-    // The question itself is the point of this event: it is the only signal
-    // for which answers are missing. Disclosed in the privacy policy, and the
-    // consent gate in trackAnalyticsEvent means a declined visitor sends
-    // nothing at all.
+    // Only catalogue IDs and outcomes enter analytics, never visitor wording.
     const near = nearestTopic(asked, index);
     trackPortfolioEvent('ask_submit', { matched: false, matched_by: 'routing' });
     // Nothing written is on screen any more, so the hash must not keep
@@ -1932,14 +1971,9 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     setDrafted(null);
     ask(asked, reviewedHistoryMode).then(answered => {
       if (answered === 'superseded') return;
-      // A written answer was served by the router,
-      // so `ask_routed` has already reported it, without the wording. Recording
-      // it here too would put covered questions into the missing-answer count,
-      // which is the one signal that decides what gets written next, and would
-      // send their wording against what the privacy policy says.
-      if (answered === 'router') return;
+      // Reviewed replies are already counted by ask_routed, not as coverage gaps.
+      if (['router', 'exact', 'guardrail'].includes(answered)) return;
       trackPortfolioEvent('ask_no_match', {
-        question: asked,
         nearest_id: near?.id ?? 'none',
         answered_by: answered,
         reason: reasonRef.current || 'none',
@@ -1948,12 +1982,17 @@ const Ask = ({ prefersReducedMotion, linkable = false }) => {
     });
   };
 
-  if (!answers?.length) return <div ref={sentinelRef} aria-hidden="true" />;
+  if (!answers?.length) return <div ref={sentinelRef}>
+    {loadState !== 'idle' && <AskAvailability loading={loadState === 'loading'} onRetry={() => {
+      focusAfterLoadRef.current = true;
+      setLoadAttempt(attempt => attempt + 1);
+    }} />}
+  </div>;
 
   return <AskPanel {...{ query, setQuery, submit, canSubmit, prefersReducedMotion, result, linkable,
     copyState, copyLink, phase, drafted, missed, suggestions, showingFollowUps, collapsible,
     suggestionsExpanded, setSuggestionsExpanded, focusRevealedRef, fullSet, show, sentinelRef,
-    suggestionListRef }} studies={CASE_STUDIES} onEvent={trackPortfolioEvent} />;
+    suggestionListRef, failureReason }} studies={CASE_STUDIES} onEvent={trackPortfolioEvent} />;
 };
 
 const AskSection = ({ scrollToSection }) => {
@@ -2084,7 +2123,7 @@ const AskPage = () => {
         Ask about the work.
       </h1>
       <p style={{ fontSize: 'var(--font-size-body-xl)', lineHeight: 'var(--line-height-relaxed-xl)', color: 'var(--fg-secondary)', margin: '0 0 var(--space-4)', maxWidth: 'var(--content-answer-width)' }}>
-        Pick a question or type your own. Every answer here has its own link, so you can send one on.
+        Pick a question or type your own. Reviewed answers have shareable links, so you can send one on.
       </p>
 
       <div id="ask-panel" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', minWidth: 0 }}>
@@ -2109,9 +2148,11 @@ const Contact = () => {
           <h2 style={{ fontSize: 'clamp(36px, 6vw, 80px)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-semi-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-secondary)', margin: 0 }}>
             Turn complexity <br /><span style={{ color: 'var(--fg-secondary)' }}>into clarity. </span><br /><span style={{ color: 'var(--fg-primary)' }}>Let's talk.</span>
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
+          <div aria-label="Start a conversation" role="group" style={{ display: 'grid', gridTemplateColumns: viewportWidth <= MOBILE_BREAKPOINT ? '1fr' : 'repeat(2, minmax(0, 1fr))', gap: 'var(--space-4)' }}>
             <ContactCard onEvent={trackPortfolioEvent} label="Book a call" value="30 minutes" href={BOOKING_URL} eventName="contact_click_booking" section="contact" />
             <ContactCard onEvent={trackPortfolioEvent} label="Email" value="omar@designedbyomar.com" href="mailto:omar@designedbyomar.com" eventName="contact_click_email" copyValue="omar@designedbyomar.com" copyEventName="copy_email_click" copyTarget="email" />
+          </div>
+          <div aria-label="Explore my work and profiles" role="group" style={{ display: 'grid', gridTemplateColumns: contactCardColumns, gap: 'var(--space-4)' }}>
             <ContactCard onEvent={trackPortfolioEvent} label="Resume / CV" value="Open PDF" href="/Omar%20Tavarez%20Resume.pdf" eventName="resume_download" />
             <ContactCard onEvent={trackPortfolioEvent} label="LinkedIn" value="in/omartavarez" href={LINKEDIN_URL} eventName="contact_click_linkedin" section="contact" />
             <ContactCard onEvent={trackPortfolioEvent} label="GitHub" value="designedbyomar" href={GITHUB_URL} eventName="contact_click_github" section="contact" />

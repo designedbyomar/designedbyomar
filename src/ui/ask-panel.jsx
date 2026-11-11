@@ -2,6 +2,7 @@ import { Button, LinkButton } from './controls.jsx';
 import React from 'react';
 import { AppIcon, ArrowUpRight, Check, Copy } from '../ui-icons.jsx';
 import { tokenizeAnswer, mentionedStudyIds } from '../ask-links.mjs';
+import { MAX_QUESTION_CHARS, askFailure } from '../ask-policy.mjs';
 const ASK_COLLAPSED_SUGGESTIONS = 3;
 const ANSWER_PARAGRAPH_STYLE = { margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 'var(--content-answer-width)' };
 const ANSWER_LINK_STYLE = { color: 'var(--fg-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'color-mix(in srgb, var(--fg-primary) 40%, transparent)' };
@@ -40,14 +41,28 @@ export const AnswerBody = ({ text, citedIds = [], answerId, studies, onEvent = (
   });
 };
 
+export const AskAvailability = ({ loading, onRetry }) => (
+  <div style={ASK_RESPONSE_CARD_STYLE}>
+    <p role="status" style={ANSWER_PARAGRAPH_STYLE}>
+      {loading ? 'Loading reviewed answers…' : 'Ask couldn’t load the reviewed answers. Try again or email Omar directly.'}
+    </p>
+    {!loading && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+      <Button variant="secondary" type="button" onClick={onRetry}>Try loading again</Button>
+      <LinkButton variant="secondary" href="mailto:omar@designedbyomar.com">Email Omar</LinkButton>
+    </div>}
+  </div>
+);
+
 export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMotion, result, linkable,
   copyState, copyLink, phase, drafted, missed, suggestions, showingFollowUps, collapsible,
   suggestionsExpanded, setSuggestionsExpanded, focusRevealedRef, fullSet, show, sentinelRef,
-  suggestionListRef, studies, onEvent = () => {}, idPrefix = '' }) => {
+  suggestionListRef, studies, onEvent = () => {}, idPrefix = '', failureReason = 'no-material' }) => {
   const sourcesFor = (answer) => (answer.sources ?? [])
     .map(id => studies.find(c => c.id === id))
     .filter(Boolean);
   const responseActive = Boolean(result || phase || drafted || missed);
+  const tooLong = query.trim().length > MAX_QUESTION_CHARS;
+  const failure = askFailure(failureReason);
 
   return (
     <div ref={sentinelRef} style={{
@@ -67,6 +82,8 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
           <input
             type="text"
             aria-label="Ask a question about Omar's work"
+            aria-describedby={`${idPrefix}ask-input-help`}
+            aria-invalid={tooLong || undefined}
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Ask about a project, a skill, a role…"
@@ -107,6 +124,10 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
         </Button>
       </form>
 
+      <p id={`${idPrefix}ask-input-help`} style={{ ...ANSWER_PARAGRAPH_STYLE, fontSize: 'var(--font-size-body-sm)' }}>
+        {tooLong ? `Please shorten your question. ${query.trim().length}/${MAX_QUESTION_CHARS} characters.` : `${query.trim().length}/${MAX_QUESTION_CHARS} characters. Please leave out personal or confidential information.`}
+      </p>
+
       {/*
         Directly under the input, because this is what a visitor wants to know
         at the moment they are about to type — not after scrolling past an
@@ -119,6 +140,7 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
 
       <div
         aria-live="polite"
+        aria-busy={phase === 'drafting'}
         data-ask-response-region="true"
         style={{
           display: 'flex',
@@ -250,7 +272,7 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
                     <AppIcon icon={ArrowUpRight} size={12} />
                   </LinkButton>
                 ))}
-              <LinkButton variant="ask" href="mailto:omar@designedbyomar.com" onClick={() => onEvent('ask_contact_click', { question: query.trim() })} style={{
+              <LinkButton variant="ask" href="mailto:omar@designedbyomar.com" onClick={() => onEvent('ask_contact_click', { answer_id: 'drafted' })} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 'var(--control-hit-area)',
                 padding: 'var(--control-padding-block) var(--control-padding-inline)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
                 color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
@@ -267,10 +289,11 @@ export const AskPanel = ({ query, setQuery, submit, canSubmit, prefersReducedMot
         {missed && (
           <div style={{ ...ASK_RESPONSE_CARD_STYLE, gap: 'var(--space-3)' }}>
             <p style={{ margin: 0, fontSize: 'var(--font-size-body-md)', lineHeight: 'var(--line-height-loose)', color: 'var(--fg-secondary)', maxWidth: 'var(--content-answer-width)' }}>
-              I couldn&apos;t safely match that to a reviewed answer or clearly relevant published work. Rather than guess, email is the faster route.
+              {failure.message}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              <LinkButton variant="ask" href="mailto:omar@designedbyomar.com" onClick={() => onEvent('ask_contact_click', { question: query.trim() })} style={{
+              {failure.retryable && <Button variant="secondary" type="button" disabled={!canSubmit} onClick={submit}>Try again</Button>}
+              <LinkButton variant="ask" href="mailto:omar@designedbyomar.com" onClick={() => onEvent('ask_contact_click', { answer_id: 'unanswered' })} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 'var(--control-hit-area)',
                 padding: 'var(--control-padding-block) var(--control-padding-inline)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
                 color: 'var(--fg-primary)', textDecoration: 'none', borderRadius: 'var(--radius-standard)',
