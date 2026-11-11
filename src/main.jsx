@@ -1,3 +1,4 @@
+import { PERSON_SCHEMA, HOME_DESCRIPTION, SITE_DESCRIPTION } from './content/identity.mjs';
 import { RATE_CARD_META, rateCardStructuredData } from './content/rate-card-meta.mjs';
 import { LinkButton } from './ui/controls.jsx';
 import { CaseStudyTag, CaseStudyMetadata } from './ui/case-study-meta.jsx';
@@ -2289,27 +2290,7 @@ const imageType = (imageUrl) => {
   return 'image/png';
 };
 
-const personSchema = {
-  '@type': 'Person',
-  name: 'Omar Tavarez',
-  url: `${SITE_ORIGIN}/`,
-  jobTitle: 'Principal Product Designer',
-  email: 'omar@designedbyomar.com',
-  sameAs: [
-    LINKEDIN_URL,
-    GITHUB_URL,
-    SUBSTACK_URL,
-    BEHANCE_URL,
-  ],
-  knowsAbout: [
-    'Product Design',
-    'Design Systems',
-    'AI Workflows',
-    'Fintech',
-    'Healthcare SaaS',
-    'Enterprise UX',
-  ],
-};
+const personSchema = PERSON_SCHEMA;
 
 const buildHomeStructuredData = () => ({
   '@context': 'https://schema.org',
@@ -2318,7 +2299,7 @@ const buildHomeStructuredData = () => ({
       '@type': 'WebSite',
       name: 'designedbyomar',
       url: `${SITE_ORIGIN}/`,
-      description: 'Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise UX.',
+      description: SITE_DESCRIPTION,
     },
     personSchema,
   ],
@@ -2534,7 +2515,7 @@ const getRouteMeta = (route, currentCase) => {
 
   return {
     title: 'designedbyomar — Omar Tavarez',
-    description: 'Omar Tavarez is a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.',
+    description: HOME_DESCRIPTION,
     url: `${SITE_ORIGIN}/`,
     robots: 'index,follow,max-image-preview:large',
     image: DEFAULT_OG_IMAGE,

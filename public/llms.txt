@@ -1,6 +1,6 @@
 # designedbyomar
 
-> Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy.
+> Portfolio site for Omar Tavarez, a principal product designer focused on AI workflows, design systems, fintech, healthcare SaaS, and enterprise product strategy. Available for fractional and freelance work.
 
 Site: [https://www.designedbyomar.com/](https://www.designedbyomar.com/)
 Contact: [omar@designedbyomar.com](mailto:omar@designedbyomar.com)
@@ -9,6 +9,7 @@ Book a call: [30-minute intro call](https://koalendar.com/e/lets-talk-or-omar-ta
 ## Primary pages
 - [Homepage](https://www.designedbyomar.com/) : background, selected work, contact
 - [Selected work](https://www.designedbyomar.com/work) : case-study index
+- [About](https://www.designedbyomar.com/about) : background, how he works, and current role
 - [Ask](https://www.designedbyomar.com/ask) : questions and answers about Omar's work, background, and how he works — each answer has its own anchor
 - [Design system](https://www.designedbyomar.com/design-system) : public brand, token, component, pattern, motion, content, and accessibility reference
 - [Privacy policy](https://www.designedbyomar.com/privacy) : data collection and analytics consent details
@@ -23,6 +24,13 @@ Book a call: [30-minute intro call](https://koalendar.com/e/lets-talk-or-omar-ta
 - [Critical Communication Tool](https://www.designedbyomar.com/work/disney-cct/) : enterprise broadcast communication workflow
 - [Unified Ad Platform](https://www.designedbyomar.com/work/disney-uap/) : consolidating Disney ad-sales brands onto AdVisor without regressing the ESPN baseline
 
+## Working with Omar
+- Omar is a full-time Product Designer at Standard Metrics, designing tools for venture investors. He is not looking for a new full-time role.
+- He takes on select fractional and freelance work through his independent practice, Designed by Omar.
+- Engagement types: product and website audits, design sprints, single design days, fractional product design (monthly capacity), and marketing website builds and support.
+- Best fit: complex B2B products with messy data, edge cases, and operational constraints, including AI workflows, fintech and embedded payments, healthcare SaaS, enterprise platforms, and design systems.
+- Pricing depends on scope and is shared directly. To start, book a [30-minute intro call](https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE) or email [omar@designedbyomar.com](mailto:omar@designedbyomar.com) with goals, timing, and budget.
+
 ## Topics
 - product design
 - design systems
@@ -30,6 +38,11 @@ Book a call: [30-minute intro call](https://koalendar.com/e/lets-talk-or-omar-ta
 - fintech
 - healthcare SaaS
 - enterprise UX
+- B2B SaaS
+- design engineering
+- fractional product design
+- product and UX audits
+- design sprints
 
 ## Notes
 - All case studies are available at stable, crawlable URLs.
