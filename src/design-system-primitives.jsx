@@ -26,7 +26,7 @@ export const SectionHeader = ({ id, eyebrow, title, children }) => (
     <div className="mono-label">{eyebrow}</div>
     {id ? (
       <div className="ds-section-header__title-row">
-        <h2 id={`${id}-title`}>{title}</h2>
+        <h2 id={`${id}-title`} tabIndex={-1}>{title}</h2>
         <SectionAnchorCopy title={title} anchor={id} />
       </div>
     ) : (

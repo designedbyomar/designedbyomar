@@ -107,3 +107,13 @@ The inquiry form is an elevated card (`--shadow-card-full`, `--radius-xl`) with 
 Ask keeps the full question editable and validates the shared 400-character limit before submission. Initial loading, failed downloads, unavailable replies, unsupported questions, and usage limits have distinct states. Manual retries preserve input; suggested questions and direct email remain available. Only reviewed answers are shareable. Analytics contain catalogue IDs and outcome categories, never question text. The design-system specimens demonstrate loading and recovery locally.
 
 Contact gives booking and email a primary two-column row (one column on mobile), followed by the existing responsive grid of resume and profile links. All controls retain their existing tokens and analytics events.
+
+## Reference organization
+
+`src/content/design-system.mjs` defines the ordered groups, anchors, labels, summaries, and renderer keys for the single-page reference. The sidebar, page, shortcuts, and generated group summaries follow that registry. Preserve existing anchors when moving or renaming material; `quick-links` remains an overview utility rather than a separate navigation destination.
+
+Foundations explain the visual language; Components demonstrate individual building blocks; Patterns show their assembled behavior. Badges, fields, dropdowns, disclosures, and contact cards have dedicated destinations. Service specimens appear once. Technical usage notes and the complete token reference use default-collapsed disclosures. Token values are read from the shared CSS source, with current-theme overrides, rather than maintained as a duplicate literal catalogue.
+
+The reference has one responsive section-navigation instance. Its active link exposes `aria-current="location"`; section selection focuses the destination heading. On narrow screens Escape restores trigger focus, outside interaction dismisses the nonmodal menu, and hidden links leave the Tab order. Group expansion remains independently controllable. Anchor navigation is immediate and reduced motion also disables CSS smooth scrolling.
+
+Component examples use local fixtures for validation, disabled fields, verification unavailability, Ask recovery, and GitHub loading. They never send inquiries or modify analytics consent. Component usage notes belong beneath examples; backend endpoint documentation remains in the repository.

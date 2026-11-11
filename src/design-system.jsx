@@ -1,5 +1,7 @@
 import { Disclosure } from './ui/disclosure.jsx';
-import { COMPONENT_TOKEN_ROLES } from './design-system-token-roles.mjs';
+import { DESIGN_SYSTEM_GROUPS, DESIGN_SYSTEM_SECTIONS, DESIGN_SYSTEM_BY_ID } from './content/design-system.mjs';
+import { useDocumentationNavigation } from './design-system-navigation.jsx';
+import { TokenTheme, TokenValue, TokenReference, TypographyExamples, SpacingExamples, RadiusExamples, OpacityExamples, MotionTokens } from './design-system-foundations.jsx';
 import React from 'react';
 import { NavLogo as SharedNavLogo, ThemeToggle } from './ui/brand.jsx';
 import './ui/components.css';
@@ -16,6 +18,9 @@ import {
   BookOpen,
   Box,
   ChevronDown,
+  Check,
+  Clock,
+  Copy,
   Menu,
   Palette,
   RefreshCcw,
@@ -28,7 +33,7 @@ import {
 import { AlienPixel, footerAlienStyles, FooterArrival } from './footer-alien.jsx';
 import { Galaxy } from './galaxy.jsx';
 import { onMediaChange } from './media-query.js';
-import { DESIGN_SYSTEM_PAGE_COPY } from './content/static-page-copy.mjs';
+import { LinkButton } from './ui/controls.jsx';
 import {
   Button,
   CopyButton,
@@ -39,101 +44,8 @@ import {
   TokenSwatch,
 } from './design-system-primitives.jsx';
 
-const NAV_GROUPS = [
-  {
-    title: 'Home',
-    icon: BookOpen,
-    items: [
-      { id: 'overview', label: 'Overview' },
-      { id: 'what-it-powers', label: 'What it powers' },
-      { id: 'quick-links', label: 'Quick links' },
-    ],
-  },
-  {
-    title: 'Foundations',
-    icon: Palette,
-    items: [
-      { id: 'foundations', label: 'Foundations overview' },
-      { id: 'color', label: 'Color' },
-      { id: 'typography', label: 'Typography' },
-      { id: 'spacing', label: 'Spacing' },
-      { id: 'radius-elevation', label: 'Radius and elevation' },
-      { id: 'foundation-specimens', label: 'Specimens' },
-      { id: 'blur', label: 'Blur' },
-      { id: 'motion-tokens', label: 'Motion tokens' },
-    ],
-  },
-  {
-    title: 'Components',
-    icon: Box,
-    items: [
-      { id: 'components', label: 'Components overview' },
-      { id: 'buttons', label: 'Buttons' },
-      { id: 'cards-accordions', label: 'Cards and accordions' },
-      { id: 'copy-actions', label: 'Copy actions' },
-      { id: 'navigation-drawers', label: 'Navigation and mobile menu' },
-      { id: 'cookie-banner', label: 'Cookie banner' },
-      { id: 'ask', label: 'Ask' },
-      { id: 'github-activity', label: 'GitHub activity' },
-      { id: 'case-study-blocks', label: 'Case-study blocks' },
-      { id: 'about-media', label: 'About media' },
-      { id: 'service-gradients', label: 'Service gradients' },
-      { id: 'service-lists', label: 'Service lists' },
-      { id: 'inquiry-form', label: 'Inquiry form' },
-    ],
-  },
-  {
-    title: 'Patterns',
-    icon: Search,
-    items: [
-      { id: 'patterns', label: 'Patterns overview' },
-      { id: 'hero-system', label: 'Hero system' },
-      { id: 'case-study-covers', label: 'Case-study covers' },
-      { id: 'footer-system', label: 'Footer system' },
-      { id: 'privacy-consent', label: 'Privacy and consent' },
-    ],
-  },
-  {
-    title: 'Motion',
-    icon: Zap,
-    items: [
-      { id: 'motion', label: 'Motion overview' },
-      { id: 'alien-arrival', label: 'Alien arrival' },
-      { id: 'pixel-orbit', label: 'Pixel orbit' },
-      { id: 'hover-reveal', label: 'Hover and reveal' },
-      { id: 'reduced-motion', label: 'Reduced motion' },
-    ],
-  },
-  {
-    title: 'Content',
-    icon: Type,
-    items: [
-      { id: 'content', label: 'Voice and tone' },
-      { id: 'case-study-anatomy', label: 'Case-study anatomy' },
-      { id: 'metadata-labels', label: 'Labels and metadata' },
-      { id: 'microcopy', label: 'Microcopy' },
-    ],
-  },
-  {
-    title: 'Accessibility',
-    icon: ShieldCheck,
-    items: [
-      { id: 'accessibility', label: 'Accessibility overview' },
-      { id: 'focus-keyboard', label: 'Focus and keyboard' },
-      { id: 'contrast-touch', label: 'Contrast and touch' },
-    ],
-  },
-  {
-    title: 'Resources',
-    icon: BookOpen,
-    items: [
-      { id: 'resources', label: 'Source files' },
-      { id: 'audit-notes', label: 'Audit notes' },
-    ],
-  },
-];
-
-const ALL_NAV_ITEMS = NAV_GROUPS.flatMap((group) => group.items);
+const GROUP_ICONS = { book: BookOpen, palette: Palette, box: Box, search: Search, zap: Zap, type: Type, shield: ShieldCheck };
+const NAV_GROUPS = DESIGN_SYSTEM_GROUPS.map(group => ({ ...group, icon: GROUP_ICONS[group.icon], items: group.sections }));
 
 const COLOR_GROUPS = [
   {
@@ -174,70 +86,9 @@ const COLOR_GROUPS = [
   },
 ];
 
-const TYPOGRAPHY_ROWS = [
-  ['Display hero', 'Geist','clamp(44px, 7vw, 88px)', '600', '-0.04em', '0.96', 'Complex systems. Clear products.'],
-  ['Section heading', 'Geist','clamp(32px, 4.2vw, 56px)', '600', '-0.04em', '1.05', 'Questions founders and hiring teams usually ask.'],
-  ['Sub-heading', 'Geist','32px', '600', '-0.04em', '1.25', 'A longer version, for the curious.'],
-  ['Card title', 'Geist','24px', '600', '-0.04em', '1.33', 'Management Portal'],
-  ['Body large', 'Geist','18px', '400', '0', '1.8', 'Lead with the product problem, the decision, and the impact.'],
-  ['Body', 'Geist','16px', '400', '0', '1.55', 'Use body copy for explanations, details, and section support.'],
-  ['Body small', 'Geist','14px', '400', '0', '1.5', 'Use small copy for compact supporting text.'],
-  ['Body semibold', 'Geist','16px', '600', '-0.02em', '1.5', 'Use semibold for emphasis inside compact panels.'],
-  ['Button / link', 'Geist','14px', '500', '0', '1.43', 'Get in touch'],
-  ['Caption', 'Geist','11px', '500', '0.04em', '1.33', 'Built across startups, scaleups, and enterprise teams.'],
-  ['Micro', 'Geist','10px', '500', '0.08em', '1.33', 'INDEXABLE ROUTE'],
-  ['Mono body', 'Geist Mono', '14px', '400', '0', '1.5', 'src/design-tokens.css'],
-  ['Mono label', 'Geist Mono', '12px', '500', '0.08em', '1', 'FOUNDATIONS'],
-];
-
-const SPACE_TOKENS = [
-  ['--space-1', '4px'],
-  ['--space-2', '8px'],
-  ['--space-3', '12px'],
-  ['--space-4', '16px'],
-  ['--space-5', '20px'],
-  ['--space-6', '24px'],
-  ['--space-7', '32px'],
-  ['--space-8', '40px'],
-];
-
-const LAYOUT_TOKENS = [
-  ['--layout-1', '48px'],
-  ['--layout-2', '64px'],
-  ['--layout-3', '96px'],
-  ['--layout-4', '120px'],
-];
-
-const BLUR_TOKENS = [
-  ['--blur-subtle', 'blur(4px)'],
-  ['--blur-base', 'blur(6px)'],
-  ['--blur-medium', 'blur(10px)'],
-  ['--blur-strong', 'blur(12px)'],
-  ['--blur-heavy', 'blur(16px)'],
-];
-
-const OPACITY_SPECIMENS = [
-  ['--opacity-8', '0.08'],
-  ['--opacity-18', '0.18'],
-  ['--opacity-35', '0.35'],
-  ['--opacity-60', '0.60'],
-];
-
-const Z_INDEX_SPECIMENS = [
-  ['Sticky', '--z-sticky'],
-  ['Fixed', '--z-fixed'],
-  ['Modal', '--z-modal'],
-  ['Tooltip', '--z-tooltip'],
-];
-
-const BREAKPOINT_SPECIMENS = [
-  ['Mobile', '600px'],
-  ['Tablet', '900px'],
-  ['Layout', '1054px'],
-];
-
 const POWER_ITEMS = [
   ['Homepage', 'Hero hierarchy, proof points, selected work, and contact rhythm.'],
+  ['Services', 'Category gradients, service cards, engagement terms, and inquiry states.'],
   ['Case studies', 'Cover cards, browser shells, metrics, page sections, and metadata.'],
   ['Navigation', 'Sticky header, mobile menu, logo mark, and footer utility links.'],
   ['Motion', 'Alien arrival, pixel orbit, loader mark, reveal, and hover behaviors.'],
@@ -247,29 +98,7 @@ const POWER_ITEMS = [
   ['Accessibility', 'Focus, keyboard behavior, contrast, touch targets, and reduced motion.'],
 ];
 
-const COMPONENT_GUIDANCE = [
-  ['Action hierarchy', 'Use primary once per local decision area. Secondary supports alternate actions. Quiet actions stay text-first for low-emphasis commands.'],
-  ['Icon-only controls', 'Use only when the icon is familiar or the control has a clear label/title. Keep the 44px hit area.'],
-  ['Cards', 'Use cards for repeatable items or framed examples, not for every page section. Avoid nested card structures.'],
-  ['Accordions', 'Use accordions when the user is scanning a known set of questions or sections. Keep ARIA state and focus order explicit.'],
-  ['Cookie banner', 'Keep privacy copy short, clear, and non-alarming. Consent controls must remain visible and keyboard reachable.'],
-];
-
-const MOTION_ROWS = [
-  ['Alien arrival', 'Narrative signature. UFO arrives, beam pulses, alien lands, then the UFO exits.'],
-  ['Pixel orbit', 'Ambient canvas motif. It supports the hero mood without blocking reading.'],
-  ['Loader mark', 'Geometric logo bounce. Used sparingly for initial orientation.'],
-  ['Reveal on scroll', 'Soft opacity and translate settle. Disabled under reduced motion.'],
-  ['Hover treatments', 'Small lift, color shift, or line travel. Never rely on hover for meaning.'],
-];
-
-const QUICK_LINK_CARDS = [
-  ['Foundations', '#foundations', 'Tokens, type, color, spacing, and surface rules.', Palette],
-  ['Components', '#components', 'Buttons, cards, accordions, copy controls, and navigation.', Box],
-  ['Patterns', '#patterns', 'Production compositions for heroes, covers, footer, and consent.', Search],
-  ['Motion', '#motion', 'Alien arrival, canvas motifs, reveal, hover, and reduced motion.', Zap],
-  ['Accessibility', '#accessibility', 'Focus, keyboard, contrast, touch targets, and motion safety.', ShieldCheck],
-];
+const QUICK_LINK_CARDS = NAV_GROUPS.filter(group => group.shortcut).map(group => [group.title, `#${group.sections[0].id}`, group.shortcut, group.icon]);
 
 const usePrefersReducedMotion = () => {
   const [reduced, setReduced] = React.useState(false);
@@ -283,30 +112,6 @@ const usePrefersReducedMotion = () => {
   }, []);
 
   return reduced;
-};
-
-const useActiveSection = () => {
-  const [activeId, setActiveId] = React.useState('overview');
-
-  React.useEffect(() => {
-    const sections = ALL_NAV_ITEMS
-      .map((item) => document.getElementById(item.id))
-      .filter(Boolean);
-
-    if (!sections.length || typeof IntersectionObserver === 'undefined') return undefined;
-
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible?.target?.id) setActiveId(visible.target.id);
-    }, { rootMargin: '-22% 0px -64% 0px', threshold: [0.1, 0.2, 0.4] });
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
-
-  return activeId;
 };
 
 const SignalGradientDefs = () => (
@@ -340,52 +145,31 @@ const DocShortcutCard = ({ href, label, body, icon }) => (
   </a>
 );
 
-const SideNavigation = ({ activeId, onNavigate, testId }) => {
-  const [openGroups, setOpenGroups] = React.useState(() => (
-    NAV_GROUPS.reduce((groups, group) => ({ ...groups, [group.title]: true }), {})
-  ));
-
-  const toggleGroup = (title) => {
-    setOpenGroups((groups) => ({ ...groups, [title]: !groups[title] }));
-  };
-
-  return (
-    <nav aria-label="Design system sections" data-sidebar-mode="collapsible" data-testid={testId}>
-      {NAV_GROUPS.map((group) => {
-        const isOpen = Boolean(openGroups[group.title]);
-        const groupId = `ds-nav-${group.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-        return (
-          <div className="ds-nav-group" key={group.title}>
-            <button
-              type="button"
-              className="ds-nav-category"
-              aria-expanded={isOpen}
-              aria-controls={groupId}
-              onClick={() => toggleGroup(group.title)}
-            >
-              <span className="ds-nav-category__label">
-                <SignalGradientIcon icon={group.icon} size={16} />
-                <span>{group.title}</span>
-              </span>
-              <AppIcon icon={ChevronDown} size={16} className="ds-nav-category__chevron" />
-            </button>
-            <div id={groupId} className="ds-nav-group__items" hidden={!isOpen}>
-              {group.items.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className={item.id === activeId ? 'is-active' : undefined}
-                  onClick={onNavigate}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </nav>
-  );
+const SideNavigation = ({ activeId, request, onNavigate }) => {
+  const [openGroups, setOpenGroups] = React.useState(() => ({ [DESIGN_SYSTEM_BY_ID[request.id]?.group || 'overview']: true }));
+  React.useEffect(() => {
+    const group = DESIGN_SYSTEM_BY_ID[request.id]?.group;
+    if (group) setOpenGroups(previous => ({ ...previous, [group]: true }));
+  }, [request]);
+  return <nav aria-label="Design system sections" data-sidebar-mode="collapsible" data-testid="design-system-sidebar">
+    {NAV_GROUPS.map(group => {
+      const open = Boolean(openGroups[group.id]);
+      const groupId = `ds-nav-${group.id}`;
+      return <div className="ds-nav-group" key={group.id}>
+        <button type="button" className="ds-nav-category" aria-expanded={open} aria-controls={groupId}
+          data-current-group={DESIGN_SYSTEM_BY_ID[activeId]?.group === group.id}
+          onClick={() => setOpenGroups(previous => ({ ...previous, [group.id]: !previous[group.id] }))}>
+          <span className="ds-nav-category__label"><SignalGradientIcon icon={group.icon} size={16} /><span>{group.title}</span></span>
+          <AppIcon icon={ChevronDown} size={16} className="ds-nav-category__chevron" />
+        </button>
+        <div id={groupId} className="ds-nav-group__items" hidden={!open}>{group.items.map(item =>
+          <a key={item.id} href={`#${item.id}`} className={item.id === activeId ? 'is-active' : undefined}
+            aria-current={item.id === activeId ? 'location' : undefined}
+            onClick={event => { event.preventDefault(); onNavigate(item.id); }}>{item.title}</a>
+        )}</div>
+      </div>;
+    })}
+  </nav>;
 };
 
 const AlienReplayDemo = ({
@@ -663,7 +447,7 @@ const BackToTopButton = () => {
   );
 };
 
-const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
+const TopBar = ({ theme, setTheme, navOpen, onToggleNav, triggerRef }) => {
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
@@ -680,9 +464,11 @@ const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
           <button
             type="button"
             className="ds-icon-button ds-mobile-nav-trigger"
+            ref={triggerRef}
+            aria-controls="ds-section-navigation"
             aria-label={navOpen ? 'Close design system navigation' : 'Open design system navigation'}
             aria-expanded={navOpen}
-            onClick={() => setNavOpen((open) => !open)}
+            onClick={onToggleNav}
           >
             <AppIcon icon={navOpen ? X : Menu} size={17} />
           </button>
@@ -706,42 +492,8 @@ const TopBar = ({ theme, setTheme, navOpen, setNavOpen }) => {
   );
 };
 
-const TypographyRow = ({ role, family, size, weight, tracking, lineHeight, sample }) => (
-  <div className="ds-typo-row">
-    <div className="ds-typo-row__meta">
-      <h3>{role}</h3>
-      <p>{family} / {size} / {weight} / {tracking} / {lineHeight}</p>
-    </div>
-    <div
-      className="ds-typo-row__sample"
-      style={{
-        fontFamily: family === 'Geist Mono' ? 'var(--font-mono)' : 'var(--font-sans)',
-        fontSize: size,
-        fontWeight: weight,
-        letterSpacing: tracking,
-        lineHeight,
-        textTransform: role === 'Micro' || role === 'Mono label' ? 'uppercase' : 'none',
-      }}
-    >
-      {sample}
-    </div>
-  </div>
-);
-
-const TokenBar = ({ token, value, scale = 1 }) => (
-  <div className="ds-token-bar">
-    <div className="ds-token-bar__label">
-      <span>{token}</span>
-      <span>{value}</span>
-    </div>
-    <div className="ds-token-bar__track">
-      <span style={{ width: `${Number.parseInt(value, 10) * scale}px` }} />
-    </div>
-  </div>
-);
-
-const BlurTokenCard = ({ token, value }) => (
-  <DocCard title={token} meta={value}>
+const BlurTokenCard = ({ token }) => (
+  <DocCard title={token} meta={<TokenValue name={token} />}>
     <div className="ds-blur-demo">
       <div className="ds-blur-demo__backdrop" />
       <div className="ds-blur-demo__pane" style={{ backdropFilter: `var(${token})`, WebkitBackdropFilter: `var(${token})` }}>
@@ -749,50 +501,6 @@ const BlurTokenCard = ({ token, value }) => (
       </div>
     </div>
   </DocCard>
-);
-
-const FoundationSpecimens = () => (
-  <div className="ds-specimen-grid" data-audit-example="foundation-specimens">
-    <DocCard title="Radius and elevation" meta="Visual scale">
-      <div className="ds-radius-stack">
-        {[
-          ['6px', 'Control'],
-          ['8px', 'Panel'],
-          ['12px', 'Media'],
-        ].map(([radius, label]) => (
-          <span key={radius} style={{ borderRadius: radius }}>{label}</span>
-        ))}
-      </div>
-    </DocCard>
-    <DocCard title="Opacity" meta="Overlay steps">
-      <div className="ds-opacity-stack">
-        {OPACITY_SPECIMENS.map(([token, value]) => (
-          <span key={token} style={{ '--specimen-opacity': value }}>
-            {token}
-          </span>
-        ))}
-      </div>
-    </DocCard>
-    <DocCard title="Z-index" meta="Layer order">
-      <div className="ds-z-stack">
-        {Z_INDEX_SPECIMENS.map(([label, token], index) => (
-          <span key={token} style={{ '--layer-index': index }}>
-            {label}<small>{token}</small>
-          </span>
-        ))}
-      </div>
-    </DocCard>
-    <DocCard title="Breakpoints" meta="Responsive rhythm">
-      <div className="ds-breakpoint-stack">
-        {BREAKPOINT_SPECIMENS.map(([label, value]) => (
-          <span key={label}>
-            <strong>{label}</strong>
-            <small>{value}</small>
-          </span>
-        ))}
-      </div>
-    </DocCard>
-  </div>
 );
 
 const PatternPreview = ({ kind }) => (
@@ -838,12 +546,14 @@ const FAQAccordionDemo = () => <div className="ds-faq-demo">
   <Disclosure heading="Is this used on the portfolio?" headingLevel={3}><p>The services page uses this shared disclosure for engagement terms. Production Ask uses the shared AskPanel specimen below.</p></Disclosure>
 </div>;
 
-const HomeSection = ({ theme }) => (
-  <>
-    <section id="overview" className="ds-section ds-hero" aria-labelledby="overview-title">
-      <div className="ds-hero-top">
+const Details = ({ heading = 'Usage and behavior', children }) => <Disclosure heading={heading} headingLevel={3}>{children}</Disclosure>;
+const SourceLink = ({ path }) => <a href={`https://github.com/designedbyomar/designedbyomar/${path.endsWith('/') ? 'tree' : 'blob'}/main/${path}`}><code>{path}</code></a>;
+
+const SECTION_RENDERERS = {
+  'overview': ({ theme }) => <>
+<div className="ds-hero-top">
         <div className="ds-hero-lede">
-          <h1 id="overview-title" className="ds-hero-title">
+          <h1 id="overview-title" tabIndex={-1} className="ds-hero-title">
             <span className="ds-hero-title__line1">
               <span className="ds-hero-title__text">designedbyomar</span>
             </span>
@@ -851,7 +561,7 @@ const HomeSection = ({ theme }) => (
           </h1>
           <div className="ds-hero-intro">
             <p>
-              {DESIGN_SYSTEM_PAGE_COPY.intro}
+              {DESIGN_SYSTEM_BY_ID.overview.summary}
             </p>
           </div>
         </div>
@@ -859,240 +569,40 @@ const HomeSection = ({ theme }) => (
           <PixelOrbitIcons theme={theme} showAlien />
         </div>
       </div>
-      <div id="quick-links" className="ds-quick-links" aria-label="Quick links">
+      <div id="quick-links" tabIndex={-1} className="ds-quick-links" aria-label="Quick links">
         {QUICK_LINK_CARDS.map(([label, href, body, icon]) => (
           <DocShortcutCard key={label} href={href} label={label} body={body} icon={icon} />
         ))}
       </div>
-    </section>
-
-    <section id="what-it-powers" className="ds-section" aria-labelledby="what-it-powers-title">
-      <SectionHeader id="what-it-powers" eyebrow="Home" title="What it powers">
-        A practical map of where the system shows up in production, from the homepage to route metadata and privacy surfaces.
-      </SectionHeader>
-      <div className="ds-power-strip">
+  </>,
+  'what-it-powers': () => <>
+<div className="ds-power-strip">
         {POWER_ITEMS.map(([title, body]) => (
           <DocCard key={title} title={title}>
             <p>{body}</p>
           </DocCard>
         ))}
       </div>
-    </section>
-  </>
-);
-
-const FoundationsSection = () => (
-  <>
-    <section id="foundations" className="ds-section" aria-labelledby="foundations-title">
-      <SectionHeader id="foundations" eyebrow="Foundations" title={DESIGN_SYSTEM_PAGE_COPY.sections.foundations.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.foundations.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['Token source', 'src/design-tokens.css is the shared implementation source for the main site and this page.'],
-          ['Theme model', 'Light and dark themes remap semantic foreground, surface, accent, shadow, and ring values.'],
-          ['Audit rule', 'Documentation should describe values already used in production, not invent a parallel system.'],
-        ].map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Foundation rule">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-      <DocCard title="Exact component roles" meta="Semantic tokens">
-        <p>These roles preserve existing computed dimensions, typography, layering and motion without rounding to the scale.</p>
-        <dl>{COMPONENT_TOKEN_ROLES.map(([name, value]) => <div key={name}><dt><code>{name}</code></dt><dd><code>{value}</code></dd></div>)}</dl>
-      </DocCard>
-    <section id="color" className="ds-section" aria-labelledby="color-title">
-      <SectionHeader id="color" eyebrow="Foundations" title="Color">
-        Semantic neutrals carry most of the interface. Develop blue, preview pink, and ship red mark workflow states and signature motion.
-      </SectionHeader>
-      <div className="ds-token-stack">
+  </>,
+  'foundations': () => <>
+<p className="ds-reading-copy">Use semantic roles such as <code>--fg-primary</code> and <code>--bg-page</code> together. Use palette colors for identity and decoration. <a href="#token-reference">Browse exact token values</a> when you need implementation detail.</p>
+  </>,
+  'color': () => <>
+<div className="ds-token-stack">
         {COLOR_GROUPS.map((group) => (
           <div key={group.title}>
             <div className="mono-label ds-token-group-label">{group.title}</div>
             <div className="ds-token-grid">
-              {group.tokens.map(([name, token, value]) => (
-                <TokenSwatch key={token} name={name} token={token} value={value} />
+              {group.tokens.map(([name, token, purpose]) => (
+                <TokenSwatch key={token} name={name} token={token} value={<>{purpose}<br /><TokenValue name={token} /></>} />
               ))}
             </div>
           </div>
         ))}
-      </div>
-    </section>
-
-    <section id="typography" className="ds-section" aria-labelledby="typography-title">
-      <SectionHeader id="typography" eyebrow="Foundations" title="Typography">
-        Geist Sans handles editorial hierarchy. Geist Mono handles labels, metadata, source references, and implementation-adjacent copy.
-      </SectionHeader>
-      <div className="ds-typography-map">
-        {TYPOGRAPHY_ROWS.map(([role, family, size, weight, tracking, lineHeight, sample]) => (
-          <TypographyRow key={role} role={role} family={family} size={size} weight={weight} tracking={tracking} lineHeight={lineHeight} sample={sample} />
-        ))}
-      </div>
-    </section>
-
-    <section id="spacing" className="ds-section" aria-labelledby="spacing-title">
-      <SectionHeader id="spacing" eyebrow="Foundations" title="Spacing">
-        UI spacing uses compact steps. Layout spacing uses larger bands for page rhythm and section separation.
-      </SectionHeader>
-      <div className="ds-two-column">
-        <DocCard title="UI band" meta="Component spacing">
-          <div className="ds-token-bars">
-            {SPACE_TOKENS.map(([token, value]) => (
-              <TokenBar key={token} token={token} value={value} scale={5} />
-            ))}
-          </div>
-        </DocCard>
-        <DocCard title="Layout band" meta="Section rhythm">
-          <div className="ds-token-bars">
-            {LAYOUT_TOKENS.map(([token, value]) => (
-              <TokenBar key={token} token={token} value={value} scale={2} />
-            ))}
-          </div>
-        </DocCard>
-      </div>
-    </section>
-
-    <section id="radius-elevation" className="ds-section" aria-labelledby="radius-elevation-title">
-      <SectionHeader id="radius-elevation" eyebrow="Foundations" title="Radius and elevation">
-        Radius stays restrained. Shadow-as-border creates definition without heavy outlines or decorative framing.
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['Standard controls', '--radius-standard / 6px', 'Buttons, links, and compact controls.'],
-          ['Comfort panels', '--radius-comfort / 8px', 'Cards, accordions, and panels.'],
-          ['Image shells', '--radius-image / 12px', 'Case covers, media, and framed previews.'],
-        ].map(([title, meta, body]) => (
-          <DocCard key={title} title={title} meta={meta}>
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    <section id="foundation-specimens" className="ds-section" aria-labelledby="foundation-specimens-title">
-      <SectionHeader id="foundation-specimens" eyebrow="Foundations" title="Visual specimens">
-        Radius, opacity, layering, and breakpoint rules are shown as rendered objects so token behavior is easier to audit.
-      </SectionHeader>
-      <FoundationSpecimens />
-    </section>
-
-    <section id="blur" className="ds-section" aria-labelledby="blur-title">
-      <SectionHeader id="blur" eyebrow="Foundations" title="Blur">
-        Blur tokens are used for sticky headers, overlays, mobile menus, and polished glassy surfaces where the content underneath should remain implied.
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {BLUR_TOKENS.map(([token, value]) => (
-          <BlurTokenCard key={token} token={token} value={value} />
-        ))}
-      </div>
-    </section>
-
-    <section id="motion-tokens" className="ds-section" aria-labelledby="motion-tokens-title">
-      <SectionHeader id="motion-tokens" eyebrow="Foundations" title="Motion tokens">
-        Durations and easing keep interactions crisp. Motion should orient the reader, not compete with the work.
-      </SectionHeader>
-      <div className="ds-two-column">
-        <DocCard title="Durations" meta="Timing scale">
-          <pre className="ds-code">{`--duration-fastest: 120ms
---duration-fast-mid: 160ms
---duration-base: 220ms
---duration-slow: 300ms
---duration-slowest-xxl: 600ms`}</pre>
-        </DocCard>
-        <DocCard title="Easing" meta="Motion curve">
-          <pre className="ds-code">{`--easing-ease-out:
-cubic-bezier(0.16, 1, 0.3, 1)
-
---easing-ease-in-out:
-cubic-bezier(0.4, 0, 0.2, 1)`}</pre>
-        </DocCard>
-      </div>
-    </section>
-  </>
-);
-
-const ComponentsSection = () => (
-  <>
-    <section id="components" className="ds-section" aria-labelledby="components-title">
-      <SectionHeader id="components" eyebrow="Components" title={DESIGN_SYSTEM_PAGE_COPY.sections.components.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.components.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {COMPONENT_GUIDANCE.map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Usage guidance">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    <section id="buttons" className="ds-section" aria-labelledby="buttons-title">
-      <SectionHeader id="buttons" eyebrow="Components" title="Buttons">
-        Buttons keep a stable 44px hit area, concise labels, visible focus, and clear hierarchy.
-      </SectionHeader>
-      <ExampleFrame label="Variants and states">
-        <Button>Primary Action</Button>
-        <Button variant="secondary">Secondary Action</Button>
-        <Button variant="quiet">Quiet Action</Button>
-        <Button disabled>Disabled</Button>
-        <IconButton icon={ArrowUpRight} label="Open external link" />
-      </ExampleFrame>
-    </section>
-
-    <section id="cards-accordions" className="ds-section" aria-labelledby="cards-accordions-title">
-      <SectionHeader id="cards-accordions" eyebrow="Components" title="Cards and accordions">
-        Service cards use vibrant category-gradient headers with solid contrast-tested titles and quiet translucent category badges. Prices, timing, inclusion checklists, and scope remain visible. Optional inquiry actions are handled by the production page. Accordions reduce scanning load when content has clear labels and predictable expansion behavior.
-      </SectionHeader>
-      <Specimen kind="services" />
-      <div className="ds-two-column">
-        <DocCard title="Card anatomy" meta="Structure">
-          <ul>
-            <li>Mono metadata when it adds useful context.</li>
-            <li>Concise title with strong hierarchy.</li>
-            <li>Body copy that explains the decision or usage.</li>
-          </ul>
-        </DocCard>
-        <ExampleFrame label="Shared disclosure · engagement terms">
-          <FAQAccordionDemo />
-        </ExampleFrame>
-      </div>
-      <div className="ds-two-column ds-component-pattern-docs">
-        <DocCard title="Contact Surface Card" meta="Production card">
-          <p>
-            The shared ContactCard renders the production surface, full-card link, and independent copy control. It accepts link and successful-copy callbacks; focus remains visible and reduced motion stops animated decoration.
-          </p>
-          <ExampleFrame label="Contact-style link">
-            <Specimen kind="contact" />
-          </ExampleFrame>
-        </DocCard>
-        <DocCard title="Signal Gradient Icon" meta="Icon style">
-          <p>
-            Signal Gradient Icons use the At a Glance gradient stroke across Lucide icons.
-            Use them when an icon acts as a signature signal, not as generic decoration.
-          </p>
-          <ExampleFrame label="Gradient stroke">
-            <SignalGradientIcon icon={Palette} />
-            <SignalGradientIcon icon={Box} />
-            <SignalGradientIcon icon={Zap} />
-          </ExampleFrame>
-        </DocCard>
-      </div>
-    </section>
-
-    <section id="case-study-blocks" className="ds-section" aria-labelledby="case-study-blocks-title">
-      <SectionHeader id="case-study-blocks" eyebrow="Components" title="Case-study blocks">Shared metadata, tags, headings, paragraphs, images, galleries, quotes, and callouts preserve authored content and semantics.</SectionHeader>
-      <Specimen kind="body" />
-    </section>
-    <section id="inquiry-form" className="ds-section" aria-labelledby="inquiry-form-title">
-      <SectionHeader id="inquiry-form" eyebrow="Components" title="Inquiry form">Shared labelled inputs, textareas, and select-only comboboxes accept values, placeholders, errors, and callbacks. Dropdowns use inset chevrons, themed menus, selected checkmarks, and active-option focus; arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, and outside dismissal are supported. Escape cancels the pending selection; Tab commits it. The select-menu-max-height token caps the popup at 288px; available viewport space can shorten it or place it above the field. Required and optional labels, error summaries, focus, sending, success, and failure states remain accessible. The form sits in an elevated card with a three-color gradient top edge (--gradient-inquiry-form), a full-width submit button, and a privacy link that opens in a new tab. The controller owns configuration, verification, and email requests; specimens use local fixtures only.</SectionHeader>
-      <Specimen kind="inquiry" />
-    </section>
-    <section id="service-gradients" className="ds-section" aria-labelledby="service-gradients-title">
-      <SectionHeader id="service-gradients" eyebrow="Tokens" title="Service gradients">Reusable category backgrounds. Gradients render at full strength with no overlay. Category-specific title colors and translucent category badges keep text readable in both themes.</SectionHeader>
-      <div className="ds-token-grid">
+      </div><p className="ds-reading-copy">Switch the page theme to compare mappings. The swatches show individual roles, not a guarantee that every foreground works on every background. Disabled text has a separate purpose from secondary text.</p>
+  </>,
+  'service-gradients': () => <>
+<div className="ds-token-grid">
         {[
           ['audits', 'Audits', 'Red → pink'],
           ['projects', 'Projects', 'Pink → blue'],
@@ -1103,65 +613,99 @@ const ComponentsSection = () => (
           <p><code>{`--gradient-rate-${category}`}</code></p>
           <CopyButton value={`var(--gradient-rate-${category})`} label={`Copy ${label} gradient token`} />
         </DocCard>)}
-      </div>
-    </section>
-
-    <section id="service-lists" className="ds-section" aria-labelledby="service-lists-title">
-      <SectionHeader id="service-lists" eyebrow="Components" title="Service lists">Service cards show a category header, price, timing, description, best-fit client, inclusion checklist, and visible scope limits. Groups accept a heading level, unique ID prefix, and optional inquiry callback. Three desktop columns become two on tablet and one on mobile. Ongoing support uses two stacked subsections with two cards occupying the first two grid columns, matching the widths of other service cards. Header and pricing tracks align dividers within each row. Production inquiry actions select a service and move focus to contact; fixtures use local callbacks only.</SectionHeader>
-      <Specimen kind="services" />
-    </section>
-    <section id="about-media" className="ds-section" aria-labelledby="about-media-title">
-      <SectionHeader id="about-media" eyebrow="Components" title="About photos and lightbox">Tiles accept photo records with descriptive alt text and dimensions. Stacks flatten on mobile. The lightbox closes with Escape, traps keyboard focus, and returns focus to the trigger; reduced motion disables photo float.</SectionHeader>
-      <Specimen kind="about" />
-    </section>
-    <section id="copy-actions" className="ds-section" aria-labelledby="copy-actions-title">
-      <SectionHeader id="copy-actions" eyebrow="Components" title="Copy actions">
-        Copy controls are used for tokens, source paths, and contact details. The copied state is temporary and does not resize the control.
-      </SectionHeader>
-      <ExampleFrame label="Copy controls">
+      </div><div className="ds-inquiry-gradient-example"><h3>Inquiry form edge</h3><div className="ds-rate-gradient-swatch" style={{ background: 'var(--gradient-inquiry-form)' }} /><code>--gradient-inquiry-form</code><CopyButton value="--gradient-inquiry-form" label="Copy inquiry form gradient token" /></div><Details><p>Audits and ongoing support use <code>--rate-header-foreground</code>; projects use <code>--rate-header-project-foreground</code>. Badges combine a fixed dark foreground with a 35% white background. Measure the combined foreground and gradient in both themes.</p></Details>
+  </>,
+  'typography': () => <>
+<TypographyExamples />
+  </>,
+  'spacing': () => <>
+<SpacingExamples />
+  </>,
+  'radius-elevation': () => <>
+<RadiusExamples />
+  </>,
+  'foundation-specimens': () => <>
+<OpacityExamples />
+  </>,
+  'blur': () => <>
+<div className="ds-card-grid">{['--blur-subtle', '--blur-base', '--blur-medium', '--blur-strong', '--blur-heavy'].map(token => <BlurTokenCard key={token} token={token} />)}</div>
+  </>,
+  'components': () => <>
+<p className="ds-reading-copy">Choose an existing component before inventing a new one. Each example identifies its production role; state controls and callbacks stay local to this page. <a href="#audit-notes">See the coverage inventory</a>.</p>
+  </>,
+  'buttons': () => <>
+<ExampleFrame label="Variants and states">
+        <Button>Primary Action</Button><LinkButton href="#contact-cards">Link action</LinkButton>
+        <Button variant="secondary">Secondary Action</Button>
+        <Button variant="quiet">Quiet Action</Button>
+        <Button disabled>Disabled</Button>
+        <IconButton icon={ArrowUpRight} label="Open external link" />
+      </ExampleFrame>
+  </>,
+  'copy-actions': () => <>
+<ExampleFrame label="Copy controls">
         <CopyButton value="--color-develop-blue" label="Copy develop blue token" />
         <CopyButton value="omar@designedbyomar.com" label="Copy email address" />
       </ExampleFrame>
-    </section>
-
-    <section id="navigation-drawers" className="ds-section" aria-labelledby="navigation-drawers-title">
-      <SectionHeader id="navigation-drawers" eyebrow="Components" title="Navigation and mobile menu">
-        Production navigation links to standalone Work and About pages. The mobile menu exposes the same destinations; the documentation sidebar belongs only to this reference page.
-      </SectionHeader>
-      <div className="ds-two-column">
+  </>,
+  'badges-tags': () => <>
+<Specimen kind="badges" />
+  </>,
+  'form-fields': () => <>
+<Specimen kind="fields" /><Details><p>FormField accepts field metadata, a value, error text, an ID prefix, a disabled state, and a change callback. Required labels stay visible; hints and errors use <code>aria-describedby</code>. Placeholders supplement labels.</p></Details>
+  </>,
+  'select-dropdowns': () => <>
+<Specimen kind="select" /><Details><p>Arrow keys, Home/End, and typeahead move the active option. Enter or Space selects; Escape cancels; Tab commits and moves on. Outside dismissal preserves the previous selection. The menu opens above or below the field and keeps its active option visible. The component owns popup state; its caller owns the selected value.</p></Details>
+  </>,
+  'cards-accordions': () => <>
+<ExampleFrame label="Shared disclosure · engagement terms"><FAQAccordionDemo /></ExampleFrame><Details><p>Disclosure accepts a heading, content, heading level, optional ID, and defaultExpanded. Its button controls a labelled region; hidden content is removed from keyboard and accessibility navigation. Toggling introduces no motion.</p></Details>
+  </>,
+  'contact-cards': () => <>
+<Specimen kind="contact" /><Details><p>ContactCard accepts label, value, destination, optional copy value, and interaction callbacks. The shared ContactCard renders the production surface; reduced motion stops animated decoration. Booking and email have priority in the homepage contact layout, followed by profile and resume links.</p></Details>
+  </>,
+  'case-study-covers': () => <>
+<ExampleFrame label="Production case-study card"><Specimen kind="case" /></ExampleFrame><Details><p>CaseCard accepts a study record, featured or wide presentation, optional video, and interaction callbacks. Metadata and tags remain readable on narrow screens. Video is disabled in this deterministic example.</p></Details>
+  </>,
+  'navigation-drawers': () => <>
+<div className="ds-two-column">
         <ExampleFrame label="Production navigation · local callbacks">
           <Specimen kind="navigation" />
         </ExampleFrame>
-        <DocCard title="Interaction notes" meta="Navigation">
+        <Details heading="Navigation behavior">
           <ul>
             <li>Desktop keeps Work, Design System, About, Ask, Contact, and a direct CTA.</li>
             <li>Mobile collapses into theme toggle plus menu trigger.</li>
             <li>The mobile menu closes with Escape and when a destination is selected; the About lightbox traps focus and restores it on close.</li>
           </ul>
-        </DocCard>
+        </Details>
       </div>
-    </section>
-
-    <section id="cookie-banner" className="ds-section" aria-labelledby="cookie-banner-title">
-      <SectionHeader id="cookie-banner" eyebrow="Components" title="Cookie banner">
-        Consent copy should be direct and calm. The banner must never block the core portfolio experience.
-      </SectionHeader>
-      <ExampleFrame label="Production consent banner · local callbacks">
-        <Specimen kind="consent" />
-      </ExampleFrame>
-    </section>
-
-    <section id="ask" className="ds-section" aria-labelledby="ask-title">
-      <SectionHeader id="ask" eyebrow="Components" title="Ask">
-        Ask connects questions about Omar’s work to reviewed answers and published case studies.
-        Suggested prompts and exact matches are answered locally. Other questions may be routed to
-        a reviewed answer or receive a clearly labelled, unreviewed draft grounded in relevant work.
-        Unsupported questions offer an email handoff; temporary failures offer recovery.
-      </SectionHeader>
-      <ExampleFrame label="Production Ask panel · labelled fixture states">
+  </>,
+  'footer-system': () => <>
+<ExampleFrame label="Production footer · local callbacks"><Specimen kind="footer" /></ExampleFrame>
+  </>,
+  'patterns': () => <>
+<p className="ds-reading-copy">Read each pattern as a composition: what appears first, what changes with state, and what the reader can do next. The examples reuse production presentation; page controllers retain routing, analytics, storage, and network requests.</p>
+  </>,
+  'hero-system': () => <>
+<ExampleFrame label="Page-specific composition sketch"><PatternPreview kind="hero" /></ExampleFrame><Details><p>The homepage pairs a clear statement of work with supporting copy, portrait media, and ambient motion. Its editorial placement stays in the homepage. This sketch illustrates hierarchy; it is not a shared hero component.</p></Details>
+  </>,
+  'case-study-blocks': () => <>
+<Specimen kind="body" /><Details><p>CaseStudyBody accepts normalized authored blocks, an accent, and an optional heading-ID prefix. Keep heading levels meaningful inside the surrounding page. Images require descriptive alternative text; captions add context rather than repeating it.</p></Details>
+  </>,
+  'about-media': () => <>
+<Specimen kind="about" /><Details><p>Photo tiles and stacks accept photo records and an open callback. The lightbox closes with Escape, traps focus, and returns it to the opening tile. Reduced motion disables photo float. Portrait art direction and About page arrangement remain page-specific.</p></Details>
+  </>,
+  'service-lists': () => <>
+<Specimen kind="services" /><Details><p>ServiceRateCard and ServiceRateGroup accept content, category labels, semantic heading levels, unique ID prefixes, subgroup metadata, and an optional inquiry callback. Three desktop columns become two below 1054px and one below 640px. Ongoing pairs occupy the first two tracks. Production actions select a service and focus contact; this fixture reports a local selection.</p></Details>
+  </>,
+  'inquiry-form': () => <>
+<Specimen kind="inquiry" /><Details><p>InquiryForm receives controlled values, errors, status, readiness, a verification slot, and change/submit callbacks. The controller owns configuration, verification, and email requests. This fixture never loads Cloudflare or sends email. The form uses an elevated card, a gradient top edge, and a full-width submit action. Its privacy link opens in a new tab with an accessible hint.</p></Details>
+  </>,
+  'ask': () => <>
+<ExampleFrame label="Production Ask panel · labelled fixture states">
         <Specimen kind="ask" />
       </ExampleFrame>
-      <div className="ds-card-grid">
+      <Details heading="Answer states and behavior"><p>Suggested prompts and exact matches are answered locally. New questions may be routed to reviewed material or receive a labelled draft.</p><div className="ds-card-grid">
         <DocCard title="Prompts follow the reader" meta="Suggestions">
           Three prompts open the panel, with more behind one disclosure. After an answer,
           up to four related prompts help the reader explore further. Refusal answers remain
@@ -1202,89 +746,37 @@ const ComponentsSection = () => (
           The answer region is <code>aria-live=&quot;polite&quot;</code> so a reply is announced without stealing
           focus. Every control clears 44px, the input is labelled, and no answer depends on motion.
         </DocCard>
-      </div>
-    </section>
-
-    <section id="github-activity" className="ds-section" aria-labelledby="github-activity-title">
-      <SectionHeader id="github-activity" eyebrow="Components" title="GitHub activity">
-        A rolling-year contribution calendar in At a Glance, backed by the official GitHub GraphQL API
-        through <code>/api/github-contributions</code>. It shows the public yearly total and daily
-        activity, scrolls horizontally on narrow screens, and links out to the profile. The endpoint
-        serves a six-hour snapshot &mdash; stale up to 24 hours if GitHub is down &mdash; and the panel
-        falls back to a quiet message rather than inventing data, so the section never shows numbers it
-        cannot source.
-      </SectionHeader>
-      <ExampleFrame label="Production activity · deterministic fixture">
+      </div></Details>
+  </>,
+  'github-activity': () => <>
+<ExampleFrame label="Production activity · deterministic fixture">
         <Specimen kind="github" />
+      </ExampleFrame><Details><p>The production calendar uses a rolling-year snapshot from the same-origin endpoint. Its controller handles fetching and caching. GitHubActivity accepts status, data, a profile destination, and an optional interaction callback. This short deterministic fixture illustrates states, not real activity.</p></Details>
+  </>,
+  'cookie-banner': () => <>
+<ExampleFrame label="Production consent banner · local callbacks">
+        <Specimen kind="consent" />
       </ExampleFrame>
-    </section>
-  </>
-);
-
-const PatternsSection = () => (
-  <>
-    <section id="patterns" className="ds-section" aria-labelledby="patterns-title">
-      <SectionHeader id="patterns" eyebrow="Patterns" title={DESIGN_SYSTEM_PAGE_COPY.sections.patterns.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.patterns.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['Hero system', 'Editorial type, portrait media, pixel orbit, and focused proof copy.'],
-          ['Case-study covers', 'Gradient shell, browser-window preview, metadata chip, and controlled hover motion.'],
-          ['Footer system', 'Brand block, link columns, signoff motion, and design-system link.'],
-        ].map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Pattern">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    {[
-      ['hero-system', 'Hero system', 'The hero is the primary portfolio signal. It should explain Omar clearly before the motion or media gets attention.', 'hero'],
-      ['case-study-covers', 'Case-study covers', 'Covers sell the work quickly, then step aside. Metadata and tags must stay readable at small widths.', 'case'],
-      ['footer-system', 'Footer system', 'The footer is a structured utility system with a small signature animation, not a loose collection of links.', 'footer'],
-      ['privacy-consent', 'Privacy and consent', 'Privacy surfaces use plain language and preserve the current analytics behavior.', 'privacy'],
-    ].map(([id, title, body, kind]) => (
-      <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader id={id} eyebrow="Patterns" title={title}>{body}</SectionHeader>
-        <ExampleFrame label={`${title} specimen`}>
-          {kind === 'case' ? <Specimen kind="case" /> : kind === 'footer' ? <Specimen kind="footer" /> : <PatternPreview kind={kind} />}
-        </ExampleFrame>
-      </section>
-    ))}
-  </>
-);
-
-const MotionSection = ({ theme }) => (
-  <>
-    <section id="motion" className="ds-section" aria-labelledby="motion-title">
-      <SectionHeader id="motion" eyebrow="Motion" title={DESIGN_SYSTEM_PAGE_COPY.sections.motion.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.motion.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {MOTION_ROWS.map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Motion behavior">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    <section id="alien-arrival" className="ds-section" aria-labelledby="alien-arrival-title">
-      <SectionHeader id="alien-arrival" eyebrow="Motion" title="Alien arrival">
-        The alien animation is the restrained signature moment: noticeable enough to be memorable, small enough to preserve the portfolio's seriousness.
-      </SectionHeader>
-      <ExampleFrame label="Signature animation">
+  </>,
+  'privacy-consent': () => <>
+<ExampleFrame label="Page-specific privacy composition"><PatternPreview kind="privacy" /></ExampleFrame><Details><p>Declining analytics must leave the portfolio usable. Production stores the visitor’s explicit choice; the banner specimen above changes only its own local message. Form and Ask copy explain their own data use near the action.</p></Details>
+  </>,
+  'motion': () => <>
+<p className="ds-reading-copy">Use short feedback for controls and restrained signature effects for identity. Ambient effects should pause offscreen and when the tab is hidden. <a href="#reduced-motion">Provide a stable alternative</a> for every moving treatment.</p>
+  </>,
+  'motion-tokens': () => <>
+<MotionTokens />
+  </>,
+  'logo-loader': () => <>
+<ExampleFrame label="Production navigation logo · hover response"><NavLogo href="#logo-loader" onClick={event => event.preventDefault()} /></ExampleFrame><Details><p>The logo’s four shapes animate on hover using <code>--duration-nav</code>. Reduced motion keeps them still. The homepage-only LogoLoader uses a full-page opening state and rotating phrases; it is not a general-purpose loading indicator. It remains in <SourceLink path="src/main.jsx" />. Ask and GitHub loading states use their own status messages.</p></Details>
+  </>,
+  'alien-arrival': () => <>
+<ExampleFrame label="Signature animation">
         <AlienReplayDemo className="ds-alien-arrival-demo" ufoSize="1.8em" alienSize="1.35em" />
       </ExampleFrame>
-    </section>
-
-    <section id="pixel-orbit" className="ds-section" aria-labelledby="pixel-orbit-title">
-      <SectionHeader id="pixel-orbit" eyebrow="Motion" title="Pixel orbit">
-        The square-particle field supports the visual identity while remaining pointer-safe and reduced-motion aware.
-      </SectionHeader>
-      <ExampleFrame label="Canvas motif">
+  </>,
+  'pixel-orbit': ({ theme }) => <>
+<ExampleFrame label="Canvas motif">
         <div
           data-design-system-galaxy-theme={theme}
           style={{ position: 'relative', width: '100%', minHeight: 220, overflow: 'hidden', borderRadius: 'var(--radius-image)' }}
@@ -1292,186 +784,138 @@ const MotionSection = ({ theme }) => (
           <Galaxy density={1.45} speed={0.55} style="pixel" accent="workflow" theme={theme} />
         </div>
       </ExampleFrame>
-    </section>
-
-    {[
-      ['hover-reveal', 'Hover and reveal', 'Hover should clarify that something is interactive. Reveal should establish reading rhythm, not delay comprehension.'],
-      ['reduced-motion', 'Reduced motion', 'Every moving treatment needs a stable equivalent. Canvas pauses, translate effects are skipped, and the final state remains readable.'],
-    ].map(([id, title, body]) => (
-      <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader id={id} eyebrow="Motion" title={title}>{body}</SectionHeader>
-        {id === 'reduced-motion' && (
-          <ExampleFrame label="Stable fallback">
-            <div className="ds-reduced-motion-preview" data-audit-example="reduced-motion-pattern">
-              <span />
-              <strong>No movement required</strong>
-              <p>Final state remains readable when animation is disabled.</p>
-            </div>
-          </ExampleFrame>
-        )}
-      </section>
-    ))}
-  </>
-);
-
-const ContentAccessibilityResources = () => (
-  <>
-    <section id="content" className="ds-section" aria-labelledby="content-title">
-      <SectionHeader id="content" eyebrow="Content" title={DESIGN_SYSTEM_PAGE_COPY.sections.content.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.content.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['Case-study anatomy', 'Challenge, approach, outcome, metrics, role, tags, and adjacent work links.'],
-          ['Labels and metadata', 'Short mono labels improve scanning when they identify useful context.'],
-          ['Microcopy', 'Use plain verbs. Keep privacy, consent, and contact copy direct.'],
-        ].map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Content rule">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    {[
-      ['case-study-anatomy', 'Case-study anatomy', 'Each case study should make the product problem, Omar’s role, decisions, and result easy to evaluate.'],
-      ['metadata-labels', 'Labels and metadata', 'Metadata should add orientation: year, client, role, workflow, route, or source. Do not decorate with empty labels.'],
-      ['microcopy', 'Microcopy', 'Small copy should reduce doubt. Use exact labels for buttons, links, privacy actions, and copy controls.'],
-    ].map(([id, title, body]) => (
-      <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader id={id} eyebrow="Content" title={title}>{body}</SectionHeader>
-      </section>
-    ))}
-
-    <section id="accessibility" className="ds-section" aria-labelledby="accessibility-title">
-      <SectionHeader id="accessibility" eyebrow="Accessibility" title={DESIGN_SYSTEM_PAGE_COPY.sections.accessibility.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.accessibility.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['Focus and keyboard', 'Every interactive element needs visible focus. Mobile menus, lightboxes and documentation accordions expose their interaction state.'],
-          ['Contrast and touch', 'Body text must meet AA contrast. Controls keep a 44px minimum target.'],
-          ['Reduced motion', 'All animation, canvas, and scroll-driven behaviors need non-motion equivalents.'],
-        ].map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Accessibility rule">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    {[
-      ['focus-keyboard', 'Focus and keyboard', 'The side nav uses real links, while the mobile menu closes on Escape; the About lightbox traps focus and restores it to its trigger.', 'focus'],
-      ['contrast-touch', 'Contrast and touch', 'Tokenized foreground colors preserve contrast across themes, while buttons and icon buttons keep minimum touch size.', 'contrast'],
-    ].map(([id, title, body, kind]) => (
-      <section key={id} id={id} className="ds-section" aria-labelledby={`${id}-title`}>
-        <SectionHeader id={id} eyebrow="Accessibility" title={title}>{body}</SectionHeader>
-        <ExampleFrame label={`${title} specimen`}>
-          <AccessibilityPreview kind={kind} />
-        </ExampleFrame>
-      </section>
-    ))}
-
-    <section id="resources" className="ds-section" aria-labelledby="resources-title">
-      <SectionHeader id="resources" eyebrow="Resources" title={DESIGN_SYSTEM_PAGE_COPY.sections.resources.title}>
-        {DESIGN_SYSTEM_PAGE_COPY.sections.resources.description}
-      </SectionHeader>
-      <div className="ds-card-grid">
-        {[
-          ['src/design-tokens.css', 'Shared token definitions for both app entries.'],
-          ['src/design-system-primitives.jsx', 'Core documentation primitives extracted for v1.'],
-          ['src/design-system.jsx', 'The public design-system documentation surface.'],
-          ['src/main.jsx', 'Production portfolio usage and route behavior.'],
-          ['DESIGN.md', 'Agent-readable design rules and review expectations.'],
-          ['docs/ai-workflow.md', 'How AI-assisted work is bounded and reviewed.'],
-        ].map(([title, body]) => (
-          <DocCard key={title} title={title} meta="Source">
-            <p>{body}</p>
-          </DocCard>
-        ))}
-      </div>
-    </section>
-
-    <section id="audit-notes" className="ds-section" aria-labelledby="audit-notes-title">
-      <SectionHeader id="audit-notes" eyebrow="Resources" title="Audit notes">
-        This audit cross-checks the documentation against src/design-tokens.css, src/main.jsx, src/footer-alien.jsx, and src/galaxy.jsx.
-      </SectionHeader>
-      <div className="ds-two-column">
-        <DocCard title="Documented now" meta="Audit result">
-          <ul>
-            <li>Color, typography, spacing, radius, elevation, opacity, layering, breakpoints, blur, motion, and theme foundations.</li>
-            <li>Buttons, icon buttons, cards, FAQ-style accordions, copy controls, navigation, lightboxes, and cookie consent.</li>
-            <li>Alien arrival, pixel orbit, loader mark, reveal behavior, hover treatments, and reduced-motion expectations.</li>
-          </ul>
-        </DocCard>
-        <DocCard title="Shared production coverage" meta="Implementation inventory">
-          <Specimen kind="inventory" />
-        </DocCard>
-      </div>
-    </section>
-  </>
-);
+  </>,
+  'hover-reveal': () => <>
+<ExampleFrame label="Shared action · hover and keyboard focus"><LinkButton href="#contact-cards" variant="secondary">Explore contact cards</LinkButton></ExampleFrame><ul className="ds-reading-copy"><li>Use hover to confirm a link or action. Never reveal essential text only on hover.</li><li>Keyboard focus receives a visible outline even when the pointer is elsewhere.</li><li>Contact borders and card lifts stop under reduced motion; content remains in its final readable position.</li></ul>
+  </>,
+  'reduced-motion': () => <>
+<ExampleFrame label="Stable fallback"><div className="ds-reduced-motion-preview" data-audit-example="reduced-motion-pattern"><span /><strong>No movement required</strong><p>Canvas movement stops, animated decoration settles, and anchor navigation is immediate. Try changing the system preference while this page is open.</p></div></ExampleFrame>
+  </>,
+  'content': () => <>
+<div className="ds-two-column"><DocCard title="Prefer evidence"><p>“The team adopted shared components across the product.”</p></DocCard><DocCard title="Avoid inflated claims"><p>“A revolutionary system that transformed everything.”</p></DocCard></div><p className="ds-reading-copy">These are writing examples, not claims about a project. Use only outcomes supported by the authored case study.</p>
+  </>,
+  'case-study-anatomy': () => <>
+<ol className="ds-reading-copy"><li><strong>Context:</strong> the product, audience, and constraint.</li><li><strong>Role:</strong> Omar’s responsibility and collaborators.</li><li><strong>Problem:</strong> what was difficult and why it mattered.</li><li><strong>Decisions:</strong> the chosen approach and its tradeoffs.</li><li><strong>Outcome:</strong> supported results and remaining limitations.</li><li><strong>Next step:</strong> related work or a relevant question.</li></ol>
+  </>,
+  'metadata-labels': () => <>
+<dl className="ds-definition-list"><div><dt>Role</dt><dd>Describe the actual responsibility, such as “Product design,” without implying ownership of the entire project.</dd></div><div><dt>Period and client</dt><dd>Use the authored year and organization; keep labels short and consistent across cards and detail pages.</dd></div><div><dt>Source</dt><dd>Link to the specific case study that supports an answer. Avoid an unlabeled “Learn more.”</dd></div></dl>
+  </>,
+  'microcopy': () => <>
+<dl className="ds-definition-list"><div><dt>Action</dt><dd>“Discuss Product Audit” names the service. “Submit” does not explain the outcome.</dd></div><div><dt>Validation</dt><dd>“Enter a valid email address.” Identify what needs fixing, beside the field.</dd></div><div><dt>Recovery</dt><dd>“Try loading again” offers a clear next step. Keep entered text intact when something fails.</dd></div><div><dt>Confirmation</dt><dd>Report what actually happened. A clipboard action should say “Copied” only after success.</dd></div></dl>
+  </>,
+  'accessibility': () => <>
+<ul className="ds-reading-copy"><li>Use real links, buttons, labels, and headings.</li><li>Check every state with the keyboard, not just the default screenshot.</li><li>Test both themes, reduced motion, forced colors, and zoom.</li><li>Validate the complete composition: accessible pieces can still form a confusing page.</li></ul>
+  </>,
+  'focus-keyboard': () => <>
+<ExampleFrame label="Focus and keyboard specimen"><AccessibilityPreview kind="focus" /></ExampleFrame><ul className="ds-reading-copy"><li>Use the skip link to bypass repeated navigation.</li><li>Escape closes the documentation menu and returns to its trigger; choosing a section focuses its heading.</li><li>A lightbox contains focus until it closes, then restores the opening tile.</li><li>Disclosure buttons expose expanded state; collapsed controls leave the Tab order.</li></ul>
+  </>,
+  'contrast-touch': () => <>
+<ExampleFrame label="Contrast and touch specimen"><AccessibilityPreview kind="contrast" /></ExampleFrame><ul className="ds-reading-copy"><li>Normal text needs at least 4.5:1 contrast; large text needs 3:1.</li><li>Essential control boundaries and focus indicators need 3:1 against adjacent colors.</li><li>The site targets 44px controls. Visual icon size can be smaller than its hit area.</li><li>Measure gradients across their full range and translucent fills against their actual backgrounds.</li><li>Disabled controls are distinct from readable secondary copy. Do not rely on color alone for errors or status.</li></ul>
+  </>,
+  'forms-announcements': () => <>
+<dl className="ds-definition-list"><div><dt>Field errors</dt><dd>Use visible error text, <code>aria-invalid</code>, and <code>aria-describedby</code>. The error summary links to fields and receives focus after a failed submission.</dd></div><div><dt>Results</dt><dd>Use a polite status announcement for sending and success. Ask announces its answer without stealing focus from the input.</dd></div><div><dt>Verification</dt><dd>Explain why sending is unavailable, preserve fields, and provide email as an alternative. Never announce success before it occurs.</dd></div></dl><p><a href="#form-fields">Try field states</a> or <a href="#inquiry-form">inspect the complete inquiry flow</a>.</p>
+  </>,
+  'resources': () => <>
+<dl className="ds-definition-list">{[
+ ['src/design-tokens.css', 'Shared token definitions and theme mappings.'],
+ ['src/ui/', 'Shared production components.'],
+ ['src/design-system.jsx', 'Reference-page rendering and example composition.'],
+ ['src/design-system-page.css', 'Documentation layout and responsive navigation styles.'],
+ ['src/design-system-primitives.jsx', 'Documentation-only cards, frames, and headings.'],
+ ['src/content/design-system.mjs', 'Canonical section order and labels.'],
+ ['src/design-system-specimens.jsx', 'Local, deterministic component fixtures.'],
+ ['DESIGN.md', 'Design rules and review expectations.'],
+ ['docs/ai-workflow.md', 'How AI-assisted work is bounded and reviewed.'],
+].map(([path, description]) => <div key={path}><dt><SourceLink path={path} /></dt><dd>{description}</dd></div>)}</dl>
+  </>,
+  'token-reference': () => <>
+<TokenReference />
+  </>,
+  'audit-notes': () => <>
+<Specimen kind="inventory" />
+  </>,
+  'layout-breakpoints': () => <>
+<div className="ds-two-column"><DocCard title="Content widths"><dl className="ds-definition-list">{['--content-reading-width', '--content-answer-width', '--content-about-width'].map(token => <div key={token}><dt><code>{token}</code></dt><dd><TokenValue name={token} /></dd></div>)}</dl><p>The homepage and services share a 1200px maximum container. Reading and form columns remain narrower.</p></DocCard><DocCard title="Existing layout boundaries"><dl className="ds-definition-list"><div><dt>600px</dt><dd>Compact portfolio layout rules.</dd></div><div><dt>640px</dt><dd>Service cards and inquiry fields stack below this width; engagement terms use a single column at 640px and below.</dd></div><div><dt>820px</dt><dd>The homepage hero changes between stacked and side-by-side layouts.</dd></div><div><dt>900px</dt><dd>Production navigation changes to its mobile menu.</dd></div><div><dt>1054px</dt><dd>The documentation sidebar becomes a menu at this width. Service cards use two columns below it.</dd></div></dl></DocCard></div>
+  </>,
+  'icons': () => <>
+<ExampleFrame label="Standard Lucide icons"><AppIcon icon={ArrowUpRight} size={24} /><AppIcon icon={Copy} size={24} /><AppIcon icon={Check} size={24} /><AppIcon icon={Clock} size={24} /></ExampleFrame><ExampleFrame label="Signal gradient icons"><SignalGradientIcon icon={Palette} /><SignalGradientIcon icon={Box} /><SignalGradientIcon icon={Zap} /></ExampleFrame><Details><p>AppIcon defaults to a 16px icon and a 2px absolute stroke. Icons beside text are decorative. Icon-only buttons require an accessible label and a 44px hit area. Timing uses a clock; inclusion checks use DS green. Category badges remain text-only.</p></Details>
+  </>,
+};
 
 const DesignSystem = () => {
-  const [theme, setTheme] = React.useState(() => localStorage.getItem('omar.theme') || 'dark');
+  const [theme, setTheme] = React.useState(() => {
+    try { return localStorage.getItem('omar.theme') === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
+  });
   const [navOpen, setNavOpen] = React.useState(() => window.innerWidth > 1054);
-  const activeId = useActiveSection();
+  const triggerRef = React.useRef(null);
+  const navigationRef = React.useRef(null);
+  const { activeId, request, navigate } = useDocumentationNavigation();
 
   React.useEffect(() => {
     const mq = window.matchMedia('(max-width: 1054px)');
-    const handler = (e) => setNavOpen(!e.matches);
-    return onMediaChange(mq, handler);
+    return onMediaChange(mq, event => setNavOpen(!event.matches));
   }, []);
-
-  React.useLayoutEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+  React.useLayoutEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  React.useEffect(() => { try { localStorage.setItem('omar.theme', theme); } catch { /* Theme still works without storage. */ } }, [theme]);
 
   React.useEffect(() => {
-    localStorage.setItem('omar.theme', theme);
-  }, [theme]);
+    if (!navOpen) return;
+    const outside = event => {
+      if (window.innerWidth <= 1054 && !navigationRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) setNavOpen(false);
+    };
+    const escape = event => {
+      if (event.key === 'Escape' && window.innerWidth <= 1054) {
+        setNavOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('focusin', outside);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('focusin', outside);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [navOpen]);
+  const toggleNavigation = () => {
+    const opening = !navOpen;
+    setNavOpen(opening);
+    if (opening && window.innerWidth <= 1054) requestAnimationFrame(() => navigationRef.current?.querySelector('button')?.focus());
+  };
+  const handleNavigate = id => {
+    if (window.innerWidth <= 1054) setNavOpen(false);
+    navigate(id);
+  };
 
-  const handleNavigate = () => { if (window.innerWidth <= 1054) setNavOpen(false); };
-
-  return (
-    <div className="ds-shell">
-      <style>{footerAlienStyles}</style>
-      <SignalGradientDefs />
-      <TopBar theme={theme} setTheme={setTheme} navOpen={navOpen} setNavOpen={setNavOpen} />
-      <div className="ds-mobile-panel" hidden={!navOpen}>
-        <SideNavigation
-          activeId={activeId}
-          onNavigate={handleNavigate}
-        />
+  return <TokenTheme.Provider value={theme}><div className="ds-shell">
+    <a className="ds-skip-link" href="#ds-main" onClick={event => {
+      event.preventDefault(); setNavOpen(window.innerWidth > 1054);
+      document.getElementById('ds-main').focus();
+    }}>Skip to content</a>
+    <style>{footerAlienStyles}</style>
+    <SignalGradientDefs />
+    <TopBar theme={theme} setTheme={setTheme} navOpen={navOpen} onToggleNav={toggleNavigation} triggerRef={triggerRef} />
+    <div className={`ds-layout${!navOpen ? ' sidebar-collapsed' : ''}`}>
+      <aside id="ds-section-navigation" ref={navigationRef} className="ds-sidebar" hidden={!navOpen} aria-label="Documentation navigation">
+        <SideNavigation activeId={activeId} request={request} onNavigate={handleNavigate} />
         <nav className="ds-site-header__nav ds-mobile-site-nav" aria-label="Site">
-          <a href="/work">Work</a>
-          <a href="/design-system" aria-current="page">Design System</a>
-          <a href="/about">About</a>
-          <a href="/#faq">Ask</a>
-          <a href="/#contact">Contact</a>
-          <a className="ds-header-cta" href="/#contact">Get in touch</a>
+          <a href="/work">Work</a><a href="/design-system" aria-current="page">Design System</a><a href="/about">About</a>
+          <a href="/#faq">Ask</a><a href="/#contact">Contact</a><a className="ds-header-cta" href="/#contact">Get in touch</a>
         </nav>
-      </div>
-      <div className={`ds-layout${!navOpen ? ' sidebar-collapsed' : ''}`}>
-        <aside className="ds-sidebar" hidden={!navOpen}>
-          <SideNavigation
-            activeId={activeId}
-            onNavigate={handleNavigate}
-            testId="design-system-sidebar"
-          />
-        </aside>
-        <main className="ds-content">
-          <HomeSection theme={theme} />
-          <FoundationsSection />
-          <ComponentsSection />
-          <PatternsSection />
-          <MotionSection theme={theme} />
-          <ContentAccessibilityResources />
-        </main>
-      </div>
-      <BackToTopButton />
+      </aside>
+      <main id="ds-main" className="ds-content" tabIndex={-1}>
+        {DESIGN_SYSTEM_SECTIONS.map(section => {
+          const Renderer = SECTION_RENDERERS[section.renderer];
+          return <section key={section.id} id={section.id} data-doc-section className={`ds-section${section.id === 'overview' ? ' ds-hero' : ''}`} aria-labelledby={`${section.id}-title`}>
+            {section.id !== 'overview' && <SectionHeader id={section.id} eyebrow={DESIGN_SYSTEM_GROUPS.find(group => group.id === section.group).title} title={section.title}>{section.summary}</SectionHeader>}
+            <Renderer theme={theme} />
+          </section>;
+        })}
+      </main>
     </div>
-  );
+    <BackToTopButton />
+  </div></TokenTheme.Provider>;
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(<DesignSystem />);

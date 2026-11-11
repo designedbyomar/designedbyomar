@@ -145,7 +145,7 @@
 
 .ds-layout {
   display: grid;
-  grid-template-columns: 292px minmax(0, 1fr);
+  grid-template-columns: var(--size-docs-sidebar) minmax(0, 1fr);
   gap: var(--layout-1);
   width: 100%;
   max-width: none;
@@ -238,8 +238,8 @@
 .ds-nav-group__items a {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  margin-left: 34px;
+  min-height: var(--control-hit-area);
+  margin-left: var(--space-7);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-standard);
   color: var(--fg-secondary);
@@ -1122,9 +1122,8 @@
   gap: var(--space-4);
 }
 
-.ds-mobile-panel {
-  display: none;
-}
+.ds-sidebar[hidden] { display: none; }
+.ds-mobile-site-nav { display: none; }
 
 @media (max-width: 1054px) {
   .ds-layout {
@@ -1141,10 +1140,7 @@
     display: none;
   }
 
-  /* Sidebar is always hidden at ≤1054px — the floating ds-mobile-panel is the only nav surface */
-  .ds-sidebar {
-    display: none;
-  }
+
 
   .ds-hero h1 {
     font-size: clamp(48px, 12vw, 128px);
@@ -1165,11 +1161,12 @@
     display: none;
   }
 
-  .ds-mobile-panel {
+  .ds-sidebar {
     display: block;
     position: fixed;
     inset: 64px var(--space-4) auto;
-    max-height: calc(100vh - 88px);
+    height: auto;
+    max-height: calc(100dvh - var(--scroll-margin-heading));
     overflow: auto;
     z-index: var(--z-modal);
     padding: var(--space-4);
@@ -1181,7 +1178,7 @@
     -webkit-backdrop-filter: var(--blur-heavy);
   }
 
-  .ds-mobile-panel[hidden] {
+  .ds-sidebar[hidden] {
     display: none;
   }
 
@@ -1271,7 +1268,7 @@
 /* The mobile panel reuses .ds-site-header__nav for link styling so the two surfaces
    cannot drift, but stacks them instead of sitting them in a row. */
 .ds-mobile-site-nav {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: stretch;
   gap: var(--space-1);
@@ -1296,3 +1293,59 @@
 
 .ds-rate-gradient-swatch { height: var(--space-8); border-radius: var(--radius-comfort); margin-bottom: var(--space-3); }
 .ds-rate-header-example { padding: var(--space-5); border-radius: var(--radius-comfort); color: var(--rate-header-foreground); font-size: var(--font-size-heading-lg); font-weight: var(--font-weight-medium); }
+
+/* Documentation layout and examples reuse the production scale. */
+.ds-skip-link { position: fixed; top: var(--space-2); left: var(--space-4); z-index: var(--z-critical); padding: var(--space-3); background: var(--bg-page); color: var(--fg-primary); transform: translateY(-200%); }
+.ds-skip-link:focus { transform: none; }
+.ds-section-header__title-row h2 { min-width: 0; overflow-wrap: anywhere; }
+.ds-hero-title__line1 { overflow-wrap: anywhere; }
+.ds-section-header__copy { width: var(--control-hit-area); height: var(--control-hit-area); }
+.ds-shell .ds-copy-button { min-width: var(--control-hit-area); min-height: var(--control-hit-area); }
+.ds-nav-group__items a[aria-current="location"] { font-weight: var(--font-weight-semibold); box-shadow: var(--shadow-ring); }
+.ds-nav-category[data-current-group="true"] { color: var(--fg-primary); }
+.ds-reading-copy { max-width: var(--content-answer-width); color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-loose); }
+.ds-reading-copy li + li { margin-top: var(--space-3); }
+.ds-reading-copy:is(ul, ol) { padding-left: var(--space-6); }
+.ds-detail-stack, .ds-definition-list, .ds-token-reference, .ds-badge-examples { display: grid; gap: var(--space-6); }
+.ds-section > .disclosure { margin-top: var(--space-7); }
+.ds-section .disclosure__panel { color: var(--fg-secondary); font-size: var(--font-size-body-lg); line-height: var(--line-height-loose); }
+.ds-section .disclosure__panel p { max-width: var(--content-answer-width); }
+.ds-definition-list { margin: 0; }
+.ds-definition-list dt { color: var(--fg-primary); font-weight: var(--font-weight-medium); }
+.ds-definition-list dd { margin: var(--space-2) 0 0; color: var(--fg-secondary); line-height: var(--line-height-relaxed); }
+.ds-definition-list code, .ds-token-reference code, .ds-token-bar code { overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--font-size-mono-md); }
+.ds-token-reference { margin: 0; }
+.ds-token-reference dt { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.ds-token-reference dd { margin: var(--space-2) 0 0; overflow-wrap: anywhere; }
+.ds-token-reference .ds-copy-button { flex-shrink: 0; }
+.ds-surface-example { display: grid; gap: var(--space-3); padding: var(--space-6); background: var(--bg-page); min-width: 0; }
+.ds-surface-example code { overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--font-size-mono-md); }
+.ds-field-example { max-width: var(--content-answer-width); display: grid; gap: var(--space-6); }
+.ds-badge-example { padding: var(--space-6); border-radius: var(--radius-image); }
+.ds-badge-example .service-rate-card__category { margin: 0; }
+.ds-badge-examples h3 { margin-bottom: var(--space-4); }
+.ds-inquiry-gradient-example { margin-top: var(--space-7); display: grid; gap: var(--space-3); justify-items: start; }
+.ds-inquiry-gradient-example .ds-rate-gradient-swatch { width: 100%; }
+.ds-content code { overflow-wrap: anywhere; }
+.ds-specimen-state-picker select { min-height: var(--control-hit-area); }
+.ds-content .ds-example-frame + .ds-example-frame { margin-top: var(--space-6); }
+#quick-links { scroll-margin-top: var(--layout-3); }
+@media (max-width: 1054px) {
+  .ds-mobile-site-nav { display: flex; }
+  .ds-sidebar { overscroll-behavior: contain; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html, body { scroll-behavior: auto; }
+  .ds-shell, .ds-shell *, .ds-shell *::before, .ds-shell *::after { scroll-behavior: auto; }
+}
+@media (forced-colors: active) {
+  .ds-shell a[aria-label="designedbyomar"] path { fill: LinkText !important; }
+  .ds-shell .ds-nav-category .ds-nav-category__chevron { color: ButtonText; }
+  .ds-sidebar, .ds-surface-example, .ds-example-frame, .ds-token-swatch, .ds-doc-card { border: var(--border-signature-width) solid CanvasText; }
+  .ds-nav-group__items a[aria-current="location"] { outline: var(--border-signature-width) solid Highlight; }
+  .ds-rate-header-example { color: CanvasText; background: Canvas !important; }
+}
+
+.ds-production-specimen--contact { padding: var(--space-1); max-width: var(--content-answer-width); }
+.ds-section h1:focus-visible, .ds-section h2:focus-visible { outline-offset: calc(-1 * var(--space-1)); }
+.ds-badge-examples > div:first-child > span + span { margin-left: var(--space-2); }
