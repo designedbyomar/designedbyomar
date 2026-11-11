@@ -1,4 +1,5 @@
 :root {
+  --size-docs-sidebar: 292px;
   --rate-badge-background: color-mix(in srgb, var(--color-white) 35%, transparent);
   --rate-badge-foreground: var(--color-omar-black);
   --rate-header-project-foreground: var(--color-white);

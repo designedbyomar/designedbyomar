@@ -186,7 +186,8 @@ test('shared dropdown supports navigation, selection, cancellation, typeahead an
   await expect(specimen.getByRole('combobox', { name: 'Budget in USD (required)', exact: true })).toBeFocused();
   await timing.click();
   await page.keyboard.press('End');
-  await specimen.getByLabel('Name (required)', { exact: true }).click();
+  // An upward-opening popup can cover Name; Email is outside either placement.
+  await specimen.getByLabel('Email (required)', { exact: true }).click();
   await expect(timing).toHaveAttribute('aria-expanded', 'false');
   await expect(timing).toHaveText('1–3 months');
   await timing.focus();

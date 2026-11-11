@@ -832,17 +832,19 @@ function generateRoutes() {
 }
 
 if (require.main === module) (async () => {
-  const [blockModule, privacyModule, staticPageCopyModule, rateCardModule, identityModule] = await Promise.all([
+  const [blockModule, privacyModule, staticPageCopyModule, rateCardModule, designSystemModule, identityModule] = await Promise.all([
     import('./src/content/case-study-blocks.mjs'),
     import('./src/content/privacy-policy.mjs'),
     import('./src/content/static-page-copy.mjs'),
     import('./src/content/rate-card.mjs'),
+    import('./src/content/design-system.mjs'),
     import('./src/content/identity.mjs'),
   ]);
   ({ PERSON_SCHEMA: personSchema } = identityModule);
   ({ normalizeBlocks } = blockModule);
   ({ PRIVACY_POLICY } = privacyModule);
-  ({ HOME_PAGE_COPY, WORK_PAGE_COPY, DESIGN_SYSTEM_PAGE_COPY } = staticPageCopyModule);
+  ({ HOME_PAGE_COPY, WORK_PAGE_COPY } = staticPageCopyModule);
+  ({ DESIGN_SYSTEM_PAGE_COPY } = designSystemModule);
   ({ RATE_CARD, rateCardStructuredData } = rateCardModule);
   generateRoutes();
 })();

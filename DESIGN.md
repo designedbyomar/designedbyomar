@@ -5,6 +5,8 @@ This file is the agent-readable entrypoint for visual and interaction work on `d
 For exact values, rendered examples, and component behavior, inspect:
 
 - `src/design-system.jsx` for the implementation reference page and current token usage.
+- `src/content/design-system.mjs` for the section registry shared by the page, its navigation, and static summary.
+- `src/design-system-foundations.jsx` and `src/design-system-navigation.jsx` for token references and documentation navigation.
 - `/design-system` for the public design-system reference, generated from `design-system.html`.
 - `src/design-tokens.css` for the shared token source used by the portfolio and design-system entries.
 - `src/main.jsx` for how the design language is applied across the portfolio.
@@ -107,3 +109,15 @@ The inquiry form is an elevated card (`--shadow-card-full`, `--radius-xl`) with 
 Ask keeps the full question editable and validates the shared 400-character limit before submission. Initial loading, failed downloads, unavailable replies, unsupported questions, and usage limits have distinct states. Manual retries preserve input; suggested questions and direct email remain available. Only reviewed answers are shareable. Analytics contain catalogue IDs and outcome categories, never question text. The design-system specimens demonstrate loading and recovery locally.
 
 Contact gives booking and email a primary two-column row (one column on mobile), followed by the existing responsive grid of resume and profile links. All controls retain their existing tokens and analytics events.
+
+## Reference organization
+
+`src/content/design-system.mjs` defines the ordered groups, anchors, labels, summaries, and renderer keys for the single-page reference. The sidebar, page, shortcuts, and generated group summaries follow that registry. Preserve existing anchors when moving or renaming material; `quick-links` remains an overview utility rather than a separate navigation destination.
+
+Foundations explain the visual language; Components demonstrate individual building blocks; Patterns show their assembled behavior. Badges, fields, dropdowns, disclosures, and contact cards have dedicated destinations. Service specimens appear once. Technical usage notes and the complete token reference use default-collapsed disclosures. Token values are read from the shared CSS source, with current-theme overrides, rather than maintained as a duplicate literal catalogue.
+
+The reference has one responsive section-navigation instance. Its active link exposes `aria-current="location"`; section selection focuses the destination heading. On narrow screens Escape restores trigger focus, outside interaction dismisses the nonmodal menu, and hidden links leave the Tab order. Group expansion remains independently controllable. Anchor navigation is immediate and reduced motion also disables CSS smooth scrolling.
+
+Component examples use local fixtures for validation, disabled fields, verification unavailability, Ask recovery, and GitHub loading. They never send inquiries or modify analytics consent. Component usage notes belong beneath examples; backend endpoint documentation remains in the repository.
+
+Documentation cards, example frames, token swatches, and usage disclosures share the image-radius token and a complete border inside their bounds. Avoid outer shadow rings for these containers: the reference column clips horizontal overflow. Radius and elevation examples use consistent two-column outer cards (one column on mobile), with each actual token treatment demonstrated on an inset sample. Production specimens retain their own component styling.

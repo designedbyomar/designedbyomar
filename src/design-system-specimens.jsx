@@ -1,4 +1,5 @@
 import { InquiryForm } from './ui/inquiry-form.jsx';
+import { FormField } from './ui/form-field.jsx';
 import { emptyInquiry, validateInquiry } from './content/inquiry.mjs';
 import { ServiceRateGroup } from './ui/service-list.jsx';
 import React from 'react';
@@ -117,20 +118,42 @@ const InquirySpecimen = () => {
   const [errors, setErrors] = React.useState({});
   const summaryRef = React.useRef(null);
   return <>
-    <StatePicker value={status} onChange={setStatus} states={['idle', 'sending', 'sent', 'error']} />
+    <StatePicker value={status} onChange={next => { setStatus(next); setErrors(next === 'validation' ? { email: 'Enter a valid email address.' } : {}); }} states={['idle', 'validation', 'sending', 'sent', 'error', 'verification-unavailable']} />
     <InquiryForm idPrefix={`ds-inquiry-${id}`} values={values} errors={errors} status={status}
-      message={status === 'error' ? 'Example failure. Nothing was sent.' : ''} ready summaryRef={summaryRef}
-      onChange={(name, value) => { setValues(previous => ({ ...previous, [name]: value })); setErrors({}); setStatus('idle'); }}
+      message={status === 'error' ? 'Example failure. Nothing was sent.' : ''} ready={status !== 'verification-unavailable'} summaryRef={summaryRef}
+      onChange={(name, value) => { setValues(previous => ({ ...previous, [name]: value })); setErrors({}); setStatus(previous => previous === 'verification-unavailable' ? previous : 'idle'); }}
       onSubmit={event => { event.preventDefault(); const checked = validateInquiry(values); setErrors(checked.errors); setStatus(checked.valid ? 'sent' : 'error'); if (!checked.valid) requestAnimationFrame(() => summaryRef.current?.focus()); }}
-      verification={<p className="mono-label">Verification fixture · no Cloudflare request</p>} />
+      verification={status === 'verification-unavailable' ? <p role="status">Verification is unavailable in this example. Your fields are preserved. <a href="mailto:omar@designedbyomar.com" onClick={event => event.preventDefault()}>Email Omar instead (example)</a></p> : <p className="mono-label">Verification fixture · no Cloudflare request</p>} />
   </>;
 };
 
+const FieldSpecimen = ({ select = false }) => {
+  const id = React.useId();
+  const [state, setState] = React.useState('default');
+  const [value, setValue] = React.useState('');
+  const [notes, setNotes] = React.useState('');
+  const field = select
+    ? { name: 'choice', label: 'Example service', required: true, options: ['Product Audit', 'Design Sprint', 'Website Support'], placeholder: 'Choose a service', help: 'Choose the closest fit; you can change it later.' }
+    : { name: 'example-email', label: 'Example email', type: 'email', required: true, placeholder: 'you@company.com', help: 'Use an address where we can reply.' };
+  return <div className="ds-field-example"><StatePicker value={state} states={['default', 'filled', 'disabled', 'invalid']} onChange={next => { setState(next); setValue(next === 'filled' ? (select ? 'Product Audit' : 'example@company.com') : ''); }} />
+    <FormField field={field} value={value} disabled={state === 'disabled'} error={state === 'invalid' ? (select ? 'Choose a service.' : 'Enter a valid email address.') : undefined} idPrefix={`ds-field-${id}`} onChange={(_name, next) => setValue(next)} />
+    {!select && <FormField field={{ name: 'example-goals', label: 'Example goals', type: 'textarea', help: 'Describe the desired outcome. This example stays on this page.' }} value={notes} disabled={state === 'disabled'} idPrefix={`ds-field-${id}`} onChange={(_name, next) => setNotes(next)} />}
+  </div>;
+};
+
+const BadgeSpecimen = () => <div className="ds-badge-examples">
+  <div><h3>Case-study tags</h3><CaseStudyTag>Design System</CaseStudyTag><CaseStudyTag>Enterprise</CaseStudyTag></div>
+  <div><h3>Service categories</h3><div className="ds-card-grid">{[['audits', 'Audits'], ['projects', 'Projects'], ['ongoing', 'Ongoing support']].map(([variant, label]) => <div key={variant} className={`ds-badge-example service-rate-card--${variant}`} style={{ background: `var(--gradient-rate-${variant})` }}><p className="service-rate-card__category">{label}</p></div>)}</div></div>
+  <p>Service badges use regular-weight text, a fixed dark foreground, and a 35% white translucent background. They identify the category without adding an icon.</p>
+</div>;
+
 const COVERAGE = [
-  ['Buttons, icon buttons, links and copy controls', '#buttons', 'Variant, label, disabled state and interaction callbacks'],
-  ['Logo and theme toggle', '#navigation-drawers', 'Destination, current theme and theme callback'],
+  ['Buttons, icon buttons and links', '#buttons', 'Variant, label, disabled state and interaction callbacks'],
+  ['Copy controls', '#copy-actions', 'Value, label and successful clipboard feedback'],
+  ['Logo', '#logo-loader', 'Destination and reduced-motion-aware hover response'],
+  ['Theme toggle', '#navigation-drawers', 'Current theme and theme callback'],
   ['Site navigation and mobile menu', '#navigation-drawers', 'Menu state, destinations and navigation callbacks'],
-  ['Contact cards', '#cards-accordions', 'Label, value, destination, optional copy value and event callback'],
+  ['Contact cards', '#contact-cards', 'Label, value, destination, optional copy value and event callback'],
   ['Consent banner', '#cookie-banner', 'Accept, decline and privacy callbacks; persistence stays in the app'],
   ['Case cards', '#case-study-covers', 'Study record, featured/wide variants and optional video'],
   ['Case-study body blocks', '#case-study-blocks', 'Normalized blocks, accent and optional heading ID prefix'],
@@ -138,8 +161,10 @@ const COVERAGE = [
   ['GitHub activity', '#github-activity', 'Loading/ready/error state, data and profile callback'],
   ['About photo tiles, stacks and lightbox', '#about-media', 'Photo records, open/close callbacks and focus restoration'],
   ['Disclosure', '#cards-accordions', 'Heading, content, semantic heading level, optional ID and defaultExpanded; local expansion state'],
-  ['Service cards and groups', '#cards-accordions', 'Content, semantic heading level and unique heading ID prefix; no side effects'],
-  ['Select-only dropdown', '#inquiry-form', 'Controlled value, options, placeholder, label ID, required/disabled/error state and change callback; keyboard navigation and themed popup'],
+  ['Service cards and groups', '#service-lists', 'Content, category labels, subgroups, semantic heading level, unique heading ID prefix and optional inquiry callback'],
+  ['Select-only dropdown', '#select-dropdowns', 'Controlled value, options, placeholder, label ID, required/disabled/error state and change callback; keyboard navigation and themed popup'],
+  ['Labelled fields', '#form-fields', 'Field metadata, value, error, disabled state and change callback'],
+  ['Badges and tags', '#badges-tags', 'CaseStudyTag and the service category treatment; no universal badge component'],
   ['Inquiry form and labelled fields', '#inquiry-form', 'Controlled values, errors, status, verification slot and change/submit callbacks; no requests'],
   ['Site footer', '#footer-system', 'Navigation and analytics callbacks'],
 ];
@@ -150,6 +175,9 @@ export default function ProductionSpecimen({ kind }) {
   const [serviceInterest, setServiceInterest] = React.useState('');
   let content;
   switch (kind) {
+    case 'badges': content = <BadgeSpecimen />; break;
+    case 'fields': content = <FieldSpecimen />; break;
+    case 'select': content = <FieldSpecimen select />; break;
     case 'services': content = <><StatePicker value={serviceVariant} onChange={setServiceVariant} states={['audits', 'projects', 'ongoing']} /><ServiceRateGroup idPrefix={`ds-service-${specimenId}-`} headingLevel={3} onInquiry={service => setServiceInterest(service.name)} group={{
       id: serviceVariant,
       ...(serviceVariant === 'ongoing' ? { subgroups: [{ id: 'fractional', title: 'Fractional Design', serviceIds: ['fixed', 'starting'] }, { id: 'website', title: 'Website Support', serviceIds: ['third', 'fourth'] }] } : {}), title: 'Example service cards', description: 'Deterministic fixtures demonstrating fixed and starting prices.',
@@ -170,7 +198,7 @@ export default function ProductionSpecimen({ kind }) {
     case 'case': content = <CaseCard c={CASE_STUDIES.find(study => study.id === 'athena-ds')} allowVideo={false} />; break;
     case 'footer': content = <SiteFooter onHome={() => {}} scrollToSection={() => {}} rootPrefix="/" />; break;
     case 'body': content = <><CaseStudyMetadata>Example role metadata</CaseStudyMetadata><CaseStudyTag>Example tag</CaseStudyTag><CaseStudyBody accent="var(--color-develop-blue)" idPrefix="ds-block-" blocks={[
-      { type: 'heading', level: 2, text: 'Example body blocks' },
+      { type: 'heading', level: 3, text: 'Example body blocks' },
       { type: 'paragraph', text: 'This labelled specimen uses the production renderer. Page-specific storytelling remains authored content.' },
       { type: 'list', items: ['A shared list', 'Preserved semantic markup'] },
       { type: 'quote', text: 'A quote specimen.', attribution: 'Example attribution' },

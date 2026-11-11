@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Added
+- 2026-11-10 — Add dedicated badge, field, dropdown, layout, icon, and accessibility examples plus a theme-aware token reference sourced from CSS.
 - 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
 - 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.
 - 2026-10-04 — Add an unlinked, noindex services and rates page with nine scoped USD offers, engagement terms, email contact, and shared editorial service-list specimens.
@@ -36,7 +37,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-16 — Docs: a `Releases` section in `README.md` and a `Cutting A Release` procedure in the deployment runbook. Versions are recorded in `VERSION`, `package.json`, and the changelog heading, and all three have to agree — they drifted four patches apart between May and September 2026 because nothing read `VERSION` and no procedure existed. Covers semver choice, the verify-before-commit gate, tagging, and publishing a GitHub release
 
 ### Changed
-- 2026-11-10 — Refresh README, PRODUCT.md, the AI-workflow notes, and the shared-component contracts to match the current site: fractional and freelance audience, every environment variable, accurate JSON-LD and header lists, and the current project layout. Merge duplicate changelog headings and date every unreleased entry.
+- 2026-11-10 — Refresh README, PRODUCT.md, the AI-workflow notes, and the shared-component contracts to match the current site: fractional and freelance audience, every environment variable, accurate JSON-LD and header lists, and the current project layout. Point component docs and DESIGN.md at the reorganized design-system sections and modules. Merge duplicate changelog headings and date every unreleased entry.
 - 2026-11-10 — Make fractional and freelance availability discoverable: the homepage description, llms.txt, and Person structured data now describe engagement types (no prices), add the About page to llms.txt, and read one shared identity source so every route's Person schema matches.
 - 2026-11-10 — Clarify Ask sharing and privacy guidance, document recovery states, and give booking and email a primary Contact row.
 - 2026-10-30 — Restore the hero status line with a neutral dot ("Currently designing tools for venture investors"), and update About, At a Glance, Ask answers and the README to reflect the Standard Metrics role, past Welcome Lend work, and not seeking new roles.
@@ -84,6 +85,9 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-21 — Case studies: Unified Ad Platform second pass — 751 to 1,068 words, eleven headings to twelve. The rewrite in #73 worked from the Marp deck but missed two sources: the deck's separate presenter-notes file, and Omar's own copy from the previous version of the site. Adds the seven functions a single decision crossed (sales, traffic, promo, legal, operations, research, accounting), the named research methods, the full audit scope beyond the icon audit, mentoring of designers outside the two he led, the first-wave rollout scope, and pre-release adoption on the migrated brands. The ad-sales design system is now described as started with documentation and React components rather than only as groundwork for Adapt. Brand list in the overview aligned to the consolidation funnel image, legacy tooling named in prose, and DTCI expanded on first use. The orphaned icon-audit image moved from the patterns section into a new `What the audit covered` section where it belongs. Static HTML for this route now serves 1,366 words to non-JS consumers, up from 1,049
 
 ### Fixed
+- 2026-11-10 — Unify documentation container borders, radii, and padding; prevent clipped usage outlines and balance the radius examples.
+- 2026-11-10 — Keep documentation navigation surfaces and indicators legible in forced colors.
+- 2026-11-10 — Align design-system navigation and content through one section registry; preserve anchors and add accessible menu dismissal, focus, and active-section tracking.
 - 2026-11-10 — Remove question text from Ask analytics and reporting; add recoverable loading and reply failures, explicit question limits, safe answer links, and clean work-history formatting.
 - 2026-11-02 — Update transitive `undici` (6.29.1) and `zod` (4.6.7) to resolve new high-severity advisories that failed the CI audit.
 - 2026-10-11 — Restrict the Ask endpoint's corpus fetch to known hosts and stop CI checkout persisting Git credentials, resolving two Aikido findings.

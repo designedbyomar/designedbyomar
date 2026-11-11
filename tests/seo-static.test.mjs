@@ -12,10 +12,10 @@ import {
   getResponsiveCaseStudyImage,
 } from '../src/case-study-media.mjs';
 import {
-  DESIGN_SYSTEM_PAGE_COPY,
   HOME_PAGE_COPY,
   WORK_PAGE_COPY,
 } from '../src/content/static-page-copy.mjs';
+import { DESIGN_SYSTEM_PAGE_COPY } from '../src/content/design-system.mjs';
 import { HOME_DESCRIPTION, PERSON_SCHEMA, PRINCIPAL_TITLE } from '../src/content/identity.mjs';
 
 const require = createRequire(import.meta.url);
