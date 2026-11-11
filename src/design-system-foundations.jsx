@@ -51,9 +51,14 @@ export const SpacingExamples = () => <div className="ds-two-column">{[['UI band'
     <div className="ds-token-bar" key={token}><div className="ds-token-bar__label"><code>{token}</code><TokenValue name={token} /></div><div className="ds-token-bar__track"><span style={{ width: `var(${token})` }} /></div></div>
   )}</div></DocCard>)}</div>;
 
-export const RadiusExamples = () => <div className="ds-card-grid">{[
+export const RadiusExamples = () => <div className="ds-radius-grid">{[
   ['Controls', '--radius-standard', '--shadow-ring'], ['Panels', '--radius-comfort', '--shadow-card-subtle'], ['Media', '--radius-image', '--shadow-card-subtle'], ['Inquiry form', '--radius-xl', '--shadow-card-full'],
-].map(([label, radius, shadow]) => <div key={radius} className="ds-surface-example" style={{ borderRadius: `var(${radius})`, boxShadow: `var(${shadow})` }}><h3>{label}</h3><code>{radius}</code><TokenValue name={radius} /><code>{shadow}</code></div>)}</div>;
+].map(([label, radius, shadow]) => <DocCard key={radius} title={label}>
+  <div className="ds-surface-example">
+    <div className="ds-radius-sample" style={{ borderRadius: `var(${radius})`, boxShadow: `var(${shadow})` }}><TokenValue name={radius} /></div>
+    <code>{radius}</code><code>{shadow}</code>
+  </div>
+</DocCard>)}</div>;
 
 export const OpacityExamples = () => <div className="ds-two-column" data-audit-example="foundation-specimens">
   <DocCard title="Opacity" meta="Emphasis and overlays"><div className="ds-opacity-stack">{['--opacity-8', '--opacity-18', '--opacity-35', '--opacity-60'].map(token => <span key={token} style={{ '--specimen-opacity': `var(${token})` }}>{token}</span>)}</div><p>Keep text opaque; apply opacity to the background or decoration.</p></DocCard>

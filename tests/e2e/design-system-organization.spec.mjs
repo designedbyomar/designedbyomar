@@ -177,6 +177,33 @@ for (const theme of ['light', 'dark']) for (const width of [390, 820, 1054, 1440
   await page.screenshot({ path: testInfo.outputPath(`badges-${theme}-${width}.png`) });
   await page.evaluate(() => { window.location.hash = 'form-fields'; });
   await page.screenshot({ path: testInfo.outputPath(`fields-${theme}-${width}.png`) });
+  const usage = page.locator('#form-fields .ds-usage-notes > .disclosure');
+  await usage.getByRole('button', { name: 'Usage and behavior' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(usage.getByRole('region')).toBeVisible();
+  const frames = await page.locator('.ds-doc-card, .ds-example-frame, .ds-token-swatch, .ds-usage-notes > .disclosure, .ds-detail-stack > .disclosure').evaluateAll(nodes => nodes.map(node => {
+    const css = getComputedStyle(node);
+    return { radius: css.borderRadius, border: css.borderStyle, sides: [css.borderTopWidth, css.borderRightWidth, css.borderBottomWidth, css.borderLeftWidth], shadow: css.boxShadow };
+  }));
+  for (const frame of frames) {
+    expect(frame.radius).toBe('12px');
+    expect(frame.border).toBe('solid');
+    expect(frame.sides.every(side => parseFloat(side) > 0)).toBe(true);
+    expect(frame.shadow).toBe('none');
+  }
+  await usage.screenshot({ path: testInfo.outputPath(`usage-expanded-${theme}-${width}.png`) });
+  await page.keyboard.press('Enter');
+  await expect(usage.getByRole('region')).toBeHidden();
+  await usage.screenshot({ path: testInfo.outputPath(`usage-collapsed-${theme}-${width}.png`) });
+  await page.evaluate(() => { window.location.hash = 'radius-elevation'; });
+  const cards = await page.locator('.ds-radius-grid > .ds-doc-card').evaluateAll(nodes => nodes.map(node => {
+    const { width, height, top } = node.getBoundingClientRect(); return { width, height, top };
+  }));
+  expect(cards).toHaveLength(4);
+  expect(Math.max(...cards.map(card => card.width)) - Math.min(...cards.map(card => card.width))).toBeLessThan(1);
+  expect(Math.max(...cards.map(card => card.height)) - Math.min(...cards.map(card => card.height))).toBeLessThan(1);
+  expect(new Set(cards.map(card => card.top)).size).toBe(width <= 640 ? 4 : 2);
+  await page.screenshot({ path: testInfo.outputPath(`radius-${theme}-${width}.png`) });
   await page.evaluate(() => { window.location.hash = 'overview'; });
   await page.screenshot({ path: testInfo.outputPath(`overview-${theme}-${width}.png`) });
 });

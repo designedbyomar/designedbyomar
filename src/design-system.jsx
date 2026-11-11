@@ -546,7 +546,7 @@ const FAQAccordionDemo = () => <div className="ds-faq-demo">
   <Disclosure heading="Is this used on the portfolio?" headingLevel={3}><p>The services page uses this shared disclosure for engagement terms. Production Ask uses the shared AskPanel specimen below.</p></Disclosure>
 </div>;
 
-const Details = ({ heading = 'Usage and behavior', children }) => <Disclosure heading={heading} headingLevel={3}>{children}</Disclosure>;
+const Details = ({ heading = 'Usage and behavior', children }) => <div className="ds-usage-notes"><Disclosure heading={heading} headingLevel={3}>{children}</Disclosure></div>;
 const SourceLink = ({ path }) => <a href={`https://github.com/designedbyomar/designedbyomar/${path.endsWith('/') ? 'tree' : 'blob'}/main/${path}`}><code>{path}</code></a>;
 
 const SECTION_RENDERERS = {

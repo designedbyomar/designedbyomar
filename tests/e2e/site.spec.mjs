@@ -739,9 +739,8 @@ test('design system quick-links grid exposes the section shortcuts', async ({ pa
     const width = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
     return width <= window.innerWidth;
   })).toBe(true);
-  await expect.poll(() => page.locator('.ds-doc-card').first().evaluate((card) => (
-    getComputedStyle(card).boxShadow.includes('inset')
-  ))).toBe(true);
+  await expect(page.locator('.ds-doc-card').first()).toHaveCSS('border-style', 'solid');
+  await expect(page.locator('.ds-doc-card').first()).toHaveCSS('box-shadow', 'none');
 });
 
 test('design system hero keeps its title clear of the orbit at intermediate desktop widths', async ({ page }) => {
