@@ -24,6 +24,7 @@ import { groq } from '@ai-sdk/groq';
 import { generateText, streamText } from 'ai';
 import { buildIndex, matchQuestion, rankNearest } from '../src/ask.mjs';
 import { buildSourceIndex, retrieveSections } from '../src/ask-sources.mjs';
+import { MAX_QUESTION_CHARS } from '../src/ask-policy.mjs';
 
 export const config = { runtime: 'edge' };
 
@@ -149,7 +150,6 @@ const CONTEXT_ANSWERS = 3;
 // Four excerpts of at most 180 words each, so the material stays well inside
 // one request's budget even when the router names two studies.
 const SOURCE_SECTIONS = 4;
-const MAX_QUESTION_CHARS = 400;
 const TIMEOUT_MS = 15000;
 // Routing sits in front of every typed question, so it stays tighter than
 // drafting. Four seconds leaves room for a cold edge instance while ensuring a
@@ -298,6 +298,7 @@ const fetchSources = async (origin) => {
 const PUBLIC_REASONS = new Set([
   '',
   'bad-request',
+  'question-too-long',
   'rate-limited',
   'no-material',
   'router-sourced',
@@ -534,8 +535,10 @@ export const createHandler = ({
   } catch {
     return textResponse('', 'fallback', [], '', '', 'bad-request');
   }
-  const question = String(body?.question ?? '').trim().slice(0, MAX_QUESTION_CHARS);
+  if (typeof body?.question !== 'string') return textResponse('', 'fallback', [], '', '', 'bad-request');
+  const question = body.question.trim();
   if (!question) return textResponse('', 'fallback', [], '', '', 'bad-request');
+  if (question.length > MAX_QUESTION_CHARS) return textResponse('', 'fallback', [], '', '', 'question-too-long');
 
   let approved, index, studies;
   try {

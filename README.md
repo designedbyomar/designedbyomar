@@ -210,7 +210,7 @@ Bump **minor** when the release adds capability or changes how something is rend
 │   ├── generate-social-images.mjs  # 1200×627 JPEG social previews
 │   ├── ask-fingerprint.mjs         # content-hash guard for reviewed Ask answers
 │   ├── build-ask-corpus.mjs        # case-study corpus for Ask drafting
-│   ├── ask-rundown.mjs             # GA4 report of unanswered Ask questions
+│   ├── ask-rundown.mjs             # GA4 report of Ask topics and outcomes
 │   └── smoke-github-contributions.mjs # prod smoke check for the GitHub endpoint
 ├── src/
 │   ├── main.jsx                    # main site app shell and homepage experience

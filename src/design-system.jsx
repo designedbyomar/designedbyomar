@@ -1153,59 +1153,41 @@ const ComponentsSection = () => (
 
     <section id="ask" className="ds-section" aria-labelledby="ask-title">
       <SectionHeader id="ask" eyebrow="Components" title="Ask">
-        Answers in the Ask section are written in advance and reviewed by hand. A suggested prompt or the
-        same reviewed question or alias with ordinary punctuation, casing, apostrophe, or spacing changes
-        is matched in the browser; anything else is matched by a model, because word overlap answered
-        “is he a manager” with a refusal. When nothing written covers a question, a reply is drafted only
-        if the router names relevant case studies; a decline, invalid result, or failure shows the honest
-        no-answer state without unrelated citations. Drafted and reviewed replies are never presented as
-        the same thing. The component exists to shorten the distance
-        between a hiring question and the case study that answers it, so every part of it either
-        answers or hands off.
+        Ask connects questions about Omar’s work to reviewed answers and published case studies.
+        Suggested prompts and exact matches are answered locally. Other questions may be routed to
+        a reviewed answer or receive a clearly labelled, unreviewed draft grounded in relevant work.
+        Unsupported questions offer an email handoff; temporary failures offer recovery.
       </SectionHeader>
       <ExampleFrame label="Production Ask panel · labelled fixture states">
         <Specimen kind="ask" />
       </ExampleFrame>
       <div className="ds-card-grid">
         <DocCard title="Prompts follow the reader" meta="Suggestions">
-          Three prompts open the panel, with five more behind one control and the whole set behind the
-          link to <code>/ask</code>. Eight at once was most of what made the section read as a wall.
-          Once an answer is on screen they are replaced by follow-ups ranked against the question just
-          answered, because the opening three are the three the reader has already passed over. Those
-          are never collapsed: there are at most four and they are a next step, not a menu. Refusals
-          are never offered as a prompt — they answer honestly when asked, but suggesting one
-          invites it.
+          Three prompts open the panel, with more behind one disclosure. After an answer,
+          up to four related prompts help the reader explore further. Refusal answers remain
+          available when asked for, but are not suggested.
         </DocCard>
         <DocCard title="Input first" meta="Order">
-          The panel reads input, then the one-line note on where answers come from, then the answer,
-          then the prompts. It used to open with a label and eight buttons, which put its own input
-          fourth and left the note stranded at the bottom, furthest from the moment it matters.
+          The input comes first, followed by its character limit and privacy reminder, the
+          source note, the answer, and related prompts. Questions over the shared 400-character
+          limit remain editable and cannot be submitted; the endpoint rejects them without truncation.
         </DocCard>
         <DocCard title="One panel, two placements" meta="Composition">
           The same component renders as a section of the homepage and as the <code>/ask</code> page.
-          On the page each answer takes the URL, so one can be sent to someone else; in the section
+          On the page each reviewed answer takes the URL, so one can be sent to someone else; in the section
           it leaves the URL alone, or it would fight the <code>#faq</code> anchor the nav uses. The
           page also gives a case study somewhere to link back to — every citation leads out of the
           panel, and the reader needs a way back to asking.
         </DocCard>
         <DocCard title="Draft, do not redirect" meta="When nothing is written">
-          A question the written set does not cover is not answered by whichever answer shares the
-          most words — that is how &ldquo;the strongest fintech case study&rdquo; returned a
-          healthcare one. The router names the case studies instead, excerpts of those are retrieved,
-          and a reply is drafted from them and labelled. If the router names no relevant study,
-          drafting stops. The studies do not use a visitor&rsquo;s
-          vocabulary, which is why the model names them rather than a text search: the word
-          &ldquo;fintech&rdquo; appears in none of the 153 sections.
+          A draft uses only the relevant case studies selected for the question. It is labelled
+          unreviewed, and its citation links name the studies used in the reply. Without supporting
+          material, the panel offers email instead of an unsupported answer.
         </DocCard>
         <DocCard title="Refuse rather than guess" meta="The governing rule">
-          A confident wrong answer costs more than no answer. Deciding which written answer a question
-          wants is the model&rsquo;s job, and it may decline. A draft is allowed only when the router names
-          relevant case studies; a decline, invalid result, timeout, or failure shows the no-answer
-          state with email and no citation chips. Exact matching still runs in the browser after
-          normalizing casing, punctuation, apostrophes, and whitespace; factual questions about formal
-          management experience are also guarded locally so a number cannot inflate the verified scope,
-          without intercepting questions about leadership or hiring approach. A loose
-          overlap match is never served on its own.
+          Missing information, connection failures, and usage limits have distinct messages.
+          Connection failures offer a manual retry without clearing the question. Suggested questions
+          and email stay available. The initial answer download also has loading, error, and retry states.
         </DocCard>
         <DocCard title="Approved only" meta="Content gate">
           Answers carry a review status and a fingerprint of the case studies they cite. Only approved
@@ -1214,7 +1196,7 @@ const ComponentsSection = () => (
         </DocCard>
         <DocCard title="Off the critical path" meta="Loading">
           The answer set is fetched when the section scrolls into view, not imported into the bundle.
-          It never affects LCP, and the panel renders nothing when there is nothing approved to show.
+          On /ask it loads immediately. An unavailable or empty answer set shows a retry and email fallback.
         </DocCard>
         <DocCard title="Accessibility" meta="Required behaviour">
           The answer region is <code>aria-live=&quot;polite&quot;</code> so a reply is announced without stealing

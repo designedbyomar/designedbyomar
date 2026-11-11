@@ -24,7 +24,14 @@ test('real component fixtures stay isolated from production services and consent
   await ask.getByLabel('Example state').selectOption('drafted');
   await expect(ask.getByText('Drafted, not reviewed')).toBeVisible();
   await ask.getByLabel('Example state').selectOption('unavailable');
+  await expect(ask.getByText(/couldn.t connect or finish/)).toBeVisible();
+  await ask.getByLabel('Example state').selectOption('no-material');
   await expect(ask.getByText(/couldn.t safely match/)).toBeVisible();
+  await ask.getByLabel('Example state').selectOption('rate-limited');
+  await expect(ask.getByText(/reached the Ask limit/)).toBeVisible();
+  await ask.getByLabel('Example state').selectOption('load-error');
+  await ask.getByRole('button', { name: 'Try loading again' }).click();
+  await expect(ask.getByRole('textbox')).toBeVisible();
   const github = page.locator('[data-production-specimen="github"]');
   await github.getByLabel('Example state').selectOption('loading');
   await expect(github.getByRole('status', { name: 'Loading GitHub activity' })).toBeVisible();

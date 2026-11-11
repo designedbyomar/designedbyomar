@@ -101,3 +101,9 @@ The portrait image occupies 88% of its square wrapper. Below 639px its slot is `
 ## Inquiry form
 
 The inquiry form is an elevated card (`--shadow-card-full`, `--radius-xl`) with a `--gradient-inquiry-form` top edge, a full-width submit button, and a privacy link that opens in a new tab with an accessible hint.
+
+## Ask recovery and contact hierarchy
+
+Ask keeps the full question editable and validates the shared 400-character limit before submission. Initial loading, failed downloads, unavailable replies, unsupported questions, and usage limits have distinct states. Manual retries preserve input; suggested questions and direct email remain available. Only reviewed answers are shareable. Analytics contain catalogue IDs and outcome categories, never question text. The design-system specimens demonstrate loading and recovery locally.
+
+Contact gives booking and email a primary two-column row (one column on mobile), followed by the existing responsive grid of resume and profile links. All controls retain their existing tokens and analytics events.

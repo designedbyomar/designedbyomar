@@ -159,7 +159,7 @@
         "how long at each job",
         "resume summary"
       ],
-      "answer": "Six roles, most recent first.\n\n**Standard Metrics** — Product Designer, present. Designing tools for venture investors.\n\n**Designed by Omar** — Principal Product Designer and consultant, Feb 2026 to present. Independent practice for freelance work; past engagements include embedded work with Welcome Lend.\n\n**Wisdom** — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\n**Simplero** — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\n**Plastiq** — Product Design Lead, Apr 2021 to Apr 2023. Lead designer, 0→1, on Plastiq Connect.\n\n**Disney** — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
+      "answer": "Six roles, most recent first.\n\nStandard Metrics — Product Designer, present. Designing tools for venture investors.\n\nDesigned by Omar — Principal Product Designer and consultant, Feb 2026 to present. Independent practice for freelance work; past engagements include embedded work with Welcome Lend.\n\nWisdom — Principal Product Designer, founding, Feb 2024 to Feb 2026. Sole design lead on an AI-powered dental operations platform.\n\nSimplero — Lead Product Designer, Apr to Dec 2023. Page Builder 2.0 and a checkout redesign.\n\nPlastiq — Product Design Lead, Apr 2021 to Apr 2023. Lead designer, 0→1, on Plastiq Connect.\n\nDisney — Senior UX Designer, Aug 2019 to Apr 2021. Enterprise ad-sales and communication tools.\n\nEarlier: GoNation. Full dates are on the resume.",
       "sources": [
         "mgmt-portal",
         "connect-api",
@@ -732,7 +732,7 @@
         "is this tracked",
         "data collection"
       ],
-      "answer": "Clicking a suggested question, or typing the same reviewed question or alias with ordinary casing, punctuation, apostrophe or spacing changes, is answered in your browser from a static file — nothing is sent.\n\nAnything else goes to this site's endpoint and is usually passed to Groq with the list of written questions, so a model can identify the right one. If that routing fails or names no relevant work, the assistant stops without drafting or attaching a citation. Only when the router names relevant case studies can a second request draft from those published sources, and that reply is labelled unreviewed.\n\nIf you accepted analytics, the wording of a question nothing covers is recorded so Omar can see which answers are missing.",
+      "answer": "Suggested questions and exact matches to reviewed questions are answered in your browser. Their wording is not sent to a model.\n\nOther questions go through this site to Groq to find a reviewed answer. If none fits, a reply may be drafted from relevant published case studies and labelled unreviewed. Without supporting material, Ask declines.\n\nIf you accept analytics, Ask records answer IDs, nearest reviewed topic IDs, outcomes, and failure categories. Your question text is not sent to analytics. Please leave out personal or confidential information. Email Omar directly if you prefer a personal reply.",
       "sources": [],
       "status": "approved",
       "sourcesFingerprint": "e3b0c44298fc"
@@ -951,7 +951,7 @@
       ],
       "answer": "As leverage, not as the decision-maker.\n\nThe public workflow for this site separates the boundary clearly. ChatGPT helps with strategy framing, copy direction and critique; Claude, Codex and similar tools help scaffold components, refactor code and automate mechanical work. Figma remains the source of truth for visual design, and Omar owns hierarchy, typography, motion, product judgment and what gets cut.\n\nGenerated copy is edited line by line, code is built and tested, visual changes are reviewed in the browser, and meaningful changes get an external review pass. The goal is to compress the repetitive parts of the loop without outsourcing taste or accountability.",
       "status": "approved",
-      "sourcesFingerprint": "8bab5f89f75f"
+      "sourcesFingerprint": "93c869c5cd69"
     },
     {
       "id": "iteration-when-wrong",
