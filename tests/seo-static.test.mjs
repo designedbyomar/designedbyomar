@@ -16,6 +16,7 @@ import {
   WORK_PAGE_COPY,
 } from '../src/content/static-page-copy.mjs';
 import { DESIGN_SYSTEM_PAGE_COPY } from '../src/content/design-system.mjs';
+import { HOME_DESCRIPTION, PERSON_SCHEMA, PRINCIPAL_TITLE } from '../src/content/identity.mjs';
 
 const require = createRequire(import.meta.url);
 const {
@@ -26,7 +27,6 @@ const {
 } = require('../postbuild.js');
 
 const SITE_ORIGIN = 'https://www.designedbyomar.com';
-const PRINCIPAL_TITLE = 'Principal Product Designer';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
 
@@ -79,12 +79,6 @@ const hasGraphUrl = (structuredData, url) => {
   return graph.some((node) => node && node.url === url);
 };
 
-const getJsJobTitle = (source, label) => {
-  const match = source.match(/\bjobTitle:\s*'([^']+)'/);
-  assert.ok(match, `${label} defines a jobTitle`);
-  return match[1];
-};
-
 test('homepage identity stays consistent across machine-readable surfaces', () => {
   const homepageHtml = readDist('index.html');
   const description = getMetaByName(homepageHtml, 'description');
@@ -97,8 +91,11 @@ test('homepage identity stays consistent across machine-readable surfaces', () =
   assert.equal(getMetaByName(homepageHtml, 'twitter:description'), description, 'Twitter description matches the homepage description');
   assert.equal(person?.jobTitle, PRINCIPAL_TITLE, 'homepage JSON-LD uses the principal title');
   assert.ok(homepageHtml.includes(`Omar Tavarez — ${PRINCIPAL_TITLE}</h1>`), 'static homepage H1 uses the principal title');
-  assert.equal(getJsJobTitle(readText('postbuild.js'), 'postbuild.js'), PRINCIPAL_TITLE);
-  assert.equal(getJsJobTitle(readText('src', 'main.jsx'), 'src/main.jsx'), PRINCIPAL_TITLE);
+  assert.equal(PRINCIPAL_TITLE, 'Principal Product Designer', 'the shared identity keeps the principal title');
+  assert.equal(PERSON_SCHEMA.jobTitle, PRINCIPAL_TITLE, 'shared Person schema uses the principal title');
+  for (const file of [['postbuild.js'], ['src', 'main.jsx']]) {
+    assert.doesNotMatch(readText(...file), /\bjobTitle:/, `${file.join('/')} reads the Person schema from src/content/identity.mjs`);
+  }
   assert.ok(
     readDist('llms.txt').toLowerCase().includes(PRINCIPAL_TITLE.toLowerCase()),
     'llms.txt uses the principal title',
@@ -334,6 +331,28 @@ test('llms.txt follows agent discovery recommendations', () => {
       `llms.txt links the ${caseStudy.id} case-study route`,
     );
   });
+});
+
+test('homepage head matches the shared identity before JavaScript runs', () => {
+  const sourceHtml = readText('index.html');
+  const builtHtml = readDist('index.html');
+  for (const html of [sourceHtml, builtHtml]) {
+    const graph = getStructuredData(html)['@graph'] ?? [];
+    assert.deepEqual(graph.find((node) => node?.['@type'] === 'Person'), PERSON_SCHEMA);
+    assert.equal(getMetaByName(html, 'description'), HOME_DESCRIPTION);
+  }
+  assert.ok(HOME_DESCRIPTION.length <= 160, 'homepage description fits search snippets');
+});
+
+test('availability is discoverable without publishing prices', () => {
+  const llms = readDist('llms.txt');
+  assert.match(llms, /fractional/i, 'llms.txt describes fractional work');
+  assert.match(llms, /freelance/i, 'llms.txt describes freelance work');
+  assert.ok(llms.includes(`(${SITE_ORIGIN}/about)`), 'llms.txt links the About page');
+  assert.doesNotMatch(llms, /\$\d/, 'llms.txt publishes no prices');
+  const offers = JSON.stringify(PERSON_SCHEMA.makesOffer);
+  assert.doesNotMatch(offers, /price|\$\d/i, 'structured offers publish no prices');
+  assert.doesNotMatch(offers, /ratecard/, 'structured offers do not link the unlisted services page');
 });
 
 // Injected prose is escaped on the way in. The real function is imported rather

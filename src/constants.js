@@ -38,8 +38,4 @@ export const ASPECT_RATIOS = {
   WIDE: '16/8',
 };
 
-export const LINKEDIN_URL = 'https://www.linkedin.com/in/omartavarez/';
-export const GITHUB_URL = 'https://github.com/designedbyomar';
-export const SUBSTACK_URL = 'https://substack.com/@designedbyomar';
-export const BEHANCE_URL = 'https://www.behance.net/omartavarez';
-export const BOOKING_URL = 'https://koalendar.com/e/lets-talk-or-omar-tavarez?duration=30&services=HJUDE';
+export { LINKEDIN_URL, GITHUB_URL, SUBSTACK_URL, BEHANCE_URL, BOOKING_URL } from './content/identity.mjs';
