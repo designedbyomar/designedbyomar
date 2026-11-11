@@ -106,7 +106,13 @@ test('scroll tracking follows long sections and the page end without stealing fo
 
 test('field and verification examples are local, labelled and recoverable', async ({ page }) => {
   const requests = [];
-  page.on('request', request => { if (/\/api\/|challenges.cloudflare.com|google-analytics.com/.test(request.url())) requests.push(request.url()); });
+  page.on('request', request => {
+    const { hostname, pathname } = new URL(request.url());
+    if (pathname.startsWith('/api/') || hostname === 'challenges.cloudflare.com'
+      || hostname === 'google-analytics.com' || hostname.endsWith('.google-analytics.com')) {
+      requests.push(request.url());
+    }
+  });
   await page.goto('/design-system#form-fields');
   const fields = page.locator('[data-production-specimen="fields"]');
   await fields.getByLabel('Example state').selectOption('invalid');
