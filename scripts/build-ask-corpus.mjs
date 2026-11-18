@@ -20,7 +20,6 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const read = p => readFileSync(resolve(ROOT, p), 'utf8');
 
 const fail = msg => {
   console.error(`build-ask-corpus: ${msg}`);
@@ -100,8 +99,8 @@ const add = (source, title, text) => {
 };
 
 // 1. Case studies, through the public allowlist.
-const caseStudies = JSON.parse(read('src/content/case-studies.json'));
-const allowlistSrc = read('src/case-studies.js');
+const caseStudies = JSON.parse(readFileSync(new URL('../src/content/case-studies.json', import.meta.url), 'utf8'));
+const allowlistSrc = readFileSync(new URL('../src/case-studies.js', import.meta.url), 'utf8');
 const PUBLIC_FIELDS = JSON.parse(
   extractConst(allowlistSrc, 'PUBLIC_FIELDS', { kind: 'array' }).replace(/'/g, '"').replace(/,(\s*])/g, '$1'),
 );
@@ -133,7 +132,7 @@ for (const raw of caseStudies) {
 // src/content/ask-answers.json — four as new answers, six as aliases on
 // answers that already existed. Re-adding it as a source would feed the answer
 // set back into its own corpus.
-const mainSrc = read('src/main.jsx');
+const mainSrc = readFileSync(new URL('../src/main.jsx', import.meta.url), 'utf8');
 
 for (const name of ['ABOUT_HEADER', 'ABOUT_SUBHEAD', 'ABOUT_SHORT']) {
   if (mainSrc.includes(`const ${name} = \``)) {
@@ -156,7 +155,7 @@ const heroStats = [...extractConst(mainSrc, 'HERO_STATS', { kind: 'array' })
 add('hero', 'Hero stats', heroStats.join('\n'));
 
 // 3. llms.txt — already a structured summary for machine readers.
-add('llms', 'llms.txt', read('public/llms.txt'));
+add('llms', 'llms.txt', readFileSync(new URL('../public/llms.txt', import.meta.url), 'utf8'));
 
 // 4. Resume — the only source of employment dates, titles and sequence.
 const resume = resumeText();
