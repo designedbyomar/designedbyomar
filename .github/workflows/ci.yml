@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Playwright 1.59 supports Ubuntu 24.04; review this pin when upgrading Playwright.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
         with:
