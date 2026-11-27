@@ -81,7 +81,7 @@ test('homepage renders the primary portfolio experience', async ({ page }) => {
   await page.goto('/');
 
   await expect(page).toHaveTitle(/designedbyomar/i);
-  await expect(page.getByRole('heading', { name: /Complex systems\.\s*Clear products\./i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /I make complicated products make sense\./i })).toBeVisible();
   await expect(page.getByRole('link', { name: /View case studies/i })).toBeVisible();
   await expect(page.getByText('CURRENTLY DESIGNING TOOLS FOR VENTURE INVESTORS.')).toBeVisible();
 });
@@ -981,7 +981,7 @@ test('cookie banner accept and decline choices hide the banner', async ({ page }
   await expect(page.getByText(/This site uses simple analytics cookies/i)).toBeVisible();
   await page.getByRole('button', { name: 'Decline' }).click();
   await expect(page.getByText(/This site uses simple analytics cookies/i)).toBeHidden();
-  await expect(page.getByRole('heading', { name: /Complex systems\.\s*Clear products\./i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /I make complicated products make sense\./i })).toBeVisible();
 
   await page.evaluate(() => {
     localStorage.removeItem('omar.analyticsConsent');
@@ -992,7 +992,7 @@ test('cookie banner accept and decline choices hide the banner', async ({ page }
   await expect(page.getByText(/This site uses simple analytics cookies/i)).toBeVisible();
   await page.getByRole('button', { name: 'Accept' }).click();
   await expect(page.getByText(/This site uses simple analytics cookies/i)).toBeHidden();
-  await expect(page.getByRole('heading', { name: /Complex systems\.\s*Clear products\./i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /I make complicated products make sense\./i })).toBeVisible();
 });
 
 test.describe('mobile navigation', () => {

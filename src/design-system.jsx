@@ -1,4 +1,5 @@
 import { Disclosure } from './ui/disclosure.jsx';
+import { HOME_PAGE_COPY } from './content/static-page-copy.mjs';
 import { DESIGN_SYSTEM_GROUPS, DESIGN_SYSTEM_SECTIONS, DESIGN_SYSTEM_BY_ID } from './content/design-system.mjs';
 import { useDocumentationNavigation } from './design-system-navigation.jsx';
 import { TokenTheme, TokenValue, TokenReference, TypographyExamples, SpacingExamples, RadiusExamples, OpacityExamples, MotionTokens } from './design-system-foundations.jsx';
@@ -509,7 +510,7 @@ const PatternPreview = ({ kind }) => (
     {kind === 'hero' && (
       <>
         <div className="mono-label">Hero system</div>
-        <h3>Complex systems. Clear products.</h3>
+        <h3>{HOME_PAGE_COPY.titleLead} {HOME_PAGE_COPY.titleAccent}</h3>
         <p>Editorial type, proof copy, and signature motion stay in balance.</p>
       </>
     )}

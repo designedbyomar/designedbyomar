@@ -720,8 +720,8 @@ const Hero = ({ galaxy, theme, scrollToSection }) => (
           <Dot /> <span>{ROLE_STATUS_COPY}</span>
         </div>
       )}
-      <h1 style={{ fontSize: 'var(--font-size-hero-title)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', margin: 0 }}>
-        {HOME_PAGE_COPY.titleLead} <span style={{ color: 'var(--fg-tertiary)' }}>{HOME_PAGE_COPY.titleAccent}</span>
+      <h1 style={{ fontSize: 'var(--font-size-hero-title)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--fg-primary)', textWrap: 'balance', margin: 0 }}>
+        {HOME_PAGE_COPY.titleLead} {HOME_PAGE_COPY.titleAccent}
       </h1>
       <p style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-relaxed-plus)', color: 'var(--fg-secondary)', margin: 0, maxWidth: 520 }}>
         {HOME_PAGE_COPY.description}

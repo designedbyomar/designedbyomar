@@ -1,7 +1,7 @@
 export const HOME_PAGE_COPY = {
-  titleLead: 'Complex systems.',
-  titleAccent: 'Clear products.',
-  description: 'AI, enterprise SaaS, fintech, healthcare. Built to scale real-world operations.',
+  titleLead: 'I make complicated products',
+  titleAccent: 'make sense.',
+  description: 'Product strategy, interaction design, and systems thinking for software people depend on.',
   workDescription: 'A few examples of turning messy operations into clear, scalable product experiences.',
 };
 
