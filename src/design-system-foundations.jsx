@@ -1,4 +1,5 @@
 import React from 'react';
+import { HOME_PAGE_COPY } from './content/static-page-copy.mjs';
 import tokenSource from './design-tokens.css?raw';
 import { readTokenDefinitions, TOKEN_FAMILIES } from './design-system-token-roles.mjs';
 import { CopyButton, DocCard } from './design-system-primitives.jsx';
@@ -30,7 +31,7 @@ export const TokenReference = () => {
 };
 
 const TYPE_ROLES = [
-  ['Display hero', '--font-size-hero-title', '--font-sans', '--font-weight-semibold', '--tracking-display', '--line-height-tight', 'Complex systems. Clear products.'],
+  ['Display hero', '--font-size-hero-title', '--font-sans', '--font-weight-semibold', '--tracking-display', '--line-height-tight', `${HOME_PAGE_COPY.titleLead} ${HOME_PAGE_COPY.titleAccent}`],
   ['Page title', '--font-size-page-title', '--font-sans', '--font-weight-semibold', '--tracking-display', '--line-height-compact', 'Selected work.'],
   ['Case-study heading', '--font-size-case-heading', '--font-sans', '--font-weight-semibold', '--tracking-heading', '--line-height-compact', 'Make the decision clear.'],
   ['Card title', '--font-size-heading-lg', '--font-sans', '--font-weight-semibold', '--tracking-display', '--line-height-normal', 'Management Portal'],

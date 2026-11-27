@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Added
+- 2026-11-27 — Add a compact white mono name card beside the hero portrait, sharing the highlights’ reveal and reduced-motion behavior.
 - 2026-11-10 — Add dedicated badge, field, dropdown, layout, icon, and accessibility examples plus a theme-aware token reference sourced from CSS.
 - 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
 - 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.
@@ -37,6 +38,7 @@ All notable changes to designedbyomar.com are documented here.
 - 2026-09-16 — Docs: a `Releases` section in `README.md` and a `Cutting A Release` procedure in the deployment runbook. Versions are recorded in `VERSION`, `package.json`, and the changelog heading, and all three have to agree — they drifted four patches apart between May and September 2026 because nothing read `VERSION` and no procedure existed. Covers semver choice, the verify-before-commit gate, tagging, and publishing a GitHub release
 
 ### Changed
+- 2026-11-26 — Refresh the homepage headline and supporting copy, using a single solid headline color and matching design-system examples.
 - 2026-11-10 — Refresh README, PRODUCT.md, the AI-workflow notes, and the shared-component contracts to match the current site: fractional and freelance audience, every environment variable, accurate JSON-LD and header lists, and the current project layout. Point component docs and DESIGN.md at the reorganized design-system sections and modules. Merge duplicate changelog headings and date every unreleased entry.
 - 2026-11-10 — Make fractional and freelance availability discoverable: the homepage description, llms.txt, and Person structured data now describe engagement types (no prices), add the About page to llms.txt, and read one shared identity source so every route's Person schema matches.
 - 2026-11-10 — Clarify Ask sharing and privacy guidance, document recovery states, and give booking and email a primary Contact row.

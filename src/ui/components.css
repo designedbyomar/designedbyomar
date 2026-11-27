@@ -1,3 +1,32 @@
+/* Compact identity treatment; the homepage supplies positioning and motion. */
+.hero-name-card,
+.hero-stat-card.hero-name-card {
+  display: inline-flex;
+  width: max-content;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-signature-width) solid var(--color-gray-100);
+  border-radius: var(--radius-comfort);
+  background: var(--color-white);
+  color: var(--color-omar-black);
+  box-shadow: var(--shadow-card-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-label-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--tracking-label-compact);
+  white-space: nowrap;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+@media (forced-colors: active) {
+  .hero-name-card,
+  .hero-stat-card.hero-name-card {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}
+
 .text-link {
   display: inline-flex;
   align-items: center;
