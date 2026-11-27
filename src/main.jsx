@@ -197,6 +197,15 @@ const HERO_STATS = [
   },
 ];
 
+// Keep identity separate from the metrics used by the corpus authoring script.
+const HERO_CARDS = [...HERO_STATS, {
+  kind: 'name',
+  value: PERSON_SCHEMA.name,
+  desktop: { top: '12%', left: '8%' },
+  mobile: { top: '6%', left: '1%' },
+  motion: { phase: 5.4, radiusX: 3, radiusY: 3, boostX: 2, boostY: 2, parallaxX: -0.12, parallaxY: -0.08, rotate: 0.5, rotateBoost: 0.25, rotateDir: -1 },
+}];
+
 const Portrait = ({ galaxy, theme }) => {
   const isLight = theme === 'light';
   const portraitRef = React.useRef(null);
@@ -288,7 +297,7 @@ const Portrait = ({ galaxy, theme }) => {
 
       statCardRefs.current.forEach((card, index) => {
         if (!card) return;
-        const motion = HERO_STATS[index]?.motion;
+        const motion = HERO_CARDS[index]?.motion;
         if (!motion) return;
         const oscillationX = Math.cos(state.orbitTime + motion.phase) * (motion.radiusX + state.speed * motion.boostX);
         const oscillationY = Math.sin(state.orbitTime * 1.08 + motion.phase) * (motion.radiusY + state.speed * motion.boostY);
@@ -461,21 +470,23 @@ const Portrait = ({ galaxy, theme }) => {
       )}
       <div style={{ position: 'absolute', top: '2%', right: '-12%', bottom: '-8%', left: '-12%', zIndex: 'var(--z-component-cover)', pointerEvents: 'none' }}><Galaxy {...galaxy} /></div>
       <div className="hero-stats-layer" aria-hidden={!statsVisible ? true : undefined}>
-        {HERO_STATS.map((stat, index) => {
+        {HERO_CARDS.map((stat, index) => {
           const position = isTouchLayout ? stat.mobile : stat.desktop;
           return (
             <div
               key={stat.value}
               ref={(node) => { statCardRefs.current[index] = node; }}
-              className={`hero-stat-card${statsVisible ? ' is-visible' : ''}`}
+              className={`hero-stat-card${stat.kind === 'name' ? ' hero-name-card' : ''}${statsVisible ? ' is-visible' : ''}`}
               style={{
-                ...cardBaseStyle,
+                ...(stat.kind === 'name' ? {} : cardBaseStyle),
                 ...position,
                 transitionDelay: '0ms',
               }}
             >
-              <div className="hero-stat-value">{stat.value}</div>
-              <div className="hero-stat-label">{stat.label}</div>
+              {stat.kind === 'name' ? stat.value : <>
+                <div className="hero-stat-value">{stat.value}</div>
+                <div className="hero-stat-label">{stat.label}</div>
+              </>}
             </div>
           );
         })}

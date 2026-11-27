@@ -5,6 +5,7 @@ All notable changes to designedbyomar.com are documented here.
 ## [Unreleased]
 
 ### Added
+- 2026-11-27 — Add a compact white mono name card beside the hero portrait, sharing the highlights’ reveal and reduced-motion behavior.
 - 2026-11-10 — Add dedicated badge, field, dropdown, layout, icon, and accessibility examples plus a theme-aware token reference sourced from CSS.
 - 2026-10-04 — Add a shared accessible dropdown with themed menus, inset chevrons, keyboard selection, and field-specific inquiry placeholders.
 - 2026-10-04 — Add an accessible inquiry form with shared field specimens, server-validated Turnstile protection, Resend email delivery, and updated contact privacy guidance; direct email remains available when the form is unconfigured.

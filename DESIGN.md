@@ -86,6 +86,8 @@ Existing exact dimensions that do not fit the scale use semantic tokens in `src/
 
 ## Portrait delivery
 
+The portrait's floating name card uses `.hero-name-card`: a compact white surface, dark mono label, comfort radius, and existing spacing tokens. Its white/dark treatment stays fixed in both themes. Position it beside the head, clear of the face; it shares the highlights' hover, focus, and tap reveal, with reduced motion disabling movement. `/design-system#hero-system` shows the static treatment; positioning and motion remain page-specific.
+
 The portrait image occupies 88% of its square wrapper. Below 639px its slot is `0.88 × (viewport − 48px)`; through 820px it is capped at 519.2px. Above 820px the hero's second grid column gives `0.88 × (viewport − 96px) / 2.1`, capped at approximately 482.743px when the content reaches 1200px. The intrinsic transparent artwork stays contained within that slot. `src/portrait-media.mjs` specifies matching responsive candidates and sizes; regression assertions keep the homepage-only head preload in sync. Light candidates stop at the original 557px width; dark candidates stop at 1230px.
 
 ## Select-only dropdowns
